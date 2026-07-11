@@ -1,18 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  // Se não está logado e não está na página de login, redireciona
-  const token = request.cookies.get("sb-access-token") || 
-                request.cookies.getAll().find(c => c.name.includes("auth-token"));
-  
-  const publica = ["/login", "/auth", "/_next", "/favicon.ico"].some((p) =>
+  // Por enquanto, redireciona para /login se não tem cookie de sessão
+  const temSessao = request.cookies.getAll().some(c => c.name.includes("sb-"));
+
+  const publica = ["/login", "/auth", "/favicon.ico"].some((p) =>
     request.nextUrl.pathname.startsWith(p)
   );
 
-  if (!token && !publica) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
+  if (!temSessao && !publica) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
