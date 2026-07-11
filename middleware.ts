@@ -1,39 +1,21 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
-  let resposta = NextResponse.next({ request });
-
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return resposta;
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => request.cookies.getAll(),
-        setAll: (lista: { name: string; value: string; options: CookieOptions }[]) => {
-          lista.forEach(({ name, value }) => request.cookies.set(name, value));
-          resposta = NextResponse.next({ request });
-          lista.forEach(({ name, value, options }) =>
-            resposta.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  const publica = ["/login", "/auth", "/verificar"].some((p) =>
+export function middleware(request: NextRequest) {
+  // Se não está logado e não está na página de login, redireciona
+  const token = request.cookies.get("sb-access-token") || 
+                request.cookies.getAll().find(c => c.name.includes("auth-token"));
+  
+  const publica = ["/login", "/auth", "/_next", "/favicon.ico"].some((p) =>
     request.nextUrl.pathname.startsWith(p)
   );
-  if (!user && !publica) {
+
+  if (!token && !publica) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
-  return resposta;
+
+  return NextResponse.next();
 }
 
 export const config = {
