@@ -1,10 +1,7 @@
 "use client";
 // components/AulaContent.tsx
 // Página da aula — réplica fiel do template aprovado (peritos-academy-aula.html),
-// 100% plugada no Supabase. Classes CSS idênticas ao template:
-// .palco, .luz, .player, .timeline, .aula-cab, .prox-aula, .abas, .painel-aba,
-// .capitulos-lista, .arquivos, .anotar, .notas, .duvida, .suporte-grid,
-// .trilho-aulas, .t-aula, .toast-xp, .nav-contexto, .mini-anel, .insignia.
+// 100% plugada no Supabase.
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -45,7 +42,6 @@ const fmtQuando = (iso: string) => {
   return `há ${d} dias`;
 };
 
-
 export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
   dados: AulaCompleta;
   usuarioId: string | null;
@@ -74,13 +70,11 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
   const notaTaRef = useRef<HTMLTextAreaElement>(null);
   const regressivaRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // O iframe do Panda não expõe o tempo atual sem o SDK; as anotações/dúvidas
-  // são ancoradas em 00:00 por padrão. Capítulos viram lista de referência.
   const seek = (_s: number) => {
     /* seek no iframe do Panda exige o SDK do player — reativar na próxima fase */
   };
 
-  /* teatro → classe no body (o CSS aprovado usa body.teatro) */
+  /* teatro → classe no body */
   useEffect(() => {
     document.body.classList.toggle("teatro", teatro);
     return () => document.body.classList.remove("teatro");
@@ -139,7 +133,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
     const texto = notaTxt.trim();
     if (!texto) return;
     if (!usuarioId) { alert("Entre na sua conta para salvar anotações."); return; }
-    const tempo_seg = 0; // âncora padrão (sem SDK do Panda)
+    const tempo_seg = 0;
     const { data, error } = await sb()
       .from("aula_anotacoes")
       .insert({ aula_id: aula.id, usuario_id: usuarioId, tempo_seg, texto })
@@ -166,12 +160,12 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
     setDuvidaTxt("");
   };
 
-  /* ---------- derivados p/ nav e trilho ---------- */
-  const anel = 75.4; // 2πr, r=12 (igual ao CSS)
+  /* ---------- derivados ---------- */
+  const anel = 75.4;
   const mm = String(modulo.ordem).padStart(2, "0");
   const totalDuvidas = duvidas.reduce((s, d) => s + 1 + (d.respostas?.length ?? 0), 0);
   const faltamModulo = modulo.totalAulas - modulo.concluidasNoModulo - (concluida && !aula.concluida ? 1 : 0);
-  const momento = "00:00"; // sem SDK do Panda, âncora padrão
+  const momento = "00:00";
 
   return (
     <div style={{ ["--arte" as string]: aula.capa_url ? `url('${aula.capa_url}')` : "none" }}>
@@ -185,22 +179,19 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
         </defs>
       </svg>
 
-      {/* ============ NAV contextual da aula ============ */}
-      <header className="nav">
+      {/* ============ NAV ============ */}
+      <NavPlataforma dados={nav} />
+
+      {/* barra contextual da aula */}
+      <div className="nav-aula-ctx">
         <div className="nav-inner">
-          <Link className="nav-logo" href="/" aria-label="Peritos Academy — Início">
-            <img src="/logo.png" alt="" />
-            <span>peritos<small>academy</small></span>
+          <Link className="nav-contexto" href={`/curso/${curso.slug}`} aria-label="Voltar para o curso">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, color: "var(--cinza)" }}><path d="M19 12H5m6-7-7 7 7 7" /></svg>
+            <span className="curso">{curso.titulo}</span>
+            <span className="sep">/</span>
+            <span className="aula-atual num">Módulo {mm} · Aula {aula.ordem} de {modulo.totalAulas}</span>
           </Link>
-          <div className="nav-centro">
-            <Link className="nav-contexto" href={`/curso/${curso.slug}`} aria-label="Voltar para o curso">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, color: "var(--cinza)" }}><path d="M19 12H5m6-7-7 7 7 7" /></svg>
-              <span className="curso">{curso.titulo}</span>
-              <span className="sep">/</span>
-              <span className="aula-atual num">Módulo {mm} · Aula {aula.ordem} de {modulo.totalAulas}</span>
-            </Link>
-          </div>
-          <div className="nav-acoes" style={{ display: "flex", alignItems: "center", gap: "var(--s-3)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--s-3)" }}>
             <div className="nav-progresso" title={`Progresso do curso: ${progresso.pct}%`}>
               <svg className="mini-anel" viewBox="0 0 30 30" aria-hidden="true">
                 <circle className="t" cx="15" cy="15" r="12" />
@@ -208,15 +199,9 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
               </svg>
               <span className="num">{progresso.pct}%</span>
             </div>
-            <div className="nav-xp">
-              <span className={`insignia num${pulso ? " pulso" : ""}`} aria-label={`Nível ${progresso.nivel}`}>{progresso.nivel}</span>
-            </div>
-            <button className="nav-avatar" aria-label="Abrir perfil">
-              {(usuarioNome ?? "?").split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()}
-            </button>
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="palco-area">
         <div className="wrap">

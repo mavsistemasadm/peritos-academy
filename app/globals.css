@@ -3153,3 +3153,369 @@ body.teatro .trilho-aulas{display:none}
 @media (prefers-reduced-motion:reduce){
   .pagina-biblioteca *,.pagina-biblioteca *::before,.pagina-biblioteca *::after{animation:none!important;transition:none!important}
 }
+
+
+
+
+/* barra contextual da aula (abaixo da NavPlataforma) */
+.nav-aula-ctx{
+  position:fixed;top:64px;left:0;right:0;z-index:99;
+  height:44px;
+  background:rgba(7,9,8,.82);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.nav-aula-ctx .nav-inner{
+  max-width:1280px;margin:0 auto;height:100%;padding:0 48px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.nav-aula-ctx .nav-contexto{
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;color:var(--cinza-claro,#B9BFB8);
+  transition:color .2s;
+}
+.nav-aula-ctx .nav-contexto:hover{color:#F1F2DF}
+.nav-aula-ctx .curso{font-weight:600}
+.nav-aula-ctx .sep{color:rgba(255,255,255,.2);margin:0 2px}
+.nav-aula-ctx .aula-atual{color:rgba(255,255,255,.5);font-size:12px}
+.nav-aula-ctx .nav-progresso{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#989E99}
+.nav-aula-ctx .mini-anel{width:26px;height:26px}
+.nav-aula-ctx .mini-anel .t{fill:none;stroke:rgba(255,255,255,.1);stroke-width:2.5}
+.nav-aula-ctx .mini-anel .f{fill:none;stroke:url(#gradAnel);stroke-width:2.5;stroke-dasharray:75.4;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center}
+@media(max-width:768px){.nav-aula-ctx .nav-inner{padding:0 24px}.nav-aula-ctx .curso{display:none}}
+.palco-area{padding-top:108px}
+
+
+
+/* ============================================================
+   PERITOS ACADEMY — DESAFIOS: galeria + experiência
+   ============================================================ */
+
+/* ---------- GALERIA (.pagina-desafios) ---------- */
+.pagina-desafios{
+  --carvao:#070908;--preto-elev:#101311;--preto-elev-2:#0B0E0C;
+  --creme:#F1F2DF;--cinza:#989E99;--cinza-claro:#B9BFB8;
+  --verde:#20D9A6;--ciano:#36DCD1;--lima:#DDF784;
+  --linha:rgba(255,255,255,.10);--linha-suave:rgba(255,255,255,.07);
+  --grad-marca:linear-gradient(120deg,#20D9A6 0%,#36DCD1 48%,#DDF784 100%);
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --s-2:12px;--s-3:16px;--s-4:24px;--s-5:32px;--s-6:48px;--s-7:64px;--s-8:80px;
+  --r-card:20px;--r-pill:999px;--nav-h:64px;--maxw:1280px;
+  --suave:cubic-bezier(.2,.7,.3,1);
+  font-family:var(--font);background:var(--carvao);color:var(--creme);
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;
+}
+.pagina-desafios *{margin:0;padding:0;box-sizing:border-box}
+.pagina-desafios a{color:inherit;text-decoration:none}
+.pagina-desafios button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+.pagina-desafios :focus-visible{outline:2px solid var(--verde);outline-offset:3px;border-radius:6px}
+.pagina-desafios .num{font-variant-numeric:tabular-nums}
+.pagina-desafios .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--s-6)}
+.pagina-desafios .eyebrow{font-size:12px;font-weight:660;letter-spacing:.16em;text-transform:uppercase;color:var(--cinza)}
+.pagina-desafios .grad-txt{background:var(--grad-marca);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pagina-desafios .grao{position:fixed;inset:0;z-index:300;pointer-events:none;opacity:.033;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* feedbacks do veredito */
+.pagina-desafio .dsc-fb{border:1px solid var(--linha-suave);border-radius:16px;padding:var(--s-4);margin-bottom:var(--s-3)}
+.pagina-desafio .dsc-fb.ok{border-left:4px solid var(--verde);background:rgba(32,217,166,.08)}
+.pagina-desafio .dsc-fb.erro{border-left:4px solid #E0776B;background:rgba(224,119,107,.08)}
+.pagina-desafio .dsc-fb-cab{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.pagina-desafio .dsc-fb-status{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;flex-shrink:0}
+.pagina-desafio .dsc-fb.ok .dsc-fb-status{color:var(--verde);background:rgba(32,217,166,.15)}
+.pagina-desafio .dsc-fb.erro .dsc-fb-status{color:#E0776B;background:rgba(224,119,107,.15)}
+.pagina-desafio .dsc-fb-qnum{font-size:12px;font-weight:650;color:var(--cinza)}
+.pagina-desafio .dsc-fb-nota{margin-left:auto;font-size:14px;font-weight:700;color:var(--creme)}
+.pagina-desafio .dsc-fb-enunciado{font-size:14px;font-weight:580;color:var(--creme);margin-bottom:8px}
+.pagina-desafio .dsc-fb-resp{font-size:13px;color:var(--cinza);margin-bottom:12px}
+.pagina-desafio .dsc-fb-resp b{color:var(--cinza-claro);font-weight:600}
+.pagina-desafio .dsc-fb-ia{display:flex;gap:10px;align-items:flex-start;padding:12px;background:rgba(255,255,255,.03);border:1px solid var(--linha-suave);border-radius:12px}
+.pagina-desafio .dsc-fb-ia-ico{font-size:16px;flex-shrink:0;margin-top:1px}
+.pagina-desafio .dsc-fb-ia p{font-size:13.5px;color:var(--cinza-claro);line-height:1.55}
+.pagina-desafio .dsc-fb-refazer{display:block;margin-top:10px;font-size:12px;font-weight:650;color:#E0776B}
+.pagina-desafio .dsc-fb-acertou{display:flex;gap:12px;align-items:flex-start;padding:14px;background:rgba(32,217,166,.12);border:1px solid rgba(32,217,166,.25);border-radius:12px;margin-top:8px}
+.pagina-desafio .dsc-fb-acertou-ico{font-size:20px;flex-shrink:0}
+.pagina-desafio .dsc-fb-acertou b{display:block;font-size:14px;font-weight:650;color:var(--verde);margin-bottom:4px}
+.pagina-desafio .dsc-fb-acertou p{font-size:13px;color:var(--cinza-claro);line-height:1.5}
+.pagina-desafio .dsc-fb-btn-explicar{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:620;color:var(--ciano);padding:8px 16px;border:1px solid rgba(54,220,209,.3);border-radius:var(--r-pill);background:rgba(54,220,209,.08);margin-top:12px;transition:all .2s}
+.pagina-desafio .dsc-fb-btn-explicar:hover{background:rgba(54,220,209,.15);border-color:rgba(54,220,209,.5);color:var(--creme)}
+.pagina-desafio .dsc-fb-btn-explicar:disabled{opacity:.6;cursor:default}
+.pagina-desafio .dsc-fb-explicacao{display:flex;gap:12px;align-items:flex-start;padding:16px;background:rgba(54,220,209,.06);border:1px solid rgba(54,220,209,.2);border-radius:12px;margin-top:12px}
+.pagina-desafio .dsc-fb-explicacao-ico{font-size:18px;flex-shrink:0;margin-top:2px}
+.pagina-desafio .dsc-fb-explicacao b{display:block;font-size:13px;font-weight:650;color:var(--ciano);margin-bottom:6px}
+.pagina-desafio .dsc-fb-explicacao p{font-size:13.5px;color:var(--cinza-claro);line-height:1.65;white-space:pre-line}
+@media(max-width:768px){.pagina-desafios .wrap{padding:0 var(--s-4)}}
+
+.pagina-desafios .des-hero{
+  padding:calc(var(--nav-h) + var(--s-8)) 0 var(--s-6);
+  background:radial-gradient(60% 70% at 80% 0%,rgba(32,217,166,.09),transparent 60%),linear-gradient(180deg,#0B100D,var(--carvao) 88%);
+  border-bottom:1px solid var(--linha-suave);
+}
+.pagina-desafios .des-hero .eyebrow{display:block;margin-bottom:var(--s-3)}
+.pagina-desafios .des-hero h1{font-size:clamp(34px,4.4vw,58px);font-weight:730;letter-spacing:-.035em;line-height:1.04;max-width:16ch;margin-bottom:var(--s-3)}
+.pagina-desafios .des-hero .sub{font-size:16.5px;color:var(--cinza-claro);max-width:54ch;line-height:1.6}
+.pagina-desafios .des-selos{display:flex;gap:var(--s-6);flex-wrap:wrap;margin-top:var(--s-5);border-top:1px solid var(--linha-suave);padding-top:var(--s-4)}
+.pagina-desafios .selo b{font-size:22px;font-weight:700;letter-spacing:-.02em;display:block;line-height:1.1}
+.pagina-desafios .selo span{font-size:12px;color:var(--cinza)}
+
+.pagina-desafios .des-corpo-pagina{padding:var(--s-6) var(--s-6) var(--s-8)}
+.pagina-desafios .des-filtros{display:flex;flex-direction:column;gap:var(--s-3);margin-bottom:var(--s-5)}
+.pagina-desafios .abas{display:flex;gap:8px;flex-wrap:wrap}
+.pagina-desafios .abas button{font-size:13.5px;font-weight:600;color:var(--cinza-claro);border:1px solid var(--linha-suave);border-radius:var(--r-pill);padding:9px 16px;background:rgba(255,255,255,.02);transition:all .2s}
+.pagina-desafios .abas button:hover{color:var(--creme);border-color:var(--linha)}
+.pagina-desafios .abas button.ativa{color:var(--carvao);background:var(--creme);border-color:var(--creme)}
+.pagina-desafios .abas button small{font-size:11px;opacity:.65;margin-left:2px}
+.pagina-desafios .des-busca{display:flex;align-items:center;gap:9px;flex:1;max-width:340px;min-width:220px;border:1px solid var(--linha-suave);border-radius:var(--r-pill);padding:10px 16px;color:var(--cinza);background:rgba(255,255,255,.03);transition:border-color .2s}
+.pagina-desafios .des-busca:focus-within{border-color:rgba(32,217,166,.4)}
+.pagina-desafios .des-busca input{font:inherit;font-size:13.5px;color:var(--creme);background:none;border:none;outline:none;width:100%}
+.pagina-desafios .des-busca input::placeholder{color:var(--cinza)}
+.pagina-desafios .des-vazio{color:var(--cinza);font-size:14.5px;padding:var(--s-7) 0;text-align:center}
+
+.pagina-desafios .des-grade{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s-4)}
+@media(max-width:900px){.pagina-desafios .des-grade{grid-template-columns:1fr}}
+
+.pagina-desafios .des-card{display:block;border:1px solid var(--linha-suave);border-radius:var(--r-card);overflow:hidden;background:linear-gradient(165deg,#0E1210,#0A0D0B);transition:transform .3s var(--suave),border-color .3s}
+.pagina-desafios .des-card:hover{transform:translateY(-3px);border-color:var(--linha)}
+.pagina-desafios .des-capa{position:relative;aspect-ratio:21/9;background:linear-gradient(150deg,#12241D,#0A0F0C);background-size:cover;background-position:center}
+.pagina-desafios .des-capa-selos{position:absolute;top:var(--s-3);left:var(--s-3);right:var(--s-3);display:flex;justify-content:space-between;align-items:flex-start}
+.pagina-desafios .selo-plano{font-size:10px;font-weight:750;letter-spacing:.12em;text-transform:uppercase;border-radius:var(--r-pill);padding:4px 10px}
+.pagina-desafios .selo-plano.free{color:var(--carvao);background:var(--verde)}
+.pagina-desafios .selo-plano.premium{color:var(--carvao);background:var(--lima)}
+.pagina-desafios .selo-part{font-size:11px;font-weight:600;color:var(--cinza-claro);background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:var(--r-pill);padding:5px 10px}
+.pagina-desafios .des-corpo{padding:var(--s-4);display:flex;flex-direction:column;gap:10px}
+.pagina-desafios .des-cat{font-size:11px;font-weight:650;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza)}
+.pagina-desafios .des-corpo h3{font-size:18px;font-weight:660;letter-spacing:-.015em;line-height:1.3}
+.pagina-desafios .des-num{color:var(--verde);font-weight:700;margin-right:6px}
+.pagina-desafios .des-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--cinza);margin-top:4px}
+.pagina-desafios .des-rodape{margin-top:8px;border-top:1px solid var(--linha-suave);padding-top:12px}
+.pagina-desafios .des-cta{font-size:14px;font-weight:640;color:var(--verde);transition:gap .2s;display:inline-flex;align-items:center;gap:4px}
+.pagina-desafios .des-card:hover .des-cta{gap:8px}
+.pagina-desafios .des-status{font-size:13px;font-weight:620;border-radius:var(--r-pill);padding:5px 12px;display:inline-block}
+.pagina-desafios .des-status.entregue{color:var(--carvao);background:var(--verde)}
+.pagina-desafios .des-status.andamento{color:var(--lima);border:1px solid rgba(221,247,132,.3)}
+
+.pagina-desafios .des-footer{border-top:1px solid var(--linha-suave);padding:var(--s-5) 0;margin-top:var(--s-8);font-size:12.5px;color:var(--cinza)}
+
+/* ---------- EXPERIÊNCIA (.pagina-desafio) ---------- */
+.pagina-desafio{
+  --carvao:#070908;--preto-elev:#101311;--preto-elev-2:#0B0E0C;
+  --creme:#F1F2DF;--cinza:#989E99;--cinza-claro:#B9BFB8;
+  --verde:#20D9A6;--ciano:#36DCD1;--lima:#DDF784;
+  --linha:rgba(255,255,255,.10);--linha-suave:rgba(255,255,255,.07);
+  --grad-marca:linear-gradient(120deg,#20D9A6 0%,#36DCD1 48%,#DDF784 100%);
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --s-2:12px;--s-3:16px;--s-4:24px;--s-5:32px;--s-6:48px;--s-7:64px;
+  --r-card:20px;--r-pill:999px;--nav-h:64px;--maxw:1280px;
+  --suave:cubic-bezier(.2,.7,.3,1);
+  font-family:var(--font);background:var(--carvao);color:var(--creme);
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;
+}
+.pagina-desafio *{margin:0;padding:0;box-sizing:border-box}
+.pagina-desafio a{color:inherit;text-decoration:none}
+.pagina-desafio button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
+.pagina-desafio :focus-visible{outline:2px solid var(--verde);outline-offset:3px;border-radius:6px}
+.pagina-desafio .num{font-variant-numeric:tabular-nums}
+.pagina-desafio .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--s-6)}
+.pagina-desafio .eyebrow{font-size:12px;font-weight:660;letter-spacing:.16em;text-transform:uppercase;color:var(--cinza)}
+.pagina-desafio .grad-txt{background:var(--grad-marca);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pagina-desafio .grao{position:fixed;inset:0;z-index:300;pointer-events:none;opacity:.033;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+@media(max-width:768px){.pagina-desafio .wrap{padding:0 var(--s-4)}}
+
+/* barra de progresso no topo */
+.pagina-desafio .dsc-barra-topo{position:fixed;top:var(--nav-h);left:0;right:0;z-index:99;background:rgba(7,9,8,.85);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--linha-suave)}
+.pagina-desafio .dsc-barra-inner{max-width:var(--maxw);margin:0 auto;padding:10px var(--s-6);display:flex;align-items:center;justify-content:space-between;gap:var(--s-3)}
+.pagina-desafio .dsc-voltar{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--cinza-claro);transition:color .2s}
+.pagina-desafio .dsc-voltar:hover{color:var(--creme)}
+.pagina-desafio .dsc-id{font-size:13px;color:var(--cinza)}
+.pagina-desafio .dsc-id b{color:var(--creme);font-weight:650}
+.pagina-desafio .dsc-expirado{font-size:12px;font-weight:650;color:#E0776B}
+.pagina-desafio .dsc-progresso{height:3px;background:rgba(255,255,255,.08)}
+.pagina-desafio .dsc-progresso i{display:block;height:100%;background:var(--grad-marca);border-radius:2px;transition:width .4s var(--suave)}
+.pagina-desafio .dsc-erro{font-size:13.5px;font-weight:560;color:#E0776B;border:1px solid rgba(224,119,107,.3);border-radius:12px;background:rgba(224,119,107,.06);padding:11px 14px;margin:var(--s-3) 0}
+
+/* contagem regressiva */
+.pagina-desafio .dsc-contagem{display:flex;gap:8px;align-items:center}
+.pagina-desafio .dsc-cb{display:flex;flex-direction:column;align-items:center;min-width:36px}
+.pagina-desafio .dsc-cb .v{font-size:16px;font-weight:700;color:var(--creme)}
+.pagina-desafio .dsc-cb .r{font-size:9px;font-weight:600;color:var(--cinza);text-transform:uppercase;letter-spacing:.08em}
+.pagina-desafio .dsc-contagem.urgente .dsc-cb .v{color:#E0776B}
+
+/* cenas */
+.pagina-desafio .dsc-cena{padding:calc(var(--nav-h) + 200px) 0 var(--s-8)}
+/* INTIMAÇÃO */
+.pagina-desafio .dsc-intimacao .wrap{max-width:720px;display:flex;flex-direction:column;align-items:center;gap:var(--s-5)}
+.pagina-desafio .dsc-intim-card{border:1px solid rgba(32,217,166,.3);border-radius:var(--r-card);background:linear-gradient(165deg,rgba(32,217,166,.08),rgba(54,220,209,.03) 50%,rgba(7,9,8,.9));padding:var(--s-5) var(--s-6);text-align:center;box-shadow:0 20px 50px -18px rgba(32,217,166,.12)}
+.pagina-desafio .dsc-intim-selo{font-size:11px;font-weight:750;letter-spacing:.14em;text-transform:uppercase;color:var(--verde);margin-bottom:var(--s-3)}
+.pagina-desafio .dsc-intim-texto{font-size:15px;color:var(--cinza-claro);line-height:1.7;max-width:56ch;margin:0 auto}
+
+.pagina-desafio .dsc-whats{width:100%;max-width:440px;border-radius:16px;overflow:hidden;border:1px solid var(--linha-suave);background:#0B1410}
+.pagina-desafio .dsc-whats-cab{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#075E54}
+.pagina-desafio .dsc-whats-cab svg{color:rgba(255,255,255,.7)}
+.pagina-desafio .dsc-whats-foto{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);display:grid;place-items:center;font-size:12px;font-weight:650;color:#fff}
+.pagina-desafio .dsc-whats-quem b{display:block;font-size:14px;font-weight:600;color:#fff}
+.pagina-desafio .dsc-whats-quem span{font-size:11px;color:rgba(255,255,255,.6)}
+.pagina-desafio .dsc-whats-corpo{padding:16px}
+.pagina-desafio .dsc-whats-balao{background:#1A3A2F;border-radius:0 12px 12px 12px;padding:12px 16px;font-size:14px;color:var(--cinza-claro);line-height:1.6;position:relative}
+.pagina-desafio .dsc-whats-balao::before{content:'';position:absolute;top:0;left:-8px;border:8px solid transparent;border-top-color:#1A3A2F;border-right-color:#1A3A2F}
+
+.pagina-desafio .dsc-intim-recomp{display:flex;gap:var(--s-4);flex-wrap:wrap;justify-content:center}
+.pagina-desafio .dsc-rw{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--cinza-claro)}
+.pagina-desafio .dsc-rw-ico{font-size:18px}
+.pagina-desafio .dsc-rw b{font-weight:650;color:var(--creme)}
+.pagina-desafio .dsc-rw span{color:var(--cinza);font-size:12px}
+
+.pagina-desafio .dsc-btn-aceitar{display:inline-flex;align-items:center;gap:10px;font-size:16px;font-weight:650;color:var(--carvao);background:var(--creme);border-radius:var(--r-pill);padding:16px 32px;transition:transform .25s var(--suave)}
+.pagina-desafio .dsc-btn-aceitar:hover{transform:scale(1.03)}
+.pagina-desafio .dsc-nota-prazo{font-size:13px;color:var(--cinza);text-align:center;max-width:44ch}
+
+/* AUTOS */
+.pagina-desafio .dsc-autos-grid{display:grid;grid-template-columns:1fr 320px;gap:var(--s-5)}
+@media(max-width:960px){.pagina-desafio .dsc-autos-grid{grid-template-columns:1fr}}
+.pagina-desafio .dsc-principal{display:flex;flex-direction:column;gap:var(--s-6)}
+.pagina-desafio .dsc-instrucoes .eyebrow{display:block;margin-bottom:var(--s-2)}
+.pagina-desafio .dsc-instrucoes h2{font-size:clamp(24px,2.8vw,34px);font-weight:690;letter-spacing:-.025em;margin-bottom:var(--s-3)}
+.pagina-desafio .dsc-instrucoes p{font-size:14.5px;color:var(--cinza-claro);line-height:1.65;margin-bottom:var(--s-2)}
+.pagina-desafio .dsc-quesitos .eyebrow{display:block;margin-bottom:var(--s-2)}
+.pagina-desafio .dsc-quesitos h2{font-size:clamp(22px,2.6vw,30px);font-weight:680;letter-spacing:-.02em;margin-bottom:var(--s-5)}
+
+.pagina-desafio .dsc-quesito{border:1px solid var(--linha-suave);border-radius:var(--r-card);background:linear-gradient(165deg,#0E1210,#0A0D0B);padding:var(--s-4);margin-bottom:var(--s-3)}
+.pagina-desafio .dsc-q-cab{display:flex;gap:14px;align-items:flex-start;margin-bottom:var(--s-3)}
+.pagina-desafio .dsc-q-num{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--verde);background:rgba(32,217,166,.1);border:1px solid rgba(32,217,166,.3);flex-shrink:0}
+.pagina-desafio .dsc-q-enunciado{font-size:15px;font-weight:580;line-height:1.5;color:var(--creme)}
+.pagina-desafio .dsc-q-input{width:100%;font:inherit;font-size:14px;color:var(--creme);background:rgba(255,255,255,.03);border:1px solid var(--linha);border-radius:12px;padding:12px 16px;outline:none;resize:vertical;transition:border-color .2s}
+.pagina-desafio .dsc-q-input:focus{border-color:rgba(32,217,166,.5)}
+.pagina-desafio .dsc-q-input::placeholder{color:var(--cinza)}
+.pagina-desafio .dsc-q-valor{display:flex;align-items:center;gap:8px}
+.pagina-desafio .dsc-q-valor input{flex:1;font:inherit;font-size:15px;color:var(--creme);background:rgba(255,255,255,.03);border:1px solid var(--linha);border-radius:12px;padding:12px 16px;outline:none;transition:border-color .2s}
+.pagina-desafio .dsc-q-valor input:focus{border-color:rgba(32,217,166,.5)}
+.pagina-desafio .dsc-q-valor input::placeholder{color:var(--cinza)}
+.pagina-desafio .dsc-q-fixo{font-size:14px;font-weight:600;color:var(--cinza)}
+
+.pagina-desafio .dsc-q-acoes{display:flex;gap:var(--s-3);flex-wrap:wrap;margin-top:var(--s-4)}
+.pagina-desafio .dsc-btn-salvar{font-size:14px;font-weight:620;color:var(--cinza-claro);border:1px solid var(--linha);border-radius:var(--r-pill);padding:12px 22px;background:rgba(255,255,255,.02);transition:all .2s}
+.pagina-desafio .dsc-btn-salvar:hover{background:rgba(255,255,255,.06);border-color:var(--linha)}
+.pagina-desafio .dsc-btn-protocolar{font-size:15px;font-weight:650;color:var(--carvao);background:var(--creme);border-radius:var(--r-pill);padding:14px 28px;transition:transform .25s var(--suave),opacity .2s}
+.pagina-desafio .dsc-btn-protocolar:hover:not(:disabled){transform:scale(1.02)}
+.pagina-desafio .dsc-btn-protocolar:disabled{opacity:.45;cursor:default}
+
+/* lateral: documentos */
+.pagina-desafio .dsc-lateral{display:flex;flex-direction:column;gap:var(--s-4);position:sticky;top:calc(var(--nav-h) + 60px);align-self:flex-start}
+.pagina-desafio .dsc-docs{border:1px solid rgba(32,217,166,.35);border-radius:var(--r-card);background:linear-gradient(150deg,rgba(32,217,166,.12) 0%,rgba(54,220,209,.05) 30%,var(--preto-elev-2) 65%);padding:var(--s-4);box-shadow:0 16px 40px -14px rgba(32,217,166,.1)}
+.pagina-desafio .dsc-docs .eyebrow{display:block;margin-bottom:var(--s-2)}
+.pagina-desafio .dsc-docs h3{font-size:18px;font-weight:660;letter-spacing:-.015em;margin-bottom:var(--s-3)}
+.pagina-desafio .dsc-doc{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border:1px solid var(--linha-suave);border-radius:14px;margin-bottom:8px;transition:border-color .2s,background .2s}
+.pagina-desafio .dsc-doc:hover{border-color:var(--linha);background:rgba(255,255,255,.03)}
+.pagina-desafio .dsc-doc-ico{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:10px;font-weight:750;letter-spacing:.06em;color:var(--ciano);background:rgba(54,220,209,.08);border:1px solid rgba(54,220,209,.25);flex-shrink:0}
+.pagina-desafio .dsc-doc-txt{flex:1;min-width:0}
+.pagina-desafio .dsc-doc-txt b{display:block;font-size:13px;font-weight:620;line-height:1.3;color:var(--creme)}
+.pagina-desafio .dsc-doc-txt span{font-size:11px;color:var(--cinza)}
+.pagina-desafio .dsc-doc-dl{font-size:16px;color:var(--cinza-claro);flex-shrink:0}
+
+.pagina-desafio .dsc-resumo{border:1px solid rgba(221,247,132,.3);border-radius:var(--r-card);background:linear-gradient(150deg,rgba(221,247,132,.10) 0%,rgba(32,217,166,.04) 40%,var(--preto-elev-2) 70%);padding:var(--s-4);display:flex;flex-direction:column;gap:12px;box-shadow:0 16px 40px -14px rgba(221,247,132,.08)}
+.pagina-desafio .dsc-resumo div{display:flex;justify-content:space-between;font-size:13px}
+.pagina-desafio .dsc-resumo span{color:var(--cinza)}
+.pagina-desafio .dsc-resumo b{color:var(--creme);font-weight:620}
+
+/* VEREDITO */
+.pagina-desafio .dsc-veredito .wrap{max-width:760px;text-align:center}
+.pagina-desafio .dsc-selo-veredito{display:inline-block;font-size:13px;font-weight:750;letter-spacing:.12em;text-transform:uppercase;color:var(--carvao);background:var(--grad-marca);border-radius:var(--r-pill);padding:8px 20px;margin-bottom:var(--s-4)}
+.pagina-desafio .dsc-selo-veredito.reprovado{background:rgba(224,119,107,.15);color:#E0776B;border:1px solid rgba(224,119,107,.3)}
+.pagina-desafio .dsc-nota-grande{font-size:clamp(72px,12vw,120px);font-weight:780;letter-spacing:-.04em;line-height:1}
+.pagina-desafio .dsc-veredito-sub{font-size:17px;color:var(--cinza-claro);margin:var(--s-3) auto var(--s-4);max-width:44ch}
+.pagina-desafio .dsc-ganhos{display:flex;gap:var(--s-4);justify-content:center;flex-wrap:wrap;margin-bottom:var(--s-5)}
+.pagina-desafio .dsc-ganho{font-size:15px;font-weight:620;color:var(--creme);background:rgba(32,217,166,.08);border:1px solid rgba(32,217,166,.25);border-radius:var(--r-pill);padding:8px 18px}
+
+/* feedbacks da IA */
+.pagina-desafio .dsc-feedbacks{text-align:left;margin:var(--s-6) 0}
+.pagina-desafio .dsc-feedbacks h3{font-size:20px;font-weight:680;letter-spacing:-.02em;margin-bottom:var(--s-4);text-align:center}
+
+.pagina-desafio .dsc-veredito-acoes{display:flex;flex-direction:column;align-items:center;gap:var(--s-3);margin-top:var(--s-6)}
+.pagina-desafio .dsc-btn-gab{font-size:14px;font-weight:620;color:var(--creme);border:1px solid var(--linha);border-radius:var(--r-pill);padding:12px 22px;background:rgba(255,255,255,.02);transition:all .2s}
+.pagina-desafio .dsc-btn-gab:hover{background:rgba(255,255,255,.06)}
+.pagina-desafio .dsc-btn-galeria{font-size:14px;font-weight:620;color:var(--verde);transition:color .2s}
+.pagina-desafio .dsc-btn-galeria:hover{color:var(--creme)}
+.pagina-desafio .dsc-btn-voltar{font-size:13px;color:var(--cinza);transition:color .2s}
+.pagina-desafio .dsc-btn-voltar:hover{color:var(--creme)}
+
+/* GALERIA */
+.pagina-desafio .dsc-galeria .wrap{max-width:900px}
+.pagina-desafio .dsc-galeria .eyebrow{display:block;margin-bottom:var(--s-2)}
+.pagina-desafio .dsc-galeria h2{font-size:clamp(26px,3vw,36px);font-weight:690;letter-spacing:-.025em;margin-bottom:var(--s-2)}
+.pagina-desafio .dsc-gal-sub{font-size:14px;color:var(--cinza);margin-bottom:var(--s-5)}
+.pagina-desafio .dsc-gal-vazio{color:var(--cinza);font-size:14px;padding:var(--s-7) 0;text-align:center}
+.pagina-desafio .dsc-gal-grade{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s-3)}
+@media(max-width:640px){.pagina-desafio .dsc-gal-grade{grid-template-columns:1fr}}
+.pagina-desafio .dsc-gal-card{border:1px solid var(--linha-suave);border-radius:16px;padding:var(--s-4);background:var(--preto-elev-2)}
+.pagina-desafio .dsc-gal-cab{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.pagina-desafio .dsc-gal-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#173B31,#0E1F1A);border:1px solid var(--linha);display:grid;place-items:center;font-size:12px;font-weight:650;flex-shrink:0}
+.pagina-desafio .dsc-gal-quem b{display:block;font-size:14px;font-weight:620;color:var(--creme)}
+.pagina-desafio .dsc-gal-quem span{font-size:12px;color:var(--cinza)}
+.pagina-desafio .dsc-gal-rodape{display:flex;justify-content:flex-end}
+.pagina-desafio .dsc-gal-curtir{font-size:13px;font-weight:600;color:var(--cinza);padding:6px 14px;border-radius:var(--r-pill);border:1px solid var(--linha-suave);transition:all .2s}
+.pagina-desafio .dsc-gal-curtir:hover{border-color:var(--linha)}
+.pagina-desafio .dsc-gal-curtir.curtido{color:#E0776B;border-color:rgba(224,119,107,.3);background:rgba(224,119,107,.06)}
+.pagina-desafio .dsc-gal-acoes{display:flex;gap:var(--s-4);justify-content:center;margin-top:var(--s-6)}
+
+@media(prefers-reduced-motion:reduce){
+  .pagina-desafios *,.pagina-desafios *::before,.pagina-desafios *::after,
+  .pagina-desafio *,.pagina-desafio *::before,.pagina-desafio *::after{animation:none!important;transition:none!important}
+}
+
+/* animações da intimação */
+.pagina-desafio .anim-entrada{opacity:0;transform:translateY(-30px);transition:opacity .7s var(--suave),transform .7s var(--suave)}
+.pagina-desafio .anim-entrada.visivel{opacity:1;transform:none}
+.pagina-desafio .anim-sobe{opacity:0;transform:translateY(40px);transition:opacity .6s var(--suave),transform .6s var(--suave)}
+.pagina-desafio .anim-sobe.visivel{opacity:1;transform:none}
+.pagina-desafio .anim-balao{opacity:0;transform:translateY(10px) scale(.95);transition:opacity .4s var(--suave),transform .4s var(--suave)}
+.pagina-desafio .anim-balao.visivel{opacity:1;transform:none}
+.pagina-desafio .anim-fade{opacity:0;transform:translateY(12px);transition:opacity .5s var(--suave),transform .5s var(--suave)}
+.pagina-desafio .anim-fade.visivel{opacity:1;transform:none}
+.pagina-desafio .dsc-whats-digitando{display:inline-flex;align-items:center;gap:5px;background:#1A3A2F;border-radius:0 12px 12px 12px;padding:14px 20px;position:relative}
+.pagina-desafio .dsc-whats-digitando::before{content:'';position:absolute;top:0;left:-8px;border:8px solid transparent;border-top-color:#1A3A2F;border-right-color:#1A3A2F}
+.pagina-desafio .dsc-whats-digitando span{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.4);animation:digitaPonto .8s ease-in-out infinite}
+.pagina-desafio .dsc-whats-digitando span:nth-child(2){animation-delay:.15s}
+.pagina-desafio .dsc-whats-digitando span:nth-child(3){animation-delay:.3s}
+@keyframes digitaPonto{0%,80%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
+
+/* pergunta por vez */
+.pagina-desafio .dsc-btn-comecar{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:650;color:var(--carvao);background:var(--grad-marca);border-radius:var(--r-pill);padding:13px 26px;margin-top:var(--s-5);transition:transform .25s var(--suave)}
+.pagina-desafio .dsc-btn-comecar:hover{transform:scale(1.03)}
+.pagina-desafio .dsc-perguntas .wrap{max-width:720px}
+.pagina-desafio .dsc-perg-layout{display:flex;flex-direction:column;align-items:center;gap:var(--s-5)}
+.pagina-desafio .dsc-perg-card{width:100%;border:1px solid rgba(32,217,166,.18);border-radius:var(--r-card);background:linear-gradient(165deg,rgba(32,217,166,.04),#0E1210 35%,#0A0D0B);padding:var(--s-6);transition:opacity .25s,transform .25s var(--suave);box-shadow:0 24px 48px -16px rgba(0,0,0,.4)}
+.pagina-desafio .dsc-perg-card.saindo{opacity:0;transform:translateX(-20px)}
+.pagina-desafio .dsc-perg-cab{margin-bottom:var(--s-5)}
+.pagina-desafio .dsc-perg-cab .eyebrow{display:block;margin-bottom:var(--s-2)}
+.pagina-desafio .dsc-perg-cab h2{font-size:clamp(20px,2.4vw,28px);font-weight:680;letter-spacing:-.02em;line-height:1.3}
+.pagina-desafio .dsc-perg-textarea{width:100%;font:inherit;font-size:15px;color:var(--creme);background:rgba(255,255,255,.03);border:1px solid var(--linha);border-radius:14px;padding:14px 18px;outline:none;resize:vertical;transition:border-color .2s;min-height:120px}
+.pagina-desafio .dsc-perg-textarea:focus{border-color:rgba(32,217,166,.5)}
+.pagina-desafio .dsc-perg-textarea::placeholder{color:var(--cinza)}
+.pagina-desafio .dsc-perg-valor{display:flex;align-items:center;gap:10px}
+.pagina-desafio .dsc-perg-valor input{flex:1;font:inherit;font-size:18px;font-weight:600;color:var(--creme);background:rgba(255,255,255,.03);border:1px solid var(--linha);border-radius:14px;padding:14px 18px;outline:none;transition:border-color .2s}
+.pagina-desafio .dsc-perg-valor input:focus{border-color:rgba(32,217,166,.5)}
+.pagina-desafio .dsc-perg-valor input::placeholder{color:var(--cinza)}
+.pagina-desafio .dsc-perg-fixo{font-size:16px;font-weight:600;color:var(--cinza)}
+.pagina-desafio .dsc-perg-nav{display:flex;justify-content:space-between;align-items:center;gap:var(--s-3);margin-top:var(--s-5)}
+.pagina-desafio .dsc-perg-btn-sec{font-size:14px;font-weight:600;color:var(--cinza-claro);padding:12px 20px;border-radius:var(--r-pill);border:1px solid var(--linha);background:rgba(255,255,255,.02);transition:all .2s}
+.pagina-desafio .dsc-perg-btn-sec:hover{background:rgba(255,255,255,.06);color:var(--creme)}
+.pagina-desafio .dsc-perg-btn-pri{font-size:15px;font-weight:650;color:var(--carvao);background:var(--creme);border-radius:var(--r-pill);padding:14px 28px;transition:transform .25s var(--suave),opacity .2s}
+.pagina-desafio .dsc-perg-btn-pri:hover:not(:disabled){transform:scale(1.02)}
+.pagina-desafio .dsc-perg-btn-pri:disabled{opacity:.4;cursor:default}
+.pagina-desafio .dsc-perg-btn-protocolar{font-size:15px;font-weight:650;color:var(--carvao);background:var(--grad-marca);border-radius:var(--r-pill);padding:14px 28px;transition:transform .25s var(--suave),opacity .2s}
+.pagina-desafio .dsc-perg-btn-protocolar:hover:not(:disabled){transform:scale(1.02)}
+.pagina-desafio .dsc-perg-btn-protocolar:disabled{opacity:.4;cursor:default}
+.pagina-desafio .dsc-perg-dica{font-size:12px;color:var(--cinza);text-align:center;margin-top:var(--s-3)}
+.pagina-desafio .dsc-perg-dica kbd{font-family:var(--font);font-size:11px;color:var(--cinza-claro);border:1px solid var(--linha-suave);border-radius:4px;padding:1px 5px}
+.pagina-desafio .dsc-perg-pontos{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.pagina-desafio .dsc-ponto{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.12);transition:all .2s;border:none;padding:0;cursor:pointer}
+.pagina-desafio .dsc-ponto.aqui{background:var(--creme);transform:scale(1.3)}
+.pagina-desafio .dsc-ponto.resp{background:var(--verde)}
+.pagina-desafio .dsc-perg-salvar{font-size:13px;font-weight:600;color:var(--cinza);transition:color .2s}
+.pagina-desafio .dsc-perg-salvar:hover{color:var(--creme)}
+
+/* múltipla escolha */
+.pagina-desafio .dsc-perg-opcoes{list-style:none;display:flex;flex-direction:column;gap:10px}
+.pagina-desafio .dsc-perg-op{display:flex;align-items:center;gap:14px;width:100%;padding:14px 18px;border:1px solid var(--linha);border-radius:14px;background:rgba(255,255,255,.02);font-size:15px;color:var(--cinza-claro);transition:all .2s var(--suave);text-align:left}
+.pagina-desafio .dsc-perg-op:hover{border-color:rgba(32,217,166,.4);background:rgba(32,217,166,.04);color:var(--creme)}
+.pagina-desafio .dsc-perg-op.sel{border-color:rgba(32,217,166,.6);background:rgba(32,217,166,.1);color:var(--creme)}
+.pagina-desafio .dsc-perg-op-letra{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--verde);background:rgba(32,217,166,.1);border:1px solid rgba(32,217,166,.25);flex-shrink:0}
+.pagina-desafio .dsc-perg-op.sel .dsc-perg-op-letra{background:var(--verde);color:var(--carvao);border-color:var(--verde)}

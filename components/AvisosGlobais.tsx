@@ -44,9 +44,12 @@ export default function AvisosGlobais({ dados }: { dados: DadosAvisos }) {
   const areaSino = useRef<HTMLDivElement>(null)
 
   // popup automático: uma vez por carregamento, se houver novidade não lida
-  useEffect(() => {
-    if (dados.temNovidadeNaoLida) setPopupAberto(true)
-  }, [dados.temNovidadeNaoLida])
+useEffect(() => {
+    if (dados.temNovidadeNaoLida) {
+      setPopupAberto(true)
+      marcarTodasNovidadesLidas().catch(() => {})
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // fecha o dropdown do sino ao clicar fora / Esc
   useEffect(() => {
