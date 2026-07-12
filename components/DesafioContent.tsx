@@ -138,7 +138,7 @@ export default function DesafioContent({ dados, nav }: { dados: DadosDesafio; na
   const respostaAtual = (respostas[String(q?.ordem)] ?? '').trim()
   const atualRespondida = !!respostaAtual
   const ultima = atual === nQ - 1
-  const aprovado = nota !== null && nota >= 6
+const aprovado = nota !== null && nota >= ds.nota_minima
 
   function irPara(idx: number) { setSaindo(true); setTimeout(() => { setAtual(idx); setSaindo(false) }, 250) }
 
@@ -340,12 +340,13 @@ export default function DesafioContent({ dados, nav }: { dados: DadosDesafio; na
               })}
             </div>
           )}
-          <div className="dsc-veredito-acoes">
-            {ds.gabarito_path && <button className="dsc-btn-gab" onClick={baixarGab} disabled={baixando === 'gabarito'}>{baixando === 'gabarito' ? 'Gerando link…' : '📎 Baixar gabarito do professor'}</button>}
+<div className="dsc-veredito-acoes">
+            {!aprovado && <p className="dsc-veredito-minima num">Nota mínima para aprovação: <b>{ds.nota_minima.toFixed(1).replace('.', ',')}</b></p>}
+            {ds.gabarito_path && aprovado && <button className="dsc-btn-gab" onClick={baixarGab} disabled={baixando === 'gabarito'}>{baixando === 'gabarito' ? 'Gerando link…' : '📎 Baixar gabarito do professor'}</button>}
             <button className="dsc-btn-galeria" onClick={() => setCena('galeria')}>👥 Ver entregas da comunidade</button>
             <a className="dsc-btn-voltar" href="/desafios">← Voltar aos desafios</a>
           </div>
-        </div></section>
+                  </div></section>
       )}
 
       {cena === 'galeria' && (

@@ -47,8 +47,8 @@ export async function protocolarLaudo(desafioId: string, respostas: { quesito_or
   if (!entrega?.aceito_em) return { ok: false as const, erro: 'Aceite o desafio antes de protocolar.' }
   if (entrega.entregue_em) return { ok: false as const, erro: 'Você já protocolou este desafio.' }
 
-  const { data: desafio } = await supabase.from('desafios')
-    .select('quesitos, xp, moedas').eq('id', desafioId).single()
+const { data: desafio } = await supabase.from('desafios')
+    .select('quesitos, xp, moedas, nota_minima').eq('id', desafioId).single()
   if (!desafio) return { ok: false as const, erro: 'Desafio não encontrado.' }
 
   const quesitosBanco = desafio.quesitos as any[]
@@ -132,7 +132,9 @@ Seja justo mas exigente — um laudo pericial precisa de precisão.`,
     .eq('id', entrega.id)
   if (error) return { ok: false as const, erro: error.message }
 
-  if (notaTotal >= 6) {
+const notaMinima = desafio.nota_minima ?? 6
+  const aprovado = notaTotal >= notaMinima
+  if (aprovado) {
     const { data: perfil } = await supabase.from('perfis')
       .select('xp, moedas').eq('id', auth.user.id).single()
     if (perfil) {
@@ -148,8 +150,10 @@ Seja justo mas exigente — um laudo pericial precisa de precisão.`,
     ok: true as const,
     nota: notaTotal,
     feedbacks,
-    xp: notaTotal >= 6 ? desafio.xp : 0,
-    moedas: notaTotal >= 6 ? desafio.moedas : 0,
+xp: aprovado ? desafio.xp : 0,
+    moedas: aprovado ? desafio.moedas : 0,
+    aprovado,
+    notaMinima,
   }
 }
 
@@ -271,6 +275,7 @@ Explique por que a resposta está errada e como chegar no valor correto.`
     console.error('[desafio] erro na explicação:', e)
     return { ok: false as const, erro: 'Não foi possível gerar a explicação.' }
   }
+}
 
 // ---------- UPLOAD DA PLANILHA DO ALUNO ----------
 export async function uploadPlanilha(desafioId: string, formData: FormData) {
@@ -321,4 +326,3 @@ export async function uploadPlanilha(desafioId: string, formData: FormData) {
   return { ok: true as const, path, nome: arquivo.name, tamanho: arquivo.size }
 }
 
-}

@@ -54,6 +54,7 @@ export type DadosDesafio = {
     moedas: number
     plano: string
     participantes: number
+    nota_minima: number
     gabarito_path: string | null
   }
   // estado do aluno
@@ -198,6 +199,7 @@ prefixo: q.prefixo,
       moedas: d.moedas,
       plano: d.plano ?? 'free',
       participantes: (d.participantes_base ?? 0) + (partCount ?? 0),
+      nota_minima: d.nota_minima ?? 6,
       gabarito_path: d.gabarito_path,
     },
     aceito_em,
