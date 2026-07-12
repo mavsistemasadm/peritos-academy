@@ -1,11 +1,6 @@
 // lib/queries/perito-publico.ts
 // Perfil público do perito — acessível sem login.
-import { createClient } from '@supabase/supabase-js'
-
-const supabasePublic = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { criarClienteServidor } from '@/lib/supabase/server'
 
 export type CertificadoPublico = {
   numero: string
@@ -61,8 +56,9 @@ export type DadosPeritoPublico = {
 }
 
 export async function carregarPeritoPublico(slug: string): Promise<DadosPeritoPublico | null> {
-  // busca o perfil público
-  const { data: perfil } = await supabasePublic
+  const supabase = await criarClienteServidor()
+
+  const { data: perfil } = await supabase
     .from('perfis')
     .select('*')
     .eq('slug', slug)
@@ -75,8 +71,7 @@ export async function carregarPeritoPublico(slug: string): Promise<DadosPeritoPu
   const nome = perfil.nome ?? 'Perito'
   const iniciais = nome.split(' ').map((p: string) => p[0]).join('').slice(0, 2).toUpperCase()
 
-  // certificados emitidos
-  const { data: certsRaw } = await supabasePublic
+  const { data: certsRaw } = await supabase
     .from('certificados')
     .select('numero, curso_titulo, nota, carga_horas, emitido_em, emitido_rotulo')
     .eq('usuario_id', uid)
@@ -93,19 +88,17 @@ export async function carregarPeritoPublico(slug: string): Promise<DadosPeritoPu
     emitido_rotulo: c.emitido_rotulo,
   }))
 
-  // desafios completados
-  const { data: entregasRaw } = await supabasePublic
+  const { data: entregasRaw } = await supabase
     .from('desafio_entregas')
     .select('nota, tempo_seg, entregue_em, desafio_id')
     .eq('usuario_id', uid)
     .not('entregue_em', 'is', null)
     .order('entregue_em', { ascending: false })
 
-  // busca dados dos desafios
   const desafioIds = [...new Set((entregasRaw ?? []).map(e => e.desafio_id))]
   let desafiosMap = new Map<string, { numero: string; titulo: string; categoria_nome: string }>()
   if (desafioIds.length > 0) {
-    const { data: desafiosRaw } = await supabasePublic
+    const { data: desafiosRaw } = await supabase
       .from('desafios')
       .select('id, numero, titulo, desafio_categorias(nome)')
       .in('id', desafioIds)
@@ -130,13 +123,11 @@ export async function carregarPeritoPublico(slug: string): Promise<DadosPeritoPu
     }
   })
 
-  // stats
   const cursos_concluidos = certificados.length
   const certificadosCount = certificados.length
   const desafios_completos = desafios.length
   const planilhas_entregues = (entregasRaw ?? []).length
 
-  // média de notas (certificados + desafios)
   const todasNotas = [
     ...certificados.filter(c => c.nota !== null).map(c => c.nota!),
     ...desafios.filter(d => d.nota !== null).map(d => d.nota!),
@@ -145,10 +136,8 @@ export async function carregarPeritoPublico(slug: string): Promise<DadosPeritoPu
     ? Math.round((todasNotas.reduce((s, n) => s + n, 0) / todasNotas.length) * 10) / 10
     : null
 
-  // provas aprovadas (nota >= 6)
   const provas_aprovadas = todasNotas.filter(n => n >= 6).length
 
-  // competências por categoria de desafio
   const compMap = new Map<string, number[]>()
   for (const d of desafios) {
     if (d.nota !== null) {
@@ -157,7 +146,6 @@ export async function carregarPeritoPublico(slug: string): Promise<DadosPeritoPu
       compMap.set(d.categoria_nome, arr)
     }
   }
-  // adiciona categorias dos certificados (cursos bancários = Bancária, etc.)
   for (const c of certificados) {
     const cat = c.curso_titulo.toLowerCase().includes('bancár') ? 'Bancária'
       : c.curso_titulo.toLowerCase().includes('previd') ? 'Previdenciária'
@@ -178,7 +166,6 @@ export async function carregarPeritoPublico(slug: string): Promise<DadosPeritoPu
     return { nome: cat, valor }
   })
 
-  // score pericial (0-100)
   const xp = perfil.xp ?? 0
   const scoreCursos = Math.min(cursos_concluidos * 8, 25)
   const scoreDesafios = Math.min(desafios_completos * 10, 25)
@@ -192,10 +179,8 @@ export async function carregarPeritoPublico(slug: string): Promise<DadosPeritoPu
     : score >= 20 ? 'Perito em Formação'
     : 'Perito Iniciante'
 
-  // membro desde
   const membro_desde = perfil.criado_em ?? perfil.created_at ?? new Date().toISOString()
 
-  // resumo auto-gerado
   const partes = []
   partes.push(`${nome}`)
   if (cursos_concluidos > 0) partes.push(`tem ${cursos_concluidos} curso${cursos_concluidos > 1 ? 's' : ''} concluído${cursos_concluidos > 1 ? 's' : ''}`)
