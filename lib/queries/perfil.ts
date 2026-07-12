@@ -43,6 +43,7 @@ export type DadosPerfil = {
   mostrar_tel: boolean
   mostrar_email: boolean
   perfil_publico: boolean
+  foto_url: string | null
   titulo: string
   nivel: number
   xp: number
@@ -165,6 +166,7 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     mostrar_tel: perfil.mostrar_tel ?? false,
     mostrar_email: perfil.mostrar_email ?? false,
     perfil_publico: perfil.perfil_publico ?? true,
+    foto_url: perfil.foto_url ?? null,
     titulo: perfil.titulo ?? 'Perito Iniciante',
     nivel: perfil.nivel ?? 1,
     xp: perfil.xp ?? 0,

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { DadosPerfil } from '@/lib/queries/perfil'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
-import { salvarPerfil } from '@/app/perfil/actions'
+import { salvarPerfil, uploadFoto } from '@/app/perfil/actions'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -52,6 +52,8 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
   const [editando, setEditando] = useState(false)
   const [salvandoPerfil, setSalvandoPerfil] = useState(false)
   const [msgSalvo, setMsgSalvo] = useState<string | null>(null)
+  const [fotoUrl, setFotoUrl] = useState<string | null>(dados.foto_url)
+  const [uploadingFoto, setUploadingFoto] = useState(false)
 
   useEffect(() => {
     const anima = (el: Element | Document) =>
@@ -77,7 +79,7 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
       await navigator.clipboard.writeText(texto)
       setCopiado(chave)
       setTimeout(() => setCopiado(null), 2000)
-    } catch { /* clipboard bloqueado */ }
+    } catch {}
   }
 
   async function handleSalvar(e: React.FormEvent<HTMLFormElement>) {
@@ -93,6 +95,15 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
     } else {
       setMsgSalvo(r.erro ?? 'Erro ao salvar.')
     }
+  }
+
+  async function handleFoto(file: File) {
+    setUploadingFoto(true)
+    const fd = new FormData()
+    fd.append('foto', file)
+    const r = await uploadFoto(fd)
+    setUploadingFoto(false)
+    if (r.ok) setFotoUrl(r.foto_url)
   }
 
   const d = dados
@@ -111,14 +122,21 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
         </div>
       )}
 
-      {/* ============ HERO ============ */}
       <section className="hero-perfil">
         <div className="wrap">
           <div className="perfil-linha">
-            <div className="avatar-grande" aria-hidden="true">
-              {iniciais(d.nome)}
+            <label className={`avatar-grande${uploadingFoto ? ' uploading' : ''}`} aria-label="Trocar foto de perfil">
+              {fotoUrl ? (
+                <img src={fotoUrl} alt="" className="avatar-foto" />
+              ) : (
+                iniciais(d.nome)
+              )}
               <span className="nivel-chip num">{d.nivel}</span>
-            </div>
+              <span className="avatar-overlay">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </span>
+              <input type="file" accept=".jpg,.jpeg,.png,.webp" hidden onChange={e => { const f = e.target.files?.[0]; if (f) handleFoto(f) }} />
+            </label>
             <div className="perfil-quem">
               <span className="titulo-nivel">{d.titulo} · Nível {d.nivel}</span>
               <h1>{nomeCurto(d.nome)}.</h1>
@@ -126,21 +144,8 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
                 Na jornada desde <b>{d.iniciouRotulo}</b> · Etapa {String(d.etapa).padStart(2, '0')} de {String(d.etapaTotal).padStart(2, '0')} · <b>{d.etapaNome}</b>
               </p>
             </div>
-            <div className="perfil-acoes">
-              <button className="btn btn-fantasma privado" onClick={() => setEditando(v => !v)}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
-                {editando ? 'Fechar edição' : 'Editar perfil'}
-              </button>
-              <button className="btn btn-fantasma privado" onClick={() => { setPublico(true); scrollTo({ top: 0, behavior: 'smooth' }) }}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg>
-                Ver como o público vê
-              </button>
-              <button className="btn btn-primario" onClick={() => copiar(location.href, 'perfil')}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3h4v4M21 3l-9 9M9 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3" /></svg>
-                {copiado === 'perfil' ? 'Link copiado ✓' : 'Compartilhar perfil'}
-              </button>
-            </div>
           </div>
+
           <div className="xp-linha privado">
             <div className="topo num">
               <b>{fmtNum(d.xp)} XP</b>
@@ -151,9 +156,23 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
             </div>
           </div>
 
-          {/* ============ PAINEL DE EDIÇÃO ============ */}
+          <div className="perfil-acoes privado">
+            <button className="btn btn-fantasma" onClick={() => setEditando(v => !v)}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
+              {editando ? 'Fechar edição' : 'Editar perfil'}
+            </button>
+            <button className="btn btn-fantasma" onClick={() => { setPublico(true); scrollTo({ top: 0, behavior: 'smooth' }) }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg>
+              Ver como o público vê
+            </button>
+            <button className="btn btn-primario" onClick={() => copiar(location.href, 'perfil')}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3h4v4M21 3l-9 9M9 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3" /></svg>
+              {copiado === 'perfil' ? 'Link copiado ✓' : 'Compartilhar perfil'}
+            </button>
+          </div>
+
           {editando && (
-            <div className="perfil-edicao reveal visivel">
+            <div className="perfil-edicao">
               <form onSubmit={handleSalvar}>
                 <h2>Editar perfil</h2>
                 <div className="pe-grid">
@@ -214,7 +233,6 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
         </div>
       </section>
 
-      {/* ============ CORPO ============ */}
       <section className="corpo">
         <div className="wrap">
           <div className="secao privado reveal">

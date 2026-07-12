@@ -21,7 +21,6 @@ export async function salvarPerfil(formData: FormData) {
 
   if (!nome || nome.length < 3) return { ok: false as const, erro: 'Nome precisa ter pelo menos 3 caracteres.' }
 
-  // gera slug a partir do nome
   const slug = nome
     .toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -32,18 +31,7 @@ export async function salvarPerfil(formData: FormData) {
 
   const { error } = await supabase
     .from('perfis')
-    .update({
-      nome,
-      bio,
-      cidade,
-      estado,
-      telefone,
-      email_publico,
-      mostrar_tel,
-      mostrar_email,
-      perfil_publico,
-      slug,
-    })
+    .update({ nome, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, slug })
     .eq('id', auth.user.id)
 
   if (error) return { ok: false as const, erro: error.message }
@@ -51,4 +39,35 @@ export async function salvarPerfil(formData: FormData) {
   revalidatePath('/perfil')
   revalidatePath(`/perito/${slug}`)
   return { ok: true as const, slug }
+}
+
+export async function uploadFoto(formData: FormData) {
+  const supabase = await criarClienteServidor()
+  const { data: auth } = await supabase.auth.getUser()
+  if (!auth?.user) return { ok: false as const, erro: 'Faça login.' }
+
+  const arquivo = formData.get('foto') as File | null
+  if (!arquivo || arquivo.size === 0) return { ok: false as const, erro: 'Selecione uma foto.' }
+
+  const ext = arquivo.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+  if (!['jpg', 'jpeg', 'png', 'webp'].includes(ext)) return { ok: false as const, erro: 'Formato não aceito. Use JPG, PNG ou WebP.' }
+  if (arquivo.size > 5 * 1024 * 1024) return { ok: false as const, erro: 'Foto muito grande. Máximo 5 MB.' }
+
+  const userId = auth.user.id
+  const path = `perfis/${userId}/foto.${ext}`
+  const buffer = Buffer.from(await arquivo.arrayBuffer())
+
+  const { error: upErr } = await supabase.storage
+    .from('planilhas')
+    .upload(path, buffer, { contentType: arquivo.type, upsert: true })
+  if (upErr) return { ok: false as const, erro: upErr.message }
+
+  const { data: urlData } = supabase.storage.from('planilhas').getPublicUrl(path)
+  const foto_url = urlData.publicUrl + '?t=' + Date.now()
+
+  const { error } = await supabase.from('perfis').update({ foto_url }).eq('id', userId)
+  if (error) return { ok: false as const, erro: error.message }
+
+  revalidatePath('/perfil')
+  return { ok: true as const, foto_url }
 }

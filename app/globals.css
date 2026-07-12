@@ -3795,7 +3795,7 @@ body.teatro .trilho-aulas{display:none}
 
 
 /* edição do perfil */
-.pagina-perfil .perfil-edicao{margin-top:var(--s-5);padding:var(--s-5);border:1px solid rgba(32,217,166,.15);border-radius:var(--r-card);background:linear-gradient(165deg,rgba(32,217,166,.04),var(--preto-elev) 40%)}
+.pagina-perfil .perfil-edicao{margin-top:var(--s-5);padding:var(--s-5) var(--s-6);border:1px solid rgba(32,217,166,.2);border-radius:20px;background:linear-gradient(150deg,rgba(32,217,166,.08),rgba(54,220,209,.03) 30%,rgba(11,14,12,.95) 60%);box-shadow:0 20px 50px -16px rgba(32,217,166,.08),inset 0 1px 0 rgba(255,255,255,.03)}
 .pagina-perfil .perfil-edicao h2{font-size:18px;font-weight:700;letter-spacing:-.02em;margin-bottom:var(--s-4)}
 .pagina-perfil .pe-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3)}
 @media(max-width:640px){.pagina-perfil .pe-grid{grid-template-columns:1fr}}
@@ -3814,3 +3814,8 @@ body.teatro .trilho-aulas{display:none}
 .pagina-perfil .pe-link-publico a:hover{color:var(--creme)}
 .pagina-perfil .pe-acoes{display:flex;align-items:center;gap:var(--s-3);margin-top:var(--s-4);flex-wrap:wrap}
 .pagina-perfil .pe-msg{font-size:13px;font-weight:600;color:var(--verde)}
+
+/* fix: botões abaixo do nome, não ao lado */
+.pagina-perfil .perfil-acoes{display:flex;gap:10px;flex-wrap:wrap;margin-top:var(--s-3)}
+@media(max-width:768px){.pagina-perfil .perfil-acoes{flex-direction:column}}
+.pagina-perfil .perfil-linha{flex-wrap:wrap}
