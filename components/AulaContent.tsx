@@ -10,6 +10,8 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import type { AulaCompleta, Anotacao, Duvida } from "@/lib/queries/aula";
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
+import { verificarCertificado } from '@/app/curso/[slug]/aula/[aulaId]/actions'
+
 
 let _sb: SupabaseClient | null = null;
 function sb() {
@@ -62,6 +64,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
   const [contador, setContador] = useState<number | string>(5);
   const [anotacoes, setAnotacoes] = useState<Anotacao[]>(dados.anotacoes);
   const [duvidas, setDuvidas] = useState<Duvida[]>(dados.duvidas);
+  const [certPopup, setCertPopup] = useState<{ numero: string; curso: string; nota?: number } | null>(null)
   const [notaTxt, setNotaTxt] = useState("");
   const [duvidaTxt, setDuvidaTxt] = useState("");
 
@@ -110,6 +113,13 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
     });
     setPulso(true); setTimeout(() => setPulso(false), 700);
     setToast(true); setTimeout(() => setToast(false), 3800);
+
+// verifica se completou o curso e emite certificado
+    const cert = await verificarCertificado(curso.id)
+    if (cert.gerado) {
+      setCertPopup({ numero: cert.numero!, curso: cert.curso_titulo!, nota: cert.nota })
+    }
+
     if (proxima) {
       setProxVisivel(true);
       let s = 5; setContador(s);
@@ -471,11 +481,45 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
         </div>
       </main>
 
-      {/* toast de XP */}
+{/* toast de XP */}
       <div className={`toast-xp${toast ? " visivel" : ""}`} role="status">
         <span className="xp num">+{aula.xp} XP</span>
         <span>Aula concluída{faltamModulo > 0 ? ` · faltam ${faltamModulo} para o módulo` : " · módulo completo!"}</span>
       </div>
+
+      {/* popup de certificado */}
+      {certPopup && (
+        <div className="cert-popup-overlay" onClick={() => setCertPopup(null)}>
+          <div className="cert-popup" onClick={e => e.stopPropagation()}>
+            <div className="cert-popup-confete" aria-hidden="true">
+              {Array.from({ length: 40 }).map((_, i) => (
+                <span key={i} className="confete" style={{
+                  left: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 0.8}s`,
+                  animationDuration: `${1.5 + Math.random() * 1.5}s`,
+                  background: ['#20D9A6','#36DCD1','#DDF784','#F1F2DF','#E0776B'][Math.floor(Math.random() * 5)],
+                  width: `${4 + Math.random() * 6}px`,
+                  height: `${4 + Math.random() * 6}px`,
+                }} />
+              ))}
+            </div>
+            <div className="cert-popup-body">
+              <div className="cert-popup-selo">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#20D9A6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="9" r="6" /><path d="m8.5 14-2 7 5.5-3 5.5 3-2-7" /></svg>
+              </div>
+              <h2>Certificado emitido!</h2>
+              <p className="cert-popup-curso">{certPopup.curso}</p>
+              {certPopup.nota && <p className="cert-popup-nota num">Nota final: <b>{certPopup.nota.toFixed(1).replace('.', ',')}</b></p>}
+              <p className="cert-popup-num num">Nº {certPopup.numero}</p>
+              <p className="cert-popup-desc">Seu certificado já está disponível no seu perfil e pode ser verificado publicamente.</p>
+              <div className="cert-popup-acoes">
+                <a className="btn btn-primario" href="/perfil#certificados">Ver meus certificados</a>
+                <button className="btn btn-fantasma" onClick={() => setCertPopup(null)}>Continuar estudando</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
