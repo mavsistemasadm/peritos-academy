@@ -1,0 +1,183 @@
+// components/BibliotecaContent.tsx
+// Biblioteca do perito: abas por área, filtro por tipo, busca,
+// favoritas, mais baixadas — e modo vitrine pra quem não tem acesso.
+'use client'
+
+import { useMemo, useState, useTransition } from 'react'
+import { baixarItem, alternarFavorita } from '@/app/biblioteca/actions'
+import NavPlataforma from '@/components/NavPlataforma'
+import type { DadosNav } from '@/lib/queries/nav'
+import type { DadosBiblioteca, ItemBiblioteca } from '@/lib/queries/biblioteca'
+
+const fmtNum = (n: number) => n.toLocaleString('pt-BR')
+const fmtData = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', month: 'short', year: 'numeric' })
+
+const ROTULO_TIPO: Record<string, string> = { planilha: 'Planilha', laudo: 'Modelo de laudo', peticao: 'Modelo de petição' }
+const ICONE_TIPO: Record<string, string> = { planilha: '📊', laudo: '📄', peticao: '⚖️' }
+
+function tamanhoBonito(kb: number | null) {
+  if (!kb) return ''
+  return kb >= 1024 ? `${(kb / 1024).toFixed(1).replace('.', ',')} MB` : `${kb} KB`
+}
+
+export default function BibliotecaContent({ dados, nav }: { dados: DadosBiblioteca; nav: DadosNav }) {
+  const d = dados
+  const [abaArea, setAbaArea] = useState<string>('todas')     // 'todas' | slug | 'favoritas' | 'top'
+  const [filtroTipo, setFiltroTipo] = useState<string>('todos')
+  const [busca, setBusca] = useState('')
+  const [baixando, setBaixando] = useState<string | null>(null)
+  const [erro, setErro] = useState<string | null>(null)
+  const [favs, setFavs] = useState<Set<string>>(
+    () => new Set(d.areas.flatMap(a => a.itens.filter(i => i.favorita).map(i => i.id)))
+  )
+  const [, start] = useTransition()
+
+  const todos = useMemo(() => d.areas.flatMap(a => a.itens.map(i => ({ ...i, areaNome: d.areas.find(x => x.itens.includes(i))!.nome }))), [d.areas])
+
+  const visiveis = useMemo(() => {
+    let lista: (ItemBiblioteca & { areaNome: string })[] = todos
+    if (abaArea === 'favoritas') lista = lista.filter(i => favs.has(i.id))
+    else if (abaArea === 'top') lista = [...lista].sort((a, b) => b.downloads - a.downloads)
+    else if (abaArea !== 'todas') {
+      const area = d.areas.find(a => a.slug === abaArea)
+      lista = lista.filter(i => area?.itens.some(x => x.id === i.id))
+    }
+    if (filtroTipo !== 'todos') lista = lista.filter(i => i.tipo === filtroTipo)
+    if (busca.trim()) {
+      const q = busca.trim().toLowerCase()
+      lista = lista.filter(i => i.nome.toLowerCase().includes(q) || (i.descricao ?? '').toLowerCase().includes(q))
+    }
+    return lista
+  }, [todos, abaArea, filtroTipo, busca, favs, d.areas])
+
+  const tiposPresentes = useMemo(() => [...new Set(todos.map(i => i.tipo))], [todos])
+
+  async function baixar(item: ItemBiblioteca) {
+    if (!d.temAcesso) return
+    setErro(null); setBaixando(item.id)
+    const r = await baixarItem(item.id)
+    setBaixando(null)
+    if (!r.ok) { setErro(r.erro); return }
+    // dispara o download pelo link assinado
+    const a = document.createElement('a')
+    a.href = r.url; a.download = ''
+    document.body.appendChild(a); a.click(); a.remove()
+  }
+
+  function favoritar(id: string) {
+    setFavs(f => { const n = new Set(f); n.has(id) ? n.delete(id) : n.add(id); return n })
+    start(async () => { await alternarFavorita(id) })
+  }
+
+  return (
+    <div className="pagina-biblioteca">
+      <div className="grao" aria-hidden="true"></div>
+      <NavPlataforma dados={nav} ativo="biblioteca" />
+
+      {/* ============ HERO ============ */}
+      <header className="bib-hero">
+        <div className="wrap">
+          <span className="eyebrow">Biblioteca do perito</span>
+          <h1>Ferramentas prontas para o <span className="grad-txt">próximo caso.</span></h1>
+          <p className="sub">Planilhas de cálculo, modelos de laudo e petições — revisadas e atualizadas pela equipe.</p>
+          <div className="bib-selos num">
+            <div className="selo"><b>{d.totalItens}</b><span>arquivos disponíveis</span></div>
+            <div className="selo"><b>{fmtNum(d.totalDownloads)}</b><span>downloads realizados</span></div>
+            <div className="selo"><b>{d.areas.length}</b><span>áreas de atuação</span></div>
+          </div>
+        </div>
+      </header>
+
+      <main className="wrap bib-corpo">
+        {/* aviso pra quem não tem acesso */}
+        {!d.temAcesso && (
+          <div className="bib-trava" role="note">
+            <b>🔒 Sua conta ainda não tem acesso à Biblioteca.</b>
+            <span>Este é um benefício de um grupo de alunos. Fale com o suporte para saber como participar.</span>
+          </div>
+        )}
+
+        {/* ============ FILTROS ============ */}
+        <div className="bib-filtros">
+          <div className="abas" role="tablist" aria-label="Áreas">
+            <button role="tab" aria-selected={abaArea === 'todas'} className={abaArea === 'todas' ? 'ativa' : ''} onClick={() => setAbaArea('todas')}>Todas</button>
+            {d.areas.map(a => (
+              <button key={a.slug} role="tab" aria-selected={abaArea === a.slug} className={abaArea === a.slug ? 'ativa' : ''} onClick={() => setAbaArea(a.slug)}>
+                {a.nome} <small className="num">{a.itens.length}</small>
+              </button>
+            ))}
+            <button role="tab" aria-selected={abaArea === 'top'} className={abaArea === 'top' ? 'ativa' : ''} onClick={() => setAbaArea('top')}>Mais baixadas</button>
+            <button role="tab" aria-selected={abaArea === 'favoritas'} className={abaArea === 'favoritas' ? 'ativa' : ''} onClick={() => setAbaArea('favoritas')}>⭐ Favoritas</button>
+          </div>
+
+          <div className="bib-filtros-linha2">
+            {tiposPresentes.length > 1 && (
+              <div className="tipos">
+                <button className={filtroTipo === 'todos' ? 'ativa' : ''} onClick={() => setFiltroTipo('todos')}>Todos os tipos</button>
+                {tiposPresentes.map(t => (
+                  <button key={t} className={filtroTipo === t ? 'ativa' : ''} onClick={() => setFiltroTipo(t)}>
+                    {ICONE_TIPO[t]} {ROTULO_TIPO[t]}
+                  </button>
+                ))}
+              </div>
+            )}
+            <label className="bib-busca">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+              <input type="search" placeholder="Buscar por nome ou tema…" value={busca} onChange={e => setBusca(e.target.value)} />
+            </label>
+          </div>
+        </div>
+
+        {erro && <p className="bib-erro" role="alert">{erro}</p>}
+
+        {/* ============ GRADE ============ */}
+        {visiveis.length === 0 ? (
+          <p className="bib-vazio">Nada por aqui — tenta outra busca ou outra aba.</p>
+        ) : (
+          <div className="bib-grade">
+            {visiveis.map(item => (
+              <article key={item.id} className={`bib-card${!d.temAcesso ? ' bloqueado' : ''}`}>
+                <div className="card-topo">
+                  <span className="tipo-selo">{ICONE_TIPO[item.tipo]} {ROTULO_TIPO[item.tipo]}</span>
+                  {item.novo && <span className="selo-novo">Novo</span>}
+                  <button
+                    className={`fav${favs.has(item.id) ? ' ativa' : ''}`}
+                    aria-label={favs.has(item.id) ? 'Remover das favoritas' : 'Adicionar às favoritas'}
+                    onClick={() => favoritar(item.id)}
+                    disabled={!d.temAcesso}
+                  >★</button>
+                </div>
+                <h3>{item.nome}</h3>
+                {item.descricao && <p className="desc">{item.descricao}</p>}
+                <div className="card-meta num">
+                  <span className="formato">.{item.formato}</span>
+                  {item.tamanhoKb ? <span>{tamanhoBonito(item.tamanhoKb)}</span> : null}
+                  <span>Atualizada {fmtData.format(new Date(item.atualizadoEm)).replace(/\./g, '').replace(' de ', '/')}</span>
+                </div>
+                <div className="card-rodape">
+                  <span className="downloads num" title="Downloads">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4" /><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></svg>
+                    {fmtNum(item.downloads)}
+                  </span>
+                  {d.temAcesso ? (
+                    <button className="btn-baixar" onClick={() => baixar(item)} disabled={baixando === item.id}>
+                      {baixando === item.id ? 'Gerando link…' : item.baixada ? 'Baixar de novo' : 'Baixar'}
+                    </button>
+                  ) : (
+                    <span className="btn-baixar travado">🔒 Restrito</span>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </main>
+
+      <footer className="bib-footer">
+        <div className="wrap">
+          <span>© 2026 Peritos Academy · Biblioteca do perito</span>
+        </div>
+      </footer>
+    </div>
+  )
+}

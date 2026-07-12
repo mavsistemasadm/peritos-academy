@@ -1,18 +1,35 @@
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
-  // Por enquanto, redireciona para /login se não tem cookie de sessão
-  const temSessao = request.cookies.getAll().some(c => c.name.includes("sb-"));
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({ request });
 
-  const publica = ["/login", "/auth", "/favicon.ico"].some((p) =>
-    request.nextUrl.pathname.startsWith(p)
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
   );
 
-  if (!temSessao && !publica) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  // Renova a sessão se o token estiver perto de expirar.
+  // TODO: reativar proteção de rotas depois (redirect para /login).
+  await supabase.auth.getUser();
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {

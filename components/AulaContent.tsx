@@ -1,0 +1,496 @@
+"use client";
+// components/AulaContent.tsx
+// Página da aula — réplica fiel do template aprovado (peritos-academy-aula.html),
+// 100% plugada no Supabase. Classes CSS idênticas ao template:
+// .palco, .luz, .player, .timeline, .aula-cab, .prox-aula, .abas, .painel-aba,
+// .capitulos-lista, .arquivos, .anotar, .notas, .duvida, .suporte-grid,
+// .trilho-aulas, .t-aula, .toast-xp, .nav-contexto, .mini-anel, .insignia.
+
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import type { AulaCompleta, Anotacao, Duvida } from "@/lib/queries/aula";
+import NavPlataforma from '@/components/NavPlataforma'
+import type { DadosNav } from '@/lib/queries/nav'
+
+let _sb: SupabaseClient | null = null;
+function sb() {
+  if (!_sb) {
+    _sb = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+  }
+  return _sb;
+}
+
+/* ---------- helpers de formatação ---------- */
+const fmtSeg = (s: number) => {
+  const m = Math.floor(s / 60), r = Math.floor(s % 60);
+  return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
+};
+const fmtDurSeg = (seg: number) => {
+  const min = Math.round(seg / 60);
+  if (min >= 60) {
+    const h = Math.floor(min / 60), m = min % 60;
+    return `${h}h${m ? ` ${m}min` : ""}`;
+  }
+  return `${min} min`;
+};
+const fmtQuando = (iso: string) => {
+  const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if (d <= 0) return "hoje";
+  if (d === 1) return "ontem";
+  return `há ${d} dias`;
+};
+
+
+export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
+  dados: AulaCompleta;
+  usuarioId: string | null;
+  usuarioNome: string | null;
+  nav: DadosNav;
+}) {
+  const router = useRouter();
+  const { curso, modulo, aula, capitulos, materiais, trilho, anterior, proxima, proximoModulo } = dados;
+
+  /* ---------- estado ---------- */
+  const [abaAtiva, setAbaAtiva] = useState("sobre");
+  const [teatro, setTeatro] = useState(false);
+  const [concluida, setConcluida] = useState(aula.concluida);
+  const [progresso, setProgresso] = useState(dados.progressoCurso);
+  const [toast, setToast] = useState(false);
+  const [pulso, setPulso] = useState(false);
+  const [proxVisivel, setProxVisivel] = useState(false);
+  const [contador, setContador] = useState<number | string>(5);
+  const [anotacoes, setAnotacoes] = useState<Anotacao[]>(dados.anotacoes);
+  const [duvidas, setDuvidas] = useState<Duvida[]>(dados.duvidas);
+  const [notaTxt, setNotaTxt] = useState("");
+  const [duvidaTxt, setDuvidaTxt] = useState("");
+
+  /* ---------- player (Panda Video via iframe) ---------- */
+  const playerRef = useRef<HTMLDivElement>(null);
+  const notaTaRef = useRef<HTMLTextAreaElement>(null);
+  const regressivaRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // O iframe do Panda não expõe o tempo atual sem o SDK; as anotações/dúvidas
+  // são ancoradas em 00:00 por padrão. Capítulos viram lista de referência.
+  const seek = (_s: number) => {
+    /* seek no iframe do Panda exige o SDK do player — reativar na próxima fase */
+  };
+
+  /* teatro → classe no body (o CSS aprovado usa body.teatro) */
+  useEffect(() => {
+    document.body.classList.toggle("teatro", teatro);
+    return () => document.body.classList.remove("teatro");
+  }, [teatro]);
+
+  /* atalho N abre anotações */
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      const tag = (document.activeElement as HTMLElement)?.tagName;
+      if (e.key.toLowerCase() === "n" && !["TEXTAREA", "INPUT"].includes(tag)) {
+        e.preventDefault();
+        setAbaAtiva("notas");
+        setTimeout(() => notaTaRef.current?.focus(), 50);
+      }
+    };
+    addEventListener("keydown", h);
+    return () => removeEventListener("keydown", h);
+  }, []);
+
+  useEffect(() => () => { if (regressivaRef.current) clearInterval(regressivaRef.current); }, []);
+
+  /* ---------- ações plugadas no banco ---------- */
+  const marcarConcluida = async () => {
+    if (concluida) return;
+    if (!usuarioId) { alert("Entre na sua conta para registrar o progresso."); return; }
+    const { error } = await sb().from("aula_progresso").upsert({ usuario_id: usuarioId, aula_id: aula.id });
+    if (error) { console.error(error); return; }
+    setConcluida(true);
+    setProgresso((p) => {
+      const c = p.concluidas + 1;
+      const xp = p.xpTotal + aula.xp;
+      return { ...p, concluidas: c, pct: Math.round((c / p.total) * 100), xpTotal: xp, nivel: Math.floor(xp / 100) + 1 };
+    });
+    setPulso(true); setTimeout(() => setPulso(false), 700);
+    setToast(true); setTimeout(() => setToast(false), 3800);
+    if (proxima) {
+      setProxVisivel(true);
+      let s = 5; setContador(s);
+      regressivaRef.current = setInterval(() => {
+        s--;
+        if (s <= 0) {
+          clearInterval(regressivaRef.current!);
+          setContador("→");
+          router.push(`/curso/${curso.slug}/aula/${proxima.id}`);
+        } else setContador(s);
+      }, 1000);
+    }
+  };
+  const ficar = () => { if (regressivaRef.current) clearInterval(regressivaRef.current); setProxVisivel(false); };
+  const irAgora = () => {
+    if (regressivaRef.current) clearInterval(regressivaRef.current);
+    if (proxima) router.push(`/curso/${curso.slug}/aula/${proxima.id}`);
+  };
+
+  const salvarNota = async () => {
+    const texto = notaTxt.trim();
+    if (!texto) return;
+    if (!usuarioId) { alert("Entre na sua conta para salvar anotações."); return; }
+    const tempo_seg = 0; // âncora padrão (sem SDK do Panda)
+    const { data, error } = await sb()
+      .from("aula_anotacoes")
+      .insert({ aula_id: aula.id, usuario_id: usuarioId, tempo_seg, texto })
+      .select().single();
+    if (error) { console.error(error); return; }
+    setAnotacoes((n) => [data as Anotacao, ...n]);
+    setNotaTxt("");
+  };
+
+  const enviarDuvida = async () => {
+    const texto = duvidaTxt.trim();
+    if (!texto) return;
+    if (!usuarioId) { alert("Entre na sua conta para enviar dúvidas."); return; }
+    const nome = usuarioNome ?? "Aluno";
+    const iniciais = nome.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
+    const { data, error } = await sb()
+      .from("aula_duvidas")
+      .insert({
+        aula_id: aula.id, usuario_id: usuarioId, autor_nome: nome, autor_iniciais: iniciais,
+        tempo_seg: 0, texto,
+      }).select().single();
+    if (error) { console.error(error); return; }
+    setDuvidas((d) => [{ ...(data as Duvida), respostas: [] }, ...d]);
+    setDuvidaTxt("");
+  };
+
+  /* ---------- derivados p/ nav e trilho ---------- */
+  const anel = 75.4; // 2πr, r=12 (igual ao CSS)
+  const mm = String(modulo.ordem).padStart(2, "0");
+  const totalDuvidas = duvidas.reduce((s, d) => s + 1 + (d.respostas?.length ?? 0), 0);
+  const faltamModulo = modulo.totalAulas - modulo.concluidasNoModulo - (concluida && !aula.concluida ? 1 : 0);
+  const momento = "00:00"; // sem SDK do Panda, âncora padrão
+
+  return (
+    <div style={{ ["--arte" as string]: aula.capa_url ? `url('${aula.capa_url}')` : "none" }}>
+      <div className="grao" aria-hidden="true"></div>
+
+      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+        <defs>
+          <linearGradient id="gradAnel" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#20D9A6" /><stop offset="55%" stopColor="#36DCD1" /><stop offset="100%" stopColor="#DDF784" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      {/* ============ NAV contextual da aula ============ */}
+      <header className="nav">
+        <div className="nav-inner">
+          <Link className="nav-logo" href="/" aria-label="Peritos Academy — Início">
+            <img src="/logo.png" alt="" />
+            <span>peritos<small>academy</small></span>
+          </Link>
+          <div className="nav-centro">
+            <Link className="nav-contexto" href={`/curso/${curso.slug}`} aria-label="Voltar para o curso">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, color: "var(--cinza)" }}><path d="M19 12H5m6-7-7 7 7 7" /></svg>
+              <span className="curso">{curso.titulo}</span>
+              <span className="sep">/</span>
+              <span className="aula-atual num">Módulo {mm} · Aula {aula.ordem} de {modulo.totalAulas}</span>
+            </Link>
+          </div>
+          <div className="nav-acoes" style={{ display: "flex", alignItems: "center", gap: "var(--s-3)" }}>
+            <div className="nav-progresso" title={`Progresso do curso: ${progresso.pct}%`}>
+              <svg className="mini-anel" viewBox="0 0 30 30" aria-hidden="true">
+                <circle className="t" cx="15" cy="15" r="12" />
+                <circle className="f" cx="15" cy="15" r="12" style={{ strokeDashoffset: anel * (1 - progresso.pct / 100) }} />
+              </svg>
+              <span className="num">{progresso.pct}%</span>
+            </div>
+            <div className="nav-xp">
+              <span className={`insignia num${pulso ? " pulso" : ""}`} aria-label={`Nível ${progresso.nivel}`}>{progresso.nivel}</span>
+            </div>
+            <button className="nav-avatar" aria-label="Abrir perfil">
+              {(usuarioNome ?? "?").split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="palco-area">
+        <div className="wrap">
+          <div className="palco-grid">
+
+            {/* ============ COLUNA PRINCIPAL ============ */}
+            <div>
+              {/* PLAYER */}
+              <div className="palco">
+                <div className="luz" aria-hidden="true"></div>
+                <div className="player" ref={playerRef} aria-label={`Player de vídeo — ${aula.titulo}`}>
+                  {aula.video_url ? (
+                    <iframe
+                      className="player-el"
+                      src={aula.video_url}
+                      title={aula.titulo}
+                      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <>
+                      <div className="player-video" aria-hidden="true"></div>
+                      <div className="player-veu" aria-hidden="true"></div>
+                      <span className="cap-atual num">Vídeo em breve</span>
+                      <span className="play-grande" aria-hidden="true">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z" /></svg>
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* TÍTULO + AÇÕES */}
+              <div className="aula-cab">
+                <div className="aula-cab-txt">
+                  <span className="eyebrow">Módulo {mm} · <b>{modulo.titulo}</b></span>
+                  <h1>{aula.titulo}</h1>
+                </div>
+                <div className="aula-acoes">
+                  {anterior ? (
+                    <Link className="btn btn-fantasma btn-nav-aula" href={`/curso/${curso.slug}/aula/${anterior.id}`} aria-label="Aula anterior">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                    </Link>
+                  ) : null}
+                  <button className={`btn btn-fantasma btn-concluir${concluida ? " feito" : ""}`} onClick={marcarConcluida}>
+                    <span className="rotulo-b">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5 9.5 18 20 6.5" /></svg>
+                      <span>{concluida ? "Concluída" : `Marcar como concluída · +${aula.xp} XP`}</span>
+                    </span>
+                  </button>
+                  {proxima ? (
+                    <Link className="btn btn-primario btn-nav-aula" href={`/curso/${curso.slug}/aula/${proxima.id}`} aria-label="Próxima aula">
+                      Próxima
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                    </Link>
+                  ) : null}
+                </div>
+              </div>
+
+              {/* CELEBRAÇÃO: PRÓXIMA AULA */}
+              {proxima && (
+                <div className={`prox-aula${proxVisivel ? " visivel" : ""}`} role="status">
+                  <div className={`prox-anel${proxVisivel ? " rodando" : ""}`}>
+                    <svg viewBox="0 0 52 52" aria-hidden="true"><circle className="t" cx="26" cy="26" r="23" /><circle className="f" cx="26" cy="26" r="23" /></svg>
+                    <b className="num">{contador}</b>
+                  </div>
+                  <div className="prox-txt">
+                    <span className="rot">A seguir</span>
+                    <b>{proxima.titulo}</b>
+                    <span className="num">{fmtDurSeg(proxima.duracaoSeg)}</span>
+                  </div>
+                  <button className="btn btn-primario" onClick={irAgora}>Ir agora</button>
+                  <button className="btn btn-fantasma" onClick={ficar}>Ficar aqui</button>
+                </div>
+              )}
+
+              {/* ABAS */}
+              <div className="abas-area">
+                <div className="abas" role="tablist" aria-label="Conteúdo da aula">
+                  {[
+                    { id: "sobre", label: "Sobre a aula" },
+                    { id: "materiais", label: "Materiais", badge: materiais.length },
+                    { id: "notas", label: "Minhas anotações", badge: anotacoes.length },
+                    { id: "duvidas", label: "Dúvidas", badge: totalDuvidas },
+                    { id: "suporte", label: "Suporte" },
+                  ].map((a) => (
+                    <button key={a.id} className="aba" role="tab" aria-selected={abaAtiva === a.id}
+                      aria-controls={`p-${a.id}`} id={`a-${a.id}`} onClick={() => setAbaAtiva(a.id)}>
+                      {a.label}{a.badge ? <span className="badge num">{a.badge}</span> : null}
+                    </button>
+                  ))}
+                </div>
+
+                {/* SOBRE */}
+                <div className={`painel-aba sobre${abaAtiva === "sobre" ? " ativo" : ""}`} id="p-sobre" role="tabpanel" aria-labelledby="a-sobre">
+                  {aula.sobre.map((p, i) => <p key={i}>{p}</p>)}
+                  {capitulos.length > 0 && (
+                    <ol className="capitulos-lista">
+                      {capitulos.map((c) => (
+                        <li key={c.id}>
+                          <button onClick={() => seek(c.tempo_seg)}>
+                            <span className="cap-tempo num">{fmtSeg(c.tempo_seg)}</span><b>{c.titulo}</b>
+                          </button>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </div>
+
+                {/* MATERIAIS */}
+                <div className={`painel-aba${abaAtiva === "materiais" ? " ativo" : ""}`} id="p-materiais" role="tabpanel" aria-labelledby="a-materiais">
+                  {materiais.length === 0 ? (
+                    <p className="meta">Nenhum material anexado a esta aula ainda.</p>
+                  ) : (
+                    <ul className="arquivos">
+                      {materiais.map((m) => (
+                        <li className="arquivo" key={m.id}>
+                          <a href={m.arquivo_url ?? "#"} target={m.arquivo_url ? "_blank" : undefined} rel="noreferrer">
+                            <span className={`arq-ico ${m.tipo}`} aria-hidden="true">{m.tipo === "xls" ? "XLSX" : "PDF"}</span>
+                            <span className="arq-txt"><b>{m.nome}</b><span>{m.descricao}</span></span>
+                            <span className="arq-baixar">
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16" /></svg>
+                              Baixar
+                            </span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                {/* ANOTAÇÕES */}
+                <div className={`painel-aba${abaAtiva === "notas" ? " ativo" : ""}`} id="p-notas" role="tabpanel" aria-labelledby="a-notas">
+                  <div className="anotar">
+                    <span className="momento num" title="A anotação fica ancorada neste momento do vídeo">{momento}</span>
+                    <textarea ref={notaTaRef} value={notaTxt} onChange={(e) => setNotaTxt(e.target.value)}
+                      placeholder="Anotar neste momento da aula…" aria-label={`Nova anotação ancorada em ${momento}`} />
+                    <button className="enviar" onClick={salvarNota} aria-label="Salvar anotação">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5 9.5 18 20 6.5" /></svg>
+                    </button>
+                  </div>
+                  <p className="dica-tecla">Dica: pressione <kbd>N</kbd> durante o vídeo para anotar sem pausar o raciocínio.</p>
+                  <ul className="notas">
+                    {anotacoes.map((n) => (
+                      <li className="nota" key={n.id}>
+                        <button className="nota-tempo num" title={`Ir para ${fmtSeg(n.tempo_seg)}`} onClick={() => seek(n.tempo_seg)}>{fmtSeg(n.tempo_seg)}</button>
+                        <p>{n.texto}</p>
+                        <span className="quando">{fmtQuando(n.criada_em)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* DÚVIDAS */}
+                <div className={`painel-aba${abaAtiva === "duvidas" ? " ativo" : ""}`} id="p-duvidas" role="tabpanel" aria-labelledby="a-duvidas">
+                  <div className="anotar" style={{ marginBottom: "var(--s-4)" }}>
+                    <span className="momento num">{momento}</span>
+                    <textarea value={duvidaTxt} onChange={(e) => setDuvidaTxt(e.target.value)}
+                      placeholder="Pergunte sobre este momento da aula…" aria-label={`Nova dúvida ancorada em ${momento}`} />
+                    <button className="enviar" onClick={enviarDuvida} aria-label="Enviar dúvida">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 14-7-4 14-3.5-5.5z" /></svg>
+                    </button>
+                  </div>
+
+                  {duvidas.map((d) => (
+                    <div className="duvida" key={d.id}>
+                      <span className="foto-p" aria-hidden="true">{d.autor_iniciais}</span>
+                      <div className="duvida-corpo">
+                        <div className="quem">
+                          <b>{d.autor_nome}</b>
+                          {d.tempo_seg != null && (
+                            <button className="marca-tempo num" onClick={() => seek(d.tempo_seg!)}>{fmtSeg(d.tempo_seg)}</button>
+                          )}
+                          <time>{fmtQuando(d.criada_em)}</time>
+                        </div>
+                        <p>{d.texto}</p>
+                        <div className="duvida-acoes"><button>Responder</button><button>Útil · {d.uteis}</button></div>
+                        {(d.respostas ?? []).map((r) => (
+                          <div className="resposta" style={{ marginTop: 14 }} key={r.id}>
+                            <span className="foto-p" aria-hidden="true">{r.autor_iniciais}</span>
+                            <div className="duvida-corpo">
+                              <div className="quem">
+                                <b>{r.autor_nome}</b>
+                                {r.e_especialista && <span className="selo-esp">Especialista</span>}
+                                <time>{fmtQuando(r.criada_em)}</time>
+                              </div>
+                              <p>{r.texto}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* SUPORTE */}
+                <div className={`painel-aba${abaAtiva === "suporte" ? " ativo" : ""}`} id="p-suporte" role="tabpanel" aria-labelledby="a-suporte">
+                  <div className="suporte-grid">
+                    <button className="suporte-opcao">
+                      <span className="sup-ico" aria-hidden="true">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.2-1L3 21l1.5-5.3c-.6-1.2-1-2.6-1-4.2A8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 9z" /></svg>
+                      </span>
+                      <b>Falar com o suporte</b>
+                      <span>Dúvida técnica ou de acesso. Resposta média em 2h úteis.</span>
+                    </button>
+                    <button className="suporte-opcao">
+                      <span className="sup-ico" aria-hidden="true">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 9v4m0 4h.01M4.9 19h14.2a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0L3.2 16a2 2 0 0 0 1.7 3z" /></svg>
+                      </span>
+                      <b>Reportar um problema</b>
+                      <span>Vídeo, áudio ou material com erro nesta aula.</span>
+                    </button>
+                  </div>
+                  <p className="contexto-nota">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: "var(--verde)" }}><path d="M4 12.5 9.5 18 20 6.5" /></svg>
+                    Seu chamado já vai com o contexto anexado:
+                    <span className="chip-ctx">Aula · {aula.titulo}</span>
+                    <span className="chip-ctx num">Momento · {momento}</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* ============ TRILHO DO MÓDULO ============ */}
+            <aside className="trilho-aulas" aria-label="Aulas deste módulo">
+              <div className="trilho-cab">
+                <span className="eyebrow">Módulo {mm} · <b>Você está aqui</b></span>
+                <h2>{modulo.titulo}</h2>
+                <p className="meta num">{modulo.concluidasNoModulo + (concluida && !aula.concluida ? 1 : 0)} de {modulo.totalAulas} concluídas · {fmtDurSeg(modulo.duracaoModuloSeg)}</p>
+              </div>
+              <ul className="trilho-lista">
+                {trilho.map((t) => {
+                  const feita = t.concluida || (t.atual && concluida);
+                  const cls = `t-aula${feita ? " feita" : ""}${t.atual ? " atual" : ""}`;
+                  return (
+                    <li className={cls} key={t.id}>
+                      <Link href={`/curso/${curso.slug}/aula/${t.id}`} aria-current={t.atual || undefined}>
+                        <span className={`t-estado${!feita && !t.atual ? " num" : ""}`} aria-hidden="true">
+                          {t.atual && !feita ? <span className="eq"><i></i><i></i><i></i></span> : feita ? "✓" : t.ordem}
+                        </span>
+                        <span className="t-txt">
+                          <b>{t.titulo}</b>
+                          <span>{t.atual ? "Assistindo agora" : feita ? "Assistida" : t.tipo === "quiz" ? "Quiz do módulo" : fmtDurSeg(t.duracaoSeg)}</span>
+                        </span>
+                        <span className="t-dur num">{fmtDurSeg(t.duracaoSeg)}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              {proximoModulo && (
+                <>
+                  <div className="trilho-divisor"><span>A seguir</span></div>
+                  <Link className="prox-mod" href={`/curso/${curso.slug}`}>
+                    <span className="num-mod num" aria-hidden="true">{String(proximoModulo.ordem).padStart(2, "0")}</span>
+                    <span style={{ flex: 1, minWidth: 0 }}>
+                      <b>{proximoModulo.titulo}</b>
+                      <span className="num">{proximoModulo.totalAulas} aulas · {fmtDurSeg(proximoModulo.duracaoModuloSeg)}</span>
+                    </span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--cinza)", flexShrink: 0 }}><path d="m9 18 6-6-6-6" /></svg>
+                  </Link>
+                </>
+              )}
+            </aside>
+
+          </div>
+        </div>
+      </main>
+
+      {/* toast de XP */}
+      <div className={`toast-xp${toast ? " visivel" : ""}`} role="status">
+        <span className="xp num">+{aula.xp} XP</span>
+        <span>Aula concluída{faltamModulo > 0 ? ` · faltam ${faltamModulo} para o módulo` : " · módulo completo!"}</span>
+      </div>
+    </div>
+  );
+}
