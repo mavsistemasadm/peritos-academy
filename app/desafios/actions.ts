@@ -251,7 +251,7 @@ O aluno errou uma pergunta. Explique de forma clara e didática:
 2. Como chegar na resposta correta, passo a passo, mostrando de onde tirar os dados na sentença
 3. Uma dica prática pra não errar isso num laudo real
 
-Seja direto, técnico mas acessível. Use português brasileiro. Máximo 4 parágrafos curtos.`,
+Seja direto, técnico mas acessível. Use português brasileiro. Máximo 4 parágrafos curtos. NÃO use markdown: nada de #, ##, **, __, ---, travessões ou listas com -. Escreva em prosa corrida, parágrafos simples.`,
         messages: [{
           role: 'user',
           content: `PERGUNTA: ${quesito.enunciado}
@@ -271,4 +271,54 @@ Explique por que a resposta está errada e como chegar no valor correto.`
     console.error('[desafio] erro na explicação:', e)
     return { ok: false as const, erro: 'Não foi possível gerar a explicação.' }
   }
+
+// ---------- UPLOAD DA PLANILHA DO ALUNO ----------
+export async function uploadPlanilha(desafioId: string, formData: FormData) {
+  const supabase = await criarClienteServidor()
+  const { data: auth } = await supabase.auth.getUser()
+  if (!auth?.user) return { ok: false as const, erro: 'Faça login.' }
+
+  const arquivo = formData.get('arquivo') as File | null
+  if (!arquivo || arquivo.size === 0) return { ok: false as const, erro: 'Selecione um arquivo.' }
+
+  // valida extensão
+  const ext = arquivo.name.split('.').pop()?.toLowerCase() ?? ''
+  const permitidos = ['xls', 'xlsx', 'xlsm', 'pdf', 'docx']
+  if (!permitidos.includes(ext)) {
+    return { ok: false as const, erro: `Formato .${ext} não aceito. Envie .xlsx, .xls, .xlsm, .pdf ou .docx.` }
+  }
+
+  // valida tamanho (máx 10 MB)
+  if (arquivo.size > 10 * 1024 * 1024) {
+    return { ok: false as const, erro: 'Arquivo muito grande. Máximo 10 MB.' }
+  }
+
+  // busca o desafio pra pegar o número
+  const { data: desafio } = await supabase.from('desafios')
+    .select('numero').eq('id', desafioId).single()
+  const num = desafio?.numero ?? '000'
+
+  // gera o path: desafios/001/entregas/userId/planilha.xlsx
+  const userId = auth.user.id
+  const nomeArquivo = `planilha-${Date.now()}.${ext}`
+  const path = `desafios/${num}/entregas/${userId}/${nomeArquivo}`
+
+  // converte pra buffer
+  const buffer = Buffer.from(await arquivo.arrayBuffer())
+
+  const { error: upErr } = await supabase.storage
+    .from('planilhas')
+    .upload(path, buffer, { contentType: arquivo.type, upsert: true })
+  if (upErr) return { ok: false as const, erro: `Erro no upload: ${upErr.message}` }
+
+  // salva o path na entrega
+  const { error: dbErr } = await supabase.from('desafio_entregas')
+    .update({ arquivo_path: path })
+    .eq('desafio_id', desafioId)
+    .eq('usuario_id', userId)
+  if (dbErr) return { ok: false as const, erro: dbErr.message }
+
+  return { ok: true as const, path, nome: arquivo.name, tamanho: arquivo.size }
+}
+
 }
