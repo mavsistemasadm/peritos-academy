@@ -8,7 +8,7 @@ import type { DadosNav } from '@/lib/queries/nav'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
-type Aba = 'inicio' | 'trilhas' | 'biblioteca' | 'comunidade' | 'agenda'
+type Aba = 'inicio' | 'trilhas' | 'biblioteca' | 'comunidade' | 'agenda' | 'desafios'
 
 export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo?: Aba }) {
   const d = dados
@@ -34,9 +34,10 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
         <nav className="np-links" aria-label="Navegação principal">
           <a href="/" className={ativo === 'inicio' ? 'ativo' : undefined} aria-current={ativo === 'inicio' ? 'page' : undefined}>Início</a>
           <a href="/jornada" className={ativo === 'trilhas' ? 'ativo' : undefined} aria-current={ativo === 'trilhas' ? 'page' : undefined}>Trilhas</a>
-          <a href="#" className={ativo === 'biblioteca' ? 'ativo' : undefined}>Biblioteca</a>
-          <a href="/comunidade" className={ativo === 'comunidade' ? 'ativo' : undefined} aria-current={ativo === 'comunidade' ? 'page' : undefined}>Comunidade</a>
-          <a href="/agenda" className={ativo === 'agenda' ? 'ativo' : undefined} aria-current={ativo === 'agenda' ? 'page' : undefined}>Agenda</a>
+          <a href="/biblioteca" className={ativo === 'biblioteca' ? 'ativo' : undefined} aria-current={ativo === 'biblioteca' ? 'page' : undefined}>Biblioteca</a>
+            <a href="/comunidade" className={ativo === 'comunidade' ? 'ativo' : undefined} aria-current={ativo === 'comunidade' ? 'page' : undefined}>Comunidade</a>
+            <a href="/agenda" className={ativo === 'agenda' ? 'ativo' : undefined} aria-current={ativo === 'agenda' ? 'page' : undefined}>Agenda</a>
+            <a href="/desafios" className={ativo === 'desafios' ? 'ativo' : undefined} aria-current={ativo === 'desafios' ? 'page' : undefined}>Desafios</a>
         </nav>
 
         <div className="np-acoes">
