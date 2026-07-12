@@ -164,7 +164,7 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
               <span className="eyebrow">Para você</span>
               <h2 className="h2">Escolhido para o seu momento.</h2>
             </div>
-            <a className="link-secao" href="#">Ver biblioteca completa <span className="seta">→</span></a>
+            <a className="link-secao" href="/cursos">Ver biblioteca completa <span className="seta">→</span></a>
           </div>
         </div>
         <div className="wrap">
