@@ -1,6 +1,7 @@
 // app/jornada/page.tsx
 import type { Metadata } from 'next'
 import { carregarJornada } from '@/lib/queries/jornada'
+import { carregarNav } from '@/lib/queries/nav'
 import JornadaContent from '@/components/JornadaContent'
 
 export const metadata: Metadata = {
@@ -8,11 +9,9 @@ export const metadata: Metadata = {
   description: 'Cinco etapas entre você e o título de Perito de Elite.',
 }
 
-// o estado das etapas deriva do perfil de quem está logado — sem cache
 export const dynamic = 'force-dynamic'
 
 export default async function PaginaJornada() {
-  const dados = await carregarJornada()
-    console.log('>>> tipo do JornadaContent:', typeof JornadaContent)
-  return <JornadaContent dados={dados} />
+  const [dados, nav] = await Promise.all([carregarJornada(), carregarNav()])
+  return <JornadaContent dados={dados} nav={nav} />
 }
