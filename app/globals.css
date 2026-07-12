@@ -3519,3 +3519,166 @@ body.teatro .trilho-aulas{display:none}
 .pagina-desafio .dsc-perg-op.sel{border-color:rgba(32,217,166,.6);background:rgba(32,217,166,.1);color:var(--creme)}
 .pagina-desafio .dsc-perg-op-letra{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--verde);background:rgba(32,217,166,.1);border:1px solid rgba(32,217,166,.25);flex-shrink:0}
 .pagina-desafio .dsc-perg-op.sel .dsc-perg-op-letra{background:var(--verde);color:var(--carvao);border-color:var(--verde)}
+
+
+
+
+/* ============================================================
+   PERITOS ACADEMY — PERFIL PÚBLICO DO PERITO
+   ============================================================ */
+.pagina-perito-pub{
+  --carvao:#070908;--preto-elev:#101311;--preto-elev-2:#0B0E0C;
+  --creme:#F1F2DF;--cinza:#989E99;--cinza-claro:#B9BFB8;
+  --verde:#20D9A6;--ciano:#36DCD1;--lima:#DDF784;
+  --linha:rgba(255,255,255,.10);--linha-suave:rgba(255,255,255,.07);
+  --grad-marca:linear-gradient(120deg,#20D9A6 0%,#36DCD1 48%,#DDF784 100%);
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --s-2:12px;--s-3:16px;--s-4:24px;--s-5:32px;--s-6:48px;--s-7:64px;--s-8:80px;
+  --r-card:20px;--r-pill:999px;
+  --suave:cubic-bezier(.2,.7,.3,1);
+  font-family:var(--font);color:var(--creme);
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;
+  background:var(--carvao);
+  background-image:
+    radial-gradient(ellipse 70% 50% at 30% 0%,rgba(32,217,166,.10),transparent 50%),
+    radial-gradient(ellipse 50% 40% at 90% 30%,rgba(54,220,209,.07),transparent 45%),
+    radial-gradient(ellipse 60% 50% at 10% 70%,rgba(221,247,132,.05),transparent 50%),
+    radial-gradient(ellipse 40% 30% at 80% 90%,rgba(32,217,166,.06),transparent 40%);
+}
+.pagina-perito-pub *{margin:0;padding:0;box-sizing:border-box}
+.pagina-perito-pub a{color:inherit;text-decoration:none}
+.pagina-perito-pub button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.pagina-perito-pub :focus-visible{outline:2px solid var(--verde);outline-offset:3px;border-radius:6px}
+.pagina-perito-pub .num{font-variant-numeric:tabular-nums}
+.pagina-perito-pub .grao{position:fixed;inset:0;z-index:300;pointer-events:none;opacity:.028;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.pagina-perito-pub .pp-wrap{max-width:1080px;margin:0 auto;padding:0 var(--s-6)}
+@media(max-width:768px){.pagina-perito-pub .pp-wrap{padding:0 var(--s-4)}}
+
+/* nav pública */
+.pagina-perito-pub .pp-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;background:rgba(7,9,8,.75);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-bottom:1px solid rgba(32,217,166,.12)}
+.pagina-perito-pub .pp-nav-inner{max-width:1080px;margin:0 auto;height:100%;padding:0 var(--s-6);display:flex;align-items:center;justify-content:space-between}
+.pagina-perito-pub .pp-logo{font-size:17px;font-weight:730;letter-spacing:-.03em;color:var(--creme)}
+.pagina-perito-pub .pp-logo small{font-size:12px;font-weight:500;color:var(--verde);margin-left:2px}
+.pagina-perito-pub .pp-nav-selo{font-size:11px;font-weight:660;letter-spacing:.1em;text-transform:uppercase;color:var(--verde);border:1px solid rgba(32,217,166,.35);border-radius:var(--r-pill);padding:5px 14px;background:rgba(32,217,166,.06)}
+
+/* hero */
+.pagina-perito-pub .pp-hero{padding:calc(60px + var(--s-7)) 0 var(--s-5);position:relative}
+.pagina-perito-pub .pp-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:320px;background:linear-gradient(180deg,rgba(32,217,166,.08) 0%,rgba(54,220,209,.04) 40%,transparent 100%);pointer-events:none}
+.pagina-perito-pub .pp-hero-card{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s-5);border:1px solid rgba(32,217,166,.25);border-radius:var(--r-card);background:linear-gradient(150deg,rgba(32,217,166,.10) 0%,rgba(54,220,209,.04) 30%,rgba(11,14,12,.95) 60%);padding:var(--s-5) var(--s-6);position:relative;overflow:hidden;box-shadow:0 30px 60px -20px rgba(32,217,166,.12),inset 0 1px 0 rgba(255,255,255,.04)}
+.pagina-perito-pub .pp-hero-card::before{content:'';position:absolute;top:-100px;right:-100px;width:300px;height:300px;background:radial-gradient(circle,rgba(221,247,132,.08),transparent 65%);pointer-events:none}
+.pagina-perito-pub .pp-hero-card::after{content:'';position:absolute;bottom:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(32,217,166,.06),transparent 60%);pointer-events:none}
+.pagina-perito-pub .pp-hero-info{display:flex;gap:var(--s-4);flex:1;min-width:0;position:relative;z-index:1}
+.pagina-perito-pub .pp-avatar{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,rgba(32,217,166,.15),rgba(11,14,12,.8));border:2px solid rgba(32,217,166,.4);display:grid;place-items:center;font-size:24px;font-weight:700;color:var(--verde);flex-shrink:0;box-shadow:0 8px 24px -8px rgba(32,217,166,.2)}
+.pagina-perito-pub .pp-hero-dados{flex:1;min-width:0}
+.pagina-perito-pub .pp-hero-dados h1{font-size:clamp(22px,3vw,32px);font-weight:720;letter-spacing:-.03em;line-height:1.15;margin-bottom:6px}
+.pagina-perito-pub .pp-bio{font-size:14px;color:var(--cinza-claro);line-height:1.55;margin-bottom:var(--s-3);max-width:48ch}
+.pagina-perito-pub .pp-meta{display:flex;flex-wrap:wrap;gap:12px 20px;font-size:12.5px;color:var(--cinza);margin-bottom:10px}
+.pagina-perito-pub .pp-contato{display:flex;flex-wrap:wrap;gap:12px}
+.pagina-perito-pub .pp-contato a{font-size:13px;color:var(--ciano);border:1px solid rgba(54,220,209,.2);border-radius:var(--r-pill);padding:4px 14px;background:rgba(54,220,209,.04);transition:all .2s}
+.pagina-perito-pub .pp-contato a:hover{background:rgba(54,220,209,.1);border-color:rgba(54,220,209,.4);color:var(--creme)}
+
+/* score */
+.pagina-perito-pub .pp-score{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;padding:var(--s-3);position:relative;z-index:1}
+.pagina-perito-pub .pp-score-numero{font-size:58px;font-weight:800;letter-spacing:-.04em;line-height:1;text-shadow:0 0 40px rgba(32,217,166,.3)}
+.pagina-perito-pub .pp-score-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cinza)}
+.pagina-perito-pub .pp-score-tier{font-size:10px;font-weight:750;letter-spacing:.12em;text-transform:uppercase;border:1.5px solid;border-radius:var(--r-pill);padding:4px 14px;margin-top:4px;background:rgba(32,217,166,.06)}
+
+/* stats */
+.pagina-perito-pub .pp-stats{padding:var(--s-4) 0 var(--s-5)}
+.pagina-perito-pub .pp-stats-grade{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-3)}
+@media(max-width:640px){.pagina-perito-pub .pp-stats-grade{grid-template-columns:repeat(2,1fr)}}
+.pagina-perito-pub .pp-stat{border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:var(--s-4);background:linear-gradient(165deg,rgba(32,217,166,.04),rgba(11,14,12,.7) 50%);transition:all .3s var(--suave);position:relative;overflow:hidden}
+.pagina-perito-pub .pp-stat::before{content:'';position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(circle,rgba(32,217,166,.06),transparent 70%);pointer-events:none}
+.pagina-perito-pub .pp-stat:hover{border-color:rgba(32,217,166,.3);transform:translateY(-3px);box-shadow:0 12px 30px -10px rgba(32,217,166,.1)}
+.pagina-perito-pub .pp-stat.destaque{border-color:rgba(32,217,166,.3);background:linear-gradient(150deg,rgba(32,217,166,.10),rgba(221,247,132,.04) 40%,rgba(11,14,12,.8) 70%)}
+.pagina-perito-pub .pp-stat.destaque::before{background:radial-gradient(circle,rgba(221,247,132,.1),transparent 70%)}
+.pagina-perito-pub .pp-stat-v{display:block;font-size:30px;font-weight:760;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px;position:relative;z-index:1}
+.pagina-perito-pub .pp-stat.destaque .pp-stat-v{background:var(--grad-marca);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pagina-perito-pub .pp-stat-r{font-size:10px;font-weight:660;letter-spacing:.14em;text-transform:uppercase;color:var(--cinza);position:relative;z-index:1}
+
+/* título de seção */
+.pagina-perito-pub .pp-titulo-secao{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--cinza);margin-bottom:var(--s-4);padding-bottom:var(--s-2);border-bottom:1px solid rgba(32,217,166,.12)}
+
+/* competências / radar */
+.pagina-perito-pub .pp-competencias{padding:var(--s-5) 0}
+.pagina-perito-pub .pp-radar{display:grid;grid-template-columns:360px 1fr;gap:var(--s-5);align-items:center;border:1px solid rgba(32,217,166,.2);border-radius:var(--r-card);background:linear-gradient(150deg,rgba(32,217,166,.07),rgba(54,220,209,.03) 30%,rgba(11,14,12,.85) 60%);padding:var(--s-5) var(--s-6);box-shadow:0 24px 50px -18px rgba(32,217,166,.08);position:relative;overflow:hidden}
+.pagina-perito-pub .pp-radar::before{content:'';position:absolute;top:-50px;left:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(32,217,166,.06),transparent 65%);pointer-events:none}
+@media(max-width:768px){.pagina-perito-pub .pp-radar{grid-template-columns:1fr;justify-items:center;padding:var(--s-5)}}
+.pagina-perito-pub .pp-radar svg{width:100%;max-width:360px}
+.pagina-perito-pub .pp-radar-lista{display:flex;flex-direction:column;gap:14px;width:100%}
+.pagina-perito-pub .pp-radar-item{display:flex;align-items:center;gap:14px}
+.pagina-perito-pub .pp-radar-nome{font-size:13px;font-weight:600;color:var(--cinza-claro);min-width:130px}
+.pagina-perito-pub .pp-radar-barra{flex:1;height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+.pagina-perito-pub .pp-radar-barra i{display:block;height:100%;background:var(--grad-marca);border-radius:4px;transition:width .6s var(--suave)}
+.pagina-perito-pub .pp-radar-val{font-size:14px;font-weight:700;color:var(--creme);min-width:32px;text-align:right}
+
+/* certificados */
+.pagina-perito-pub .pp-certs{padding:var(--s-5) 0}
+.pagina-perito-pub .pp-certs-lista{display:flex;flex-direction:column;gap:10px}
+.pagina-perito-pub .pp-cert{display:flex;justify-content:space-between;align-items:center;gap:var(--s-3);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 22px;background:linear-gradient(165deg,rgba(32,217,166,.04),rgba(11,14,12,.7) 45%);transition:all .3s var(--suave);position:relative;overflow:hidden}
+.pagina-perito-pub .pp-cert::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--grad-marca);border-radius:3px 0 0 3px;opacity:.5;transition:opacity .3s}
+.pagina-perito-pub .pp-cert:hover{border-color:rgba(32,217,166,.3);transform:translateY(-2px);box-shadow:0 10px 28px -10px rgba(32,217,166,.1)}
+.pagina-perito-pub .pp-cert:hover::before{opacity:1}
+.pagina-perito-pub .pp-cert-info{flex:1;min-width:0;padding-left:12px}
+.pagina-perito-pub .pp-cert-info b{display:block;font-size:14.5px;font-weight:620;margin-bottom:3px}
+.pagina-perito-pub .pp-cert-info span{font-size:12px;color:var(--cinza)}
+.pagina-perito-pub .pp-cert-dir{display:flex;align-items:center;gap:16px;flex-shrink:0}
+.pagina-perito-pub .pp-cert-nota{font-size:20px;font-weight:740;background:var(--grad-marca);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pagina-perito-pub .pp-cert-num{font-size:11px;font-weight:600;color:var(--cinza);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-pill);padding:3px 10px;background:rgba(255,255,255,.03)}
+
+/* desafios */
+.pagina-perito-pub .pp-desafios{padding:var(--s-5) 0}
+.pagina-perito-pub .pp-desafios-lista{display:flex;flex-direction:column;gap:10px}
+.pagina-perito-pub .pp-desafio{display:flex;align-items:center;gap:16px;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:18px 22px;background:linear-gradient(165deg,rgba(54,220,209,.04),rgba(11,14,12,.7) 45%);transition:all .3s var(--suave);position:relative;overflow:hidden}
+.pagina-perito-pub .pp-desafio::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--ciano),var(--verde));border-radius:3px 0 0 3px;opacity:.5;transition:opacity .3s}
+.pagina-perito-pub .pp-desafio:hover{border-color:rgba(54,220,209,.3);transform:translateY(-2px);box-shadow:0 10px 28px -10px rgba(54,220,209,.1)}
+.pagina-perito-pub .pp-desafio:hover::before{opacity:1}
+.pagina-perito-pub .pp-desafio-num{font-size:14px;font-weight:700;color:var(--verde);min-width:48px;padding-left:10px}
+.pagina-perito-pub .pp-desafio-info{flex:1;min-width:0}
+.pagina-perito-pub .pp-desafio-info b{display:block;font-size:14px;font-weight:620;margin-bottom:2px}
+.pagina-perito-pub .pp-desafio-info span{font-size:12px;color:var(--cinza)}
+.pagina-perito-pub .pp-desafio-nota{font-size:20px;font-weight:740;background:linear-gradient(120deg,var(--ciano),var(--lima));-webkit-background-clip:text;background-clip:text;color:transparent;flex-shrink:0}
+
+/* resumo */
+.pagina-perito-pub .pp-resumo{padding:var(--s-5) 0}
+.pagina-perito-pub .pp-resumo-card{border:1px solid rgba(54,220,209,.25);border-radius:var(--r-card);background:linear-gradient(150deg,rgba(54,220,209,.08),rgba(32,217,166,.04) 30%,rgba(11,14,12,.85) 55%);padding:var(--s-5) var(--s-6);position:relative;overflow:hidden;box-shadow:0 20px 50px -18px rgba(54,220,209,.08)}
+.pagina-perito-pub .pp-resumo-card::before{content:'';position:absolute;bottom:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(221,247,132,.06),transparent 60%);pointer-events:none}
+.pagina-perito-pub .pp-resumo-card p{font-size:15px;color:var(--cinza-claro);line-height:1.65;margin-bottom:var(--s-4);position:relative;z-index:1}
+.pagina-perito-pub .pp-resumo-acoes{display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:relative;z-index:1}
+.pagina-perito-pub .pp-btn-copiar{font-size:13px;font-weight:640;color:var(--carvao);background:var(--grad-marca);border-radius:var(--r-pill);padding:10px 22px;transition:transform .25s var(--suave);box-shadow:0 6px 20px -6px rgba(32,217,166,.3)}
+.pagina-perito-pub .pp-btn-copiar:hover{transform:scale(1.04)}
+.pagina-perito-pub .pp-resumo-dica{font-size:12px;color:var(--cinza);font-style:italic}
+
+/* verificação + QR */
+.pagina-perito-pub .pp-verificacao{padding:var(--s-6) 0}
+.pagina-perito-pub .pp-verif-card{display:flex;justify-content:space-between;align-items:center;gap:var(--s-5);border:1px solid rgba(32,217,166,.25);border-radius:var(--r-card);background:linear-gradient(150deg,rgba(32,217,166,.08),rgba(54,220,209,.04) 30%,rgba(11,14,12,.85) 55%);padding:var(--s-5) var(--s-6);position:relative;overflow:hidden;box-shadow:0 24px 60px -20px rgba(32,217,166,.1)}
+.pagina-perito-pub .pp-verif-card::before{content:'';position:absolute;top:-40px;left:50%;width:200px;height:200px;background:radial-gradient(circle,rgba(32,217,166,.06),transparent 60%);pointer-events:none;transform:translateX(-50%)}
+.pagina-perito-pub .pp-verif-selo{display:flex;gap:14px;align-items:center;position:relative;z-index:1}
+.pagina-perito-pub .pp-verif-selo b{display:block;font-size:15px;font-weight:660;color:var(--creme);margin-bottom:2px}
+.pagina-perito-pub .pp-verif-selo span{font-size:13px;color:var(--cinza)}
+.pagina-perito-pub .pp-verif-qr{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;position:relative;z-index:1}
+.pagina-perito-pub .pp-verif-qr img{border-radius:12px;border:2px solid rgba(32,217,166,.2);box-shadow:0 8px 24px -8px rgba(32,217,166,.15)}
+.pagina-perito-pub .pp-verif-url{font-size:10px;color:var(--cinza);max-width:140px;text-align:center;word-break:break-all}
+
+/* footer */
+.pagina-perito-pub .pp-footer{border-top:1px solid rgba(32,217,166,.1);padding:var(--s-5) 0;margin-top:var(--s-5)}
+.pagina-perito-pub .pp-footer .pp-wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--s-3)}
+.pagina-perito-pub .pp-footer span{font-size:12px;color:var(--cinza)}
+.pagina-perito-pub .pp-footer a{font-size:13px;font-weight:620;color:var(--verde);transition:color .2s}
+.pagina-perito-pub .pp-footer a:hover{color:var(--creme)}
+
+/* responsivo hero */
+@media(max-width:768px){
+  .pagina-perito-pub .pp-hero-card{flex-direction:column;align-items:center;text-align:center;padding:var(--s-5)}
+  .pagina-perito-pub .pp-hero-info{flex-direction:column;align-items:center}
+  .pagina-perito-pub .pp-bio{max-width:none}
+  .pagina-perito-pub .pp-meta{justify-content:center}
+  .pagina-perito-pub .pp-contato{justify-content:center}
+  .pagina-perito-pub .pp-verif-card{flex-direction:column;text-align:center;padding:var(--s-5)}
+  .pagina-perito-pub .pp-verif-selo{flex-direction:column;align-items:center}
+  .pagina-perito-pub .pp-resumo-card{padding:var(--s-5)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .pagina-perito-pub *,.pagina-perito-pub *::before,.pagina-perito-pub *::after{animation:none!important;transition:none!important}
+}
