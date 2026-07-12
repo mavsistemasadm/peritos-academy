@@ -34,33 +34,39 @@ export type Atividade = {
 
 export type DadosPerfil = {
   nome: string
+  slug: string | null
+  bio: string | null
+  cidade: string | null
+  estado: string | null
+  telefone: string | null
+  email_publico: string | null
+  mostrar_tel: boolean
+  mostrar_email: boolean
+  perfil_publico: boolean
   titulo: string
   nivel: number
   xp: number
   xpProximoNivel: number
-  progressoPct: number          // barra do hero
-  iniciouRotulo: string         // "março de 2026"
+  progressoPct: number
+  iniciouRotulo: string
   etapa: number
   etapaTotal: number
   etapaNome: string
-  // números
   xpSemana: number
-  estudoHoras: string           // "41h"
-  estudoSemana: string          // "3h 40"
+  estudoHoras: string
+  estudoSemana: string
   missoesFeitas: number
   missoesTotal: number
   rankingPos: number | null
   rankingVar: number | null
   anotacoes: number
-  // constância (tudo computado)
-  heatmap: number[]             // 112 células, 0..4, da mais antiga à mais nova
+  heatmap: number[]
   diasEstudados: number
   diasJanela: number
   sequenciaAtual: number
   recorde: number
-  diasFortes: string            // "Terça e quinta são seus dias fortes."
+  diasFortes: string
   ritmoSubiu: boolean
-  // listas
   insignias: Insignia[]
   certificados: Certificado[]
   atividades: Atividade[]
@@ -101,7 +107,6 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
   ])
   if (!perfil) return null
 
-  // ---------- constância: computada dos dias reais ----------
   const JANELA = 112
   const porDia = new Map<string, number>()
   for (const d of dias ?? []) porDia.set(d.dia, d.nivel)
@@ -123,11 +128,10 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     }
   }
 
-  // sequência atual (termina hoje ou ontem) e recorde na janela
   let sequenciaAtual = 0
   for (let i = heatmap.length - 1; i >= 0; i--) {
     if (heatmap[i] > 0) sequenciaAtual++
-    else if (i === heatmap.length - 1) continue // hoje ainda sem estudo não quebra
+    else if (i === heatmap.length - 1) continue
     else break
   }
   let recorde = 0, corrente = 0
@@ -136,7 +140,6 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     if (corrente > recorde) recorde = corrente
   }
 
-  // dias fortes: os 2 dias da semana com mais estudo
   const ordenados = porDow.map((qtd, dow) => ({ dow, qtd })).sort((a, b) => b.qtd - a.qtd)
   const fortes = ordenados.slice(0, 2).filter(x => x.qtd > 0).map(x => DIA_SEMANA[x.dow])
   const diasFortes = fortes.length === 2
@@ -147,13 +150,21 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
 
   const ritmoSubiu = estudou28 / 28 > estudouAntes / (JANELA - 28)
 
-  // ---------- montagem ----------
   const progressoPct = Math.min(100, Math.round(
     perfil.xp_proximo_nivel > 0 ? (perfil.xp / perfil.xp_proximo_nivel) * 100 : 0
   ))
 
   return {
     nome: perfil.nome ?? 'Perito',
+    slug: perfil.slug ?? null,
+    bio: perfil.bio ?? null,
+    cidade: perfil.cidade ?? null,
+    estado: perfil.estado ?? null,
+    telefone: perfil.telefone ?? null,
+    email_publico: perfil.email_publico ?? null,
+    mostrar_tel: perfil.mostrar_tel ?? false,
+    mostrar_email: perfil.mostrar_email ?? false,
+    perfil_publico: perfil.perfil_publico ?? true,
     titulo: perfil.titulo ?? 'Perito Iniciante',
     nivel: perfil.nivel ?? 1,
     xp: perfil.xp ?? 0,
@@ -178,11 +189,11 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     recorde,
     diasFortes,
     ritmoSubiu,
-    insignias: (insigniasRaw ?? []).map(i => ({
+    insignias: (insigniasRaw ?? []).map((i: any) => ({
       nome: i.nome, descricao: i.descricao, icone: i.icone,
       conquistada: i.conquistada_em != null, quando_rotulo: i.quando_rotulo,
     })),
-    certificados: (certsRaw ?? []).map(c => ({
+    certificados: (certsRaw ?? []).map((c: any) => ({
       numero: c.numero, curso_titulo: c.curso_titulo, curso_slug: c.curso_slug,
       emitido: c.emitido_em != null, emitido_rotulo: c.emitido_rotulo,
       nota: c.nota, carga_horas: c.carga_horas,

@@ -7,6 +7,7 @@ export type DadosNav = {
   logado: boolean
   nome: string
   iniciais: string
+  slug: string | null
   nivel: number
   titulo: string
   xp: number
@@ -18,7 +19,7 @@ export type DadosNav = {
 }
 
 const VAZIO: DadosNav = {
-  logado: false, nome: 'Visitante', iniciais: 'PA',
+logado: false, nome: 'Visitante', iniciais: 'PA', slug: null,
   nivel: 1, titulo: 'Perito Iniciante',
   xp: 0, xpProximo: 100, progressoPct: 0, faltaXp: 100,
   moedas: 0, sequenciaDias: 0,
@@ -34,7 +35,7 @@ export async function carregarNav(): Promise<DadosNav> {
   if (!auth?.user) return VAZIO
 
   const [{ data: perfil }, { data: dias }] = await Promise.all([
-    supabase.from('perfis').select('nome, nivel, titulo, xp, xp_proximo_nivel, moedas').eq('id', auth.user.id).single(),
+    supabase.from('perfis').select('nome, nivel, titulo, xp, xp_proximo_nivel, moedas, slug').eq('id', auth.user.id).single(),
     supabase.from('perfil_estudo_dias').select('dia'),
   ])
   if (!perfil) return VAZIO
@@ -43,7 +44,7 @@ export async function carregarNav(): Promise<DadosNav> {
   const xpProximo = perfil.xp_proximo_nivel ?? 100
 
   // sequência atual de dias consecutivos (o foguinho)
-  const diasSet = new Set((dias ?? []).map(d => d.dia))
+  const diasSet = new Set((dias ?? []).map((d: any) => d.dia))
   const hoje = new Date(); hoje.setHours(12, 0, 0, 0)
   let sequenciaDias = 0
   for (let i = 0; ; i++) {
@@ -58,6 +59,7 @@ export async function carregarNav(): Promise<DadosNav> {
     logado: true,
     nome: perfil.nome ?? 'Perito',
     iniciais: iniciaisDe(perfil.nome ?? 'PA'),
+    slug: perfil.slug ?? null,
     nivel: perfil.nivel ?? 1,
     titulo: perfil.titulo ?? 'Perito Iniciante',
     xp, xpProximo,

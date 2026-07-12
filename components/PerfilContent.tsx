@@ -1,11 +1,11 @@
 // components/PerfilContent.tsx
-// Réplica fiel do template aprovado, 100% plugada no banco.
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
 import type { DadosPerfil } from '@/lib/queries/perfil'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
+import { salvarPerfil } from '@/app/perfil/actions'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -13,7 +13,6 @@ function iniciais(nome: string) {
   return nome.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 }
 
-// primeiro nome + segundo, como "Marlos Henrique"
 function nomeCurto(nome: string) {
   return nome.split(' ').slice(0, 2).join(' ')
 }
@@ -31,7 +30,6 @@ function quandoAtividade(iso: string) {
   return 'semana passada'
 }
 
-// ---------- ícones ----------
 const ICONE_INS: Record<string, React.ReactNode> = {
   check: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5 9.5 18 20 6.5" /></svg>,
   doc: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3v6h6M6 3h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /></svg>,
@@ -51,8 +49,10 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
   const [publico, setPublico] = useState(false)
   const [copiado, setCopiado] = useState<string | null>(null)
   const raiz = useRef<HTMLDivElement>(null)
+  const [editando, setEditando] = useState(false)
+  const [salvandoPerfil, setSalvandoPerfil] = useState(false)
+  const [msgSalvo, setMsgSalvo] = useState<string | null>(null)
 
-  // reveals + animação da barra (igual ao template)
   useEffect(() => {
     const anima = (el: Element | Document) =>
       el.querySelectorAll<HTMLElement>('i[data-fill]').forEach(i => { i.style.width = i.dataset.fill ?? '0%' })
@@ -77,7 +77,22 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
       await navigator.clipboard.writeText(texto)
       setCopiado(chave)
       setTimeout(() => setCopiado(null), 2000)
-    } catch { /* clipboard bloqueado: sem drama */ }
+    } catch { /* clipboard bloqueado */ }
+  }
+
+  async function handleSalvar(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setSalvandoPerfil(true)
+    setMsgSalvo(null)
+    const fd = new FormData(e.currentTarget)
+    const r = await salvarPerfil(fd)
+    setSalvandoPerfil(false)
+    if (r.ok) {
+      setMsgSalvo('Perfil salvo!')
+      setTimeout(() => { setMsgSalvo(null); setEditando(false) }, 1500)
+    } else {
+      setMsgSalvo(r.erro ?? 'Erro ao salvar.')
+    }
   }
 
   const d = dados
@@ -85,8 +100,6 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
   return (
     <div ref={raiz} className={`pagina-perfil${publico ? ' publico' : ''}`}>
       <div className="grao" aria-hidden="true"></div>
-
-      {/* ============ NAV ============ */}
       <NavPlataforma dados={nav} />
 
       {publico && (
@@ -114,6 +127,10 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
               </p>
             </div>
             <div className="perfil-acoes">
+              <button className="btn btn-fantasma privado" onClick={() => setEditando(v => !v)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
+                {editando ? 'Fechar edição' : 'Editar perfil'}
+              </button>
               <button className="btn btn-fantasma privado" onClick={() => { setPublico(true); scrollTo({ top: 0, behavior: 'smooth' }) }}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg>
                 Ver como o público vê
@@ -133,14 +150,73 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
               <i data-fill={`${d.progressoPct}%`}></i>
             </div>
           </div>
+
+          {/* ============ PAINEL DE EDIÇÃO ============ */}
+          {editando && (
+            <div className="perfil-edicao reveal visivel">
+              <form onSubmit={handleSalvar}>
+                <h2>Editar perfil</h2>
+                <div className="pe-grid">
+                  <div className="pe-campo pe-full">
+                    <label>Nome completo</label>
+                    <input name="nome" defaultValue={d.nome} required minLength={3} />
+                  </div>
+                  <div className="pe-campo pe-full">
+                    <label>Bio</label>
+                    <textarea name="bio" defaultValue={d.bio ?? ''} rows={3} placeholder="Perito contábil especializado em..." />
+                  </div>
+                  <div className="pe-campo">
+                    <label>Cidade</label>
+                    <input name="cidade" defaultValue={d.cidade ?? ''} placeholder="São Paulo" />
+                  </div>
+                  <div className="pe-campo">
+                    <label>Estado</label>
+                    <input name="estado" defaultValue={d.estado ?? ''} placeholder="SP" maxLength={2} />
+                  </div>
+                  <div className="pe-campo">
+                    <label>Email público</label>
+                    <input name="email_publico" type="email" defaultValue={d.email_publico ?? ''} placeholder="contato@perito.com" />
+                  </div>
+                  <div className="pe-campo">
+                    <label>Telefone</label>
+                    <input name="telefone" defaultValue={d.telefone ?? ''} placeholder="(48) 99999-0000" />
+                  </div>
+                </div>
+                <div className="pe-toggles">
+                  <label className="pe-toggle">
+                    <input type="checkbox" name="mostrar_email" defaultChecked={d.mostrar_email} />
+                    <span>Mostrar email no perfil público</span>
+                  </label>
+                  <label className="pe-toggle">
+                    <input type="checkbox" name="mostrar_tel" defaultChecked={d.mostrar_tel} />
+                    <span>Mostrar telefone no perfil público</span>
+                  </label>
+                  <label className="pe-toggle">
+                    <input type="checkbox" name="perfil_publico" defaultChecked={d.perfil_publico} />
+                    <span>Perfil público ativo</span>
+                  </label>
+                </div>
+                {d.slug && d.perfil_publico && (
+                  <p className="pe-link-publico">
+                    Seu perfil público: <a href={`/perito/${d.slug}`} target="_blank" rel="noopener">/perito/{d.slug}</a>
+                  </p>
+                )}
+                <div className="pe-acoes">
+                  <button type="submit" className="btn btn-primario" disabled={salvandoPerfil}>
+                    {salvandoPerfil ? 'Salvando…' : '✓ Salvar alterações'}
+                  </button>
+                  <button type="button" className="btn btn-fantasma" onClick={() => setEditando(false)}>Cancelar</button>
+                  {msgSalvo && <span className="pe-msg">{msgSalvo}</span>}
+                </div>
+              </form>
+            </div>
+          )}
         </div>
       </section>
 
       {/* ============ CORPO ============ */}
       <section className="corpo">
         <div className="wrap">
-
-          {/* NÚMEROS (privado) */}
           <div className="secao privado reveal">
             <div className="numeros num">
               <div className="n-item">
@@ -173,7 +249,6 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
             </div>
           </div>
 
-          {/* CONSTÂNCIA (privado) */}
           <div className="secao privado reveal">
             <div className="secao-cab">
               <h2>Constância.</h2>
@@ -205,7 +280,6 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
             </div>
           </div>
 
-          {/* INSÍGNIAS */}
           <div className="secao reveal">
             <div className="secao-cab">
               <h2>Insígnias.</h2>
@@ -223,7 +297,6 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
             </div>
           </div>
 
-          {/* CERTIFICADOS */}
           <div className="secao reveal">
             <div className="secao-cab">
               <h2>Certificados.</h2>
@@ -268,7 +341,6 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
             </div>
           </div>
 
-          {/* ATIVIDADE (privado) */}
           <div className="secao privado reveal">
             <div className="secao-cab">
               <h2>Atividade recente.</h2>
@@ -290,7 +362,6 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
               ))}
             </ul>
           </div>
-
         </div>
       </section>
     </div>
