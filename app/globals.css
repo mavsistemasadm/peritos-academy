@@ -3880,6 +3880,34 @@ body.teatro .trilho-aulas{display:none}
   font-size:14px;font-weight:600;padding:10px 20px;background:var(--creme);color:var(--carvao);
 }
 
+/* ============================================================
+   PERITOS ACADEMY — ASSINATURA NECESSÁRIA (escopado em .pagina-assinatura-necessaria)
+   ============================================================ */
+.pagina-assinatura-necessaria{
+  background:var(--carvao);color:var(--creme);min-height:100vh;
+}
+.pagina-assinatura-necessaria *{box-sizing:border-box}
+.pagina-assinatura-necessaria a{color:inherit;text-decoration:none}
+.pagina-assinatura-necessaria .an2-main{
+  min-height:calc(100vh - var(--nav-h,64px));display:grid;place-items:center;padding:var(--s-5,32px) var(--s-4,24px);
+}
+.pagina-assinatura-necessaria .an2-card{
+  max-width:380px;width:100%;text-align:center;padding:var(--s-5,32px);
+  border:1px solid var(--linha);border-radius:var(--r-card);
+  background:radial-gradient(60% 60% at 50% 0%,rgba(32,217,166,.10),transparent 65%),rgba(255,255,255,.02);
+}
+.pagina-assinatura-necessaria .an2-ico{
+  display:inline-grid;place-items:center;width:56px;height:56px;border-radius:50%;
+  color:var(--verde);background:rgba(32,217,166,.1);border:1px solid rgba(32,217,166,.3);
+  margin-bottom:16px;
+}
+.pagina-assinatura-necessaria h1{font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px}
+.pagina-assinatura-necessaria p{font-size:14px;color:var(--cinza-claro);line-height:1.5;margin-bottom:20px}
+.pagina-assinatura-necessaria .an2-link{
+  display:inline-flex;align-items:center;gap:8px;border-radius:var(--r-pill);
+  font-size:14px;font-weight:600;padding:10px 20px;background:var(--creme);color:var(--carvao);
+}
+
 
 
 
@@ -4195,4 +4223,43 @@ body.teatro .trilho-aulas{display:none}
 }
 .pagina-admin .ad-aba:hover{color:var(--creme)}
 .pagina-admin .ad-aba.ativa{color:var(--verde);border-bottom-color:var(--verde)}
+
+/* ============================================================
+   PERITOS ACADEMY — ADMIN: FINANCEIRO
+   ============================================================ */
+.pagina-admin .ad-fin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--s-3);margin-bottom:var(--s-4)}
+.pagina-admin .ad-fin-stat{
+  border:1px solid var(--linha-suave);border-radius:var(--r-card);padding:16px;
+  background:rgba(255,255,255,.02);
+}
+.pagina-admin .ad-fin-stat b{display:block;font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px}
+.pagina-admin .ad-fin-stat span{font-size:11px;font-weight:650;text-transform:uppercase;letter-spacing:.05em;color:var(--cinza)}
+
+.pagina-admin .ad-fin-grafico{display:flex;align-items:flex-end;gap:10px;height:120px;padding-top:10px}
+.pagina-admin .ad-fin-barra-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.pagina-admin .ad-fin-barra{width:100%;max-width:36px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--verde),var(--ciano));min-height:2px}
+.pagina-admin .ad-fin-barra-rot{font-size:10.5px;color:var(--cinza);white-space:nowrap}
+
+.pagina-admin .ad-status-pill{
+  display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:650;
+  padding:3px 10px;border-radius:var(--r-pill);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;
+}
+.pagina-admin .ad-status-pill.ativa{color:#20D9A6;background:rgba(32,217,166,.12)}
+.pagina-admin .ad-status-pill.cortesia{color:#DDF784;background:rgba(221,247,132,.12)}
+.pagina-admin .ad-status-pill.inadimplente{color:#E0B96B;background:rgba(224,185,107,.12)}
+.pagina-admin .ad-status-pill.suspensa{color:#B9BFB8;background:rgba(185,191,184,.12)}
+.pagina-admin .ad-status-pill.cancelada{color:#E0776B;background:rgba(224,119,107,.12)}
+.pagina-admin .ad-status-pill.pendente{color:#B9BFB8;background:rgba(185,191,184,.12)}
+.pagina-admin .ad-status-pill.confirmada{color:#20D9A6;background:rgba(32,217,166,.12)}
+.pagina-admin .ad-status-pill.vencida{color:#E0776B;background:rgba(224,119,107,.12)}
+.pagina-admin .ad-status-pill.estornada{color:#B9BFB8;background:rgba(185,191,184,.12)}
+
+.pagina-admin .ad-fin-detalhe{padding:14px 10px;border-bottom:1px solid var(--linha-suave);background:rgba(255,255,255,.015)}
+.pagina-admin .ad-fin-detalhe-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pagina-admin .ad-fin-nota{font-size:12px;color:var(--cinza);margin-top:6px}
+.pagina-admin .ad-fin-payload{
+  font-size:11px;color:var(--cinza-claro);background:rgba(0,0,0,.25);border-radius:8px;
+  padding:8px 10px;max-width:360px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;
+}
+
 .cert-popup-acoes .btn{justify-content:center}

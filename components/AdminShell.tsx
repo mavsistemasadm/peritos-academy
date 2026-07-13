@@ -15,6 +15,7 @@ const ROTA_SECAO: Partial<Record<SecaoAdmin, string>> = {
   agenda: '/admin/agenda',
   avisos: '/admin/avisos',
   gamificacao: '/admin/gamificacao',
+  financeiro: '/admin/financeiro',
 }
 
 function temPermissao(admin: AdminAtual, secao: SecaoAdmin) {

@@ -4,6 +4,8 @@ import { getAula } from "@/lib/queries/aula";
 import { carregarNav } from "@/lib/queries/nav";
 import AulaContent from "@/components/AulaContent";
 import { criarClienteServidor } from "@/lib/supabase/server";
+import { verificarAcessoConteudo } from "@/lib/acesso/verificar";
+import AssinaturaNecessaria from "@/components/AssinaturaNecessaria";
 
 export default async function AulaPage({ params }: {
   params: Promise<{ slug: string; aulaId: string }>;
@@ -14,6 +16,9 @@ export default async function AulaPage({ params }: {
 
   const [dados, nav] = await Promise.all([getAula(slug, aulaId), carregarNav()]);
   if (!dados) notFound();
+
+  const acesso = await verificarAcessoConteudo();
+  if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} />;
 
   const usuarioId = auth?.user?.id ?? null;
   const usuarioNome =

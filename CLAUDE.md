@@ -70,8 +70,9 @@ Sequência de build de cada página:
 - `novidades`, `novidade_leituras` (avisos/banners institucionais — diferente de `notificacoes`, ver Sistema de Notificações)
 - `notificacoes` (notificações pessoais/sino), `admin_usuarios` (papéis do admin)
 - `config_gamificacao`, `gamificacao_gatilhos`, `gamificacao_niveis`, `gamificacao_extrato` (ledger de XP/moedas, ver seção Gamificação)
+- `planos_assinatura`, `assinaturas`, `cobrancas`, `webhook_eventos`, `config_financeiro`, `financeiro_log_acoes` (ver seção Financeiro — **não confundir `planos_assinatura` com `planos`**, tabelas diferentes)
 - Bucket Storage `planilhas` (privado, uploads de aluno/documentos), `capas` (público, imagens de capa)
-- Tabelas duplicadas/legadas — nunca usadas pelo app, não construir em cima: `posts`/`post_comentarios`/`post_reacoes` (substituídas por `comunidade_*`), `duvidas`/`duvida_respostas` (substituídas por `aula_duvidas`), `questoes`/`tentativas`/`materiais`/`progresso_aulas`
+- Tabelas duplicadas/legadas — nunca usadas pelo app, não construir em cima: `posts`/`post_comentarios`/`post_reacoes` (substituídas por `comunidade_*`), `duvidas`/`duvida_respostas` (substituídas por `aula_duvidas`), `questoes`/`tentativas`/`materiais`/`progresso_aulas`, `planos` (feature dormente "meu plano de estudo" do aluno, sem leitura/escrita em código), `matriculas` (resquício de modelo antigo, sem leitura/escrita em código — o gate de acesso atual é por assinatura, ver seção Financeiro)
 
 ## Sistema de ícones (dois níveis)
 Toda a plataforma usa dois arquivos centrais em vez de SVGs inline espalhados pelos componentes.
@@ -97,6 +98,7 @@ Toda a plataforma usa dois arquivos centrais em vez de SVGs inline espalhados pe
 ## PowerShell (ambiente do dev)
 - Paths com colchetes quebram; usar `-LiteralPath`
 - `Select-String -Recurse` não existe; usar `Get-ChildItem -Recurse -Include | Select-String`
+- `.env.local` (gitignorado) não existe em checkouts/worktrees novos — `npm run dev` quebra com "Your project's URL and Key are required" até criar um com `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY`. Pegar os valores via MCP (`get_project_url` + `get_publishable_keys`, projeto `abpbxvbmyogmsokboveu`) em vez de pedir pro usuário — é só a chave anon, segura de circular.
 
 ## Sistema de Notificações
 Arquitetura multi-canal desde o início (in-app, email, push, whatsapp), mesmo a Fase 1 só ligando in-app — a ideia é nunca precisar refazer os gatilhos quando um canal novo entrar.
@@ -164,6 +166,55 @@ Todos os valores de `pontos`/`moedas`/`limite_diario` dos gatilhos e os `pontos_
 ### Fora do escopo por enquanto
 Loja de recompensas (só o saldo de moedas existe), página pública de ranking, notificações de gamificação (spec já registrada acima), cron de aniversários, `perfil_insignias` (insígnias visuais avulsas, sem gatilho).
 
+## Financeiro (módulo Asaas no admin)
+Estrutura completa de assinaturas/cobranças/webhooks construída em 2026-07-13, **sem nenhuma chamada externa real** — a ideia foi deixar tudo pronto pra só plugar as chaves do Asaas depois. Ver pendências no fim da seção.
+
+### Nomenclatura — atenção ao nome `planos`
+Já existia uma tabela `planos` no banco, não documentada até então: é a feature dormente "meu plano de estudo" do aluno (`usuario_id`, `titulo`, `meta`, `passos` jsonb — o botão "Criar novo plano" em `HomeContent.tsx`, sem `onClick`, 0 linhas). Pra não colidir nem confundir sessões futuras, os planos de assinatura pagos vivem em **`planos_assinatura`**, não em `planos`. Mesma cautela vale pra `matriculas` (`usuario_id`, `curso_id`, `origem`, `turma`) — também pré-existente, também sem nenhuma leitura/escrita em código, provavelmente resquício de um modelo antigo de matrícula por turma; não usada pelo gate de acesso atual (que é por assinatura, não por matrícula).
+
+### Tabelas
+- `planos_assinatura` — `nome`, `descricao`, `valor_centavos`, `periodicidade` (mensal/anual), `asaas_plan_id` nullable, `ativo`. Catálogo ativo é público (RLS `select using (ativo = true)`) pra uma futura página de checkout.
+- `assinaturas` — `usuario_id`, `plano_id`, `status` (ativa/inadimplente/suspensa/cancelada/cortesia), `asaas_subscription_id` nullable, `iniciada_em`, `proxima_cobranca`, `cancelada_em`, `observacao`. Índice único parcial `uq_assinatura_usuario_corrente` garante no máximo uma assinatura não-cancelada por aluno — ações do admin fazem `UPDATE` na mesma linha, nunca criam linha nova.
+- `cobrancas` — `assinatura_id`, `valor_centavos`, `status` (pendente/confirmada/vencida/estornada), `metodo`, `vencimento`, `pago_em`, `asaas_payment_id` unique, `observacao` (campo extra além da spec original, pra marcar cobranças de teste no seed).
+- `webhook_eventos` — log bruto de tudo que chega em `/api/webhooks/asaas`: `origem`, `evento_id_externo` unique (idempotência), `tipo`, `payload` jsonb, `processado`, `erro`.
+- `config_financeiro` (singleton, id=1) — `dias_carencia` (default 3).
+- `financeiro_log_acoes` — quem fez o quê: `admin_id`, `assinatura_id`, `acao` (conceder_cortesia/suspender/reativar/cancelar), `observacao`. Não existe um log genérico de ações do admin no projeto ainda, então esse log é escopado só ao financeiro.
+
+### RPCs (todas `security definer`, `set search_path = public`)
+- `tem_acesso_ativo(usuario)` — gate de conteúdo. `ativa`/`cortesia` sempre passam; `suspensa`/sem assinatura nunca passam; `inadimplente` passa durante `dias_carencia` contados de `proxima_cobranca` pra frente. Chamada por `lib/acesso/verificar.ts` em toda página de conteúdo pago.
+- `fin_conceder_cortesia` / `fin_suspender_assinatura` / `fin_reativar_assinatura` / `fin_cancelar_assinatura` — todas checam `is_admin_papel(auth.uid(), array['super_admin','financeiro'])` internamente (não só na Server Action) e logam em `financeiro_log_acoes`. `fin_conceder_cortesia` faz upsert (atualiza a assinatura corrente se existir, senão cria) vinculada ao plano interno "Cortesia" (seed, `ativo=false`, não aparece no catálogo público).
+- `processar_evento_asaas(webhook_evento_id)` — lê o payload já logado em `webhook_eventos` e atualiza `cobrancas`/`assinaturas` por `asaas_payment_id`/`asaas_subscription_id`. Concedida a `anon` **e** `authenticated` — a rota de webhook roda sem sessão de usuário (o Asaas não manda cookie), então a validação de origem é toda no route handler (token), não no RLS.
+- `admin_buscar_usuario_por_email(email)` — resolve e-mail → `perfil.id` pra tela de "conceder cortesia". Só existe pra evitar introduzir um cliente Supabase service-role no projeto: como é `security definer`, a função em si enxerga `auth.users` (owner da função), mas só devolve `id`/`nome`/`ja_tem_assinatura`, e só pra quem já é admin financeiro/super_admin. **Não existe cliente service-role no projeto** — se surgir outra necessidade de ler `auth.users` ou bypassar RLS, o padrão é esse (RPC `security definer` estreita), não adicionar a service role key.
+
+### Gate de acesso (`lib/acesso/`)
+- `lib/acesso/verificar.ts` → `verificarAcessoConteudo()`: pega o usuário da sessão, chama `tem_acesso_ativo` via RPC, devolve `{ logado, permitido }`.
+- `lib/acesso/config.ts` → `EXIGE_ASSINATURA_COMUNIDADE_E_AGENDA` (hoje `true`) — única constante que decide se Comunidade e Agenda também exigem assinatura ativa além de login. Fácil de virar `false` se decidirem liberar essas duas seções pra qualquer logado.
+- Aplicado com gate incondicional (sempre exige assinatura) em `curso/[slug]`, `curso/[slug]/aula/[aulaId]`, `curso/[slug]/avaliacao/[avaliacaoId]` e `desafios/[slug]` — checado **depois** do `notFound()`/`redirect('/login')` já existente, pra 404 e "precisa logar" continuarem tendo prioridade sobre "precisa assinar".
+- `components/AssinaturaNecessaria.tsx` — placeholder de paywall (`.pagina-assinatura-necessaria` no CSS, mesmo padrão visual de `.pagina-acesso-negado` mas em verde em vez de vermelho). Mensagem e CTA mudam conforme `logado` (deslogado → "faça login"; logado sem assinatura → "regularize"). CTA aponta pra `/perfil` — a página de checkout real é pendência de amanhã.
+
+### Webhook (`app/api/webhooks/asaas/route.ts`)
+Primeira rota `app/api/` do projeto (antes só existiam Server Actions). Fluxo: 1) valida `asaas-access-token` contra `ASAAS_WEBHOOK_TOKEN` — se a env existir e não bater, `401`; **se a env não existir, só loga `console.warn` e aceita qualquer chamada** (aceitável agora porque não há chave real; precisa estar configurada antes de apontar o Asaas de verdade pra essa URL); 2) loga bruto em `webhook_eventos` (id gerado no client com `crypto.randomUUID()` — ver pegadinha de RLS abaixo); 3) chama `processar_evento_asaas`. Eventos tratados: `PAYMENT_CONFIRMED`/`PAYMENT_RECEIVED` → cobrança confirmada + assinatura ativa; `PAYMENT_OVERDUE` → cobrança vencida + assinatura inadimplente; `SUBSCRIPTION_CANCELLED`/`SUBSCRIPTION_DELETED` → assinatura cancelada. Testado de ponta a ponta via curl local (insert idempotente, dedupe por `evento_id_externo`, `erro` populado quando a cobrança não é encontrada) — nenhuma chamada real ao Asaas.
+
+⚠️ **Pegadinha de RLS descoberta no smoke test**: `.insert(...).select().single()` encadeado numa tabela onde a role que insere (`anon`, nesse caso) não tem policy de `SELECT` derruba o insert inteiro com `"new row violates row-level security policy"` — o Postgres exige que a linha do `RETURNING` também passe por uma policy de leitura, não só a de escrita. Corrigido gerando o `id` no client (`crypto.randomUUID()`) antes do insert e não encadeando `.select()`. Vale pra qualquer rota futura que escreva como `anon`/role sem SELECT.
+
+### Admin (`app/admin/financeiro`, papéis `super_admin`/`financeiro`)
+Segue o padrão de módulo dos demais (`lib/queries/admin-financeiro.ts` + `app/admin/financeiro/actions.ts` + `components/AdminFinanceiroContent.tsx`), com 4 abas internas:
+- **Painel**: MRR (soma das assinaturas `ativa`, plano anual normalizado ÷12), assinantes ativos, inadimplentes, cortesias, faturamento do mês (cobranças `confirmada` com `pago_em` no mês corrente), gráfico de barras simples de receita dos últimos 6 meses, campo de `dias_carencia`.
+- **Assinaturas**: busca por nome + filtro por status (client-side, dataset pequeno pré-lançamento), card "Conceder cortesia" (busca por e-mail via `admin_buscar_usuario_por_email`), linha expansível por aluno com histórico de cobranças e ações (suspender/reativar/cancelar, com `confirm()`/`prompt()` nativos pra confirmação e observação — mesmo padrão de diálogo nativo já usado em `AdminCertificadosContent`).
+- **Planos**: CRUD completo. O plano "Cortesia" aparece marcado como "(interno — não excluir)" na lista — se for renomeado ou apagado, `fin_conceder_cortesia` não acha mais `plano_id` por nome e a próxima concessão de cortesia falha (constraint `NOT NULL`); não há proteção de banco contra isso, só o aviso visual.
+- **Webhooks**: últimos 50 eventos de `webhook_eventos`, com status de processamento, erro e payload expansível — é a tela de depuração pra quando a integração real for ligada.
+
+### Seed
+2 planos reais (Mensal R$97, Anual R$970 — valores placeholder), 1 plano interno "Cortesia" (R$0, `ativo=false`), cortesia pré-lançamento pra `marlos.h.santos@gmail.com` (nada bloqueia o uso dele), 2 cobranças de teste na assinatura de cortesia (uma confirmada, uma pendente) marcadas em `observacao` como dado de teste.
+
+### Pendências (integração real — "amanhã")
+- **Chaves do Asaas**: `ASAAS_WEBHOOK_TOKEN` (validação do webhook) e as credenciais da API do Asaas em si (criação de assinatura/cobrança) — nenhuma existe ainda, nenhuma chamada de saída foi feita nesta sessão.
+- **Checkout real**: `AssinaturaNecessaria` é só um placeholder; a página de assinar/pagar de fato (fluxo de criação de assinatura no Asaas) não existe.
+- **Validação real do webhook**: hoje é só um `console.warn` quando a env não está setada — precisa validar a assinatura/token de verdade assim que o Asaas for conectado, e testar com payloads reais (o formato assumido — `event`, `payment.id`, `subscription.id` — é uma suposição razoável, não confirmado contra a doc do Asaas).
+- **Cron de carência**: `tem_acesso_ativo` calcula a carência **dinamicamente na leitura** (não precisa de cron pro bloqueio em si funcionar). Um cron futuro pode servir pra lembrar o aluno durante a janela de carência (via notificações) ou pra transicionar o status depois que ela expira — não construído.
+- **Criação de novas cobranças**: `processar_evento_asaas` só atualiza `cobrancas` já existentes (casadas por `asaas_payment_id`); o fluxo que cria uma `cobranca` nova a partir de um ciclo de cobrança do Asaas (ou que chama a API do Asaas pra criar a cobrança) fica pra quando a integração for ligada.
+- **Notificações financeiras**: a spec de notificações (categoria "Financeiro" na seção acima) pede `notificar()` nos eventos de assinatura confirmada/atrasada/cancelada — como o sistema de notificações Fase 1 **ainda não foi implementado em código** (só documentado), `processar_evento_asaas` não dispara nada. Quando a Fase 1 for construída, plugar as chamadas ali.
+
 ## Próximo grande passo: ADMIN
 Áreas a construir (ordem sugerida):
 1. ~~Base de acesso admin + níveis de permissão~~ ✅ feito
@@ -172,7 +223,7 @@ Loja de recompensas (só o saldo de moedas existe), página pública de ranking,
 4. ~~Gamificação (XP/moedas/níveis/gatilhos)~~ ✅ feito — ver seção acima
 5. Sistema de Notificações (Fase 1: in-app) — ver seção acima
 6. Configurações da plataforma + logo global (tabela `config_plataforma`, refletir em nav/certificado/emails)
-7. Financeiro Asaas (assinaturas, cobranças, webhooks liberam/suspendem acesso)
+7. ~~Financeiro Asaas (assinaturas, cobranças, webhooks liberam/suspendem acesso)~~ ✅ estrutura feita — ver seção acima; integração real (chaves, checkout, validação de webhook) pendente
 8. Usuários, Relatórios
 
 ## Fluxo de trabalho

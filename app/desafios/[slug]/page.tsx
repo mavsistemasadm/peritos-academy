@@ -3,6 +3,8 @@ import { notFound, redirect } from 'next/navigation'
 import { carregarDesafio } from '@/lib/queries/desafio'
 import { carregarNav } from '@/lib/queries/nav'
 import DesafioContent from '@/components/DesafioContent'
+import { verificarAcessoConteudo } from '@/lib/acesso/verificar'
+import AssinaturaNecessaria from '@/components/AssinaturaNecessaria'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,6 +15,10 @@ export default async function PaginaDesafio({ params }: {
   const [dados, nav] = await Promise.all([carregarDesafio(slug), carregarNav()])
   if (!dados) redirect('/login')
   if (!dados.desafio) notFound()
+
+  const acesso = await verificarAcessoConteudo()
+  if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} />
+
   return <DesafioContent dados={dados} nav={nav} />
 }
 

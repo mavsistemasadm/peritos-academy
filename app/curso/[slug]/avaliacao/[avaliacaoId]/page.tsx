@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { getAvaliacao, type ResultadoCorrecao, type GabaritoItem } from "@/lib/queries/avaliacao";
 import AvaliacaoContent from "@/components/AvaliacaoContent";
 import { criarClienteServidor } from "@/lib/supabase/server";
+import { carregarNav } from "@/lib/queries/nav";
+import { verificarAcessoConteudo } from "@/lib/acesso/verificar";
+import AssinaturaNecessaria from "@/components/AssinaturaNecessaria";
 
 export default async function AvaliacaoPage({ params }: {
   params: Promise<{ slug: string; avaliacaoId: string }>;
@@ -11,6 +14,12 @@ export default async function AvaliacaoPage({ params }: {
 
   const dados = await getAvaliacao(slug, avaliacaoId);
   if (!dados) notFound();
+
+  const acesso = await verificarAcessoConteudo();
+  if (!acesso.permitido) {
+    const nav = await carregarNav();
+    return <AssinaturaNecessaria nav={nav} logado={acesso.logado} />;
+  }
 
   const supabase = await criarClienteServidor();
   const { data: auth } = await supabase.auth.getUser();
