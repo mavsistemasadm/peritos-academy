@@ -74,9 +74,10 @@ export async function carregarBibliotecaCursos(): Promise<DadosBibliotecaCursos>
       .select('id, modulo_id, modulos!inner(curso_id)')
 
     const { data: aulasAssistidas } = await supabase
-      .from('aula_concluida')
+      .from('aula_progresso')
       .select('aula_id')
       .eq('usuario_id', uid)
+      .eq('concluida', true)
 
     if (aulasTotal && aulasAssistidas) {
       const assistidasSet = new Set(aulasAssistidas.map(a => a.aula_id))

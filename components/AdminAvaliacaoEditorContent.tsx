@@ -136,8 +136,8 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
               <label>Nota mínima
                 <input name="nota_minima" type="number" step="0.1" min="0" max="10" defaultValue={avaliacao.notaMinima} />
               </label>
-              <label>XP
-                <input name="xp" type="number" min="0" defaultValue={avaliacao.xp} />
+              <label>Peso (multiplica os pontos de XP por faixa de acerto)
+                <input name="peso" type="number" min="1" max="5" defaultValue={avaliacao.peso} />
               </label>
             </div>
             <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar dados gerais'}</button>

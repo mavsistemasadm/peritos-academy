@@ -13,7 +13,7 @@ export type AvaliacaoListaItem = {
   titulo: string
   tipo: 'avaliacao' | 'prova'
   notaMinima: number
-  xp: number
+  peso: number
   tema: number
   publicado: boolean
   capaUrl: string | null
@@ -46,7 +46,7 @@ export type AvaliacaoAdmin = {
   titulo: string
   briefing: string | null
   notaMinima: number
-  xp: number
+  peso: number
   tipo: 'avaliacao' | 'prova'
   ordem: number
   tema: number
@@ -66,7 +66,7 @@ export async function carregarAvaliacoesAdmin(cursoId?: string): Promise<Avaliac
 
   let query = supabase
     .from('avaliacoes')
-    .select('id, curso_id, modulo_id, numero_caso, titulo, tipo, nota_minima, xp, tema, publicado, capa_url')
+    .select('id, curso_id, modulo_id, numero_caso, titulo, tipo, nota_minima, peso, tema, publicado, capa_url')
     .order('ordem', { ascending: true })
   if (cursoId) query = query.eq('curso_id', cursoId)
 
@@ -95,7 +95,7 @@ export async function carregarAvaliacoesAdmin(cursoId?: string): Promise<Avaliac
     id: a.id, cursoId: a.curso_id, cursoTitulo: cursosMap.get(a.curso_id) ?? 'Curso',
     moduloId: a.modulo_id, moduloTitulo: a.modulo_id ? modulosMap.get(a.modulo_id) ?? null : null,
     numeroCaso: a.numero_caso, titulo: a.titulo, tipo: a.tipo, notaMinima: Number(a.nota_minima),
-    xp: a.xp, tema: a.tema, publicado: a.publicado, capaUrl: a.capa_url,
+    peso: a.peso, tema: a.tema, publicado: a.publicado, capaUrl: a.capa_url,
     totalQuestoes: questoesPorAvaliacao.get(a.id) ?? 0,
   }))
 }
@@ -105,7 +105,7 @@ export async function carregarAvaliacaoAdmin(id: string): Promise<AvaliacaoDetal
 
   const { data: av } = await supabase
     .from('avaliacoes')
-    .select('id, curso_id, modulo_id, numero_caso, titulo, briefing, nota_minima, xp, tipo, ordem, tema, publicado, capa_url')
+    .select('id, curso_id, modulo_id, numero_caso, titulo, briefing, nota_minima, peso, tipo, ordem, tema, publicado, capa_url')
     .eq('id', id)
     .single()
   if (!av) return null
@@ -139,7 +139,7 @@ export async function carregarAvaliacaoAdmin(id: string): Promise<AvaliacaoDetal
   return {
     avaliacao: {
       id: av.id, cursoId: av.curso_id, moduloId: av.modulo_id, numeroCaso: av.numero_caso,
-      titulo: av.titulo, briefing: av.briefing, notaMinima: Number(av.nota_minima), xp: av.xp,
+      titulo: av.titulo, briefing: av.briefing, notaMinima: Number(av.nota_minima), peso: av.peso,
       tipo: av.tipo, ordem: av.ordem, tema: av.tema, publicado: av.publicado, capaUrl: av.capa_url,
     },
     questoes,

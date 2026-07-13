@@ -28,7 +28,7 @@ export type AvaliacaoInfo = {
   descricao: string | null;
   caso_numero: string | null;
   capa_url: string | null;
-  xp_total: number;
+  xp_total: number; // teto de XP (faixa quiz_100 x peso da avaliação) — o efetivo depende do acerto
   nota_minima: number;
   tema: number;
 };
@@ -80,13 +80,19 @@ export async function getAvaliacao(
   const { data: av } = await supabase
     .from("avaliacoes")
     .select(
-      "id, tipo, titulo, briefing, numero_caso, capa_url, xp, nota_minima, tema, modulo_id"
+      "id, tipo, titulo, briefing, numero_caso, capa_url, peso, nota_minima, tema, modulo_id"
     )
     .eq("id", avaliacaoId)
     .eq("curso_id", curso.id)
     .eq("publicado", true)
     .single();
   if (!av) return null;
+
+  const { data: faixaMax } = await supabase
+    .from("gamificacao_gatilhos")
+    .select("pontos")
+    .eq("codigo", "quiz_100")
+    .maybeSingle();
 
   let modulo: AvaliacaoDados["modulo"] = null;
   if (av.modulo_id) {
@@ -128,7 +134,7 @@ export async function getAvaliacao(
       descricao: av.briefing,           // coluna real: briefing
       caso_numero: av.numero_caso,      // coluna real: numero_caso
       capa_url: av.capa_url,
-      xp_total: av.xp ?? 200,           // coluna real: xp
+      xp_total: (faixaMax?.pontos ?? 60) * Math.max(av.peso ?? 1, 1), // teto: faixa quiz_100 x peso
       nota_minima: Number(av.nota_minima ?? 7),
       tema: av.tema ?? 0,
     },

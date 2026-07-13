@@ -48,7 +48,7 @@ export async function criarAvaliacao(formData: FormData): Promise<Resultado> {
       tipo,
       briefing: (formData.get('briefing') as string)?.trim() || null,
       nota_minima: Number((formData.get('nota_minima') as string) || 7),
-      xp: Number((formData.get('xp') as string) || 200),
+      peso: Number((formData.get('peso') as string) || 1),
       publicado: false,
     })
     .select('id')

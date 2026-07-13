@@ -60,7 +60,7 @@ Sequência de build de cada página:
 
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo)
-- `cursos`, `modulos`, `aulas`, `aula_concluida`, `aula_progresso`, `aula_anotacoes`
+- `cursos`, `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool — não existe tabela `aula_concluida`, nunca criar código que a referencie), `aula_anotacoes`
 - `trilhas`, `etapas`, `curso_trilha` (com trilha_nome, trilha_slug, etapa_nome)
 - `avaliacoes`, `avaliacao_questoes`, `avaliacao_opcoes`, `avaliacao_tentativas`, `avaliacao_respostas` (+ views `_publicas`)
 - `desafios`, `desafio_categorias`, `desafio_entregas` (nota_minima, arquivo_path)
@@ -68,6 +68,7 @@ Sequência de build de cada página:
 - `eventos`, `evento_reservas` (agenda), `comunidade_*` (feed/ranking, ver Bloco 2)
 - `novidades`, `novidade_leituras` (avisos/banners institucionais — diferente de `notificacoes`, ver Sistema de Notificações)
 - `notificacoes` (notificações pessoais/sino), `admin_usuarios` (papéis do admin)
+- `config_gamificacao`, `gamificacao_gatilhos`, `gamificacao_niveis`, `gamificacao_extrato` (ledger de XP/moedas, ver seção Gamificação)
 - Bucket Storage `planilhas` (privado, uploads de aluno/documentos), `capas` (público, imagens de capa)
 - Tabelas duplicadas/legadas — nunca usadas pelo app, não construir em cima: `posts`/`post_comentarios`/`post_reacoes` (substituídas por `comunidade_*`), `duvidas`/`duvida_respostas` (substituídas por `aula_duvidas`), `questoes`/`tentativas`/`materiais`/`progresso_aulas`
 
@@ -110,20 +111,50 @@ Função SQL `security definer` — todo gatilho (trigger de tabela ou pg_cron) 
 - **Financeiro**: reservado pro Asaas (assinatura confirmada/atrasada/cancelada) — só o catálogo existe por enquanto, sem integração real.
 - **Administrativo**: boas-vindas ao criar conta.
 
-⚠️ **Gap descoberto durante o desenho**: `perfis.xp`/`perfis.nivel`, `perfil_insignias` e o progresso de etapas (`jornada_etapas`) não têm NENHUM gatilho vivo hoje que os atualize — `submeter_avaliacao` calcula `xp_ganho` mas nunca credita em `perfis.xp`. Os gatilhos de "subiu de nível", "insígnia de peso", "completou etapa" e "desbloqueou próxima etapa" ficam prontos mas dormentes até essa engine de gamificação existir (fora do escopo do bloco de notificações).
+✅ **Gap resolvido**: o motor de gamificação (abaixo) agora credita `perfis.xp`/`nivel`/`moedas` de verdade — os gatilhos de "subiu de nível", "completou etapa" e "desbloqueou próxima etapa" deixaram de ser dormentes. Só `perfil_insignias` (insígnias visuais avulsas) segue sem gatilho vivo — não faz parte do catálogo de `gamificacao_gatilhos`.
 
 ### Admin
 Seção "Notificações": matriz `notif_tipos` (categoria → tipo → toggle por canal) + log das últimas notificações disparadas (suporte/debug).
+
+## Gamificação (módulo 16 do admin)
+Motor de XP/moedas/níveis com gatilhos configuráveis. Fonte da verdade é um **ledger append-only** (`gamificacao_extrato`), não um contador incremental — todo crédito é uma linha nova, o saldo é a soma.
+
+### Tabelas
+- `config_gamificacao` (singleton, id=1) — switches (`gamificacao_ativa`, `gatilhos_ativos`, `ranking_ativo`, `loja_ativa` etc.) + nomenclatura de XP/moeda + texto explicativo
+- `gamificacao_gatilhos` — catálogo (`codigo` pk, `pontos`, `moedas`, `limite_diario` nullable, `ativo`, `categoria`: comum/marco/quiz/especial)
+- `gamificacao_niveis` — `nome`, `pontos_minimos` (unique), `selo_url`, `ordem`
+- `gamificacao_extrato` — ledger: `usuario_id`, `gatilho_codigo`, `pontos`, `moedas`, `referencia_tipo`/`referencia_id` (idempotência — unique parcial quando `referencia_id` não é nulo)
+- `perfis.data_nascimento` (nova, nullable) — pro gatilho `aniversario`, ainda sem agendamento (fase seguinte)
+
+### RPC única: `creditar_gamificacao(usuario, codigo, referencia_tipo?, referencia_id?, pontos_override?, moedas_override?, pular_idempotencia?)`
+Todo gatilho passa por aqui — nunca insere direto no extrato. Checa `config_gamificacao`, existência/ativo do gatilho, limite diário (fuso America/Sao_Paulo), idempotência por referência, insere, **recalcula xp_total/moedas_total somando o extrato inteiro** (sem batch) e sincroniza `perfis.xp`/`moedas`/`nivel` (nivel = maior `gamificacao_niveis.ordem` com `pontos_minimos <= xp_total`; abaixo do primeiro nível, `perfis.nivel = 0`).
+
+### Duas decisões estruturais (regras de quiz em `submeter_avaliacao`)
+1. **Faixas de acerto × peso substituem o XP fixo.** A antiga coluna `avaliacoes.xp` foi renomeada pra `avaliacoes.peso` (multiplicador, default 1; provas usam 2). Faixas: `quiz_ate_49`, `quiz_50_69`, `quiz_70_89`, `quiz_90_99`, `quiz_100` — pontos da faixa × peso da avaliação.
+2. **Retentativa só paga o delta.** `submeter_avaliacao` soma tudo que já foi creditado pra aquela avaliação (`referencia_tipo='avaliacao_quiz'`) e credita só a diferença se a nova faixa valer mais. Nota pior nunca debita. `passar_prova` é bônus único (idempotente) só quando `avaliacoes.tipo = 'prova'`.
+
+### Gatilhos instrumentados (triggers de banco, exceto onde indicado)
+`aula_progresso` (insert/update `concluida`) → `concluir_aula`, e cascata no mesmo trigger pra `iniciar_curso` (primeira aula do curso), `concluir_modulo` e `concluir_curso`/`concluir_etapa` (via `gam_verificar_progresso_curso`, que também roda dentro de `submeter_avaliacao` quando uma aprovação fecha o curso). `certificados` → `certificado`. `comunidade_reacoes`/`comunidade_comentarios`/`comunidade_posts`/`aula_duvidas` → `reagir`/`comentar_post`/`criar_post`/`comentar_aula`. `desafio_entregas` (transição pra `entregue_em` não nulo) → `entregar_desafio`. `login_diario` é a exceção — não é trigger de banco, é chamado a partir de `app/layout.tsx` (`lib/gamificacao/login-diario.ts`, fire-and-forget, idempotente pelo `limite_diario=1`). `aniversario`/`aniversario_plataforma` existem no catálogo mas sem agendamento (pg_cron/Vercel Cron fica pra fase seguinte). `compra_aprovada`/`primeira_compra` ficam `ativo=false` até o Asaas entrar.
+
+### Bugs corrigidos no caminho
+- `lib/certificados/gerar.ts` e `lib/queries/cursos-biblioteca.ts` liam de uma tabela `aula_concluida` que **não existe** — a emissão automática de certificado nunca funcionou de verdade. Trocado por `aula_progresso.eq('concluida', true)`; `gerar.ts` agora chama a RPC `gam_curso_completo` (mesma função usada pelo motor de gamificação) em vez de duplicar a checagem em TS.
+
+### Seed
+Todos os valores de `pontos`/`moedas`/`limite_diario` dos gatilhos e os `pontos_minimos` dos níveis são **placeholder** — a spec original pediu pra calibrar depois pelo admin. O seed usa `ON CONFLICT (codigo) DO UPDATE` só em nome/descrição/categoria, então recalibragens feitas no admin sobrevivem a re-seeds.
+
+### Fora do escopo por enquanto
+Loja de recompensas (só o saldo de moedas existe), página pública de ranking, notificações de gamificação (spec já registrada acima), cron de aniversários, `perfil_insignias` (insígnias visuais avulsas, sem gatilho).
 
 ## Próximo grande passo: ADMIN
 Áreas a construir (ordem sugerida):
 1. ~~Base de acesso admin + níveis de permissão~~ ✅ feito
 2. ~~Gestão de Cursos → Módulos → Aulas, Trilhas/Etapas, Avaliações/Questões~~ ✅ feito (Bloco 1)
 3. ~~Desafios, Certificados, Comunidade, Agenda, Avisos/Novidades~~ ✅ feito (Bloco 2)
-4. Sistema de Notificações (Fase 1: in-app) — ver seção acima
-5. Configurações da plataforma + logo global (tabela `config_plataforma`, refletir em nav/certificado/emails)
-6. Financeiro Asaas (assinaturas, cobranças, webhooks liberam/suspendem acesso)
-7. Usuários, Gamificação (engine de XP/nível/insígnias), Relatórios
+4. ~~Gamificação (XP/moedas/níveis/gatilhos)~~ ✅ feito — ver seção acima
+5. Sistema de Notificações (Fase 1: in-app) — ver seção acima
+6. Configurações da plataforma + logo global (tabela `config_plataforma`, refletir em nav/certificado/emails)
+7. Financeiro Asaas (assinaturas, cobranças, webhooks liberam/suspendem acesso)
+8. Usuários, Relatórios
 
 ## Fluxo de trabalho
 - Sempre rodar `npm run build` antes de commitar pra pegar erros de tipo

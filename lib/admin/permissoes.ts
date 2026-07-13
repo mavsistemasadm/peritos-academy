@@ -24,7 +24,7 @@ export const PERMISSOES_SECAO: Record<SecaoAdmin, PapelAdmin[]> = {
   comunidade:      ['super_admin', 'moderador'],
   agenda:          ['super_admin', 'moderador', 'conteudo'],
   avisos:          ['super_admin', 'moderador'],
-  gamificacao:     ['super_admin', 'conteudo'],
+  gamificacao:     ['super_admin'],
   relatorios:      ['super_admin', 'financeiro'],
 }
 

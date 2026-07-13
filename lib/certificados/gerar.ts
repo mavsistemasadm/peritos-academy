@@ -35,46 +35,20 @@ export async function verificarEEmitirCertificado(
 
   if (certExistente) return { gerado: false }
 
-  // 3. Todas as aulas concluídas?
-  const { data: aulas } = await supabase
-    .from('aulas')
-    .select('id, modulos!inner(curso_id)')
-    .eq('modulos.curso_id', cursoId)
+  // 3. Curso 100% completo (aulas + avaliações)? Checagem única via RPC
+  //    (fonte da verdade compartilhada com o motor de gamificação —
+  //    ver gam_curso_completo() na migração de gamificação).
+  const { data: completo } = await supabase.rpc('gam_curso_completo', {
+    p_usuario: userId,
+    p_curso_id: cursoId,
+  })
 
-  const totalAulas = (aulas ?? []).length
-  if (totalAulas === 0) return { gerado: false }
+  if (!completo) return { gerado: false }
 
-  const { data: concluidas } = await supabase
-    .from('aula_concluida')
-    .select('aula_id')
-    .eq('usuario_id', userId)
-
-  const concluidasSet = new Set((concluidas ?? []).map((c: any) => c.aula_id))
-  const aulasDoCurso = (aulas ?? []).map((a: any) => a.id)
-  const todasConcluidas = aulasDoCurso.every((id: string) => concluidasSet.has(id))
-
-  if (!todasConcluidas) return { gerado: false }
-
-  // 4. Todas as avaliações/provas aprovadas?
   const { data: avaliacoes } = await supabase
     .from('avaliacoes')
     .select('id, nota_minima')
     .eq('curso_id', cursoId)
-
-  if (avaliacoes && avaliacoes.length > 0) {
-    for (const av of avaliacoes) {
-      const { data: tentativa } = await supabase
-        .from('avaliacao_tentativas')
-        .select('aprovado, nota')
-        .eq('avaliacao_id', av.id)
-        .eq('usuario_id', userId)
-        .eq('aprovado', true)
-        .limit(1)
-        .maybeSingle()
-
-      if (!tentativa) return { gerado: false }
-    }
-  }
 
   // 5. Calcula nota média das avaliações
   let notaMedia: number | null = null

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { carregarAvisos } from "@/lib/queries/avisos";
 import AvisosGlobais from "@/components/AvisosGlobais";
+import { creditarLoginDiario } from "@/lib/gamificacao/login-diario";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,6 +19,7 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const avisos = await carregarAvisos();
+  void creditarLoginDiario(); // fire-and-forget, não bloqueia o render
 
   return (
     <html lang="pt-BR" className={inter.className}>
