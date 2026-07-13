@@ -2,6 +2,18 @@
 // Conteúdo de /dev/icones — só leitura, sem server actions/queries. Lista os
 // exports de Icones.tsx e Emblemas.tsx dinamicamente (Object.entries) pra
 // nunca ficar desatualizado quando um ícone novo for adicionado.
+//
+// 'use client' é obrigatório aqui: Emblemas.tsx é 'use client', e este
+// arquivo faz `import * as EmblemasNS` (namespace import) pra depois indexar
+// por chave dinâmica (EmblemasNS[nome]). Se este componente ficasse Server
+// Component, o compilador RSC do Next só consegue gerar client-reference
+// proxies corretos pra imports NOMEADOS e estáticos de um módulo
+// 'use client' — um namespace import acessado por chave computada resolve
+// pra `undefined` em runtime (erro real visto em produção: "Element type is
+// invalid ... got: undefined"). Virando Client Component, os imports viram
+// JS de módulo comum, sem fronteira RSC no meio.
+'use client'
+
 import * as IconesNS from '@/components/Icones'
 import * as EmblemasNS from '@/components/Emblemas'
 import { Fragment, type ComponentType } from 'react'
@@ -196,9 +208,35 @@ const INCONSISTENCIAS = [
   '"Novo/adicionar" (IconePlus) é 14 no Financeiro vs. 15 em Curso/Agenda — mesma ação, tamanhos diferentes.',
 ]
 
+// Só trata como componente renderizável algo que é de fato uma função —
+// blinda a galeria contra qualquer export futuro em Icones.tsx/Emblemas.tsx
+// que não seja um componente (constante, helper, re-export, etc.): em vez de
+// quebrar a página inteira com "Element type is invalid", esse export
+// simplesmente não aparece na grade.
+function ehComponente(valor: unknown): valor is ComponentType<any> {
+  return typeof valor === 'function'
+}
+
+const Vazio = () => null
+
+// Lookup seguro por nome — usado nos mockups da seção 2, que referenciam
+// ícones/emblemas específicos por string. Se o nome não existir mais (ex.:
+// renomeado em Icones.tsx/Emblemas.tsx), cai num componente vazio em vez de
+// derrubar a página inteira com "Element type is invalid".
+function pegarIcone(nome: string): IconeComponente {
+  const valor = (IconesNS as Record<string, unknown>)[nome]
+  return ehComponente(valor) ? (valor as IconeComponente) : Vazio
+}
+function pegarEmblema(nome: string): EmblemaComponente {
+  const valor = (EmblemasNS as Record<string, unknown>)[nome]
+  return ehComponente(valor) ? (valor as EmblemaComponente) : Vazio
+}
+
 // Todo export de Icones.tsx começa com "Icone" — captura automaticamente
 // qualquer ícone novo, mesmo que ninguém tenha lembrado de listar aqui em cima.
-const todosIconesExportados = Object.keys(IconesNS).filter(n => n.startsWith('Icone'))
+const todosIconesExportados = Object.entries(IconesNS)
+  .filter(([nome, valor]) => nome.startsWith('Icone') && ehComponente(valor))
+  .map(([nome]) => nome)
 const naoCategorizados = todosIconesExportados.filter(n => !CATEGORIAS_ICONES.some(c => c.nomes.includes(n)))
 
 function CardIcone({ nome, Componente }: { nome: string; Componente: IconeComponente }) {
@@ -239,11 +277,11 @@ function CardEmblema({ nome, Componente }: { nome: string; Componente: EmblemaCo
 // ---------- seção 2: usos reais, tamanhos exatos copiados do código de produção ----------
 
 function CtxMenuAvatar() {
-  const IconeUser = (IconesNS as Record<string, IconeComponente>).IconeUser
-  const IconeGlobe = (IconesNS as Record<string, IconeComponente>).IconeGlobe
-  const IconeShield = (IconesNS as Record<string, IconeComponente>).IconeShield
-  const IconeLogOut = (IconesNS as Record<string, IconeComponente>).IconeLogOut
-  const Certificado = (EmblemasNS as Record<string, EmblemaComponente>).Certificado
+  const IconeUser = pegarIcone('IconeUser')
+  const IconeGlobe = pegarIcone('IconeGlobe')
+  const IconeShield = pegarIcone('IconeShield')
+  const IconeLogOut = pegarIcone('IconeLogOut')
+  const Certificado = pegarEmblema('Certificado')
   return (
     <div className="di-mock di-mock-avatarmenu">
       <div className="di-am-item"><IconeUser size={16} strokeWidth={1.8} /> Meu perfil</div>
@@ -256,9 +294,9 @@ function CtxMenuAvatar() {
 }
 
 function CtxAcoesPost() {
-  const IconeThumbsUp = (IconesNS as Record<string, IconeComponente>).IconeThumbsUp
-  const IconeMessageCircle = (IconesNS as Record<string, IconeComponente>).IconeMessageCircle
-  const IconeBookmark = (IconesNS as Record<string, IconeComponente>).IconeBookmark
+  const IconeThumbsUp = pegarIcone('IconeThumbsUp')
+  const IconeMessageCircle = pegarIcone('IconeMessageCircle')
+  const IconeBookmark = pegarIcone('IconeBookmark')
   return (
     <div className="di-mock di-mock-acoespost">
       <button className="di-acao"><IconeThumbsUp size={15} strokeWidth={2} /> Útil · <span className="num">12</span></button>
@@ -269,8 +307,8 @@ function CtxAcoesPost() {
 }
 
 function CtxPilulasNav() {
-  const FogoStreak = (EmblemasNS as Record<string, EmblemaComponente>).FogoStreak
-  const Moeda = (EmblemasNS as Record<string, EmblemaComponente>).Moeda
+  const FogoStreak = pegarEmblema('FogoStreak')
+  const Moeda = pegarEmblema('Moeda')
   return (
     <div className="di-mock di-mock-pilulas">
       <div className="di-nivel-fake">
@@ -318,9 +356,9 @@ export default function DevIconesContent() {
             <h3>{cat.titulo}</h3>
             <div className="di-grid">
               {cat.nomes.map(nome => {
-                const Componente = (IconesNS as Record<string, IconeComponente>)[nome]
-                if (!Componente) return null
-                return <CardIcone key={nome} nome={nome} Componente={Componente} />
+                const Componente = (IconesNS as Record<string, unknown>)[nome]
+                if (!ehComponente(Componente)) return null
+                return <CardIcone key={nome} nome={nome} Componente={Componente as IconeComponente} />
               })}
             </div>
           </div>
@@ -331,8 +369,9 @@ export default function DevIconesContent() {
             <h3>Não categorizados aqui (adicionados após esta página — revisar agrupamento)</h3>
             <div className="di-grid">
               {naoCategorizados.map(nome => {
-                const Componente = (IconesNS as Record<string, IconeComponente>)[nome]
-                return <CardIcone key={nome} nome={nome} Componente={Componente} />
+                const Componente = (IconesNS as Record<string, unknown>)[nome]
+                if (!ehComponente(Componente)) return null
+                return <CardIcone key={nome} nome={nome} Componente={Componente as IconeComponente} />
               })}
             </div>
           </div>
@@ -342,9 +381,9 @@ export default function DevIconesContent() {
           <h3>Emblemas (Nível 2 — variantes cor e mono)</h3>
           <div className="di-grid di-grid-emblemas">
             {NOMES_EMBLEMAS.map(nome => {
-              const Componente = (EmblemasNS as Record<string, EmblemaComponente>)[nome]
-              if (!Componente) return null
-              return <CardEmblema key={nome} nome={nome} Componente={Componente} />
+              const Componente = (EmblemasNS as Record<string, unknown>)[nome]
+              if (!ehComponente(Componente)) return null
+              return <CardEmblema key={nome} nome={nome} Componente={Componente as EmblemaComponente} />
             })}
           </div>
         </div>
