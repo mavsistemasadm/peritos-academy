@@ -65,8 +65,11 @@ Sequência de build de cada página:
 - `avaliacoes`, `avaliacao_questoes`, `avaliacao_opcoes`, `avaliacao_tentativas`, `avaliacao_respostas` (+ views `_publicas`)
 - `desafios`, `desafio_categorias`, `desafio_entregas` (nota_minima, arquivo_path)
 - `certificados`, `perfil_insignias`, `perfil_estudo_dias`, `perfil_atividades`
-- `eventos` (agenda), `comunidade_*` (feed/ranking)
-- Bucket Storage `planilhas` (privado)
+- `eventos`, `evento_reservas` (agenda), `comunidade_*` (feed/ranking, ver Bloco 2)
+- `novidades`, `novidade_leituras` (avisos/banners institucionais — diferente de `notificacoes`, ver Sistema de Notificações)
+- `notificacoes` (notificações pessoais/sino), `admin_usuarios` (papéis do admin)
+- Bucket Storage `planilhas` (privado, uploads de aluno/documentos), `capas` (público, imagens de capa)
+- Tabelas duplicadas/legadas — nunca usadas pelo app, não construir em cima: `posts`/`post_comentarios`/`post_reacoes` (substituídas por `comunidade_*`), `duvidas`/`duvida_respostas` (substituídas por `aula_duvidas`), `questoes`/`tentativas`/`materiais`/`progresso_aulas`
 
 ## Componentes-chave
 - `NavPlataforma` — nav única, dropdown "Conteúdos" + menu avatar; prop `ativo` e tipo `Aba`
@@ -84,13 +87,43 @@ Sequência de build de cada página:
 - Paths com colchetes quebram; usar `-LiteralPath`
 - `Select-String -Recurse` não existe; usar `Get-ChildItem -Recurse -Include | Select-String`
 
+## Sistema de Notificações
+Arquitetura multi-canal desde o início (in-app, email, push, whatsapp), mesmo a Fase 1 só ligando in-app — a ideia é nunca precisar refazer os gatilhos quando um canal novo entrar.
+
+### Tabelas
+- `notificacoes` (JÁ EXISTE, já tem UI funcionando): `usuario_id`, `tipo`, `prefixo`/`destaque`/`sufixo` (frase montada em 3 partes, `destaque` em negrito), `link_url`, `lida`, `criado_em`. RLS hoje só tem SELECT/UPDATE do próprio usuário — **sem INSERT** (ninguém escreve nela ainda, só existem 3 linhas de seed).
+- `novidade_leituras` (JÁ EXISTE) — **não é notificação pessoal**, é o controle de leitura de `novidades` (avisos/banners do admin, Bloco 2). Não confundir os dois sistemas: avisos = broadcast institucional; notificações = eventos pessoais do usuário.
+- `notif_tipos` (nova) — catálogo: `codigo` (pk, ex. `curso_concluido`), `categoria` (agenda/trilha/conteudo/avaliacoes/gamificacao/comunidade/financeiro/administrativo), `nome`, `descricao`, `canal_in_app`, `canal_email`, `canal_push`, `canal_whatsapp` (bool, editável no admin), `ativo`.
+- `notif_fila_email`, `notif_fila_push`, `notif_fila_whatsapp` (novas, outbox) — criadas vazias na Fase 1. A função de disparo já escreve nelas quando o canal correspondente está ligado no catálogo; só não existe processador ainda. Fase 2/3 = só criar o worker que lê a fila, zero mudança nos gatilhos.
+- `evento_notif_enviadas` (nova) — dedupe dos lembretes de agenda (evento_id + tipo_lembrete), pra pg_cron não mandar duplicado.
+
+### Chokepoint único: `criar_notificacao()`
+Função SQL `security definer` — todo gatilho (trigger de tabela ou pg_cron) chama só ela, nunca insere direto em `notificacoes`. Ela: 1) confere `notif_tipos.ativo` e `canal_in_app` pro tipo — se desligado no admin, não insere nada (kill-switch); 2) insere em `notificacoes`; 3) se `canal_email`/`canal_push`/`canal_whatsapp` estiverem ligados, insere na fila correspondente (hoje sempre vazio na Fase 1 porque nenhum tipo liga esses canais ainda). Isso é o que permite ligar email depois só mudando uma linha no catálogo.
+
+### Categorias e gatilhos (Fase 1 = todos in-app)
+- **Agenda**: lembrete de live 1 dia / 1h / 30min antes + "começou agora" — via `pg_cron` rodando a cada 5 min, olha `eventos.inicia_em` + `evento_reservas`, dedupe em `evento_notif_enviadas`.
+- **Marcos de trilha** (in-app + email desde que a Fase 2 ligue o canal): terminou curso, passou em prova difícil, completou etapa, desbloqueou próxima etapa, insígnia de peso, subiu de nível.
+- **Conteúdo**: nova aula/avaliação publicada num curso em que o aluno está matriculado.
+- **Avaliações**: aprovado/reprovado ao submeter (via RPC `submeter_avaliacao`).
+- **Gamificação**: XP ganho, nível, insígnias (mesmo gatilho de "marcos de trilha").
+- **Comunidade**: dúvida de aula respondida, comentário no seu post, marcado como melhor resposta.
+- **Financeiro**: reservado pro Asaas (assinatura confirmada/atrasada/cancelada) — só o catálogo existe por enquanto, sem integração real.
+- **Administrativo**: boas-vindas ao criar conta.
+
+⚠️ **Gap descoberto durante o desenho**: `perfis.xp`/`perfis.nivel`, `perfil_insignias` e o progresso de etapas (`jornada_etapas`) não têm NENHUM gatilho vivo hoje que os atualize — `submeter_avaliacao` calcula `xp_ganho` mas nunca credita em `perfis.xp`. Os gatilhos de "subiu de nível", "insígnia de peso", "completou etapa" e "desbloqueou próxima etapa" ficam prontos mas dormentes até essa engine de gamificação existir (fora do escopo do bloco de notificações).
+
+### Admin
+Seção "Notificações": matriz `notif_tipos` (categoria → tipo → toggle por canal) + log das últimas notificações disparadas (suporte/debug).
+
 ## Próximo grande passo: ADMIN
 Áreas a construir (ordem sugerida):
-1. Base de acesso admin + níveis de permissão (Super Admin, Conteúdo, Financeiro, Moderador)
-2. Configurações da plataforma + logo global (tabela `config_plataforma`, refletir em nav/certificado/emails)
-3. Gestão de Cursos → Módulos → Aulas
-4. Financeiro Asaas (assinaturas, cobranças, webhooks liberam/suspendem acesso)
-5. Desafios, Avaliações, Trilhas, Certificados, Usuários, Comunidade, Agenda, Banners/Novidades, Gamificação, Relatórios
+1. ~~Base de acesso admin + níveis de permissão~~ ✅ feito
+2. ~~Gestão de Cursos → Módulos → Aulas, Trilhas/Etapas, Avaliações/Questões~~ ✅ feito (Bloco 1)
+3. ~~Desafios, Certificados, Comunidade, Agenda, Avisos/Novidades~~ ✅ feito (Bloco 2)
+4. Sistema de Notificações (Fase 1: in-app) — ver seção acima
+5. Configurações da plataforma + logo global (tabela `config_plataforma`, refletir em nav/certificado/emails)
+6. Financeiro Asaas (assinaturas, cobranças, webhooks liberam/suspendem acesso)
+7. Usuários, Gamificação (engine de XP/nível/insígnias), Relatórios
 
 ## Fluxo de trabalho
 - Sempre rodar `npm run build` antes de commitar pra pegar erros de tipo
