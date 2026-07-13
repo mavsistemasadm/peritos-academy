@@ -33,7 +33,7 @@ export default function LoginContent({ selos }: { selos: Selos }) {
       return
     }
     // recarrega pelo servidor para a sessão valer em toda a plataforma
-    location.href = '/curso/segredos-bancarios'
+    location.href = '/'
   }
 
   return (
