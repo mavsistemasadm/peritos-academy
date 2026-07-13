@@ -96,6 +96,7 @@ Sequência de build de cada página:
 - `config_gamificacao`, `gamificacao_gatilhos`, `gamificacao_niveis`, `gamificacao_extrato` (ledger de XP/moedas, ver seção Gamificação)
 - `planos_assinatura`, `assinaturas`, `cobrancas`, `webhook_eventos`, `config_financeiro`, `financeiro_log_acoes` (ver seção Financeiro — **não confundir `planos_assinatura` com `planos`**, tabelas diferentes)
 - `admin_log_acoes_usuario` (log unificado de ações administrativas sobre um aluno — suspender/reativar/banir/resetar senha/ajuste de gamificação/certificado manual, ver seção Usuários)
+- `config_plataforma` (registro único — identidade, contato, textos institucionais, comportamento, SEO; leitura pública `using (true)`, ver seção Configurações)
 - Bucket Storage `planilhas` (privado, uploads de aluno/documentos), `capas` (público, imagens de capa)
 - Tabelas duplicadas/legadas — nunca usadas pelo app, não construir em cima: `posts`/`post_comentarios`/`post_reacoes` (substituídas por `comunidade_*`), `duvidas`/`duvida_respostas` (substituídas por `aula_duvidas`), `questoes`/`tentativas`/`materiais`/`progresso_aulas`, `planos` (feature dormente "meu plano de estudo" do aluno, sem leitura/escrita em código), `matriculas` (resquício de modelo antigo, sem leitura/escrita em código — o gate de acesso atual é por assinatura, ver seção Financeiro)
 
@@ -260,6 +261,33 @@ Como o fluxo de recuperação de senha não existia no app antes, `app/redefinir
 - Ficha do aluno (`/admin/usuarios/[id]`) em abas: Visão geral (dados + status + assinatura atual + botões de ação, todos com `confirm()`/`prompt()` nativo pra justificativa — mesmo padrão já usado em Financeiro/Certificados), Progresso (cursos/% aulas, avaliações, certificados + emissão manual), Gamificação (XP/moedas/nível/streak via `Emblemas` variante `mono` + extrato paginado + ajuste manual), Financeiro (leitura, linka pro módulo Financeiro pras ações), Comunidade (posts/comentários recentes, linka pro módulo Comunidade), Auditoria (log unificado).
 - **Impersonação ("Ver como este aluno") propositalmente NÃO implementada** — botão existe desabilitado com tooltip "em breve". Fica de fora até ter desenho de segurança dedicado: sessão separada da do admin, banner visível durante a impersonação, log reforçado (toda ação feita durante a sessão impersonada precisa ficar rastreável de volta ao admin), expiração automática curta.
 
+## Configurações (módulo guarda-chuva da plataforma no admin)
+Papel: só `super_admin`. Construído em 2026-07-13 — registro único `config_plataforma`, sem RPCs (RLS direta: leitura pública `using (true)`, escrita `is_admin_papel(...,'super_admin')`). **Não duplica** `config_gamificacao`/`config_financeiro`/futuro `notificacao_config` — a aba Integrações só linka pra eles.
+
+### Por que leitura pública de verdade (anon incluso)
+`config_plataforma` precisa ser lida por: o middleware pra visitante deslogado (checagem de manutenção), `/termos` e `/privacidade` (páginas públicas), e `generateMetadata()` do layout root (roda antes de qualquer sessão existir). Não tem dado sensível — RLS `select using (true)` é a escolha certa aqui, ao contrário de `assinaturas`/`cobrancas`.
+
+### Decisão: checagem de manutenção no middleware, não no layout
+Ficou no `middleware.ts` (junto do gate de suspensão/banimento já existente), não no layout root — porque o middleware já tem `request.nextUrl.pathname` de graça pra excluir `/login` e `/manutencao` do próprio redirect sem loop; fazer isso no layout exigiria um hack pra descobrir a rota atual (não existe API direta pra isso em Server Component/layout). O custo (mais um `select` de linha única por request) é o mesmo já aceito pela checagem de suspensão. `ehAdmin` é computado uma vez e reusado tanto no bypass de manutenção quanto no gate de `/admin` (evita query duplicada).
+
+### Efeitos aplicados (nada de config sem efeito)
+1. **Manutenção**: `modo_manutencao=true` → middleware redireciona todo não-admin (logado ou não) pra `/manutencao`; admin navega normal e vê banner fixo no `NavPlataforma` (`d.modoManutencao && d.isAdmin`).
+2. **Toggles de módulo** (`comunidade_ativa`/`desafios_ativos`/`agenda_ativa`): `NavPlataforma` esconde o link E cada página (`/comunidade`, `/agenda`, `/desafios`) faz `redirect('/')` se o próprio flag (lido via `carregarNav()`, que já busca `config_plataforma` pra todo mundo — logado ou não) estiver desligado — defesa dupla, mesmo dado, sem query extra.
+3. **`pagina_inicial_pos_login`**: `LoginContent` usa `location.href = paginaInicialPosLogin || '/'` em vez do `/` fixo (prop vinda de `app/login/page.tsx`).
+4. **Metadata**: `app/layout.tsx` trocou `metadata` estático por `generateMetadata()` async lendo `nome_plataforma`/`meta_titulo`/`meta_descricao`/`og_image_url`/`favicon_url`.
+5. **`/termos` e `/privacidade`**: páginas públicas novas renderizando `termos_uso`/`politica_privacidade` (um parágrafo por linha).
+6. **Logo**: `NavPlataforma` e `LoginContent` trocam o texto "peritos academy" por `<img>` quando `logo_url` existe (fallback pro texto atual).
+7. **Rodapé**: `texto_rodape` renderizado num `<footer>` global no layout root (não escopado a uma página — é a única exceção à regra de CSS por página, documentada inline no CSS).
+
+### Tabelas/campos
+`config_plataforma` (id fixo=1): identidade (nome, slogan, logo_url, favicon_url), contato (email/whatsapp suporte, instagram/youtube/linkedin — colunas, não jsonb, pro padrão ficar igual a `config_gamificacao`), textos institucionais, comportamento (`pagina_inicial_pos_login`, `modo_manutencao` + `mensagem_manutencao`, os 3 toggles de módulo), SEO (`meta_titulo`/`meta_descricao`/`og_image_url`). Upload de logo/favicon/og_image reusa o bucket `capas` (mesmo padrão de selo de nível em Gamificação), path fixo `config-plataforma/{campo}.{ext}` (sempre sobrescreve, sem histórico).
+
+### Aba Integrações
+Somente leitura, checagem por presença de env (`!!process.env.X`), nunca o valor: Supabase (`NEXT_PUBLIC_SUPABASE_URL`/`ANON_KEY`), Asaas webhook (`ASAAS_WEBHOOK_TOKEN`), Asaas API (`ASAAS_API_KEY` — nome assumido, a integração real ainda não define isso em lugar nenhum, ver pendência do Financeiro), Panda Video (informativo, sem API key). Inclui card linkando a pendência de `config_gamificacao.moeda_icone` (editável, não lido em lugar nenhum do app).
+
+### Testes feitos (e um que não foi feito de propósito)
+Testado via dev server local + toggle no banco com reversão imediata: `comunidade_ativa=false` → `/comunidade` responde 307 pra `/` (confirmado, revertido na sequência); `pagina_inicial_pos_login='/cursos'` → RSC payload de `/login` reflete o valor (confirmado, revertido). RLS de escrita testado em transação com rollback (usuário descartável sem papel admin tenta `update config_plataforma` → 0 linhas afetadas). **`modo_manutencao=true` NÃO foi testado ao vivo contra o banco compartilhado** — no meio dos testes uma chamada de reversão (`comunidade_ativa` de volta pra `true`) teve timeout de conexão e não aplicou na hora (precisou de uma segunda tentativa pra confirmar), o que expôs o risco real de um revert falhar silenciosamente. Como `modo_manutencao` bloqueia o site inteiro pra quem não é admin (raio de efeito bem maior que um único toggle de módulo), não valeu o risco de deixar produção presa em manutenção por engano. A lógica é estruturalmente idêntica ao teste que passou (mesmo padrão "lê flag → redirect"), só que no middleware em vez de num page.tsx — recomendo um teste manual único (ativar, conferir, desativar) da próxima vez que alguém estiver por perto pra reverter na hora se algo travar.
+
 ## Próximo grande passo: ADMIN
 Áreas a construir (ordem sugerida):
 1. ~~Base de acesso admin + níveis de permissão~~ ✅ feito
@@ -267,7 +295,7 @@ Como o fluxo de recuperação de senha não existia no app antes, `app/redefinir
 3. ~~Desafios, Certificados, Comunidade, Agenda, Avisos/Novidades~~ ✅ feito (Bloco 2)
 4. ~~Gamificação (XP/moedas/níveis/gatilhos)~~ ✅ feito — ver seção acima
 5. Sistema de Notificações (Fase 1: in-app) — ver seção acima
-6. Configurações da plataforma + logo global (tabela `config_plataforma`, refletir em nav/certificado/emails)
+6. ~~Configurações da plataforma + logo global~~ ✅ feito — ver seção acima
 7. ~~Financeiro Asaas (assinaturas, cobranças, webhooks liberam/suspendem acesso)~~ ✅ estrutura feita — ver seção acima; integração real (chaves, checkout, validação de webhook) pendente
 8. ~~Usuários~~ ✅ feito — ver seção acima (impersonação fica pra depois, ver pendência). Relatórios ainda não construído.
 

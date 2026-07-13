@@ -27,11 +27,27 @@ export async function middleware(request: NextRequest) {
 
   // Renova a sessão se o token estiver perto de expirar.
   const { data: auth } = await supabase.auth.getUser();
+  const pathname = request.nextUrl.pathname;
+  const rotaNeutra = pathname === "/login" || pathname === "/conta-suspensa" || pathname === "/manutencao";
+
+  // Admin ativo — computado uma vez e reusado no gate de /admin e no bypass
+  // de manutenção (evita duas queries iguais).
+  let ehAdmin = false;
+  if (auth?.user) {
+    const { data: adminRow } = await supabase
+      .from("admin_usuarios")
+      .select("id")
+      .eq("usuario_id", auth.user.id)
+      .eq("ativo", true)
+      .limit(1)
+      .maybeSingle();
+    ehAdmin = !!adminRow;
+  }
 
   // Suspenso/banido: bloqueio global (não só conteúdo pago) — checado aqui
   // em vez de tem_acesso_ativo porque esse RPC só gateia rotas de conteúdo
   // pago específicas; suspensão/banimento precisa cortar QUALQUER rota.
-  if (auth?.user && request.nextUrl.pathname !== "/conta-suspensa" && request.nextUrl.pathname !== "/login") {
+  if (auth?.user && !rotaNeutra) {
     const { data: perfil } = await supabase
       .from("perfis")
       .select("status")
@@ -42,18 +58,27 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (request.nextUrl.pathname.startsWith("/admin")) {
+  // Modo manutenção: bloqueia TODO visitante não-admin (logado ou não) em
+  // qualquer rota — checado aqui (não no layout) porque precisa do pathname
+  // pra excluir /login e /manutencao do próprio redirect sem entrar em loop,
+  // e middleware já paga uma query por request nesse mesmo estilo (ver
+  // suspensão acima); layout root não tem o pathname sem um hack extra.
+  if (!rotaNeutra && !ehAdmin) {
+    const { data: config } = await supabase
+      .from("config_plataforma")
+      .select("modo_manutencao")
+      .eq("id", 1)
+      .maybeSingle();
+    if (config?.modo_manutencao) {
+      return NextResponse.redirect(new URL("/manutencao", request.url));
+    }
+  }
+
+  if (pathname.startsWith("/admin")) {
     if (!auth?.user) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
-    const { data: adminRow } = await supabase
-      .from("admin_usuarios")
-      .select("id")
-      .eq("usuario_id", auth.user.id)
-      .eq("ativo", true)
-      .limit(1)
-      .maybeSingle();
-    if (!adminRow) {
+    if (!ehAdmin) {
       return NextResponse.redirect(new URL("/acesso-negado", request.url));
     }
   }

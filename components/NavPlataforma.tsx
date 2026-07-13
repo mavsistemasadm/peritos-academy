@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { DadosNav } from '@/lib/queries/nav'
-import { IconeChevronDown, IconeMap, IconeBookOpen, IconeBarChart, IconeUser, IconeGlobe, IconeShield, IconeLogOut } from '@/components/Icones'
+import { IconeChevronDown, IconeMap, IconeBookOpen, IconeBarChart, IconeUser, IconeGlobe, IconeShield, IconeLogOut, IconeAlertTriangle } from '@/components/Icones'
 import { FogoStreak, Moeda, Certificado } from '@/components/Emblemas'
 import { sair } from '@/lib/auth/sair'
 
@@ -38,9 +38,18 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
 
   return (
     <header className="nav-plat">
+      {d.modoManutencao && d.isAdmin && (
+        <div className="np-banner-manutencao">
+          <IconeAlertTriangle size={14} /> Modo manutenção ativo — visitantes não-admin estão vendo a página de manutenção.
+        </div>
+      )}
       <div className="np-inner">
-        <a className="np-logo" href="/" aria-label="Peritos Academy — Início">
-          <span>peritos<small>academy</small></span>
+        <a className="np-logo" href="/" aria-label={`${d.nomePlataforma} — Início`}>
+          {d.logoUrl ? (
+            <img src={d.logoUrl} alt={d.nomePlataforma} className="np-logo-img" />
+          ) : (
+            <span>peritos<small>academy</small></span>
+          )}
         </a>
 
         <nav className="np-links" aria-label="Navegação principal">
@@ -69,9 +78,15 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
             )}
           </div>
 
-          <a href="/comunidade" className={ativo === 'comunidade' ? 'ativo' : undefined} aria-current={ativo === 'comunidade' ? 'page' : undefined}>Comunidade</a>
-          <a href="/agenda" className={ativo === 'agenda' ? 'ativo' : undefined} aria-current={ativo === 'agenda' ? 'page' : undefined}>Agenda</a>
-          <a href="/desafios" className={ativo === 'desafios' ? 'ativo' : undefined} aria-current={ativo === 'desafios' ? 'page' : undefined}>Desafios</a>
+          {d.comunidadeAtiva && (
+            <a href="/comunidade" className={ativo === 'comunidade' ? 'ativo' : undefined} aria-current={ativo === 'comunidade' ? 'page' : undefined}>Comunidade</a>
+          )}
+          {d.agendaAtiva && (
+            <a href="/agenda" className={ativo === 'agenda' ? 'ativo' : undefined} aria-current={ativo === 'agenda' ? 'page' : undefined}>Agenda</a>
+          )}
+          {d.desafiosAtivos && (
+            <a href="/desafios" className={ativo === 'desafios' ? 'ativo' : undefined} aria-current={ativo === 'desafios' ? 'page' : undefined}>Desafios</a>
+          )}
         </nav>
 
         <div className="np-acoes">

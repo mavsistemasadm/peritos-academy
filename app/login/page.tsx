@@ -1,6 +1,7 @@
 // app/login/page.tsx
 import type { Metadata } from 'next'
 import { criarClienteServidor } from '@/lib/supabase/server'
+import { carregarConfigPlataforma } from '@/lib/queries/config-plataforma'
 import LoginContent from '@/components/LoginContent'
 
 export const metadata: Metadata = {
@@ -12,9 +13,10 @@ export const dynamic = 'force-dynamic'
 export default async function PaginaLogin() {
   const supabase = await criarClienteServidor()
 
-  const [{ data: config }, { data: etapas }] = await Promise.all([
+  const [{ data: config }, { data: etapas }, plataforma] = await Promise.all([
     supabase.from('comunidade_config').select('membros_total, casos_semana').eq('id', 1).maybeSingle(),
     supabase.from('jornada_etapas').select('missoes_total'),
+    carregarConfigPlataforma(),
   ])
 
   const selos = {
@@ -23,5 +25,12 @@ export default async function PaginaLogin() {
     casos: config?.casos_semana ?? 0,
   }
 
-  return <LoginContent selos={selos} />
+  return (
+    <LoginContent
+      selos={selos}
+      nomePlataforma={plataforma.nomePlataforma}
+      logoUrl={plataforma.logoUrl}
+      paginaInicialPosLogin={plataforma.paginaInicialPosLogin}
+    />
+  )
 }

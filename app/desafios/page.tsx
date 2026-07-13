@@ -14,6 +14,8 @@ export const dynamic = 'force-dynamic'
 
 export default async function PaginaDesafios() {
   const [dados, nav] = await Promise.all([carregarDesafios(), carregarNav()])
+  // Defesa dupla com o toggle de módulo em config_plataforma.
+  if (!nav.desafiosAtivos) redirect('/')
   if (!dados.logado) redirect('/login')
   return <DesafiosContent dados={dados} nav={nav} />
 }

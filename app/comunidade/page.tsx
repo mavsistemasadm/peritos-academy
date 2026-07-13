@@ -1,5 +1,6 @@
 // app/comunidade/page.tsx
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 import { carregarComunidade } from '@/lib/queries/comunidade'
 import { carregarNav } from '@/lib/queries/nav'
 import ComunidadeContent from '@/components/ComunidadeContent'
@@ -16,6 +17,9 @@ export const dynamic = 'force-dynamic'
 
 export default async function PaginaComunidade() {
   const nav = await carregarNav()
+  // Defesa dupla com o toggle de módulo em config_plataforma — o link já
+  // some do NavPlataforma, mas a rota também precisa recusar acesso direto.
+  if (!nav.comunidadeAtiva) redirect('/')
   if (EXIGE_ASSINATURA_COMUNIDADE_E_AGENDA) {
     const acesso = await verificarAcessoConteudo()
     if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} />

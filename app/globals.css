@@ -25,6 +25,12 @@
 }
 
 .num { font-variant-numeric: tabular-nums; }
+/* Rodapé global (texto institucional configurável) — não escopado a uma
+   página específica porque aparece no root layout, em toda página. */
+.rodape-global{
+  text-align:center;font-size:12px;color:#989E99;
+  padding:20px 16px;border-top:1px solid rgba(255,255,255,.06);
+}
 /* ============================================================
    PERITOS ACADEMY — HOME / DASHBOARD (escopado em .pagina-home)
    ============================================================ */
@@ -2636,6 +2642,7 @@ body.teatro .trilho-aulas{display:none}
 @keyframes flutuarLog{from{transform:translate(-4%,-3%) scale(1)}to{transform:translate(6%,4%) scale(1.14)}}
 .pagina-login .marca span{font-size:16px;font-weight:650;letter-spacing:-.02em;line-height:1.05}
 .pagina-login .marca small{display:block;font-size:11.5px;font-weight:450;color:var(--cinza)}
+.pagina-login .marca-img{height:28px;width:auto;display:block}
 .pagina-login .painel-frase{position:relative;z-index:1;max-width:44ch}
 .pagina-login .painel-frase .eyebrow{display:block;margin-bottom:var(--s-3)}
 .pagina-login .painel-frase h1{
@@ -2889,6 +2896,14 @@ body.teatro .trilho-aulas{display:none}
 .nav-plat .np-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .nav-plat .np-logo span{font-size:15px;font-weight:650;letter-spacing:-.02em;line-height:1.05;color:var(--creme)}
 .nav-plat .np-logo small{display:block;font-size:11px;font-weight:450;color:var(--cinza);letter-spacing:.02em}
+.nav-plat .np-logo-img{height:26px;width:auto;display:block}
+
+.nav-plat .np-banner-manutencao{
+  position:fixed;top:var(--nav-h);left:0;right:0;z-index:99;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:8px var(--s-4,24px);font-size:12.5px;font-weight:650;
+  background:rgba(224,185,107,.16);color:#E0B96B;border-bottom:1px solid rgba(224,185,107,.3);
+}
 
 .nav-plat .np-links{display:flex;gap:4px;margin:0 auto}
 .nav-plat .np-links a{font-size:14px;font-weight:520;color:var(--cinza-claro);padding:8px 14px;border-radius:var(--r-pill);transition:color .2s,background .2s}
@@ -4272,5 +4287,44 @@ body.teatro .trilho-aulas{display:none}
 .pagina-admin .ad-usu-lista li{padding:10px 0;border-bottom:1px solid var(--linha-suave)}
 .pagina-admin .ad-usu-lista li:last-child{border-bottom:none}
 .pagina-admin .ad-usu-lista p{margin-top:4px;color:var(--cinza-claro);font-size:13px;line-height:1.5}
+
+/* ============================================================
+   PERITOS ACADEMY — PÁGINAS INSTITUCIONAIS (escopado em .pagina-institucional)
+   ============================================================ */
+.pagina-institucional{
+  --carvao:#070908; --creme:#F1F2DF; --cinza:#989E99; --cinza-claro:#B9BFB8;
+  --linha-suave:rgba(255,255,255,.07);
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --s-4:24px; --s-5:32px; --s-6:48px; --s-7:64px; --nav-h:64px;
+  font-family:var(--font);background:var(--carvao);color:var(--creme);
+  font-size:16px;line-height:1.6;min-height:100vh;
+}
+.pagina-institucional .inst-main{
+  max-width:720px;margin:0 auto;padding:calc(var(--nav-h) + var(--s-7)) var(--s-4) var(--s-6);
+}
+.pagina-institucional h1{font-size:28px;font-weight:700;letter-spacing:-.02em;margin-bottom:var(--s-5)}
+.pagina-institucional .inst-corpo p{color:var(--cinza-claro);margin-bottom:var(--s-4)}
+.pagina-institucional .inst-corpo p:empty{display:none}
+
+/* ============================================================
+   PERITOS ACADEMY — BANNER FIXO DE COMPARTILHAMENTO OG (preview admin)
+   ============================================================ */
+.pagina-admin .ad-og-preview{
+  max-width:380px;border:1px solid var(--linha-suave);border-radius:var(--r-card);overflow:hidden;
+  background:rgba(255,255,255,.02);
+}
+.pagina-admin .ad-og-preview img{width:100%;height:180px;object-fit:cover;display:block;background:rgba(255,255,255,.04)}
+.pagina-admin .ad-og-preview-corpo{padding:10px 12px}
+.pagina-admin .ad-og-preview-dominio{font-size:11px;color:var(--cinza);text-transform:uppercase;letter-spacing:.04em}
+.pagina-admin .ad-og-preview-titulo{font-size:13.5px;font-weight:650;margin:2px 0;color:var(--creme)}
+.pagina-admin .ad-og-preview-desc{font-size:12px;color:var(--cinza-claro);line-height:1.4}
+
+.pagina-admin .ad-integracao-linha{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--linha-suave);
+}
+.pagina-admin .ad-integracao-linha:last-child{border-bottom:none}
+.pagina-admin .ad-integracao-nome{font-size:14px;font-weight:650}
+.pagina-admin .ad-integracao-onde{font-size:12.5px;color:var(--cinza);margin-top:2px}
 
 .cert-popup-acoes .btn{justify-content:center}

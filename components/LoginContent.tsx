@@ -16,7 +16,9 @@ function traduzErro(msg: string) {
 
 type Selos = { membros: number; missoes: number; casos: number }
 
-export default function LoginContent({ selos }: { selos: Selos }) {
+export default function LoginContent({ selos, nomePlataforma, logoUrl, paginaInicialPosLogin }: {
+  selos: Selos; nomePlataforma: string; logoUrl: string | null; paginaInicialPosLogin: string
+}) {
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [estado, setEstado] = useState<'parado' | 'enviando' | 'erro'>('parado')
@@ -33,8 +35,12 @@ export default function LoginContent({ selos }: { selos: Selos }) {
       return
     }
     // recarrega pelo servidor para a sessão valer em toda a plataforma
-    location.href = '/'
+    location.href = paginaInicialPosLogin || '/'
   }
+
+  const logo = logoUrl
+    ? <img src={logoUrl} alt={nomePlataforma} className="marca-img" />
+    : <span>peritos<small>academy</small></span>
 
   return (
     <main className="pagina-login">
@@ -44,7 +50,7 @@ export default function LoginContent({ selos }: { selos: Selos }) {
       <section className="painel-marca" aria-hidden="true">
         <div className="aurora-log"></div>
         <a className="marca" href="/">
-          <span>peritos<small>academy</small></span>
+          {logo}
         </a>
         <div className="painel-frase">
           <span className="eyebrow">Plataforma do perito</span>
@@ -62,7 +68,7 @@ export default function LoginContent({ selos }: { selos: Selos }) {
       <section className="painel-form">
         <div className="cartao-login">
           <a className="marca marca-mobile" href="/">
-            <span>peritos<small>academy</small></span>
+            {logo}
           </a>
           <span className="eyebrow">Acesso do aluno</span>
           <h2>Bem-vindo de volta.</h2>
