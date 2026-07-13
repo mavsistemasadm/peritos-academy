@@ -84,7 +84,7 @@ Sequência de build de cada página:
 - Auditoria retroativa (2026-07-13): checado se havia aluno com curso completo sem certificado emitido (bug do `aula_concluida` fantasma) — plataforma ainda pré-lançamento, `aula_progresso` está zerada, nenhum caso pendente
 
 ## Tabelas principais
-- `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo)
+- `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários)
 - `cursos`, `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool — não existe tabela `aula_concluida`, nunca criar código que a referencie), `aula_anotacoes`
 - `trilhas`, `etapas`, `curso_trilha` (com trilha_nome, trilha_slug, etapa_nome)
 - `avaliacoes`, `avaliacao_questoes`, `avaliacao_opcoes`, `avaliacao_tentativas`, `avaliacao_respostas` (+ views `_publicas`)
@@ -95,6 +95,7 @@ Sequência de build de cada página:
 - `notificacoes` (notificações pessoais/sino), `admin_usuarios` (papéis do admin)
 - `config_gamificacao`, `gamificacao_gatilhos`, `gamificacao_niveis`, `gamificacao_extrato` (ledger de XP/moedas, ver seção Gamificação)
 - `planos_assinatura`, `assinaturas`, `cobrancas`, `webhook_eventos`, `config_financeiro`, `financeiro_log_acoes` (ver seção Financeiro — **não confundir `planos_assinatura` com `planos`**, tabelas diferentes)
+- `admin_log_acoes_usuario` (log unificado de ações administrativas sobre um aluno — suspender/reativar/banir/resetar senha/ajuste de gamificação/certificado manual, ver seção Usuários)
 - Bucket Storage `planilhas` (privado, uploads de aluno/documentos), `capas` (público, imagens de capa)
 - Tabelas duplicadas/legadas — nunca usadas pelo app, não construir em cima: `posts`/`post_comentarios`/`post_reacoes` (substituídas por `comunidade_*`), `duvidas`/`duvida_respostas` (substituídas por `aula_duvidas`), `questoes`/`tentativas`/`materiais`/`progresso_aulas`, `planos` (feature dormente "meu plano de estudo" do aluno, sem leitura/escrita em código), `matriculas` (resquício de modelo antigo, sem leitura/escrita em código — o gate de acesso atual é por assinatura, ver seção Financeiro)
 
@@ -239,6 +240,26 @@ Segue o padrão de módulo dos demais (`lib/queries/admin-financeiro.ts` + `app/
 - **Criação de novas cobranças**: `processar_evento_asaas` só atualiza `cobrancas` já existentes (casadas por `asaas_payment_id`); o fluxo que cria uma `cobranca` nova a partir de um ciclo de cobrança do Asaas (ou que chama a API do Asaas pra criar a cobrança) fica pra quando a integração for ligada.
 - **Notificações financeiras**: a spec de notificações (categoria "Financeiro" na seção acima) pede `notificar()` nos eventos de assinatura confirmada/atrasada/cancelada — como o sistema de notificações Fase 1 **ainda não foi implementado em código** (só documentado), `processar_evento_asaas` não dispara nada. Quando a Fase 1 for construída, plugar as chamadas ali.
 
+## Usuários (módulo de suporte ao aluno no admin)
+Visão 360° de cada aluno com ações administrativas — construído em 2026-07-13. Papéis: `super_admin` e o novo `suporte` (adicionado ao check constraint de `admin_usuarios.papel` e ao `PapelAdmin`/`PERMISSOES_SECAO.usuarios` em `lib/admin/permissoes.ts`).
+
+### Banco — leitura via RPCs de consolidação, sem tabelas espelho
+Todas as RPCs de leitura (`admin_listar_usuarios`, `admin_usuario_ficha`, `admin_usuario_extrato`, `admin_usuario_comunidade`, `admin_usuario_auditoria`) são `security definer` e checam `is_admin_papel(auth.uid(), array['super_admin','suporte'])` internamente — nenhuma policy de RLS nova foi adicionada nas tabelas de origem (assinaturas/cobrancas/gamificacao_extrato/comunidade_*) pro papel `suporte`; as RPCs agregam e curam os dados no servidor, evitando espalhar `suporte` pelas políticas de outros módulos. `admin_listar_usuarios` e `admin_usuario_ficha` também juntam `auth.users` (email, `last_sign_in_at` como "último acesso") do mesmo jeito que `admin_buscar_usuario_por_email` já fazia — sem cliente service-role.
+- `perfis.status` (`ativo|suspenso|banido`, default `ativo`) — **gate em `middleware.ts`**, não em `tem_acesso_ativo`: esse RPC só cobre rotas de conteúdo pago específicas, enquanto suspensão/banimento precisa cortar acesso a QUALQUER rota (inclusive home/perfil/comunidade). O middleware busca `perfis.status` pra todo usuário autenticado (exceto em `/login` e `/conta-suspensa`, pra não entrar em loop) e redireciona pra `/conta-suspensa` se suspenso/banido.
+- `admin_log_acoes_usuario` (dedicada, não reaproveitou `financeiro_log_acoes`): o log financeiro tem FK pra `assinatura_id` e vocabulário de ação sobre a ASSINATURA — misturar exigiria afrouxar isso pra um domínio diferente (ações sobre o USUÁRIO). A aba Auditoria da ficha faz `UNION` de `admin_log_acoes_usuario` com `financeiro_log_acoes` (via `admin_usuario_auditoria`) pra mostrar cortesias concedidas também.
+- `fin_conceder_cortesia` foi ampliada pra aceitar o papel `suporte` (spec pediu reusar essa RPC em vez de duplicar) — as outras ações financeiras (suspender/reativar/cancelar assinatura) continuam só `super_admin`/`financeiro`.
+- Gatilho `ajuste_admin` em `gamificacao_gatilhos` (`ativo=true` — precisa estar ativo pra passar pelo gate de `creditar_gamificacao`; "restrito a essa RPC" é garantido porque nenhum trigger automático referencia esse código, só `adm_ajustar_gamificacao` chama).
+
+### RPCs de ação (todas com justificativa obrigatória, todas logam em `admin_log_acoes_usuario`)
+`adm_suspender_usuario` / `adm_reativar_usuario` / `adm_banir_usuario` (mudam `perfis.status`) · `adm_resetar_senha` (só resolve o e-mail via `auth.users` e loga — quem dispara o e-mail de fato é a Server Action chamando `supabase.auth.resetPasswordForEmail(email)`, o método padrão do Supabase Auth; nunca define senha diretamente, nunca precisa de service role) · `adm_ajustar_gamificacao` (chama `creditar_gamificacao(..., 'ajuste_admin', null, null, pontos, moedas, false)` — `referencia_id` nulo, então nunca esbarra no bloqueio de idempotência; aceita pontos/moedas negativos pra correção) · `adm_emitir_certificado_manual` (reusa a mecânica oficial — `numero` via `nextval_certificado()`, mesmos campos de `lib/certificados/gerar.ts`, mesmo trigger `trg_gam_certificados` cascateando pra gamificação — mas pula de propósito o `gam_curso_completo`, já que o botão manual existe justamente pra exceções).
+
+Como o fluxo de recuperação de senha não existia no app antes, `app/redefinir-senha/` (+ `RedefinirSenhaContent.tsx`) foi criado nesta sessão: escuta `onAuthStateChange('PASSWORD_RECOVERY')`, chama `supabase.auth.updateUser({password})`.
+
+### Interface (`/admin/usuarios`)
+- Lista paginada server-side (`admin_listar_usuarios`, filtros de busca/status da conta/status de assinatura/nível/"ativos nos últimos N dias", ordenação por coluna) — `lib/queries/admin-suporte.ts` + `app/admin/usuarios/page.tsx` (lê `searchParams`) + `AdminUsuariosContent.tsx`.
+- Ficha do aluno (`/admin/usuarios/[id]`) em abas: Visão geral (dados + status + assinatura atual + botões de ação, todos com `confirm()`/`prompt()` nativo pra justificativa — mesmo padrão já usado em Financeiro/Certificados), Progresso (cursos/% aulas, avaliações, certificados + emissão manual), Gamificação (XP/moedas/nível/streak via `Emblemas` variante `mono` + extrato paginado + ajuste manual), Financeiro (leitura, linka pro módulo Financeiro pras ações), Comunidade (posts/comentários recentes, linka pro módulo Comunidade), Auditoria (log unificado).
+- **Impersonação ("Ver como este aluno") propositalmente NÃO implementada** — botão existe desabilitado com tooltip "em breve". Fica de fora até ter desenho de segurança dedicado: sessão separada da do admin, banner visível durante a impersonação, log reforçado (toda ação feita durante a sessão impersonada precisa ficar rastreável de volta ao admin), expiração automática curta.
+
 ## Próximo grande passo: ADMIN
 Áreas a construir (ordem sugerida):
 1. ~~Base de acesso admin + níveis de permissão~~ ✅ feito
@@ -248,7 +269,7 @@ Segue o padrão de módulo dos demais (`lib/queries/admin-financeiro.ts` + `app/
 5. Sistema de Notificações (Fase 1: in-app) — ver seção acima
 6. Configurações da plataforma + logo global (tabela `config_plataforma`, refletir em nav/certificado/emails)
 7. ~~Financeiro Asaas (assinaturas, cobranças, webhooks liberam/suspendem acesso)~~ ✅ estrutura feita — ver seção acima; integração real (chaves, checkout, validação de webhook) pendente
-8. Usuários, Relatórios
+8. ~~Usuários~~ ✅ feito — ver seção acima (impersonação fica pra depois, ver pendência). Relatórios ainda não construído.
 
 ## Fluxo de trabalho
 - Sempre rodar `npm run build` antes de commitar pra pegar erros de tipo

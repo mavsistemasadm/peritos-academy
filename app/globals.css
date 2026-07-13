@@ -4253,6 +4253,10 @@ body.teatro .trilho-aulas{display:none}
 .pagina-admin .ad-status-pill.confirmada{color:#20D9A6;background:rgba(32,217,166,.12)}
 .pagina-admin .ad-status-pill.vencida{color:#E0776B;background:rgba(224,119,107,.12)}
 .pagina-admin .ad-status-pill.estornada{color:#B9BFB8;background:rgba(185,191,184,.12)}
+.pagina-admin .ad-status-pill.ativo{color:#20D9A6;background:rgba(32,217,166,.12)}
+.pagina-admin .ad-status-pill.suspenso{color:#B9BFB8;background:rgba(185,191,184,.12)}
+.pagina-admin .ad-status-pill.banido{color:#E0776B;background:rgba(224,119,107,.12)}
+.pagina-admin .ad-status-pill.sem_assinatura{color:#B9BFB8;background:rgba(185,191,184,.12)}
 
 .pagina-admin .ad-fin-detalhe{padding:14px 10px;border-bottom:1px solid var(--linha-suave);background:rgba(255,255,255,.015)}
 .pagina-admin .ad-fin-detalhe-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
@@ -4261,5 +4265,12 @@ body.teatro .trilho-aulas{display:none}
   font-size:11px;color:var(--cinza-claro);background:rgba(0,0,0,.25);border-radius:8px;
   padding:8px 10px;max-width:360px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;
 }
+
+.pagina-admin .ad-usu-info{display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--creme)}
+.pagina-admin .ad-usu-info>div{display:flex;align-items:center;gap:8px;color:var(--cinza-claro)}
+.pagina-admin .ad-usu-lista{display:flex;flex-direction:column;gap:12px;list-style:none;padding:0;margin:0}
+.pagina-admin .ad-usu-lista li{padding:10px 0;border-bottom:1px solid var(--linha-suave)}
+.pagina-admin .ad-usu-lista li:last-child{border-bottom:none}
+.pagina-admin .ad-usu-lista p{margin-top:4px;color:var(--cinza-claro);font-size:13px;line-height:1.5}
 
 .cert-popup-acoes .btn{justify-content:center}

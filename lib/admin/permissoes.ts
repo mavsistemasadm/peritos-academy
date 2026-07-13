@@ -4,7 +4,7 @@
 // existem pra sidebar já ter os placeholders certos quando cada seção
 // for construída (mapeamento provisório, ajustável por quem implementar).
 
-export type PapelAdmin = 'super_admin' | 'conteudo' | 'financeiro' | 'moderador'
+export type PapelAdmin = 'super_admin' | 'conteudo' | 'financeiro' | 'moderador' | 'suporte'
 
 export type SecaoAdmin =
   | 'administradores' | 'configuracoes' | 'cursos' | 'financeiro'
@@ -20,7 +20,7 @@ export const PERMISSOES_SECAO: Record<SecaoAdmin, PapelAdmin[]> = {
   trilhas:         ['super_admin', 'conteudo'],
   certificados:    ['super_admin', 'conteudo'],
   financeiro:      ['super_admin', 'financeiro'],
-  usuarios:        ['super_admin', 'moderador'],
+  usuarios:        ['super_admin', 'suporte'],
   comunidade:      ['super_admin', 'moderador'],
   agenda:          ['super_admin', 'moderador', 'conteudo'],
   avisos:          ['super_admin', 'moderador'],
@@ -50,4 +50,5 @@ export const NOME_PAPEL: Record<PapelAdmin, string> = {
   conteudo: 'Conteúdo',
   financeiro: 'Financeiro',
   moderador: 'Moderador',
+  suporte: 'Suporte',
 }

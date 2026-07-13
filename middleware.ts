@@ -28,6 +28,20 @@ export async function middleware(request: NextRequest) {
   // Renova a sessão se o token estiver perto de expirar.
   const { data: auth } = await supabase.auth.getUser();
 
+  // Suspenso/banido: bloqueio global (não só conteúdo pago) — checado aqui
+  // em vez de tem_acesso_ativo porque esse RPC só gateia rotas de conteúdo
+  // pago específicas; suspensão/banimento precisa cortar QUALQUER rota.
+  if (auth?.user && request.nextUrl.pathname !== "/conta-suspensa" && request.nextUrl.pathname !== "/login") {
+    const { data: perfil } = await supabase
+      .from("perfis")
+      .select("status")
+      .eq("id", auth.user.id)
+      .single();
+    if (perfil?.status === "suspenso" || perfil?.status === "banido") {
+      return NextResponse.redirect(new URL("/conta-suspensa", request.url));
+    }
+  }
+
   if (request.nextUrl.pathname.startsWith("/admin")) {
     if (!auth?.user) {
       return NextResponse.redirect(new URL("/login", request.url));
