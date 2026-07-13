@@ -35,6 +35,8 @@ export type Post = {
   jaUtil: boolean          // o usuário logado já reagiu?
   jaSalvo: boolean
   melhorResposta: MelhorResposta | null
+  fixado: boolean
+  destaque: boolean
 }
 
 export type LinhaRanking = {
@@ -87,7 +89,7 @@ export async function carregarComunidade(): Promise<DadosComunidade> {
     { data: auth },
   ] = await Promise.all([
     supabase.from('comunidade_espacos').select('*').order('ordem'),
-    supabase.from('comunidade_posts').select('*').order('criado_em', { ascending: false }),
+    supabase.from('comunidade_posts').select('*').order('fixado', { ascending: false }).order('criado_em', { ascending: false }),
     supabase.from('comunidade_comentarios').select('*'),
     supabase.from('comunidade_ranking').select('*').order('posicao'),
     supabase.from('comunidade_especialistas').select('*').order('ordem'),
@@ -163,6 +165,8 @@ export async function carregarComunidade(): Promise<DadosComunidade> {
       melhorResposta: melhor
         ? { autor_nome: melhor.autor_nome, autor_selo: melhor.autor_selo, corpo: melhor.corpo }
         : null,
+      fixado: p.fixado,
+      destaque: p.destaque,
     }
   }))
 

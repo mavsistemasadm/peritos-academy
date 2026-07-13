@@ -4162,4 +4162,37 @@ body.teatro .trilho-aulas{display:none}
 .pagina-admin .ad-sublista li label{flex:1;display:flex !important;flex-direction:row !important}
 .pagina-admin .ad-sublista-meta{font-size:11px;color:var(--cinza)}
 .pagina-admin .ad-vazio-sm{font-size:12.5px;color:var(--cinza);margin-bottom:8px}
+
+
+
+
+/* ============================================================
+   PERITOS ACADEMY — ADMIN: OPERAÇÃO
+   (desafios, certificados, comunidade, agenda, avisos)
+   ============================================================ */
+.pagina-admin .ad-form-subtitulo{font-size:13px;font-weight:650;text-transform:uppercase;letter-spacing:.06em;color:var(--cinza);margin-top:6px;padding-top:var(--s-3);border-top:1px solid var(--linha-suave)}
+
+.pagina-admin .ad-sublista-lista{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.pagina-admin .ad-doc-linha{
+  display:flex;align-items:center;gap:10px;padding:8px 12px;
+  border:1px solid var(--linha-suave);border-radius:10px;font-size:13px;color:var(--creme);flex-wrap:wrap;
+}
+.pagina-admin .ad-doc-linha span:first-child{flex:1;font-weight:600}
+
+.pagina-admin .ad-tabela-scroll{overflow-x:auto}
+.pagina-admin .ad-tabela{width:100%;border-collapse:collapse;font-size:13px}
+.pagina-admin .ad-tabela th{
+  text-align:left;font-size:11px;font-weight:650;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--cinza);padding:8px 10px;border-bottom:1px solid var(--linha);white-space:nowrap;
+}
+.pagina-admin .ad-tabela td{padding:9px 10px;border-bottom:1px solid var(--linha-suave);color:var(--creme);white-space:nowrap}
+.pagina-admin .ad-tabela tr:last-child td{border-bottom:none}
+
+.pagina-admin .ad-abas{display:flex;gap:6px;margin-bottom:var(--s-4);flex-wrap:wrap;border-bottom:1px solid var(--linha-suave)}
+.pagina-admin .ad-aba{
+  font-size:13.5px;font-weight:600;color:var(--cinza);padding:10px 16px;
+  border-bottom:2px solid transparent;transition:color .2s,border-color .2s;
+}
+.pagina-admin .ad-aba:hover{color:var(--creme)}
+.pagina-admin .ad-aba.ativa{color:var(--verde);border-bottom-color:var(--verde)}
 .cert-popup-acoes .btn{justify-content:center}
