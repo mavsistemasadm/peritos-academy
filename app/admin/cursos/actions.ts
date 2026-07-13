@@ -360,27 +360,77 @@ export async function excluirCapitulo(id: string, cursoId: string): Promise<Resu
 
 // ---------- Materiais ----------
 
-export async function criarMaterial(aulaId: string, cursoId: string, formData: FormData): Promise<Resultado> {
+const EXT_PARA_TIPO: Record<string, 'pdf' | 'xlsx' | 'docx' | 'zip'> = {
+  pdf: 'pdf', xlsx: 'xlsx', xls: 'xlsx', docx: 'docx', doc: 'docx', zip: 'zip',
+}
+
+// Upload real (múltiplos arquivos) pro bucket privado 'materiais-aulas' —
+// substitui o antigo fluxo de colar um link à mão. path = aula_id/uuid-nome,
+// pra nunca colidir entre aulas nem entre arquivos com o mesmo nome.
+export async function uploadMateriais(aulaId: string, cursoId: string, formData: FormData): Promise<Resultado> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
 
-  const nome = (formData.get('nome') as string)?.trim()
-  const arquivoUrl = (formData.get('arquivo_url') as string)?.trim()
-  const tipo = (formData.get('tipo') as string)?.trim() || 'pdf'
-  if (!nome) return { ok: false, erro: 'Nome do material é obrigatório.' }
-  if (!['pdf', 'xls'].includes(tipo)) return { ok: false, erro: 'Tipo inválido.' }
+  const arquivos = (formData.getAll('arquivos') as File[]).filter(a => a && a.size > 0)
+  if (arquivos.length === 0) return { ok: false, erro: 'Selecione ao menos um arquivo.' }
 
   const supabase = await criarClienteServidor()
   const { data: ultimo } = await supabase
     .from('aula_materiais').select('ordem').eq('aula_id', aulaId).order('ordem', { ascending: false }).limit(1).maybeSingle()
-  const ordem = (ultimo?.ordem ?? 0) + 1
+  let ordem = ultimo?.ordem ?? 0
 
-  const { error } = await supabase.from('aula_materiais').insert({
-    aula_id: aulaId, nome, tipo,
-    descricao: (formData.get('descricao') as string)?.trim() || null,
-    arquivo_url: arquivoUrl || null,
-    ordem,
-  })
+  for (const arquivo of arquivos) {
+    if (arquivo.size > 20 * 1024 * 1024) return { ok: false, erro: `"${arquivo.name}" é muito grande. Máximo 20MB.` }
+
+    const ext = arquivo.name.split('.').pop()?.toLowerCase() ?? ''
+    const tipo = EXT_PARA_TIPO[ext] ?? 'outro'
+    const path = `${aulaId}/${crypto.randomUUID()}-${arquivo.name}`
+    const buffer = Buffer.from(await arquivo.arrayBuffer())
+
+    const { error: upErr } = await supabase.storage
+      .from('materiais-aulas')
+      .upload(path, buffer, { contentType: arquivo.type || undefined })
+    if (upErr) return { ok: false, erro: upErr.message }
+
+    ordem += 1
+    const { error } = await supabase.from('aula_materiais').insert({
+      aula_id: aulaId, nome: arquivo.name, tipo, arquivo_url: path, tamanho_bytes: arquivo.size, ordem,
+    })
+    if (error) return { ok: false, erro: error.message }
+  }
+
+  revalidarCurso(cursoId)
+  return { ok: true }
+}
+
+export async function renomearMaterial(id: string, cursoId: string, nome: string): Promise<Resultado> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  if (!nome.trim()) return { ok: false, erro: 'Nome é obrigatório.' }
+
+  const supabase = await criarClienteServidor()
+  const { error } = await supabase.from('aula_materiais').update({ nome: nome.trim() }).eq('id', id)
   if (error) return { ok: false, erro: error.message }
+
+  revalidarCurso(cursoId)
+  return { ok: true }
+}
+
+export async function moverMaterial(aulaId: string, cursoId: string, id: string, direcao: 'up' | 'down'): Promise<Resultado> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+
+  const supabase = await criarClienteServidor()
+  const { data: materiais } = await supabase.from('aula_materiais').select('id, ordem').eq('aula_id', aulaId).order('ordem', { ascending: true })
+  if (!materiais) return { ok: false, erro: 'Materiais não encontrados.' }
+
+  const idx = materiais.findIndex(m => m.id === id)
+  const alvo = direcao === 'up' ? idx - 1 : idx + 1
+  if (idx < 0 || alvo < 0 || alvo >= materiais.length) return { ok: true }
+
+  const a = materiais[idx]
+  const b = materiais[alvo]
+  await Promise.all([
+    supabase.from('aula_materiais').update({ ordem: b.ordem }).eq('id', a.id),
+    supabase.from('aula_materiais').update({ ordem: a.ordem }).eq('id', b.id),
+  ])
 
   revalidarCurso(cursoId)
   return { ok: true }
@@ -390,8 +440,14 @@ export async function excluirMaterial(id: string, cursoId: string): Promise<Resu
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
 
   const supabase = await criarClienteServidor()
+  const { data: material } = await supabase.from('aula_materiais').select('arquivo_url').eq('id', id).maybeSingle()
+
   const { error } = await supabase.from('aula_materiais').delete().eq('id', id)
   if (error) return { ok: false, erro: error.message }
+
+  if (material?.arquivo_url) {
+    await supabase.storage.from('materiais-aulas').remove([material.arquivo_url])
+  }
 
   revalidarCurso(cursoId)
   return { ok: true }

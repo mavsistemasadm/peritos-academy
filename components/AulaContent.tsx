@@ -7,11 +7,14 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import type { AulaCompleta, Anotacao, Duvida } from "@/lib/queries/aula";
+import type { AulaCompleta, Anotacao, Duvida, Material } from "@/lib/queries/aula";
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
-import { verificarCertificado } from '@/app/curso/[slug]/aula/[aulaId]/actions'
-import { IconeChevronLeft, IconeChevronRight, IconePlay, IconeCheck, IconeDownload, IconeSend, IconeHeadset, IconeAlertTriangle } from '@/components/Icones'
+import { verificarCertificado, baixarMaterialAula } from '@/app/curso/[slug]/aula/[aulaId]/actions'
+import {
+  IconeChevronLeft, IconeChevronRight, IconePlay, IconeCheck, IconeDownload, IconeSend, IconeHeadset, IconeAlertTriangle,
+  IconeFileText, IconeBarChart, IconePaperclip,
+} from '@/components/Icones'
 import { Certificado, XP } from '@/components/Emblemas'
 
 
@@ -329,18 +332,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
                     <p className="meta">Nenhum material anexado a esta aula ainda.</p>
                   ) : (
                     <ul className="arquivos">
-                      {materiais.map((m) => (
-                        <li className="arquivo" key={m.id}>
-                          <a href={m.arquivo_url ?? "#"} target={m.arquivo_url ? "_blank" : undefined} rel="noreferrer">
-                            <span className={`arq-ico ${m.tipo}`} aria-hidden="true">{m.tipo === "xls" ? "XLSX" : "PDF"}</span>
-                            <span className="arq-txt"><b>{m.nome}</b><span>{m.descricao}</span></span>
-                            <span className="arq-baixar">
-                              <IconeDownload size={13} strokeWidth={2.2} />
-                              Baixar
-                            </span>
-                          </a>
-                        </li>
-                      ))}
+                      {materiais.map((m) => <MaterialItem key={m.id} material={m} />)}
                     </ul>
                   )}
                 </div>
@@ -523,5 +515,44 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
         </div>
       )}
     </div>
+  );
+}
+
+const ICONE_POR_TIPO: Record<string, typeof IconeFileText> = {
+  pdf: IconeFileText,
+  xlsx: IconeBarChart,
+  docx: IconeFileText,
+  zip: IconePaperclip,
+  outro: IconePaperclip,
+};
+
+function MaterialItem({ material }: { material: Material }) {
+  const [baixando, setBaixando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+  const Icone = ICONE_POR_TIPO[material.tipo] ?? IconePaperclip;
+
+  async function onBaixar(e: React.MouseEvent) {
+    e.preventDefault();
+    setErro(null);
+    setBaixando(true);
+    const r = await baixarMaterialAula(material.id);
+    setBaixando(false);
+    if (!r.ok) { setErro(r.erro); return; }
+    window.open(r.url, "_blank");
+  }
+
+  return (
+    <li className="arquivo">
+      <a href="#" onClick={onBaixar} aria-disabled={baixando}>
+        <span className={`arq-ico ${material.tipo}`} aria-hidden="true">
+          <Icone size={20} strokeWidth={1.6} />
+        </span>
+        <span className="arq-txt"><b>{material.nome}</b><span>{erro ?? material.descricao}</span></span>
+        <span className="arq-baixar">
+          <IconeDownload size={13} strokeWidth={2.2} />
+          {baixando ? "Gerando link..." : "Baixar"}
+        </span>
+      </a>
+    </li>
   );
 }

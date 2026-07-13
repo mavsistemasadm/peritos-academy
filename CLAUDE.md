@@ -83,6 +83,17 @@ Sequência de build de cada página:
 - Lógica em `lib/certificados/gerar.ts` → `verificarEEmitirCertificado(supabase, userId, cursoId)`
 - Auditoria retroativa (2026-07-13): checado se havia aluno com curso completo sem certificado emitido (bug do `aula_concluida` fantasma) — plataforma ainda pré-lançamento, `aula_progresso` está zerada, nenhum caso pendente
 
+## Materiais complementares das aulas
+`aula_materiais` já existia desde o Bloco 1, mas só como metadados com link colado à mão (`arquivo_url` sempre nulo no seed) — nunca teve upload de arquivo real. Migrado em 2026-07-13 pra suportar isso, motivado pela migração de conteúdo da Ensinio (aulas de lá têm anexos que precisam de casa aqui).
+- Schema: `tipo` agora é `pdf|xlsx|docx|zip|outro` (antes só `pdf|xls` — havia um check constraint **não rastreado em migração nenhuma**, criado direto no SQL Editor; cuidado com isso ao mexer nessa tabela de novo). Colunas novas: `tamanho_bytes`, `criado_em`.
+- `arquivo_url` guarda o **path dentro do bucket**, não uma URL pública — o bucket `materiais-aulas` é privado (só o nome é reaproveitado de antes; seria mais preciso chamar de `arquivo_path`, mas mantive o nome já usado pela spec/schema existente pra não quebrar nada por vaidade de nome).
+- RLS da tabela apertada: antes era leitura pública (`qual = true`, inclusive anon via metadata); agora é `is_admin_papel(...,'conteudo') or tem_acesso_ativo(auth.uid())` — mesmo gate do conteúdo pago.
+- Bucket privado `materiais-aulas` (20MB por arquivo): download só via **URL assinada** gerada no servidor (`baixarMaterialAula` em `app/curso/[slug]/aula/[aulaId]/actions.ts`), expira em 60s — mesmíssimo padrão de `app/biblioteca/actions.ts` com o bucket `planilhas`. Não precisa checar `tem_acesso_ativo` manualmente na action: tanto a leitura da linha em `aula_materiais` quanto o `createSignedUrl` no storage já são gateados pela RLS.
+- Admin (`AdminCursoEditorContent.tsx` → `MateriaisBloco`): upload real de múltiplos arquivos por vez (`uploadMateriais`), renomear (`renomearMaterial`), reordenar (`moverMaterial`, mesmo padrão de `moverAula`), excluir (`excluirMaterial`, agora também remove o arquivo do storage, não só a linha).
+- Aluno (`AulaContent.tsx`, aba "Materiais"): ícone por tipo via `Icones.tsx` (`IconeFileText` pdf/docx, `IconeBarChart` xlsx, `IconePaperclip` zip/outro — nada de ícone inline), clique gera o link assinado on-demand em vez de embutir uma URL na carga inicial da página (que expiraria).
+- Testado de ponta a ponta via REST direto (upload como admin, signed URL + download com bytes idênticos como aluno com assinatura ativa, bloqueio confirmado tanto pra aluno sem assinatura quanto pra anon — 404 por RLS, não 403, o que é até melhor pra não vazar a existência do arquivo) — usuários descartáveis, tudo apagado ao final.
+- **Ideia futura (não implementada de propósito)**: gatilho de gamificação `baixar_material` (XP por baixar um material) — deixar pra próxima sessão de calibragem de gatilhos, junto com os outros valores placeholder já registrados na seção Gamificação.
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários)
 - `cursos`, `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool — não existe tabela `aula_concluida`, nunca criar código que a referencie), `aula_anotacoes`
@@ -97,7 +108,7 @@ Sequência de build de cada página:
 - `planos_assinatura`, `assinaturas`, `cobrancas`, `webhook_eventos`, `config_financeiro`, `financeiro_log_acoes` (ver seção Financeiro — **não confundir `planos_assinatura` com `planos`**, tabelas diferentes)
 - `admin_log_acoes_usuario` (log unificado de ações administrativas sobre um aluno — suspender/reativar/banir/resetar senha/ajuste de gamificação/certificado manual, ver seção Usuários)
 - `config_plataforma` (registro único — identidade, contato, textos institucionais, comportamento, SEO; leitura pública `using (true)`, ver seção Configurações)
-- Bucket Storage `planilhas` (privado, uploads de aluno/documentos), `capas` (público, imagens de capa)
+- Bucket Storage `planilhas` (privado, uploads de aluno/documentos), `capas` (público, imagens de capa), `materiais-aulas` (privado, anexos de aula — ver seção Materiais complementares)
 - Tabelas duplicadas/legadas — nunca usadas pelo app, não construir em cima: `posts`/`post_comentarios`/`post_reacoes` (substituídas por `comunidade_*`), `duvidas`/`duvida_respostas` (substituídas por `aula_duvidas`), `questoes`/`tentativas`/`materiais`/`progresso_aulas`, `planos` (feature dormente "meu plano de estudo" do aluno, sem leitura/escrita em código), `matriculas` (resquício de modelo antigo, sem leitura/escrita em código — o gate de acesso atual é por assinatura, ver seção Financeiro)
 
 ## Sistema de ícones (dois níveis)

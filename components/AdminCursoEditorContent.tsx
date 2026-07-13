@@ -9,9 +9,9 @@ import {
   atualizarCurso, uploadCapaCurso, alternarPublicacaoCurso, excluirCurso,
   criarModulo, atualizarModulo, excluirModulo, moverModulo,
   criarAula, atualizarAula, excluirAula, moverAula, uploadCapaAula,
-  criarCapitulo, excluirCapitulo, criarMaterial, excluirMaterial,
+  criarCapitulo, excluirCapitulo, uploadMateriais, renomearMaterial, moverMaterial, excluirMaterial,
 } from '@/app/admin/cursos/actions'
-import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconePencil, IconeTrash } from '@/components/Icones'
+import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconePencil, IconeTrash, IconeUpload } from '@/components/Icones'
 
 function segParaLabel(seg: number) {
   const m = Math.floor(seg / 60)
@@ -479,29 +479,53 @@ function CapitulosBloco({ aula, cursoId, onErro, onRefresh }: {
   )
 }
 
+function fmtBytes(bytes: number | null) {
+  if (!bytes) return ''
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
 function MateriaisBloco({ aula, cursoId, onErro, onRefresh }: {
   aula: AulaAdmin; cursoId: string; onErro: (e: string | null) => void; onRefresh: () => void
 }) {
   const [pendente, startTransition] = useTransition()
-  const [nome, setNome] = useState('')
-  const [tipo, setTipo] = useState<'pdf' | 'xls'>('pdf')
-  const [url, setUrl] = useState('')
+  const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [nomeEditado, setNomeEditado] = useState('')
 
-  function onCriar() {
-    if (!nome.trim() || !url.trim()) { onErro('Nome e link do material são obrigatórios.'); return }
+  function onUpload(e: ChangeEvent<HTMLInputElement>) {
+    const arquivos = e.target.files
+    if (!arquivos || arquivos.length === 0) return
     onErro(null)
     const fd = new FormData()
-    fd.set('nome', nome)
-    fd.set('tipo', tipo)
-    fd.set('arquivo_url', url)
+    Array.from(arquivos).forEach(f => fd.append('arquivos', f))
     startTransition(async () => {
-      const r = await criarMaterial(aula.id, cursoId, fd)
+      const r = await uploadMateriais(aula.id, cursoId, fd)
       if (!r.ok) onErro(r.erro)
-      else { setNome(''); setUrl(''); onRefresh() }
+      else { e.target.value = ''; onRefresh() }
     })
   }
 
-  function onExcluir(id: string) {
+  function onSalvarNome(id: string) {
+    if (!nomeEditado.trim()) return
+    onErro(null)
+    startTransition(async () => {
+      const r = await renomearMaterial(id, cursoId, nomeEditado)
+      if (!r.ok) onErro(r.erro)
+      else { setEditandoId(null); onRefresh() }
+    })
+  }
+
+  function onMover(id: string, direcao: 'up' | 'down') {
+    onErro(null)
+    startTransition(async () => {
+      const r = await moverMaterial(aula.id, cursoId, id, direcao)
+      if (!r.ok) onErro(r.erro)
+      else onRefresh()
+    })
+  }
+
+  function onExcluir(id: string, nome: string) {
+    if (!confirm(`Excluir o material "${nome}"? Essa ação não pode ser desfeita.`)) return
     onErro(null)
     startTransition(async () => {
       const r = await excluirMaterial(id, cursoId)
@@ -515,23 +539,31 @@ function MateriaisBloco({ aula, cursoId, onErro, onRefresh }: {
       <h3>Materiais de apoio</h3>
       {aula.materiais.length === 0 && <p className="ad-vazio-sm">Nenhum material.</p>}
       <ul>
-        {aula.materiais.map(m => (
+        {aula.materiais.map((m, i) => (
           <li key={m.id}>
-            <span>{m.nome}</span>
-            <span className="ad-sublista-meta">{m.tipo.toUpperCase()}</span>
-            <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(m.id)}><IconeTrash size={13} /></button>
+            {editandoId === m.id ? (
+              <div className="ad-inline-edit">
+                <input value={nomeEditado} onChange={e => setNomeEditado(e.target.value)} autoFocus />
+                <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => onSalvarNome(m.id)}>Salvar</button>
+                <button type="button" className="ad-btn-secundario" onClick={() => setEditandoId(null)}>Cancelar</button>
+              </div>
+            ) : (
+              <>
+                <span>{m.nome}</span>
+                <span className="ad-sublista-meta">{m.tipo.toUpperCase()}{m.tamanhoBytes ? ` · ${fmtBytes(m.tamanhoBytes)}` : ''}</span>
+                <button type="button" disabled={pendente || i === 0} onClick={() => onMover(m.id, 'up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
+                <button type="button" disabled={pendente || i === aula.materiais.length - 1} onClick={() => onMover(m.id, 'down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
+                <button type="button" onClick={() => { setEditandoId(m.id); setNomeEditado(m.nome) }} title="Renomear"><IconePencil size={13} /></button>
+                <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(m.id, m.nome)} title="Excluir"><IconeTrash size={13} /></button>
+              </>
+            )}
           </li>
         ))}
       </ul>
-      <div className="ad-nova-linha">
-        <input type="text" placeholder="Nome do material" value={nome} onChange={e => setNome(e.target.value)} />
-        <select value={tipo} onChange={e => setTipo(e.target.value as 'pdf' | 'xls')}>
-          <option value="pdf">PDF</option>
-          <option value="xls">XLS</option>
-        </select>
-        <input type="text" placeholder="Link do arquivo" value={url} onChange={e => setUrl(e.target.value)} />
-        <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={onCriar}>+ Material</button>
-      </div>
+      <label className="ad-btn-secundario ad-upload-btn">
+        <IconeUpload size={13} /> Enviar arquivos (PDF, XLSX, DOCX, ZIP — até 20MB cada)
+        <input type="file" multiple accept=".pdf,.xlsx,.xls,.docx,.doc,.zip" onChange={onUpload} hidden disabled={pendente} />
+      </label>
     </div>
   )
 }

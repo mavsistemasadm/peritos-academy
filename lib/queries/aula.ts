@@ -3,7 +3,7 @@
 import { criarClienteServidor } from "@/lib/supabase/server";
 
 export type Capitulo = { id: string; titulo: string; tempo_seg: number; ordem: number };
-export type Material = { id: string; nome: string; descricao: string | null; tipo: "pdf" | "xls"; arquivo_url: string | null; ordem: number };
+export type Material = { id: string; nome: string; descricao: string | null; tipo: "pdf" | "xlsx" | "docx" | "zip" | "outro"; arquivo_url: string | null; ordem: number };
 export type Duvida = {
   id: string; parent_id: string | null; autor_nome: string; autor_iniciais: string;
   e_especialista: boolean; tempo_seg: number | null; texto: string; uteis: number; criada_em: string;

@@ -882,7 +882,9 @@ body.teatro .trilho-aulas{display:none}
   display:grid;place-items:center;font-size:10.5px;font-weight:750;letter-spacing:.06em;
 }
 .arq-ico.pdf{color:var(--verde);background:rgba(32,217,166,.09);border:1px solid rgba(32,217,166,.3)}
-.arq-ico.xls{color:var(--lima);background:rgba(221,247,132,.08);border:1px solid rgba(221,247,132,.28)}
+.arq-ico.xls,.arq-ico.xlsx{color:var(--lima);background:rgba(221,247,132,.08);border:1px solid rgba(221,247,132,.28)}
+.arq-ico.docx{color:var(--ciano);background:rgba(54,220,209,.09);border:1px solid rgba(54,220,209,.3)}
+.arq-ico.zip,.arq-ico.outro{color:var(--cinza-claro);background:rgba(255,255,255,.05);border:1px solid var(--linha)}
 .arq-txt{flex:1;min-width:0}
 .arq-txt b{display:block;font-size:15px;font-weight:590;letter-spacing:-.01em}
 .arq-txt span{font-size:12.5px;color:var(--cinza)}
