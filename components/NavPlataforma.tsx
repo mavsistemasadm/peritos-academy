@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { DadosNav } from '@/lib/queries/nav'
 import { IconeChevronDown, IconeMap, IconeBookOpen, IconeBarChart, IconeUser, IconeGlobe, IconeShield, IconeLogOut } from '@/components/Icones'
 import { FogoStreak, Moeda, Certificado } from '@/components/Emblemas'
+import { sair } from '@/lib/auth/sair'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -147,7 +148,7 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
                       </a>
                     )}
                     <div className="np-am-sep"></div>
-                    <form action="/api/auth/logout" method="POST">
+                    <form action={sair}>
                       <button type="submit" className="np-am-item np-am-sair">
                         <IconeLogOut size={16} strokeWidth={1.8} />
                         Sair
