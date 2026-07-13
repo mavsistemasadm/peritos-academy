@@ -6,6 +6,9 @@ import { PERMISSOES_SECAO, NOME_SECAO, NOME_PAPEL, type SecaoAdmin } from '@/lib
 
 const ROTA_SECAO: Partial<Record<SecaoAdmin, string>> = {
   administradores: '/admin/administradores',
+  cursos: '/admin/cursos',
+  trilhas: '/admin/trilhas',
+  avaliacoes: '/admin/avaliacoes',
 }
 
 function temPermissao(admin: AdminAtual, secao: SecaoAdmin) {

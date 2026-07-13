@@ -3998,4 +3998,168 @@ body.teatro .trilho-aulas{display:none}
 }
 .pagina-admin .ad-toggle-papel.ativo{color:var(--creme);font-weight:600}
 .pagina-admin .ad-toggle-papel input[type="checkbox"]{width:16px;height:16px;accent-color:#20D9A6;cursor:pointer}
+
+
+
+
+/* ============================================================
+   PERITOS ACADEMY — ADMIN: CONTEÚDO
+   (cursos, trilhas, avaliações — escopado em .pagina-admin)
+   ============================================================ */
+.pagina-admin .ad-cursos-cab{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s-3);
+  flex-wrap:wrap;margin-bottom:var(--s-4);
+}
+.pagina-admin .ad-btn-primario{
+  font-size:13.5px;font-weight:650;color:var(--carvao);
+  padding:10px 18px;border-radius:var(--r-pill);background:var(--verde);
+  transition:opacity .2s;white-space:nowrap;
+}
+.pagina-admin .ad-btn-primario:hover{opacity:.88}
+.pagina-admin .ad-btn-primario:disabled{opacity:.5;cursor:default}
+.pagina-admin .ad-btn-secundario{
+  font-size:13px;font-weight:600;color:var(--creme);
+  padding:9px 16px;border-radius:var(--r-pill);
+  background:rgba(255,255,255,.05);border:1px solid var(--linha);
+  transition:background .2s;white-space:nowrap;display:inline-flex;align-items:center;
+}
+.pagina-admin .ad-btn-secundario:hover{background:rgba(255,255,255,.09)}
+.pagina-admin .ad-btn-secundario:disabled{opacity:.5;cursor:default}
+.pagina-admin .ad-btn-perigo{
+  font-size:12.5px;font-weight:600;color:#E0776B;
+  padding:8px 14px;border-radius:var(--r-pill);
+  background:rgba(224,107,107,.08);border:1px solid rgba(224,107,107,.25);
+  transition:background .2s;white-space:nowrap;
+}
+.pagina-admin .ad-btn-perigo:hover{background:rgba(224,107,107,.16)}
+.pagina-admin .ad-btn-perigo:disabled{opacity:.5;cursor:default}
+.pagina-admin .ad-btn-perigo-sm{
+  font-size:13px;line-height:1;color:#E0776B;
+  padding:6px 8px;border-radius:8px;background:rgba(224,107,107,.08);
+  transition:background .2s;
+}
+.pagina-admin .ad-btn-perigo-sm:hover{background:rgba(224,107,107,.16)}
+.pagina-admin .ad-btn-perigo-sm:disabled{opacity:.5;cursor:default}
+.pagina-admin .ad-form-acoes{display:flex;gap:8px;margin-top:var(--s-3)}
+
+.pagina-admin .ad-cursos-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--s-3);
+}
+.pagina-admin .ad-curso-card{
+  border:1px solid var(--linha);border-radius:var(--r-card);overflow:hidden;
+  background:rgba(255,255,255,.015);display:flex;flex-direction:column;
+}
+.pagina-admin .ad-curso-capa{
+  display:block;aspect-ratio:16/9;background-size:cover;background-position:center;
+  background-color:var(--preto-elev);display:grid;place-items:center;
+  color:var(--cinza);font-size:12px;
+}
+.pagina-admin .ad-curso-info{padding:var(--s-3);display:flex;flex-direction:column;gap:8px}
+.pagina-admin .ad-curso-titulo{font-size:15px;font-weight:650;color:var(--creme)}
+.pagina-admin .ad-curso-subtitulo{font-size:12.5px;color:var(--cinza-claro);line-height:1.4}
+.pagina-admin .ad-curso-meta{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--cinza)}
+.pagina-admin .ad-curso-acoes{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:4px}
+
+.pagina-admin .ad-voltar{font-size:13px;color:var(--cinza);display:inline-block;margin-bottom:var(--s-3)}
+.pagina-admin .ad-voltar:hover{color:var(--creme)}
+.pagina-admin .ad-editor-cab{
+  display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);flex-wrap:wrap;
+  margin-bottom:var(--s-4);
+}
+.pagina-admin .ad-editor-cab h1{margin-bottom:0}
+.pagina-admin .ad-editor-cab-acoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pagina-admin .ad-caso-numero{font-size:14px;font-weight:500;color:var(--cinza)}
+
+.pagina-admin .ad-editor-grid{display:grid;grid-template-columns:220px 1fr;gap:var(--s-3);align-items:start}
+@media(max-width:760px){.pagina-admin .ad-editor-grid{grid-template-columns:1fr}}
+.pagina-admin .ad-capa-preview{
+  aspect-ratio:16/9;border-radius:14px;background-size:cover;background-position:center;
+  background-color:var(--preto-elev);border:1px solid var(--linha);
+  display:grid;place-items:center;color:var(--cinza);font-size:12px;margin-bottom:10px;
+}
+.pagina-admin .ad-capa-preview-sm{aspect-ratio:16/9;max-width:220px;margin-bottom:0}
+.pagina-admin .ad-upload-btn{display:inline-flex;cursor:pointer}
+
+.pagina-admin .ad-form{display:flex;flex-direction:column;gap:var(--s-3)}
+.pagina-admin .ad-form label{
+  display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:650;
+  letter-spacing:.04em;color:var(--cinza);
+}
+.pagina-admin .ad-form input,
+.pagina-admin .ad-form textarea,
+.pagina-admin .ad-form select{
+  width:100%;font:inherit;font-size:14px;font-weight:400;color:var(--creme);
+  background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:10px;
+  padding:10px 14px;outline:none;transition:border-color .2s;resize:vertical;
+}
+.pagina-admin .ad-form input:focus,
+.pagina-admin .ad-form textarea:focus,
+.pagina-admin .ad-form select:focus{border-color:rgba(32,217,166,.4)}
+.pagina-admin .ad-form-linha{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--s-3)}
+.pagina-admin .ad-checkbox-linha{
+  flex-direction:row !important;align-items:center;gap:8px !important;font-size:13px !important;
+  font-weight:500 !important;color:var(--cinza-claro) !important;text-transform:none;letter-spacing:normal;
+  cursor:pointer;
+}
+.pagina-admin .ad-checkbox-linha input{width:16px;height:16px;accent-color:#20D9A6;cursor:pointer}
+
+.pagina-admin .ad-nova-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:var(--s-3)}
+.pagina-admin .ad-nova-linha input,
+.pagina-admin .ad-nova-linha select{
+  flex:1;min-width:160px;font:inherit;font-size:13.5px;color:var(--creme);
+  background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:10px;
+  padding:9px 12px;outline:none;transition:border-color .2s;
+}
+.pagina-admin .ad-nova-linha input:focus,
+.pagina-admin .ad-nova-linha select:focus{border-color:rgba(32,217,166,.4)}
+.pagina-admin .ad-input-sm{flex:0 0 110px !important;min-width:0 !important}
+
+.pagina-admin .ad-modulos-lista{display:flex;flex-direction:column;gap:10px}
+.pagina-admin .ad-modulo-bloco{border:1px solid var(--linha);border-radius:16px;background:rgba(255,255,255,.015);overflow:hidden}
+.pagina-admin .ad-modulo-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;flex-wrap:wrap}
+.pagina-admin .ad-modulo-toggle{font-size:14px;font-weight:650;color:var(--creme);text-align:left;flex:1}
+.pagina-admin .ad-modulo-acoes{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pagina-admin .ad-modulo-acoes button{
+  font-size:13px;color:var(--cinza-claro);padding:6px 9px;border-radius:8px;
+  background:rgba(255,255,255,.04);transition:background .2s;
+}
+.pagina-admin .ad-modulo-acoes button:hover{background:rgba(255,255,255,.09)}
+.pagina-admin .ad-modulo-acoes button:disabled{opacity:.4;cursor:default}
+.pagina-admin .ad-modulo-contagem{font-size:12px;color:var(--cinza);margin-right:4px}
+.pagina-admin .ad-modulo-corpo{padding:0 14px 14px;border-top:1px solid var(--linha-suave);padding-top:12px;display:flex;flex-direction:column;gap:10px}
+.pagina-admin .ad-inline-edit{display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap}
+.pagina-admin .ad-inline-edit input{
+  flex:1;min-width:160px;font:inherit;font-size:14px;color:var(--creme);
+  background:rgba(255,255,255,.05);border:1px solid rgba(32,217,166,.4);border-radius:8px;padding:6px 10px;outline:none;
+}
+.pagina-admin .ad-inline-edit button{
+  font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:8px;
+  background:rgba(255,255,255,.05);color:var(--creme);
+}
+
+.pagina-admin .ad-aula-bloco{border:1px solid var(--linha-suave);border-radius:12px;background:rgba(255,255,255,.012)}
+.pagina-admin .ad-aula-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;flex-wrap:wrap}
+.pagina-admin .ad-aula-toggle{font-size:13.5px;font-weight:600;color:var(--creme);text-align:left;flex:1}
+.pagina-admin .ad-aula-acoes{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pagina-admin .ad-aula-acoes button{
+  font-size:12.5px;color:var(--cinza-claro);padding:5px 8px;border-radius:8px;
+  background:rgba(255,255,255,.04);transition:background .2s;
+}
+.pagina-admin .ad-aula-acoes button:hover{background:rgba(255,255,255,.09)}
+.pagina-admin .ad-aula-acoes button:disabled{opacity:.4;cursor:default}
+.pagina-admin .ad-aula-meta{font-size:11.5px;color:var(--cinza);margin-right:4px;white-space:nowrap}
+.pagina-admin .ad-aula-corpo{padding:12px;border-top:1px solid var(--linha-suave);display:flex;flex-direction:column;gap:var(--s-3)}
+.pagina-admin .ad-aula-capa-linha{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+.pagina-admin .ad-sublista{border-top:1px solid var(--linha-suave);padding-top:12px}
+.pagina-admin .ad-sublista h3{font-size:12px;font-weight:650;text-transform:uppercase;letter-spacing:.06em;color:var(--cinza);margin-bottom:8px}
+.pagina-admin .ad-sublista ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.pagina-admin .ad-sublista li{
+  display:flex;align-items:center;gap:10px;padding:7px 10px;
+  border:1px solid var(--linha-suave);border-radius:9px;font-size:13px;color:var(--creme);
+}
+.pagina-admin .ad-sublista li span:first-of-type{flex:1}
+.pagina-admin .ad-sublista li label{flex:1;display:flex !important;flex-direction:row !important}
+.pagina-admin .ad-sublista-meta{font-size:11px;color:var(--cinza)}
+.pagina-admin .ad-vazio-sm{font-size:12.5px;color:var(--cinza);margin-bottom:8px}
 .cert-popup-acoes .btn{justify-content:center}
