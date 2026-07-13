@@ -4408,3 +4408,491 @@ body.teatro .trilho-aulas{display:none}
 .pagina-dev-icones .di-lista-inconsistencias li::before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--lima)}
 
 .cert-popup-acoes .btn{justify-content:center}
+
+
+
+/* ============================================================
+   COMUNIDADE — /comunidade
+   Escopo: .pagina-comunidade | Keyframes com sufixo "Com"
+   ============================================================ */
+.pagina-comunidade{
+  --fundoCom:#0b0e14;
+  --painelCom:#121722;
+  --painel2Com:#171d2a;
+  --bordaCom:rgba(255,255,255,.07);
+  --borda2Com:rgba(255,255,255,.13);
+  --textoCom:#e9ecf3;
+  --suaveCom:#9aa4b5;
+  --apagadoCom:#69738a;
+  --ouroCom:#d4a94e;
+  --ouro2Com:#f0cf8a;
+  --verdeCom:#3ddc97;
+  --vermCom:#ff6b6b;
+  --azulCom:#5aa9ff;
+  --roxoCom:#a78bfa;
+
+  position:relative;
+  min-height:100vh;
+  background:
+    radial-gradient(900px 420px at 85% -80px, rgba(212,169,78,.07), transparent 60%),
+    radial-gradient(700px 380px at 0% 0%, rgba(90,169,255,.05), transparent 55%),
+    var(--fundoCom);
+  color:var(--textoCom);
+}
+.pagina-comunidade .num{ font-variant-numeric:tabular-nums; }
+
+/* grão de fundo */
+.pagina-comunidade .grao{
+  position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.35;
+  background-image:radial-gradient(rgba(255,255,255,.028) 1px, transparent 1px);
+  background-size:3px 3px;
+}
+.pagina-comunidade .topo,
+.pagina-comunidade .corpo{ position:relative; z-index:1; }
+
+/* layout base */
+.pagina-comunidade .wrap{
+  max-width:1240px; margin:0 auto; padding:0 24px;
+}
+
+/* ---------- reveal ---------- */
+.pagina-comunidade .reveal{
+  opacity:0; transform:translateY(14px);
+  transition:opacity .55s ease, transform .55s ease;
+}
+.pagina-comunidade .reveal.visivel{ opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce){
+  .pagina-comunidade .reveal{ opacity:1; transform:none; transition:none; }
+}
+
+/* ============ TOPO ============ */
+.pagina-comunidade .topo{ padding:118px 0 26px; }
+.pagina-comunidade .topo-linha{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:28px; flex-wrap:wrap;
+  border-bottom:1px solid var(--bordaCom); padding-bottom:24px;
+}
+.pagina-comunidade .eyebrow{
+  display:inline-block; font-size:.72rem; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:var(--ouroCom); margin-bottom:10px;
+}
+.pagina-comunidade .topo h1{
+  font-size:clamp(1.9rem, 3.4vw, 2.7rem); line-height:1.08;
+  font-weight:800; letter-spacing:-.02em; margin:0;
+}
+.pagina-comunidade .grad-txt{
+  background:linear-gradient(92deg, var(--ouroCom), var(--ouro2Com));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.pagina-comunidade .topo-stats{
+  display:flex; gap:26px; flex-wrap:wrap; padding-bottom:4px;
+}
+.pagina-comunidade .t-stat{
+  display:flex; align-items:center; gap:9px;
+  font-size:.86rem; color:var(--suaveCom);
+}
+.pagina-comunidade .t-stat b{
+  color:var(--textoCom); font-size:1.02rem; margin-right:4px;
+}
+.pagina-comunidade .ponto{
+  width:8px; height:8px; border-radius:50%; background:var(--verdeCom);
+  box-shadow:0 0 0 0 rgba(61,220,151,.5);
+  animation:pulsarPontoCom 2s ease-out infinite;
+}
+@keyframes pulsarPontoCom{
+  0%{ box-shadow:0 0 0 0 rgba(61,220,151,.45); }
+  70%{ box-shadow:0 0 0 8px rgba(61,220,151,0); }
+  100%{ box-shadow:0 0 0 0 rgba(61,220,151,0); }
+}
+
+/* ============ GRID ============ */
+.pagina-comunidade .corpo{ padding:28px 0 90px; }
+.pagina-comunidade .grid{
+  display:grid; grid-template-columns:230px minmax(0,1fr) 300px; gap:26px;
+  align-items:start;
+}
+
+/* ---------- rails (comum) ---------- */
+.pagina-comunidade .rail-esq,
+.pagina-comunidade .rail-dir{ position:sticky; top:96px; }
+.pagina-comunidade .rail-titulo{
+  display:block; font-size:.68rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:var(--apagadoCom); margin:0 0 10px;
+}
+
+/* ---------- rail esquerdo: espaços ---------- */
+.pagina-comunidade .espacos{
+  list-style:none; margin:0 0 26px; padding:0;
+  display:flex; flex-direction:column; gap:2px;
+}
+.pagina-comunidade .espacos a{
+  display:flex; align-items:center; gap:8px;
+  padding:8px 10px; border-radius:9px;
+  color:var(--suaveCom); text-decoration:none; font-size:.9rem;
+  border:1px solid transparent;
+  transition:background .18s ease, color .18s ease, border-color .18s ease;
+}
+.pagina-comunidade .espacos a:hover{
+  background:var(--painelCom); color:var(--textoCom);
+}
+.pagina-comunidade .espacos a.ativo{
+  background:var(--painel2Com); color:var(--textoCom);
+  border-color:var(--borda2Com);
+}
+.pagina-comunidade .espacos a.ativo .cerquilha{ color:var(--ouroCom); }
+.pagina-comunidade .cerquilha{
+  color:var(--apagadoCom); font-weight:700;
+}
+.pagina-comunidade .espacos .qtd{
+  margin-left:auto; font-size:.74rem; color:var(--apagadoCom);
+  background:rgba(255,255,255,.05); border-radius:99px; padding:2px 8px;
+}
+.pagina-comunidade .novo-ponto{
+  margin-left:auto; width:7px; height:7px; border-radius:50%;
+  background:var(--ouroCom);
+  box-shadow:0 0 10px rgba(212,169,78,.6);
+}
+.pagina-comunidade .turma{
+  display:block; padding:13px 14px; border-radius:12px;
+  background:linear-gradient(135deg, rgba(212,169,78,.1), rgba(212,169,78,.03));
+  border:1px solid rgba(212,169,78,.22);
+  text-decoration:none; color:var(--textoCom);
+  transition:border-color .18s ease, transform .18s ease;
+}
+.pagina-comunidade .turma:hover{
+  border-color:rgba(212,169,78,.45); transform:translateY(-1px);
+}
+.pagina-comunidade .turma b{ display:block; font-size:.9rem; margin-bottom:3px; }
+.pagina-comunidade .turma .num{ font-size:.76rem; color:var(--suaveCom); }
+
+/* ---------- avatar genérico ---------- */
+.pagina-comunidade .foto-p{
+  flex:none; width:40px; height:40px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:.8rem; font-weight:700; letter-spacing:.03em;
+  color:var(--ouro2Com);
+  background:linear-gradient(145deg, #232a3a, #171d2a);
+  border:1px solid var(--borda2Com);
+}
+
+/* ---------- compor ---------- */
+.pagina-comunidade .compor{
+  display:flex; gap:14px; padding:18px;
+  background:var(--painelCom); border:1px solid var(--bordaCom);
+  border-radius:16px; margin-bottom:18px;
+}
+.pagina-comunidade .compor-corpo{ flex:1; min-width:0; }
+.pagina-comunidade .compor textarea{
+  width:100%; min-height:64px; resize:vertical;
+  background:transparent; border:none; outline:none;
+  color:var(--textoCom); font:inherit; font-size:.95rem; line-height:1.5;
+}
+.pagina-comunidade .compor textarea::placeholder{ color:var(--apagadoCom); }
+.pagina-comunidade .compor-acoes{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  margin-top:10px; padding-top:12px; border-top:1px solid var(--bordaCom);
+}
+.pagina-comunidade .tipo-chip{
+  padding:6px 14px; border-radius:99px; cursor:pointer;
+  background:transparent; border:1px solid var(--borda2Com);
+  color:var(--suaveCom); font-size:.8rem; font-weight:600;
+  transition:all .18s ease;
+}
+.pagina-comunidade .tipo-chip:hover{ color:var(--textoCom); border-color:rgba(255,255,255,.25); }
+.pagina-comunidade .tipo-chip.sel{
+  background:rgba(212,169,78,.14); border-color:rgba(212,169,78,.5);
+  color:var(--ouro2Com);
+}
+
+/* ---------- botões ---------- */
+.pagina-comunidade .btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  border-radius:10px; padding:9px 18px; cursor:pointer;
+  font-size:.85rem; font-weight:700; text-decoration:none;
+  border:1px solid transparent; transition:all .18s ease;
+}
+.pagina-comunidade .btn-primario{
+  margin-left:auto;
+  background:linear-gradient(92deg, var(--ouroCom), var(--ouro2Com));
+  color:#1a1405;
+}
+.pagina-comunidade .btn-primario:hover{
+  filter:brightness(1.07); transform:translateY(-1px);
+  box-shadow:0 6px 18px rgba(212,169,78,.25);
+}
+.pagina-comunidade .btn-primario:disabled{
+  opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; filter:none;
+}
+.pagina-comunidade .btn-fantasma{
+  background:transparent; border-color:var(--borda2Com); color:var(--suaveCom);
+}
+.pagina-comunidade .btn-fantasma:hover{ color:var(--textoCom); border-color:rgba(255,255,255,.28); }
+.pagina-comunidade .btn-fantasma.aplaudido{
+  background:rgba(61,220,151,.12); border-color:rgba(61,220,151,.45);
+  color:var(--verdeCom);
+  animation:aplaudirCom .35s ease;
+}
+@keyframes aplaudirCom{
+  0%{ transform:scale(1); }
+  40%{ transform:scale(1.08); }
+  100%{ transform:scale(1); }
+}
+
+/* ---------- filtros ---------- */
+.pagina-comunidade .filtros{
+  display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;
+}
+.pagina-comunidade .filtro{
+  padding:7px 14px; border-radius:99px; cursor:pointer;
+  background:transparent; border:1px solid var(--bordaCom);
+  color:var(--suaveCom); font-size:.8rem; font-weight:600;
+  transition:all .18s ease;
+}
+.pagina-comunidade .filtro:hover{ color:var(--textoCom); border-color:var(--borda2Com); }
+.pagina-comunidade .filtro.ativo{
+  background:var(--painel2Com); border-color:var(--borda2Com);
+  color:var(--textoCom);
+}
+
+/* ---------- post ---------- */
+.pagina-comunidade .post{
+  background:var(--painelCom); border:1px solid var(--bordaCom);
+  border-radius:16px; padding:20px; margin-bottom:16px;
+  transition:border-color .2s ease;
+}
+.pagina-comunidade .post:hover{ border-color:var(--borda2Com); }
+.pagina-comunidade .post-cab{
+  display:flex; align-items:center; gap:12px; margin-bottom:12px;
+}
+.pagina-comunidade .post-quem{ min-width:0; flex:1; }
+.pagina-comunidade .post-quem .nome{
+  display:flex; align-items:center; gap:8px; font-size:.92rem;
+}
+.pagina-comunidade .post-quem > span{
+  display:block; font-size:.76rem; color:var(--apagadoCom); margin-top:2px;
+}
+.pagina-comunidade .mini-nivel{
+  font-size:.66rem; font-weight:800; padding:2px 7px; border-radius:99px;
+  background:rgba(212,169,78,.14); color:var(--ouro2Com);
+  border:1px solid rgba(212,169,78,.3);
+}
+.pagina-comunidade .post h3{
+  margin:0 0 8px; font-size:1.06rem; font-weight:700; line-height:1.35;
+}
+.pagina-comunidade .post h3 a{
+  color:var(--textoCom); text-decoration:none; transition:color .18s ease;
+}
+.pagina-comunidade .post h3 a:hover{ color:var(--ouro2Com); }
+.pagina-comunidade .post > p{
+  margin:0 0 14px; font-size:.92rem; line-height:1.6; color:var(--suaveCom);
+}
+
+/* tags */
+.pagina-comunidade .tag{
+  flex:none; font-size:.68rem; font-weight:700; letter-spacing:.05em;
+  text-transform:uppercase; padding:4px 10px; border-radius:99px;
+  border:1px solid;
+}
+.pagina-comunidade .tag.caso{
+  color:var(--azulCom); border-color:rgba(90,169,255,.35);
+  background:rgba(90,169,255,.09);
+}
+.pagina-comunidade .tag.duvida{
+  color:var(--ouro2Com); border-color:rgba(212,169,78,.35);
+  background:rgba(212,169,78,.09);
+}
+.pagina-comunidade .tag.resolvida{
+  color:var(--verdeCom); border-color:rgba(61,220,151,.35);
+  background:rgba(61,220,151,.09);
+}
+
+/* melhor resposta */
+.pagina-comunidade .melhor-resposta{
+  display:flex; gap:12px; padding:14px;
+  background:var(--painel2Com); border:1px solid var(--bordaCom);
+  border-left:3px solid var(--verdeCom);
+  border-radius:12px; margin-bottom:14px;
+}
+.pagina-comunidade .melhor-resposta .foto-p{ width:32px; height:32px; font-size:.68rem; }
+.pagina-comunidade .corpo-r{ min-width:0; }
+.pagina-comunidade .quem-r{
+  display:flex; align-items:center; gap:8px; font-size:.84rem; margin-bottom:5px;
+}
+.pagina-comunidade .selo-esp{
+  font-size:.64rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+  padding:2px 8px; border-radius:99px;
+  color:var(--verdeCom); border:1px solid rgba(61,220,151,.35);
+  background:rgba(61,220,151,.09);
+}
+.pagina-comunidade .corpo-r p{
+  margin:0; font-size:.86rem; line-height:1.55; color:var(--suaveCom);
+}
+
+/* ações do post */
+.pagina-comunidade .post-acoes{
+  display:flex; gap:8px; flex-wrap:wrap;
+  padding-top:12px; border-top:1px solid var(--bordaCom);
+}
+.pagina-comunidade .acao{
+  display:inline-flex; align-items:center; gap:7px;
+  padding:7px 13px; border-radius:9px; cursor:pointer;
+  background:transparent; border:1px solid transparent;
+  color:var(--suaveCom); font-size:.8rem; font-weight:600;
+  transition:all .18s ease;
+}
+.pagina-comunidade .acao:hover{
+  background:var(--painel2Com); color:var(--textoCom);
+}
+.pagina-comunidade .acao.feita{
+  color:var(--ouro2Com);
+  background:rgba(212,169,78,.1); border-color:rgba(212,169,78,.3);
+}
+.pagina-comunidade .acao.util.feita svg{ animation:aplaudirCom .35s ease; }
+
+/* ---------- post de vitória ---------- */
+.pagina-comunidade .post.vitoria{
+  background:linear-gradient(135deg, rgba(212,169,78,.09), rgba(212,169,78,.02)),
+             var(--painelCom);
+  border-color:rgba(212,169,78,.25);
+}
+.pagina-comunidade .vitoria-linha{
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+.pagina-comunidade .vitoria-badge{
+  flex:none; width:46px; height:46px; border-radius:12px;
+  display:inline-flex; align-items:center; justify-content:center;
+  color:var(--ouro2Com);
+  background:rgba(212,169,78,.13); border:1px solid rgba(212,169,78,.35);
+}
+.pagina-comunidade .vitoria-txt{
+  flex:1; min-width:180px; display:flex; flex-direction:column; gap:2px;
+}
+.pagina-comunidade .vitoria-txt .rot{
+  font-size:.68rem; font-weight:700; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ouroCom);
+}
+.pagina-comunidade .vitoria-txt b{ font-size:.98rem; }
+.pagina-comunidade .vitoria-txt .num{ font-size:.78rem; color:var(--apagadoCom); }
+
+/* ---------- rail direito ---------- */
+.pagina-comunidade .bloco-r{
+  background:var(--painelCom); border:1px solid var(--bordaCom);
+  border-radius:16px; padding:18px; margin-bottom:16px;
+}
+.pagina-comunidade .bloco-r-cab{
+  display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+}
+.pagina-comunidade .bloco-r-cab a{
+  font-size:.76rem; color:var(--ouroCom); text-decoration:none;
+}
+.pagina-comunidade .bloco-r-cab a:hover{ color:var(--ouro2Com); }
+
+/* evento ao vivo */
+.pagina-comunidade .bloco-r.evento{
+  display:flex; flex-direction:column; gap:10px;
+  background:linear-gradient(135deg, rgba(255,107,107,.08), rgba(255,107,107,.02)),
+             var(--painelCom);
+  border-color:rgba(255,107,107,.25);
+}
+.pagina-comunidade .bloco-r.evento b{ font-size:.98rem; line-height:1.35; }
+.pagina-comunidade .bloco-r.evento > span:not(.selo-vivo){
+  font-size:.82rem; color:var(--suaveCom); line-height:1.5;
+}
+.pagina-comunidade .bloco-r.evento .btn{ margin-top:4px; }
+.pagina-comunidade .selo-vivo{
+  display:inline-flex; align-items:center; gap:7px; align-self:flex-start;
+  font-size:.7rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--vermCom); padding:4px 10px; border-radius:99px;
+  background:rgba(255,107,107,.1); border:1px solid rgba(255,107,107,.3);
+}
+.pagina-comunidade .selo-vivo .ponto{
+  background:var(--vermCom);
+  animation-name:pulsarVivoCom;
+}
+@keyframes pulsarVivoCom{
+  0%{ box-shadow:0 0 0 0 rgba(255,107,107,.45); }
+  70%{ box-shadow:0 0 0 8px rgba(255,107,107,0); }
+  100%{ box-shadow:0 0 0 0 rgba(255,107,107,0); }
+}
+
+/* ranking */
+.pagina-comunidade .ranking{
+  list-style:none; margin:12px 0 0; padding:0;
+  display:flex; flex-direction:column; gap:4px;
+}
+.pagina-comunidade .rk{
+  display:flex; align-items:center; gap:10px;
+  padding:8px 10px; border-radius:10px;
+  border:1px solid transparent;
+}
+.pagina-comunidade .rk.voce{
+  background:rgba(212,169,78,.08); border-color:rgba(212,169,78,.28);
+}
+.pagina-comunidade .rk .pos{
+  flex:none; width:20px; text-align:center;
+  font-size:.78rem; font-weight:800; color:var(--apagadoCom);
+}
+.pagina-comunidade .rk:nth-child(1) .pos{ color:var(--ouro2Com); }
+.pagina-comunidade .rk:nth-child(2) .pos{ color:#c9d3e0; }
+.pagina-comunidade .rk:nth-child(3) .pos{ color:#c88a5a; }
+.pagina-comunidade .rk .foto-p{ width:30px; height:30px; font-size:.64rem; }
+.pagina-comunidade .rk-txt{
+  flex:1; min-width:0; display:flex; flex-direction:column; gap:1px;
+}
+.pagina-comunidade .rk-txt b{
+  font-size:.84rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.pagina-comunidade .rk-txt span{ font-size:.72rem; color:var(--apagadoCom); }
+.pagina-comunidade .var{ flex:none; font-size:.72rem; font-weight:800; }
+.pagina-comunidade .var.sobe{ color:var(--verdeCom); }
+.pagina-comunidade .var.desce{ color:var(--vermCom); }
+.pagina-comunidade .ranking-nota{
+  margin:12px 0 0; padding-top:12px; border-top:1px solid var(--bordaCom);
+  font-size:.76rem; color:var(--apagadoCom); line-height:1.5;
+}
+.pagina-comunidade .ranking-nota b{ color:var(--ouro2Com); }
+
+/* especialistas */
+.pagina-comunidade .especialista{
+  display:flex; align-items:center; gap:11px; padding:8px 0;
+}
+.pagina-comunidade .especialista + .especialista{
+  border-top:1px solid var(--bordaCom);
+}
+.pagina-comunidade .esp-status{ position:relative; width:36px; height:36px; font-size:.7rem; }
+.pagina-comunidade .online-dot{
+  position:absolute; right:-1px; bottom:-1px;
+  width:10px; height:10px; border-radius:50%;
+  background:var(--verdeCom); border:2px solid var(--painelCom);
+}
+.pagina-comunidade .especialista > span:last-child{
+  display:flex; flex-direction:column; gap:1px; min-width:0;
+}
+.pagina-comunidade .especialista b{ font-size:.86rem; }
+.pagina-comunidade .especialista span span{
+  font-size:.74rem; color:var(--apagadoCom);
+}
+
+/* ============ RESPONSIVO ============ */
+@media (max-width: 1080px){
+  .pagina-comunidade .grid{ grid-template-columns:200px minmax(0,1fr); }
+  .pagina-comunidade .rail-dir{ display:none; }
+}
+@media (max-width: 760px){
+  .pagina-comunidade .grid{ grid-template-columns:minmax(0,1fr); }
+  .pagina-comunidade .rail-esq{ position:static; }
+  .pagina-comunidade .espacos{
+    flex-direction:row; flex-wrap:nowrap; overflow-x:auto;
+    padding-bottom:6px; margin-bottom:18px;
+  }
+  .pagina-comunidade .espacos a{ white-space:nowrap; }
+  .pagina-comunidade .espacos .qtd,
+  .pagina-comunidade .novo-ponto{ margin-left:6px; }
+  .pagina-comunidade .turma{ display:none; }
+  .pagina-comunidade .topo{ padding-top:96px; }
+  .pagina-comunidade .topo-stats{ gap:16px; }
+  .pagina-comunidade .compor{ padding:14px; }
+  .pagina-comunidade .compor .foto-p{ display:none; }
+}
