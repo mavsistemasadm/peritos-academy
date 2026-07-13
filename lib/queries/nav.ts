@@ -16,13 +16,14 @@ export type DadosNav = {
   faltaXp: number
   moedas: number
   sequenciaDias: number      // o foguinho
+  isAdmin: boolean
 }
 
 const VAZIO: DadosNav = {
 logado: false, nome: 'Visitante', iniciais: 'PA', slug: null,
   nivel: 1, titulo: 'Perito Iniciante',
   xp: 0, xpProximo: 100, progressoPct: 0, faltaXp: 100,
-  moedas: 0, sequenciaDias: 0,
+  moedas: 0, sequenciaDias: 0, isAdmin: false,
 }
 
 function iniciaisDe(nome: string) {
@@ -34,9 +35,10 @@ export async function carregarNav(): Promise<DadosNav> {
   const { data: auth } = await supabase.auth.getUser()
   if (!auth?.user) return VAZIO
 
-  const [{ data: perfil }, { data: dias }] = await Promise.all([
+  const [{ data: perfil }, { data: dias }, { data: adminRows }] = await Promise.all([
     supabase.from('perfis').select('nome, nivel, titulo, xp, xp_proximo_nivel, moedas, slug').eq('id', auth.user.id).single(),
     supabase.from('perfil_estudo_dias').select('dia'),
+    supabase.from('admin_usuarios').select('id').eq('usuario_id', auth.user.id).eq('ativo', true).limit(1),
   ])
   if (!perfil) return VAZIO
 
@@ -67,5 +69,6 @@ export async function carregarNav(): Promise<DadosNav> {
     faltaXp: Math.max(0, xpProximo - xp),
     moedas: perfil.moedas ?? 0,
     sequenciaDias,
+    isAdmin: (adminRows?.length ?? 0) > 0,
   }
 }

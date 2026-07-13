@@ -138,6 +138,12 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
                       Perfil público
                     </a>
+                    {d.isAdmin && (
+                      <a href="/admin" className="np-am-item" onClick={() => setMenuAvatar(false)}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                        Painel Admin
+                      </a>
+                    )}
                     <div className="np-am-sep"></div>
                     <form action="/api/auth/logout" method="POST">
                       <button type="submit" className="np-am-item np-am-sair">

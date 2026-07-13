@@ -26,8 +26,23 @@ export async function middleware(request: NextRequest) {
   );
 
   // Renova a sessão se o token estiver perto de expirar.
-  // TODO: reativar proteção de rotas depois (redirect para /login).
-  await supabase.auth.getUser();
+  const { data: auth } = await supabase.auth.getUser();
+
+  if (request.nextUrl.pathname.startsWith("/admin")) {
+    if (!auth?.user) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    const { data: adminRow } = await supabase
+      .from("admin_usuarios")
+      .select("id")
+      .eq("usuario_id", auth.user.id)
+      .eq("ativo", true)
+      .limit(1)
+      .maybeSingle();
+    if (!adminRow) {
+      return NextResponse.redirect(new URL("/acesso-negado", request.url));
+    }
+  }
 
   return response;
 }
