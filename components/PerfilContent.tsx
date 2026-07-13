@@ -301,7 +301,6 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
           <div className="secao reveal">
             <div className="secao-cab">
               <h2>Insígnias.</h2>
-              <span className="meta num"><b>{d.insignias.filter(i => i.conquistada).length} conquistadas</b> · próxima a 3 missões</span>
             </div>
             <div className="insignias">
               {d.insignias.map(ins => (

@@ -145,6 +145,7 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
                         Sair
                       </button>
                     </form>
+                    
                   </div>
                 )}
               </div>
