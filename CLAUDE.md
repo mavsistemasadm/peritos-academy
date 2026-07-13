@@ -12,6 +12,38 @@ Plataforma de educação para peritos judiciais (perícia bancária, cálculos j
 - **Deploy**: Vercel, repo `github.com/mavsistemasadm/peritos-academy`, branch `main`
 - **Ambiente**: Windows, VS Code, PowerShell
 
+## ⚠️ Incidente produção (em investigação) — 2026-07-13
+`https://peritos-academy.vercel.app` retorna `500 MIDDLEWARE_INVOCATION_FAILED` em **todas** as rotas. Erro real (via `vercel logs --json`): `[ReferenceError: __dirname is not defined]`, `source: edge-middleware`. Não resolvido ainda — próxima sessão continua daqui.
+
+### Fatos apurados (confirmados, não especulação)
+- **Produção já estava quebrada antes dos merges de ontem** (ícones `cf51de3`, financeiro `1174b48`). Deploy do commit `b990cca` (imediatamente anterior a qualquer um dos dois merges) tem log de erro `__dirname is not defined` em `edge-middleware` com timestamp de **horas antes** do incidente ter sido reportado. Ou seja: os merges de ontem não são a causa — só coincidiram no tempo com a descoberta.
+- `middleware.ts` está **byte-a-byte idêntico** entre `b990cca` e o HEAD atual — nenhuma sessão tocou nele.
+- Build local (Windows) é **sempre saudável**: `.next/server/middleware.js` sai com ~87-90KB e zero ocorrências de `__dirname`, testado em 3 cenários diferentes — build incremental, build limpo (`rm -rf .next`), e `npm ci` genuinamente do zero a partir do `package-lock.json` numa pasta separada.
+- **Todo** build feito na Vercel (Linux) reproduz o erro de forma determinística — inclusive `vercel deploy --prod --force` (sem cache). O bundle quebrado sai maior, **102,83KB**, com `__dirname` presente.
+- Hipóteses já testadas e **descartadas** (todas continuam quebrando):
+  - Cache de build poluído (`--force` sem cache não resolveu)
+  - Versão do Next.js — upgrade `15.3.6 → 15.3.9` (patch que corrige a vulnerabilidade que o npm avisa no install) não resolveu
+  - Versão do Node.js — pin via `engines.node: "22.x"` em `package.json` (Vercel confirmou nos logs que usou 22.x em vez do 24.x do projeto) não resolveu; bundle continuou 102,83KB com `__dirname`
+  - `experimental.nodeMiddleware` (mover middleware pro runtime Node.js em vez de Edge) — **não chega a testar**, quebra o build com `Error: The experimental feature "experimental.nodeMiddleware" can only be enabled when using the latest canary version of Next.js`. Revertido, não commitado.
+
+### Hipótese principal ainda não testada
+A Vercel pode estar resolvendo um **grafo de dependências diferente** do que o `npm ci` local resolve, mesmo com `package-lock.json` idêntico — verificar:
+1. **Install Command** configurado no painel da Vercel (Project Settings → Build & Development) — se não for `npm ci`, pode não estar respeitando o lockfile do jeito esperado.
+2. Se `package.json` e `package-lock.json` estão genuinamente sincronizados (rodar `npm ci` — não `npm install` — localmente falha alto e claro se não estiverem).
+3. Qual pacote está literalmente injetando o `__dirname` no bundle da Vercel — baixar/inspecionar o output real da Vercel (não dá pra inferir só comparando bundle local, que nunca reproduziu o bug) e fazer bisect nos imports do `middleware.ts` (hoje só `@supabase/ssr` + `next/server`) removendo um de cada vez num deploy de teste, ou usar `vercel build` puxando o ambiente Linux se disponível.
+
+### Estado atual do código (seguro, pode manter)
+- Commit `2671cc0` — `next` `15.3.6 → 15.3.9` (patch de segurança, correto de manter independente do incidente)
+- Commit `6dc3603` — `engines.node: "22.x"` em `package.json` (fixa versão madura em vez do 24.x do projeto — correto de manter, é mais uma prática de higiene do que suspeita real agora)
+- Nenhum outro commit relacionado ao incidente foi enviado — o experimento `nodeMiddleware` foi revertido antes de commitar.
+- **Produção continua fora do ar** no momento em que esta sessão encerrou. Deploys foram interrompidos a pedido do usuário pra não acumular mais tentativas sem direção clara.
+
+### Ferramental usado (referência pra próxima sessão)
+- Vercel CLI (`vercel`) está instalado e autenticado (`mavsistemasadm`) — mas **cuidado ao rodar `vercel link`**: existe um projeto irmão `peritos-academy-2026` que o CLI pode linkar por engano (nome parecido); o projeto certo, que serve `peritos-academy.vercel.app`, é **`peritos-academy`** (`prj_Sdg7rd2hasTnlMpTNRQTPa87TTQH`).
+- `vercel promote <url>` **não** promove o artefato exato — ele dispara um rebuild a partir do branch `main` conectado no Git. Se o fix está só localmente commitado (não empurrado pro `origin/main`), `promote` vai rebuildar o código **antigo**. Sempre dar `git push origin HEAD:main` antes de esperar que o deploy automático reflita um fix.
+- URLs de deployment não-aliased (`*.vercel.app` com hash) ficam atrás do SSO da Vercel (redirect 302 pra `vercel.com/sso-api`) — isso **mascara** erros da aplicação real. Só o domínio de produção alias (`peritos-academy.vercel.app`) responde sem essa proteção; teste sempre por ali.
+- `vercel logs <url> --json` é a forma confiável de pegar o erro real por trás de um request ID / `MIDDLEWARE_INVOCATION_FAILED`.
+
 ## Design System
 - Carvão `#070908` (fundo), Creme `#F1F2DF` (texto), Verde `#20D9A6`, Ciano `#36DCD1`, Lima `#DDF784`
 - Fonte Inter
