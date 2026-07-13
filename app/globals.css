@@ -4329,4 +4329,82 @@ body.teatro .trilho-aulas{display:none}
 .pagina-admin .ad-integracao-nome{font-size:14px;font-weight:650}
 .pagina-admin .ad-integracao-onde{font-size:12.5px;color:var(--cinza);margin-top:2px}
 
+/* ============================================================
+   PERITOS ACADEMY — /dev/icones (revisão do sistema de ícones)
+   ============================================================ */
+.pagina-dev-icones{
+  --carvao:#070908; --preto-elev:#101311; --creme:#F1F2DF;
+  --cinza:#989E99; --cinza-claro:#B9BFB8; --verde:#20D9A6; --ciano:#36DCD1; --lima:#DDF784;
+  --linha:rgba(255,255,255,.10); --linha-suave:rgba(255,255,255,.06);
+  --r-card:16px; --r-pill:999px; --s-3:16px; --s-4:24px; --s-5:32px; --s-6:48px;
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--carvao);color:var(--creme);min-height:100vh;
+  padding:var(--s-6) var(--s-4) calc(var(--s-6) * 2);
+}
+.pagina-dev-icones *{box-sizing:border-box}
+.pagina-dev-icones code{font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:.92em;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:5px}
+.pagina-dev-icones .num{font-variant-numeric:tabular-nums}
+
+.pagina-dev-icones .di-header{max-width:900px;margin:0 auto var(--s-6);padding-top:var(--s-4)}
+.pagina-dev-icones .di-eyebrow{font-size:12px;font-weight:650;letter-spacing:.1em;text-transform:uppercase;color:var(--ciano)}
+.pagina-dev-icones .di-header h1{font-size:clamp(26px,3.4vw,36px);font-weight:730;letter-spacing:-.02em;margin:8px 0 10px}
+.pagina-dev-icones .di-header p{color:var(--cinza-claro);line-height:1.6;max-width:720px}
+
+.pagina-dev-icones .di-secao{max-width:1280px;margin:0 auto calc(var(--s-6) * 2);padding-bottom:var(--s-6)}
+.pagina-dev-icones .di-titulo-secao{font-size:20px;font-weight:700;letter-spacing:-.01em;margin-bottom:var(--s-4);padding-bottom:10px;border-bottom:1px solid var(--linha)}
+
+.pagina-dev-icones .di-categoria{margin-bottom:var(--s-5)}
+.pagina-dev-icones .di-categoria h3{font-size:13px;font-weight:650;text-transform:uppercase;letter-spacing:.06em;color:var(--cinza);margin-bottom:12px}
+.pagina-dev-icones .di-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.pagina-dev-icones .di-grid-emblemas{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+
+.pagina-dev-icones .di-card{background:var(--preto-elev);border:1px solid var(--linha-suave);border-radius:var(--r-card);padding:14px}
+.pagina-dev-icones .di-card-nome{display:block;font-size:12.5px;font-weight:650;color:var(--creme);margin-bottom:10px;font-family:ui-monospace,'SFMono-Regular',Consolas,monospace}
+.pagina-dev-icones .di-card-linha{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.pagina-dev-icones .di-card-linha:last-child{margin-bottom:0}
+.pagina-dev-icones .di-variante-tag{font-size:10.5px;font-weight:650;text-transform:uppercase;letter-spacing:.05em;color:var(--cinza);width:32px;flex-shrink:0}
+.pagina-dev-icones .di-swatch{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--carvao);border:1px solid var(--linha-suave);border-radius:8px;padding:8px 10px;flex:1;color:var(--creme)}
+.pagina-dev-icones .di-swatch small{font-size:9.5px;color:var(--cinza);font-variant-numeric:tabular-nums}
+
+.pagina-dev-icones .di-ctx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--s-4)}
+.pagina-dev-icones .di-ctx-card{background:var(--preto-elev);border:1px solid var(--linha-suave);border-radius:var(--r-card);padding:var(--s-4)}
+.pagina-dev-icones .di-ctx-card h4{font-size:14px;font-weight:650;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pagina-dev-icones .di-tam-badge{font-size:10.5px;font-weight:650;color:var(--carvao);background:var(--lima);padding:3px 8px;border-radius:var(--r-pill);white-space:nowrap}
+.pagina-dev-icones .di-ctx-fonte{font-size:12px;color:var(--cinza);margin-bottom:14px;line-height:1.5}
+.pagina-dev-icones .di-ctx-fonte code{font-size:.92em}
+.pagina-dev-icones .di-mock{background:var(--carvao);border:1px solid var(--linha-suave);border-radius:12px;padding:14px}
+
+.pagina-dev-icones .di-am-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-size:12.5px;font-weight:520;color:var(--cinza-claro)}
+.pagina-dev-icones .di-am-item svg{color:var(--cinza);flex-shrink:0}
+.pagina-dev-icones .di-am-sair{color:#ef476f}
+.pagina-dev-icones .di-am-sair svg{color:#ef476f}
+
+.pagina-dev-icones .di-mock-acoespost{display:flex;gap:8px;flex-wrap:wrap}
+.pagina-dev-icones .di-acao{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--cinza-claro);background:rgba(255,255,255,.03);border:1px solid var(--linha-suave);border-radius:var(--r-pill);padding:7px 12px}
+
+.pagina-dev-icones .di-mock-pilulas{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pagina-dev-icones .di-nivel-fake{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.03);border:1px solid var(--linha-suave);border-radius:var(--r-pill);padding:6px 12px 6px 6px}
+.pagina-dev-icones .di-insignia{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--verde),var(--ciano));color:var(--carvao);font-size:12px;font-weight:750}
+.pagina-dev-icones .di-nivel-info{display:flex;flex-direction:column;gap:3px;font-size:11.5px}
+.pagina-dev-icones .di-barra{display:block;width:100px;height:4px;border-radius:var(--r-pill);background:rgba(255,255,255,.1);overflow:hidden}
+.pagina-dev-icones .di-barra i{display:block;height:100%;background:linear-gradient(90deg,var(--verde),var(--ciano))}
+.pagina-dev-icones .di-pilula{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:680;color:var(--creme);background:rgba(255,255,255,.03);border:1px solid var(--linha-suave);border-radius:var(--r-pill);padding:7px 12px}
+.pagina-dev-icones .di-pilula-fogo{border-color:rgba(224,119,60,.3);background:rgba(224,119,60,.08)}
+
+.pagina-dev-icones .di-mock-sidebar{display:flex;flex-direction:column;gap:2px}
+.pagina-dev-icones .di-ad-item{font-size:13px;font-weight:550;color:var(--cinza-claro);padding:9px 12px;border-radius:8px}
+
+.pagina-dev-icones .di-tabela-wrap{overflow-x:auto;border:1px solid var(--linha-suave);border-radius:var(--r-card)}
+.pagina-dev-icones table.di-tabela{width:100%;border-collapse:collapse;font-size:12.5px}
+.pagina-dev-icones table.di-tabela th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--cinza);padding:10px 14px;background:var(--preto-elev);border-bottom:1px solid var(--linha);white-space:nowrap;position:sticky;top:0}
+.pagina-dev-icones table.di-tabela td{padding:9px 14px;border-bottom:1px solid var(--linha-suave);color:var(--cinza-claro);vertical-align:top}
+.pagina-dev-icones table.di-tabela tr:last-child td{border-bottom:none}
+.pagina-dev-icones table.di-tabela td.di-td-tam{font-variant-numeric:tabular-nums;font-weight:650;color:var(--creme);white-space:nowrap}
+.pagina-dev-icones table.di-tabela td code{white-space:nowrap}
+.pagina-dev-icones .di-cat-sep td{background:rgba(255,255,255,.03);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ciano)}
+
+.pagina-dev-icones .di-lista-inconsistencias{display:flex;flex-direction:column;gap:10px;max-width:900px}
+.pagina-dev-icones .di-lista-inconsistencias li{list-style:none;position:relative;padding-left:20px;font-size:13.5px;line-height:1.55;color:var(--cinza-claro)}
+.pagina-dev-icones .di-lista-inconsistencias li::before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--lima)}
+
 .cert-popup-acoes .btn{justify-content:center}
