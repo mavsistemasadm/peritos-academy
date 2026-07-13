@@ -297,7 +297,29 @@ Testado via dev server local + toggle no banco com reversão imediata: `comunida
 5. Sistema de Notificações (Fase 1: in-app) — ver seção acima
 6. ~~Configurações da plataforma + logo global~~ ✅ feito — ver seção acima
 7. ~~Financeiro Asaas (assinaturas, cobranças, webhooks liberam/suspendem acesso)~~ ✅ estrutura feita — ver seção acima; integração real (chaves, checkout, validação de webhook) pendente
-8. ~~Usuários~~ ✅ feito — ver seção acima (impersonação fica pra depois, ver pendência). Relatórios ainda não construído.
+8. ~~Usuários~~ ✅ feito — ver seção acima (impersonação fica pra depois, ver pendência). Relatórios tem spec registrada (ver seção abaixo), construção adiada de propósito pra pós-lançamento.
+
+## Módulo Relatórios (spec futura, construir ~2-4 semanas pós-lançamento)
+**Decisão deliberada de NÃO construir agora** (2026-07-13): plataforma pré-lançamento, sem dados reais — um relatório rodado sobre dado de seed seria inválido no dia em que importasse de verdade, e pior, poderia passar confiança falsa. Construir só depois de ter tráfego real pra agregar.
+
+### Princípio
+Módulo 100% leitura. Nenhuma tabela nova de dados — no máximo views materializadas/RPCs de agregação sobre o que já existe (`aula_progresso`, `gamificacao_extrato`, `assinaturas`, `cobrancas`, `comunidade_posts`, `avaliacao_tentativas`/`avaliacao_respostas`). Papéis: `super_admin` e `financeiro` (aba financeira) e `suporte` (aba engajamento) — mesmo padrão de papel-por-aba que os outros módulos.
+
+### Abas e métricas
+1. **Engajamento**: alunos ativos (DAU/WAU/MAU via `gamificacao_extrato` filtrado por `gatilho_codigo='login_diario'`), aulas assistidas por período, cursos mais/menos assistidos, taxa de conclusão por curso, funil dentro de cada curso (onde os alunos param, aula a aula), horários de pico.
+2. **Aprendizado**: nota média por avaliação, distribuição de notas, **questões mais erradas** (a métrica de maior valor pra revisar conteúdo), taxa de aprovação, tempo médio até conclusão de curso.
+3. **Gamificação**: distribuição de alunos por nível, top streaks, XP médio, gatilhos mais acionados (leitura direta do `gamificacao_extrato`, já é o ledger completo).
+4. **Financeiro**: evolução de MRR mês a mês, novas assinaturas vs. cancelamentos (churn), inadimplência ao longo do tempo, LTV simples — é a versão histórica/gráfica do painel instantâneo que já existe em `/admin/financeiro` (`carregarPainelFinanceiro`), não um cálculo novo.
+5. **Comunidade**: posts/semana, taxa de dúvidas respondidas, membros mais ativos.
+
+Todas as abas: filtro de período (7/30/90 dias/tudo) e exportação CSV.
+
+### Pré-requisito já verificado (não é mais uma pendência)
+A métrica "questões mais erradas" parecia depender de granularidade por questão nas submissões — **já existe**: `submeter_avaliacao` (ver seção Gamificação) grava uma linha por questão em `avaliacao_respostas` (`tentativa_id`, `questao_id`, `opcao_id`, `valor_informado`, `correta`), então a agregação "questão X errada em Y% das tentativas" é um `group by questao_id` direto sobre essa tabela, sem precisar de nenhuma migração antes. Confirmado direto no schema em 2026-07-13.
+
+### Notas técnicas pra quando construir
+- Gráficos: escolher lib na hora — `recharts` é o candidato natural no stack (React puro, sem dependência de canvas/SVG externo).
+- Agregações pesadas (funil por curso, DAU/WAU/MAU histórico): view materializada com refresh diário via `pg_cron` — mesma pendência do cron de lembretes de agenda/aniversários (`aniversario`/`aniversario_plataforma` na seção Gamificação); resolver os crons juntos numa única sessão de infra em vez de espalhar `pg_cron` em pedaços.
 
 ## Fluxo de trabalho
 - Sempre rodar `npm run build` antes de commitar pra pegar erros de tipo
