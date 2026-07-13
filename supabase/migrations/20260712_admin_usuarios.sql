@@ -72,10 +72,10 @@ create trigger trg_admin_usuarios_atualizado_em
   before update on public.admin_usuarios
   for each row execute function public.tg_admin_usuarios_atualizado_em();
 
--- Seed do primeiro Super Admin — ajustar o e-mail antes de rodar.
--- insert into public.admin_usuarios (usuario_id, papel, ativo)
--- select p.id, 'super_admin', true
--- from public.perfis p
--- join auth.users u on u.id = p.id
--- where u.email = 'SEU_EMAIL_AQUI'
--- on conflict (usuario_id, papel) do update set ativo = true, atualizado_em = now();
+-- Seed do primeiro Super Admin (idempotente).
+insert into public.admin_usuarios (usuario_id, papel, ativo)
+select p.id, 'super_admin', true
+from public.perfis p
+join auth.users u on u.id = p.id
+where u.email = 'marlos.h.santos@gmail.com'
+on conflict (usuario_id, papel) do update set ativo = true, atualizado_em = now();
