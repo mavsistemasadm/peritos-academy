@@ -21,7 +21,7 @@ export type DadosNav = {
 
 const VAZIO: DadosNav = {
 logado: false, nome: 'Visitante', iniciais: 'PA', slug: null,
-  nivel: 1, titulo: 'Perito Iniciante',
+  nivel: 0, titulo: 'Iniciante',
   xp: 0, xpProximo: 100, progressoPct: 0, faltaXp: 100,
   moedas: 0, sequenciaDias: 0, isAdmin: false,
 }
@@ -35,40 +35,40 @@ export async function carregarNav(): Promise<DadosNav> {
   const { data: auth } = await supabase.auth.getUser()
   if (!auth?.user) return VAZIO
 
-  const [{ data: perfil }, { data: dias }, { data: adminRows }] = await Promise.all([
-    supabase.from('perfis').select('nome, nivel, titulo, xp, xp_proximo_nivel, moedas, slug').eq('id', auth.user.id).single(),
-    supabase.from('perfil_estudo_dias').select('dia'),
+  const [{ data: perfil }, { data: niveis }, { data: saldo }, { data: adminRows }, { data: streak }] = await Promise.all([
+    supabase.from('perfis').select('nome, slug').eq('id', auth.user.id).single(),
+    // gamificacao_niveis é pequena (dezenas de linhas) — busca tudo e deriva
+    // atual/próximo aqui em vez de duas queries com filtro.
+    supabase.from('gamificacao_niveis').select('nome, pontos_minimos, ordem').order('ordem', { ascending: true }),
+    // fonte real: soma do ledger (gamificacao_extrato) via view, não a coluna
+    // perfis.xp em cache — evita depender de um valor que pode dessincronizar.
+    supabase.from('gamificacao_saldo').select('xp_total, moedas_total').eq('usuario_id', auth.user.id).maybeSingle(),
     supabase.from('admin_usuarios').select('id').eq('usuario_id', auth.user.id).eq('ativo', true).limit(1),
+    supabase.rpc('gam_calcular_streak', { p_usuario: auth.user.id }),
   ])
   if (!perfil) return VAZIO
 
-  const xp = perfil.xp ?? 0
-  const xpProximo = perfil.xp_proximo_nivel ?? 100
+  const xp = saldo?.xp_total ?? 0
+  const moedas = saldo?.moedas_total ?? 0
 
-  // sequência atual de dias consecutivos (o foguinho)
-  const diasSet = new Set((dias ?? []).map((d: any) => d.dia))
-  const hoje = new Date(); hoje.setHours(12, 0, 0, 0)
-  let sequenciaDias = 0
-  for (let i = 0; ; i++) {
-    const d = new Date(hoje); d.setDate(d.getDate() - i)
-    const chave = d.toISOString().slice(0, 10)
-    if (diasSet.has(chave)) sequenciaDias++
-    else if (i === 0) continue    // hoje ainda sem estudo não zera a sequência de ontem
-    else break
-  }
+  const ordenados = (niveis ?? []).slice().sort((a, b) => a.ordem - b.ordem)
+  const atual = [...ordenados].reverse().find(n => n.pontos_minimos <= xp) ?? null
+  const proximo = ordenados.find(n => n.pontos_minimos > xp) ?? null
+
+  const xpProximo = proximo?.pontos_minimos ?? atual?.pontos_minimos ?? 100
 
   return {
     logado: true,
     nome: perfil.nome ?? 'Perito',
     iniciais: iniciaisDe(perfil.nome ?? 'PA'),
     slug: perfil.slug ?? null,
-    nivel: perfil.nivel ?? 1,
-    titulo: perfil.titulo ?? 'Perito Iniciante',
+    nivel: atual?.ordem ?? 0,
+    titulo: atual?.nome ?? 'Iniciante',
     xp, xpProximo,
-    progressoPct: xpProximo > 0 ? Math.min(100, Math.round((xp / xpProximo) * 100)) : 0,
+    progressoPct: xpProximo > 0 ? Math.min(100, Math.round((xp / xpProximo) * 100)) : 100,
     faltaXp: Math.max(0, xpProximo - xp),
-    moedas: perfil.moedas ?? 0,
-    sequenciaDias,
+    moedas,
+    sequenciaDias: typeof streak === 'number' ? streak : 0,
     isAdmin: (adminRows?.length ?? 0) > 0,
   }
 }

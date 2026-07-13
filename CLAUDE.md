@@ -52,11 +52,12 @@ Sequência de build de cada página:
 
 ## Certificados
 - Cursos têm `emite_certificado` (bool) e `carga_horas` (numeric, preenchível no admin)
-- Emissão automática: 100% aulas concluídas (`aula_concluida`) + todas avaliações aprovadas (`avaliacao_tentativas.aprovado = true`)
+- Emissão automática: checagem via RPC `gam_curso_completo(usuario, curso)` (100% `aula_progresso.concluida=true` + todas `avaliacoes` do curso com `avaliacao_tentativas.aprovado=true`) — mesma função usada pelo motor de gamificação, ver seção Gamificação
 - Número via RPC `nextval_certificado()` (sequência `seq_certificado_numero`), formato `PA-{ano}-{5dígitos}`
 - Constraint `uq_cert_usuario_curso unique(usuario_id, curso_id)`
 - Popup animado com confetes randômicos ao completar
 - Lógica em `lib/certificados/gerar.ts` → `verificarEEmitirCertificado(supabase, userId, cursoId)`
+- Auditoria retroativa (2026-07-13): checado se havia aluno com curso completo sem certificado emitido (bug do `aula_concluida` fantasma) — plataforma ainda pré-lançamento, `aula_progresso` está zerada, nenhum caso pendente
 
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo)
@@ -141,6 +142,15 @@ Todo gatilho passa por aqui — nunca insere direto no extrato. Checa `config_ga
 
 ### Seed
 Todos os valores de `pontos`/`moedas`/`limite_diario` dos gatilhos e os `pontos_minimos` dos níveis são **placeholder** — a spec original pediu pra calibrar depois pelo admin. O seed usa `ON CONFLICT (codigo) DO UPDATE` só em nome/descrição/categoria, então recalibragens feitas no admin sobrevivem a re-seeds.
+
+### Nav com dado real (2026-07-13)
+`lib/queries/nav.ts` plugou no motor de verdade:
+- XP/moedas: view `gamificacao_saldo` (`security_invoker=true` — herda a RLS de `gamificacao_extrato`, então soma só o próprio usuário), não a coluna `perfis.xp` em cache
+- Nível/título/próximo nível: busca `gamificacao_niveis` inteira (é pequena) e deriva no servidor — nível atual = maior `ordem` com `pontos_minimos <= xp`; título = `nome` desse nível; barra de progresso = `xp / pontos_minimos do próximo nível`
+- Streak (dias consecutivos): RPC `gam_calcular_streak(usuario)` — conta dias distintos com lançamento `login_diario` no extrato (fuso America/Sao_Paulo), andando pra trás a partir de hoje (ou ontem, se ainda não logou hoje) até achar um buraco. **Substitui** a lógica antiga baseada em `perfil_estudo_dias`, que era dado de seed de um único usuário demo, nunca escrita pelo app.
+- `perfis.xp_proximo_nivel` e `perfis.titulo` (colunas antigas) ficaram órfãs — não são mais lidas pelo nav, mas continuam existindo na tabela (não foram dropadas).
+
+⚠️ **Gap de segurança fechado no caminho**: a policy de update de `perfis` é só por linha (`auth.uid() = id`), sem restrição de coluna — qualquer usuário logado podia sobrescrever seu próprio `xp`/`moedas`/`nivel` direto via client, sem passar pelo ledger. Trigger `trg_gam_proteger_perfis` (BEFORE UPDATE OF xp, moedas, nivel) reverte essas 3 colunas pro valor antigo a menos que a sessão tenha `set_config('app.gamificacao_write', 'on', true)` ativo — só `creditar_gamificacao()` seta essa flag antes de escrever.
 
 ### Fora do escopo por enquanto
 Loja de recompensas (só o saldo de moedas existe), página pública de ranking, notificações de gamificação (spec já registrada acima), cron de aniversários, `perfil_insignias` (insígnias visuais avulsas, sem gatilho).
