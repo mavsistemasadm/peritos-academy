@@ -1,0 +1,37 @@
+[
+  {
+    "aula_id_novo": "76b2bca4-026c-4a95-87af-452bd8295eb3",
+    "nome": "processual trabalhista.pdf",
+    "erro": "excede limite de 20MB do bucket (36.1MB)"
+  },
+  {
+    "aula_id_novo": "13c43fd9-150f-4637-955f-e22e0deab806",
+    "nome": "Modelo Planilha de Cálculo - Exclusão ICMS PIS COFINS.xlsx",
+    "erro": "excede limite de 20MB do bucket (41.7MB)"
+  },
+  {
+    "aula_id_novo": "f6f6ca4c-6726-48dd-9d6d-449c42888363",
+    "nome": "Processo Judicial - Teto 20 salários mínimos.pdf",
+    "erro": "excede limite de 20MB do bucket (55.0MB)"
+  },
+  {
+    "aula_id_novo": "98a30761-bb91-45b7-a79e-0f42bae49e58",
+    "nome": "Processo Judicial - Teto EC´s.pdf",
+    "erro": "excede limite de 20MB do bucket (27.5MB)"
+  },
+  {
+    "aula_id_novo": "d346c32f-e835-4c44-ad9f-ac9447573a3b",
+    "nome": "Mapa dos R$ 100mil em 6 meses.pdf",
+    "erro": "excede limite de 20MB do bucket (33.2MB)"
+  },
+  {
+    "aula_id_novo": "6568532d-bbc9-4f6b-a8f5-41c8e4bc2487",
+    "nome": "Modelos de Contratos.zip",
+    "erro": "excede limite de 20MB do bucket (54.2MB)"
+  },
+  {
+    "aula_id_novo": "643b5ca0-ad13-4ba9-b3b8-cc06b5d0cdec",
+    "nome": "05. Petições e Docs de Cálculos Trabalhistas.zip",
+    "erro": "excede limite de 20MB do bucket (164.7MB)"
+  }
+]

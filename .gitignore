@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# migracao Ensinio: dados brutos e arquivos baixados (grandes, já sincronizados no Supabase Storage)
+migracao/materiais/
+migracao/detalhes_brutos/

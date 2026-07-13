@@ -36,6 +36,16 @@ Plataforma de educação para peritos judiciais (perícia bancária, cálculos j
 ### Backlog técnico
 - `@supabase/supabase-js` emite warning usando `process.version` no Edge Runtime — não-fatal hoje, monitorar em upgrades futuros de `@supabase/ssr`/`@supabase/supabase-js` ou do Next.js.
 
+## ✅ Migração de conteúdo Ensinio → Peritos Academy — CONCLUÍDA — 2026-07-13
+75 cursos, 178 módulos, 604 aulas, 408 materiais (218 aulas), 75 capas de curso e 180 thumbnails de aula importados e publicados em produção (`main`, deploy Vercel confirmado). Relatório completo em `migracao/relatorio_importacao.md` (pendências detalhadas, contagens, arquivos de suporte). Cursos ficam em rascunho (`publicado=false`) até revisão de conteúdo.
+
+Achado importante desta sessão: a feature de upload real de materiais (`aula_materiais` — URL assinada, RLS por assinatura) só existia em código numa branch separada (`worktree-icones-sistema`), 14 commits à frente de `main`, que também continha um fix de incidente de produção não mergeado (Next 15.3.6→15.3.9, `engines.node`) e os módulos Financeiro/Usuários/Configurações inteiros. Fast-forward feito e testado (build + smoke test de download em produção via URL assinada, bytes conferidos). **Se aparecer código/schema documentado neste arquivo que não bate com o que está em `main`, suspeitar primeiro de uma branch/worktree desalinhada antes de assumir bug.**
+
+### Pendências da migração (não bloqueiam nada, só não foram feitas)
+- 3 materiais grandes (54–165MB) não couberam no teto do plano Supabase (~50MB) — arquivos originais em `migracao/materiais/`, path completo no relatório.
+- 37 aulas com quiz na Ensinio precisam ser recriadas manualmente como `avaliacoes` no admin (`avaliacoes` está com 0 linhas) — lista em `migracao/avaliacoes_a_recriar.md`.
+- 6 aulas com vídeo fora do Panda (Vimeo/ensinio-stream) — lista em `migracao/videos_a_resolver.md`.
+
 ## Design System
 - Carvão `#070908` (fundo), Creme `#F1F2DF` (texto), Verde `#20D9A6`, Ciano `#36DCD1`, Lima `#DDF784`
 - Fonte Inter
@@ -108,7 +118,7 @@ Sequência de build de cada página:
 - `planos_assinatura`, `assinaturas`, `cobrancas`, `webhook_eventos`, `config_financeiro`, `financeiro_log_acoes` (ver seção Financeiro — **não confundir `planos_assinatura` com `planos`**, tabelas diferentes)
 - `admin_log_acoes_usuario` (log unificado de ações administrativas sobre um aluno — suspender/reativar/banir/resetar senha/ajuste de gamificação/certificado manual, ver seção Usuários)
 - `config_plataforma` (registro único — identidade, contato, textos institucionais, comportamento, SEO; leitura pública `using (true)`, ver seção Configurações)
-- Bucket Storage `planilhas` (privado, uploads de aluno/documentos), `capas` (público, imagens de capa), `materiais-aulas` (privado, anexos de aula — ver seção Materiais complementares)
+- Bucket Storage `planilhas` (privado, uploads de aluno/documentos), `capas` (público, imagens de capa), `capas-cursos` (público, capas horizontais/verticais de curso + thumbnails de aula — criado na migração Ensinio, ver seção da migração), `materiais-aulas` (privado, anexos de aula — ver seção Materiais complementares)
 - Tabelas duplicadas/legadas — nunca usadas pelo app, não construir em cima: `posts`/`post_comentarios`/`post_reacoes` (substituídas por `comunidade_*`), `duvidas`/`duvida_respostas` (substituídas por `aula_duvidas`), `questoes`/`tentativas`/`materiais`/`progresso_aulas`, `planos` (feature dormente "meu plano de estudo" do aluno, sem leitura/escrita em código), `matriculas` (resquício de modelo antigo, sem leitura/escrita em código — o gate de acesso atual é por assinatura, ver seção Financeiro)
 
 ## Sistema de ícones (dois níveis)

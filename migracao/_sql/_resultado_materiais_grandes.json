@@ -1,0 +1,46 @@
+[
+  {
+    "aula_id_novo": "76b2bca4-026c-4a95-87af-452bd8295eb3",
+    "nome": "processual trabalhista.pdf",
+    "tipo": "pdf",
+    "arquivo_url": "programa-03-da-licenca-agora-sou-expert-em-calculos-trabalhistas/realizando-calculo-trabalhista-exemplo-02/processual_trabalhista.pdf",
+    "tamanho_bytes": 37850832
+  },
+  {
+    "aula_id_novo": "13c43fd9-150f-4637-955f-e22e0deab806",
+    "nome": "Modelo Planilha de Cálculo - Exclusão ICMS PIS COFINS.xlsx",
+    "tipo": "xlsx",
+    "arquivo_url": "exclusao-do-icms-da-base-pis-e-cofins/analisando-os-documento-e-elaborando-os-calculos/Modelo_Planilha_de_Calculo_-_Exclusao_ICMS_PIS_COFINS.xlsx",
+    "tamanho_bytes": 43761691
+  },
+  {
+    "aula_id_novo": "f6f6ca4c-6726-48dd-9d6d-449c42888363",
+    "nome": "Processo Judicial - Teto 20 salários mínimos.pdf",
+    "erro": "{\"statusCode\":\"413\",\"error\":\"Payload too large\",\"message\":\"The object exceeded the maximum allowed size\"}"
+  },
+  {
+    "aula_id_novo": "98a30761-bb91-45b7-a79e-0f42bae49e58",
+    "nome": "Processo Judicial - Teto EC´s.pdf",
+    "tipo": "pdf",
+    "arquivo_url": "domine-todas-as-revisoes-previdenciarias-programa-ii/revisao-do-teto-pelas-emendas-constitucionais/Processo_Judicial_-_Teto_EC_s.pdf",
+    "tamanho_bytes": 28833650
+  },
+  {
+    "aula_id_novo": "d346c32f-e835-4c44-ad9f-ac9447573a3b",
+    "nome": "Mapa dos R$ 100mil em 6 meses.pdf",
+    "tipo": "pdf",
+    "arquivo_url": "o-mapa-da-mina/definindo-a-rota-dos-r-100-mil/Mapa_dos_R_100mil_em_6_meses.pdf",
+    "tamanho_bytes": 34848253
+  },
+  {
+    "aula_id_novo": "6568532d-bbc9-4f6b-a8f5-41c8e4bc2487",
+    "nome": "Modelos de Contratos.zip",
+    "erro": "{\"statusCode\":\"413\",\"error\":\"Payload too large\",\"message\":\"The object exceeded the maximum allowed size\"}"
+  },
+  {
+    "aula_id_novo": "643b5ca0-ad13-4ba9-b3b8-cc06b5d0cdec",
+    "nome": "05. Petições e Docs de Cálculos Trabalhistas.zip",
+    "erro": "excede 60MB (164.7MB)",
+    "pulado": true
+  }
+]

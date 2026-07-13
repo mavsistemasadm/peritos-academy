@@ -1,0 +1,452 @@
+[
+  {
+    "curso_slug": "leitura-e-interpretacao-de-processos-judiciais-para-calculo",
+    "curso_id": "5aa8fe06-8467-4964-b12a-31ad78e9ede8",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/b771b7a18e3232825afec09119bbb014.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/96b4e471710ac679eeaed583d3028c6f.png"
+  },
+  {
+    "curso_slug": "excel-para-caculo",
+    "curso_id": "e1a6f785-2ec0-4348-b9da-13193be1578b",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/43784e0197194ad51d720eff5ebb06b9.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/80f1f07e1435285b281019115f1b85d5.png"
+  },
+  {
+    "curso_slug": "aprenda-a-construir-qualquer-tabela-de-atualizacao-monetaria",
+    "curso_id": "83a44838-1f87-4939-b80f-86d26bf2a670",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/7a0f03905183830822e26baf629761ea.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/95a12837462a7076d9b386f6d286884a.png"
+  },
+  {
+    "curso_slug": "excel-para-calculos-judiciais",
+    "curso_id": "dbf71899-f84c-43d8-9a16-d8a5f8da3c96",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/3c212cdf14e599306f684f32310c761c.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/7be0d3e5017f60a67ad63fedfe2b007c.png"
+  },
+  {
+    "curso_slug": "voce-perito-e",
+    "curso_id": "18d91617-e43a-44b3-bb24-c0b8b9dad47c",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/8f795abcb29ee1ccb1a090dc52e4aa72.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/ccdd595cf3a6b20c2e14f5368650ab32.png"
+  },
+  {
+    "curso_slug": "construcao-de-laudos-periciais-automaticos",
+    "curso_id": "181ed921-1ead-4b7b-b341-70a31271062a",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/8a90c7558c24b5175e26ab5db6b226d8.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/cff42ae08019fb14a8b7e58c1e60a90e.png"
+  },
+  {
+    "curso_slug": "como-iniciar-na-carreira-de-perito",
+    "curso_id": "e04f159b-3166-4d3d-a79c-721fc1fe55e7",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/104facd1ec1ce9f36a91b4a88f045f66.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/3166acc4e1ca50f198b70105e03122af.png"
+  },
+  {
+    "curso_slug": "atuacao-judicial",
+    "curso_id": "bc306e47-d9f6-4337-aed4-c27bc98caded",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/ef771d3e41f67b78b24782d7aee5c1e8.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/39679ec7ed526fc1e66f58c15050d913.png"
+  },
+  {
+    "curso_slug": "calculos-revisionais-de-cartao-de-credito1",
+    "curso_id": "96b26177-8448-4f48-a7f9-e83e27fa3aae",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/8d6bfdc4d9ef7c49dad6fa0169945739.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/6b405663b4ce23f746c816fce80756e0.png"
+  },
+  {
+    "curso_slug": "desvendando-os-segredos-das-instituicoes-bancarias",
+    "curso_id": "c2620030-4fd9-4178-bf7a-5bd26a69ce2d",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/f801396e957bce427d222a0497483b08.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/4bb0cda23ceffb7a9d3a98453f3a8a69.png"
+  },
+  {
+    "curso_slug": "calculos-revisionais-de-financiamento-e-emprestimos",
+    "curso_id": "fc14aa84-bf84-47f7-a34b-e38d21022f84",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/b380bc11444e48a5eb0c1986ce49f2a5.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/d707846a951160ac69a08082bbafe7ec.png"
+  },
+  {
+    "curso_slug": "calculos-revisionais-de-cheque-especial",
+    "curso_id": "29191702-4579-4349-980d-62948ae169f4",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/790427612b15daa20a0d36043d9faa54.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/f9b1ef53728c5d09b8bfb342c03f1737.png"
+  },
+  {
+    "curso_slug": "calculos-revisionais-de-financiamento-habitacional-sfh",
+    "curso_id": "6e6aa840-09e1-4306-b958-da1d634fa42a",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/18a2914630658815859ba4c69a56fcec.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/29e6329ea0f212cbe72236211ae65baf.png"
+  },
+  {
+    "curso_slug": "dominando-as-execucoes-bancarias",
+    "curso_id": "8018e03c-f937-4657-96bd-2ad87ed0d3ec",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/d8366e8452f5357c44181828245c0da0.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/688dca6875257e875016c027a3993451.png"
+  },
+  {
+    "curso_slug": "recalculo-de-contratos-estudantis-fies",
+    "curso_id": "86bb86fc-f56b-4ef8-a99f-5d3c545e2f2c",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/62664a9e68e918493bbdb6f235881305.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/3f4636f89badd4483bba0acc9e26e67a.png"
+  },
+  {
+    "curso_slug": "aprenda-a-aplicar-a-tjlp-nos-contratos-bancarios",
+    "curso_id": "9157d17e-b126-445c-a49b-5f216be723fc",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/c3e6e28f94057e94d719630354c1d687.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/05ef56228d9219077f33ce3197fc98cc.png"
+  },
+  {
+    "curso_slug": "como-calcular-o-iof-nos-contratos-de-financiamento",
+    "curso_id": "4334386a-fc48-4a94-b727-01d3db9da19a",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/4299314f4f1731f831cbb5b4308ff556.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/06367a8936a913a20845fbce799ec575.png"
+  },
+  {
+    "curso_slug": "programa-01-iniciando-a-caminhada-nos-calculos-trabalhistas",
+    "curso_id": "86add3db-6591-4966-afd2-7d0775d71376",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/6da594ff53af8e15fbf6121b0a72ff93.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/03533c2094a733641f7459aab652cda0.png"
+  },
+  {
+    "curso_slug": "programa-02-afiando-o-machado-nos-calculos-trabalhistas",
+    "curso_id": "69eeddb9-6171-4fbf-a4eb-3e013aa3827d",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/f64bace26d7a09bcb33de1c43d7ea7c4.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/cf0be70388ffb87abe24761797f9fef0.png"
+  },
+  {
+    "curso_slug": "programa-03-da-licenca-agora-sou-expert-em-calculos-trabalhistas",
+    "curso_id": "d0d582a9-80e7-49e6-8a74-4093208c1ff0",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/37c2d58247f3f0203727d7a49a5b52fe.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/7dfddb2200b2c037c68e8333bbfbd913.png"
+  },
+  {
+    "curso_slug": "verbas-rescisorias-trabalhistas",
+    "curso_id": "989f7686-0337-49a6-b35e-d0779099363b",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/e8be02ef0653284e00112db7e6085079.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/787ff6078d4bc0aa1a6a63426b0f48f6.png"
+  },
+  {
+    "curso_slug": "como-as-automacoes-podem-transformar-a-tua-pericia",
+    "curso_id": "62fe2f10-2acd-48f2-8322-4672eb486fe8",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/f00ab04a189ea26f00ec0b77f3edca65.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/2b4e912d2fa838ca079f68fcd5597025.png"
+  },
+  {
+    "curso_slug": "estruturando-a-planilha-para-milhares-de-calculos",
+    "curso_id": "cb9220bc-1916-46d3-9e88-cca84d021d3e",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/2d074aea37a007d12d0a666187cab390.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/d5a482198250604af4bb28da2b2aa92c.png"
+  },
+  {
+    "curso_slug": "exclusao-do-icms-da-energia-eletrica-contratada",
+    "curso_id": "3636f803-a8e5-4652-a10f-2f1b71e39547",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/8caa72a0d1f4826fdc1d3ce50913f031.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/2c01fd88f38daa7797e03e560cae4752.png"
+  },
+  {
+    "curso_slug": "tratando-dados-e-informacoes-de-calculo-automaticamente",
+    "curso_id": "b42d703f-5234-4bd8-9b71-3096e25d495e",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/a99c96aa1888613df144fe183daa7782.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/0c6e3ca4ee13a5a1688c0776fd7bdfca.png"
+  },
+  {
+    "curso_slug": "transformando-o-impossivel-em-realidade",
+    "curso_id": "c4a69e63-da71-44c6-9547-77a9c1169753",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/4e80f55fbbcf73f1be8a724e3e24180a.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/25f6782c1a7525701026b71b12114437.png"
+  },
+  {
+    "curso_slug": "exclusao-do-icms-da-base-pis-e-cofins",
+    "curso_id": "23c5c605-e511-4b90-a4b6-e45aa9978294",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/8ae08bd9a269f9ac66d95a4c21a56f5a.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/089c7dfd6fa471e27c17ccbc7977b089.png"
+  },
+  {
+    "curso_slug": "revisao-do-tributos-municipais-e-parcelamentos",
+    "curso_id": "c62bdbd5-9b4f-485b-9af2-7fcbd67e28df",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/19aba4f6688a1591c797a0dbea007923.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/be90f0174e10702523a1d132314b173f.png"
+  },
+  {
+    "curso_slug": "excusao-do-icms-da-base-tusd-e-tust-na-energia-eletrica",
+    "curso_id": "6b35381c-0915-475a-aaef-23cd9b7dde02",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/6ae7053dbc709812c4bb11a88887317e.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/5cb7689e0f98a0440de925495f2902ad.png"
+  },
+  {
+    "curso_slug": "isencao-de-imposto-de-renda-pessoa-fisica",
+    "curso_id": "8ffd0560-77f3-4be9-9f64-d859e5fa8dbd",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/e784cd45d437d51dddc935e6d82f7905.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/096f7b8232cabd3bf30d39967425b3f7.png"
+  },
+  {
+    "curso_slug": "exclusao-de-verbas-indenizatorias-no-inss-patronal",
+    "curso_id": "52fec89b-470d-4412-8a23-5b619cf06f8d",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/f3c8bbec07f95a4e9af9d728be8ca8ed.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/f46c4aded83764f3f98fe21c4cd3c8ed.png"
+  },
+  {
+    "curso_slug": "revisao-do-beneficio-petros",
+    "curso_id": "047fe9e8-a397-4f92-8536-a04a103a71a0",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/ed4a036afd02fd29757d3a0d2ed0995f.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/8fe85e0ca4750b7d09f5b77926ac0059.png"
+  },
+  {
+    "curso_slug": "calculo-do-beneficio-saldado-funcef",
+    "curso_id": "1d3f23b5-ada5-4ace-93f4-ba3fc98e4520",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/f3c29bf38b7a4ce49ed3d769413c9737.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/aadd5c5c766be1225a3baeec6e0429c7.png"
+  },
+  {
+    "curso_slug": "expurgos-inflacionarios-na-reserva-matematica",
+    "curso_id": "292a339f-1964-4b85-97bb-78258d71b988",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/4f4c1c03e7ec0f386221b4b033bd6995.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/bf51cf4340d38ae598c72da4d089e6e2.png"
+  },
+  {
+    "curso_slug": "aprenda-a-calcular-todos-os-tipo-de-aposentadorias-e-beneficios-programa-i",
+    "curso_id": "fc71eac0-2bd8-4539-ad8a-3e50b7c2aeb6",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/278864ce73636123a04ac740c35d05e5.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/73d4a76195446c995abe84f06b4abd9d.png"
+  },
+  {
+    "curso_slug": "domine-todas-as-revisoes-previdenciarias-programa-ii",
+    "curso_id": "3a2cfc4c-9033-42e4-845c-8a74f8d56090",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/10d4605b5bf3dddf06ef904921cae9dc.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/e7ece588a681fc3fc29062e65dd2455e.png"
+  },
+  {
+    "curso_slug": "segredo-dos-calculos-contra-a-fazenda-publica-programa-iii",
+    "curso_id": "d35f0f06-2484-4548-81fe-dd55fa9044d4",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/1f921a2cc381eea3934a341f605e0dad.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/6f4f493546b589568c3b00311832433b.png"
+  },
+  {
+    "curso_slug": "planilha-de-calculos-revisionais-bancarios-automatica",
+    "curso_id": "70a588d9-9d5c-4b1e-9784-6defb36a9a4d",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/8ea13e17a10dd6934d5b90880e66ed8f.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/b86f82c2fa958ad65926b73ef5d5de63.png"
+  },
+  {
+    "curso_slug": "planilha-automatica-dos-calculos-de-rmc",
+    "curso_id": "8eda04ad-7ae2-4e30-88ea-6814e85f3028",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/1c75510135d10cd5426f833dce75a1c3.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/ab7bfda7488428dc631d6abcd897ac13.png"
+  },
+  {
+    "curso_slug": "planilha-de-calculos-da-revisao-da-vida-toda-100-inteligente",
+    "curso_id": "90739d32-c717-46e2-9749-02ccd06fa2c9",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/eecf16fe974104d55a54043942775e7a.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/e1fb9f8acd446cd309579e62233e7d5b.png"
+  },
+  {
+    "curso_slug": "planilha-de-calculo-automatica-de-revisao-do-sistema-financiamento-habitacional-sfh",
+    "curso_id": "6c14f498-b3dd-4663-9fee-7a10043ed77b",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/eedc79bdb6f04b9c25c51bf9feb8f591.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/96904104b1f0dd868cddebf16d6e9635.png"
+  },
+  {
+    "curso_slug": "planilha-de-calculo-da-revisao-do-fgts-tr-x-inpc",
+    "curso_id": "ef32646d-7f1a-42f0-a13e-65a7a4485d28",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/118e696cfb149f53bcb1fef4aa136a9e.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/5ac28415cfe74365ba062b4c8de8265a.png"
+  },
+  {
+    "curso_slug": "planilha-automatica-e-inteligente-de-calculos-trabalhistas",
+    "curso_id": "1f48648d-1870-4fe4-ba74-e0bddbf107eb",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/7e374dd8b752e639956ab1ec7fbb6507.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/56e35bb969496a3f63aeda4b230789f7.png"
+  },
+  {
+    "curso_slug": "o-mapa-da-mina",
+    "curso_id": "2de99020-8d72-41d3-a7cf-321b22e25db1",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/6e0a087c30fca05b75c5379a0751e946.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/63d19e46cc8dd7b438fc0e048f874406.png"
+  },
+  {
+    "curso_slug": "como-dar-o-pontape-inicial-na-carreira-de-perito",
+    "curso_id": "3cc46ed4-6f9c-42e5-8008-cbb37d8a0797",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/bbd8637c46958b079dfec86e02884b8f.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/7140cecf49099286b7179e67e0408443.png"
+  },
+  {
+    "curso_slug": "estrategias-comerciais",
+    "curso_id": "dc8af7f5-3fb9-4d26-90c9-90406398add1",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/4ee1897fea251231304c562008e9e489.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/9ad3e7fe107f7abe6a0a241121d52a1c.png"
+  },
+  {
+    "curso_slug": "facebook-ads",
+    "curso_id": "5fa9f269-8175-4c94-8c27-73a48117cc5f",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/2f337d0b32a514bebbae0114b244fb57.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/5007dc6648020a0fb9d97dff41897145.png"
+  },
+  {
+    "curso_slug": "google-ads",
+    "curso_id": "dc4e1bdd-c93d-47f7-ae72-27b567846246",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/ef7619892dd0940800a73b7af6b66dbf.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/2daaeedd1700e0fffd400b894a0b5bcc.png"
+  },
+  {
+    "curso_slug": "expurgos-inflacionarios-nas-cedulas-de-credito-rural",
+    "curso_id": "51e5d083-96d7-4f3f-884b-c2724bdb1e59",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/a1ea307e94347b670765fd17524e645b.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/78263f69234a3b4d03edcd27c987a6ff.png"
+  },
+  {
+    "curso_slug": "expurgos-inflacionarios-na-poupanca",
+    "curso_id": "682cfc6c-c2ee-4d36-929a-b9969a9afd5c",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/ed35d39966e24d11f070d52618daf9f2.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/7d53caf5a590771f887544857fc439de.png"
+  },
+  {
+    "curso_slug": "atualizacao-de-precatorios-judiciais",
+    "curso_id": "95d3a71a-e044-4d21-9456-9eceeaa2e403",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/579db650a00f881ab3268b4a1f87f271.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/dff0af1eb4b32e58a7d344b8579bb883.png"
+  },
+  {
+    "curso_slug": "revisao-de-contratos-de-compra-direto-com-a-construtora",
+    "curso_id": "754cacb9-081e-4d35-a522-c9dcbca19eab",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/4c65bdf12dc9d16ad5d294f3dab6660c.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/f067efd4ef1a5a2595c278ea6826e793.png"
+  },
+  {
+    "curso_slug": "revisao-de-contratos-de-consorcio",
+    "curso_id": "616b24bc-79b1-4fab-847d-a5eef833b92a",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/64648c11b0e271210adfe906379e13f9.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/1622fb6fcef12952acfc99fff45fd77d.png"
+  },
+  {
+    "curso_slug": "calculo-das-diferencas-da-urv",
+    "curso_id": "07c7a525-ea0c-4802-a388-669469f2d5d6",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/3ef2ac24a222ab25890a8a799806b8c2.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/940918ff51fbf21d45d8706ea7a218ee.png"
+  },
+  {
+    "curso_slug": "calculo-de-pensao-alimenticia",
+    "curso_id": "2cd588a7-697e-472a-a027-42dea925838a",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/bb84be2e5cc0f61361ed3b6ad2cb3121.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/ec43e90493024531928e9f5e50c17cd5.png"
+  },
+  {
+    "curso_slug": "revisao-de-valores-de-aluguel",
+    "curso_id": "266b6a78-9227-4282-a184-4d57b47c0f0c",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/2e2081b9ff2d72ac7736c4c0e067a50d.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/04acf9f5b4e120727d53448e5ebedf4f.png"
+  },
+  {
+    "curso_slug": "revisao-do-saldo-da-conta-pasep",
+    "curso_id": "ddfa2898-6bdc-417d-8efd-1f08ec66378a",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/1cadc984e438908f538032438f32ccbd.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/8fe27e5bdbb78c0c106869110a822aeb.png"
+  },
+  {
+    "curso_slug": "conhecendo-e-aplicando-as-automacoes-iniciais-nas-planilhas",
+    "curso_id": "06fb8e4f-5a6b-438d-ba80-fd4bea94cc4c",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/eb89d81c7250a8d8de06ec136c503e0b.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/81878876843b7b64ac88035c66c51d51.png"
+  },
+  {
+    "curso_slug": "juros-moratorios-honorarios-e-multa-processual",
+    "curso_id": "19e84c28-de32-466b-8432-abf53a62bffd",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/cac26f2ff08f7ae840d9efde3d77a286.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/3495e896a5fd74ddd439f46727b55669.png"
+  },
+  {
+    "curso_slug": "entenda-as-consequencias-da-sua-decisao-esta-pronto-para-ser-perito",
+    "curso_id": "7a0015ef-ff5b-49a6-9ddc-6e81133884e0",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/11b1842a10ecb6644c4b31d517bfcfe5.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/09e036d2ec36632dccba5b8a3ef7f2e7.png"
+  },
+  {
+    "curso_slug": "reajuste-de-plano-de-saude",
+    "curso_id": "635b134f-fee1-4e8f-87e0-fbbed74bca7c",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/497d95184ec42545869b3478735ab887.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/682d9aa04fb0e927b03cd2b0ce95a9aa.png"
+  },
+  {
+    "curso_slug": "modelos-e-estrategias-de-e-mails-que-vendem-milhoes",
+    "curso_id": "2a427e97-2157-4ce2-bc8a-31d44cad40bf",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/1d79f0298aa38cbd06eb5161f5c51c9e.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/6f0e742385cd8270a87012320445ca8b.png"
+  },
+  {
+    "curso_slug": "estrategias-de-redacao-de-quesitos",
+    "curso_id": "bfda7be8-460c-4814-a258-072f3062333f",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/beac5440d837c12dd68a87a3fd873d32.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/3bd69c35c0ec4168ebb703b56481a13a.png"
+  },
+  {
+    "curso_slug": "lei-149052024-e-os-calculos",
+    "curso_id": "13ff581a-3729-4431-ac24-274c17c6a4e3",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/6a6e366c4e40cd50c5907f96c8ace6ef.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/a7b16a28ec68115e6531a89f53e79eb1.png"
+  },
+  {
+    "curso_slug": "planilha-de-calculo-cheque-especial",
+    "curso_id": "8f87e9f6-ffc3-435e-82d4-b798db14584c",
+    "logo_h": null,
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/37bd22b3caaaf705db423408b13d53f3.png"
+  },
+  {
+    "curso_slug": "calculo-desapropriacao",
+    "curso_id": "4c472da6-1d49-41b2-962e-e45a90f8217f",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/27c605652dfc591c627ff8de3c87503a.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/48549a10849c46a2c942663b61d2b323.png"
+  },
+  {
+    "curso_slug": "estrategias-comerciais-copy",
+    "curso_id": "2513c6c8-4bcb-48d9-9988-ca69075bb6d5",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/4ee1897fea251231304c562008e9e489-copy.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/9ad3e7fe107f7abe6a0a241121d52a1c-copy.png"
+  },
+  {
+    "curso_slug": "como-conseguir-nomeacoes-judiciais",
+    "curso_id": "d70b431b-5d6e-4da4-aa97-2da5b5e7b8eb",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/9ff7fb8f875968c1340b5e17a17ec66b.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/dd88c7134a26fe6d54501ccf487c3c2f.png"
+  },
+  {
+    "curso_slug": "planilha-automatica-dos-calculos-de-rmc-copy",
+    "curso_id": "4603a574-e9cd-4ae2-8517-4b1e723be8c2",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/76bd5e0f2f78df13390d7456ac9f2e34.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/b7a342bf2069eb386dc92fae9a197a78.png"
+  },
+  {
+    "curso_slug": "dominando-os-calculos-do-banco-do-brasil",
+    "curso_id": "913e3075-9441-4641-a098-231c40ecc11e",
+    "logo_h": null,
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/d0f3d17cf9aba7ab850ec861255ab5cb.png"
+  },
+  {
+    "curso_slug": "ia-da-peritos-acadelmy-os-galacticos",
+    "curso_id": "f7e22603-17f8-4e48-b81b-87ec171ebc82",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/6dd164856cec20f458e451e4cb776b5f.png",
+    "logo_v": null
+  },
+  {
+    "curso_slug": "documentos-essenciais-do-perito",
+    "curso_id": "bc2ee78f-e5dd-4ec2-b72a-e122bf230275",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/c5661528fd1a41c802e3e01b6fb8de06.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/1dca58ba4662c8531ef5937dfd297609.png"
+  },
+  {
+    "curso_slug": "pje-calc-e-liquidacao-de-sentenca",
+    "curso_id": "038cdc70-8580-4ea6-b96b-b12b918e89c3",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/fc29a9200f054502d0aafdb874cbd079.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/1415403d1d00c4a522deb1044f3ffff3.png"
+  },
+  {
+    "curso_slug": "revisao-de-beneficio-previ",
+    "curso_id": "ceb53de3-1149-484e-b605-e41fa1ccd282",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/eb2bda1810346e4c74bb7e0256d4cdf0.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/624bb667caaf73fa4ecc352517305e6f.png"
+  },
+  {
+    "curso_slug": "planilha-automatica-de-apuracao-de-jornada",
+    "curso_id": "0f33be82-ed07-4586-a77d-86bf696aecff",
+    "logo_h": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/de079e2fc21106cf9995ddaa73a6ffdc.png",
+    "logo_v": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group/logo/74ba08caebadc6772af9242e50019be0.png"
+  }
+]
