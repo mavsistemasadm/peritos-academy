@@ -8,6 +8,7 @@ import {
   criarDesafio, alternarPublicacaoDesafio, excluirDesafio,
   criarCategoria, atualizarCategoria, excluirCategoria,
 } from '@/app/admin/desafios/actions'
+import { IconePencil, IconeTrash } from '@/components/Icones'
 
 export default function AdminDesafiosContent({ desafios, categorias }: { desafios: DesafioListaItem[]; categorias: CategoriaAdmin[] }) {
   const router = useRouter()
@@ -170,8 +171,8 @@ function CategoriasBloco({ categorias, onErro }: { categorias: CategoriaAdmin[];
               <>
                 <span>{c.nome}</span>
                 <span className="ad-sublista-meta">{c.totalDesafios} desafio{c.totalDesafios === 1 ? '' : 's'}</span>
-                <button type="button" onClick={() => { setEditandoId(c.id); setEditNome(c.nome) }}>✎</button>
-                <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(c.id, c.nome, c.totalDesafios)}>🗑</button>
+                <button type="button" onClick={() => { setEditandoId(c.id); setEditNome(c.nome) }}><IconePencil size={13} /></button>
+                <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(c.id, c.nome, c.totalDesafios)}><IconeTrash size={13} /></button>
               </>
             )}
           </li>

@@ -4,6 +4,8 @@
 
 import { useState } from 'react'
 import type { DadosPeritoPublico } from '@/lib/queries/perito-publico'
+import { IconeMapPin, IconeCalendar, IconeMail, IconePhone, IconeCheck, IconeClipboard } from '@/components/Icones'
+import { Certificado, XP, SeloNivel } from '@/components/Emblemas'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -122,14 +124,14 @@ export default function PeritoPublicoContent({ dados, url }: { dados: DadosPerit
                 <h1>{p.nome}</h1>
                 <p className="pp-bio">{p.bio}</p>
                 <div className="pp-meta">
-                  {p.cidade && <span>📍 {p.cidade}{p.estado ? `, ${p.estado}` : ''}</span>}
-                  <span>⚡ {fmtNum(p.xp)} XP</span>
-                  <span>🏅 Nível {p.nivel}</span>
-                  <span>📅 Membro desde {fmtData(p.membro_desde)}</span>
+                  {p.cidade && <span><IconeMapPin size={13} /> {p.cidade}{p.estado ? `, ${p.estado}` : ''}</span>}
+                  <span><XP size={13} /> {fmtNum(p.xp)} XP</span>
+                  <span><SeloNivel size={13} nivel={p.nivel} /> Nível {p.nivel}</span>
+                  <span><IconeCalendar size={13} /> Membro desde {fmtData(p.membro_desde)}</span>
                 </div>
                 <div className="pp-contato">
-                  {p.email_publico && <a href={`mailto:${p.email_publico}`}>✉️ {p.email_publico}</a>}
-                  {p.telefone && <a href={`tel:${p.telefone}`}>📞 {p.telefone}</a>}
+                  {p.email_publico && <a href={`mailto:${p.email_publico}`}><IconeMail size={13} /> {p.email_publico}</a>}
+                  {p.telefone && <a href={`tel:${p.telefone}`}><IconePhone size={13} /> {p.telefone}</a>}
                 </div>
               </div>
             </div>
@@ -216,7 +218,7 @@ export default function PeritoPublicoContent({ dados, url }: { dados: DadosPerit
             <p>{resumo}</p>
             <div className="pp-resumo-acoes">
               <button className="pp-btn-copiar" onClick={copiarResumo}>
-                {copiado ? '✓ Copiado!' : '📋 Copiar resumo'}
+                {copiado ? <><IconeCheck size={13} /> Copiado!</> : <><IconeClipboard size={13} /> Copiar resumo</>}
               </button>
               <span className="pp-resumo-dica">Cole em petições, propostas de honorários ou currículos</span>
             </div>
@@ -229,7 +231,7 @@ export default function PeritoPublicoContent({ dados, url }: { dados: DadosPerit
         <div className="pp-wrap">
           <div className="pp-verif-card">
             <div className="pp-verif-selo">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#20D9A6" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="9" r="6" /><path d="m8.5 14-2 7 5.5-3 5.5 3-2-7" /></svg>
+              <Certificado size={24} />
               <div>
                 <b>Perfil verificado</b>
                 <span>Emitido e verificado pela Peritos Academy</span>

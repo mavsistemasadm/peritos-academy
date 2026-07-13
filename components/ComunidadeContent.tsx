@@ -7,6 +7,8 @@ import { publicarPost, alternarReacao } from '@/app/comunidade/actions'
 import type { DadosComunidade, Post } from '@/lib/queries/comunidade'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
+import { IconeThumbsUp, IconeMessageCircle, IconeBookmark, IconeSparkle } from '@/components/Icones'
+import { InsigniaEtapa } from '@/components/Emblemas'
 
 const TZ = 'America/Sao_Paulo'
 const fmtHora = new Intl.DateTimeFormat('pt-BR', { timeZone: TZ, hour: '2-digit', minute: '2-digit' })
@@ -39,15 +41,9 @@ const TAG: Record<string, { classe: string; rotulo: string }> = {
 }
 
 // ---------- ícones das ações ----------
-const IcoUtil = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 11v9m0-9 4-7.5a2 2 0 0 1 3.8 1.2L14 9h5a2 2 0 0 1 2 2.4l-1.4 6.6a2 2 0 0 1-2 1.6H7m0-9H4a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h3" /></svg>
-)
-const IcoComent = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.2-1L3 21l1.5-5.3c-.6-1.2-1-2.6-1-4.2A8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 9z" /></svg>
-)
-const IcoSalvar = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3h4v4M21 3l-9 9M9 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3" /></svg>
-)
+const IcoUtil = () => <IconeThumbsUp size={15} strokeWidth={2} />
+const IcoComent = () => <IconeMessageCircle size={15} strokeWidth={2} />
+const IcoSalvar = () => <IconeBookmark size={15} strokeWidth={2} />
 
 // ---------- post comum (caso / dúvida) ----------
 function CardPost({ post }: { post: Post }) {
@@ -119,7 +115,7 @@ function CardVitoria({ post }: { post: Post }) {
     <article className="post vitoria reveal">
       <div className="vitoria-linha">
         <span className="vitoria-badge" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="9" r="5.5" /><path d="m9 13.5-1.5 6 4.5-2.5 4.5 2.5-1.5-6" /></svg>
+          <InsigniaEtapa size={22} />
         </span>
         <div className="vitoria-txt">
           <span className="rot">Nova conquista na comunidade</span>
@@ -132,7 +128,7 @@ function CardVitoria({ post }: { post: Post }) {
             const r = await alternarReacao(post.id, 'parabens')
             if (!r.ok) { setPar({ ativo: post.jaUtil, qtd: post.uteis }); alert(r.erro) }
           })}>
-          Parabenizar 👏 <span className="num">· {par.qtd}</span>
+          Parabenizar <IconeSparkle size={13} /> <span className="num">· {par.qtd}</span>
         </button>
       </div>
     </article>

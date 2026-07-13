@@ -11,6 +11,7 @@ import {
   uploadDocumento, excluirDocumento, uploadGabarito,
 } from '@/app/admin/desafios/actions'
 import { baixarDocumento } from '@/app/desafios/actions'
+import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconeTrash } from '@/components/Icones'
 
 function segParaLabel(seg: number | null) {
   if (seg === null) return '—'
@@ -93,7 +94,7 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
 
   return (
     <div className="ad-curso-editor">
-      <a href="/admin/desafios" className="ad-voltar">← Desafios</a>
+      <a href="/admin/desafios" className="ad-voltar"><IconeChevronLeft size={14} /> Desafios</a>
       <div className="ad-editor-cab">
         <h1>{desafio.numero ? `#${desafio.numero} — ` : ''}{desafio.titulo}</h1>
         <div className="ad-editor-cab-acoes">
@@ -304,9 +305,9 @@ function QuesitoBloco({ quesito, indice, desafioId, total, expandido, onToggle, 
         </button>
         <div className="ad-modulo-acoes">
           <span className="ad-modulo-contagem">{quesito.tipo}</span>
-          <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima">↑</button>
-          <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo">↓</button>
-          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir quesito">🗑</button>
+          <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
+          <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
+          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir quesito"><IconeTrash size={13} /></button>
         </div>
       </div>
 
@@ -392,7 +393,7 @@ function DocumentoExcluirBotao({ desafioId, indice, onErro, onRefresh }: { desaf
       else onRefresh()
     })
   }
-  return <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir}>🗑</button>
+  return <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir}><IconeTrash size={13} /></button>
 }
 
 function GabaritoForm({ desafioId, onErro, onRefresh }: { desafioId: string; onErro: (e: string | null) => void; onRefresh: () => void }) {

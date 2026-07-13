@@ -11,6 +11,7 @@ import {
   criarAula, atualizarAula, excluirAula, moverAula, uploadCapaAula,
   criarCapitulo, excluirCapitulo, criarMaterial, excluirMaterial,
 } from '@/app/admin/cursos/actions'
+import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconePencil, IconeTrash } from '@/components/Icones'
 
 function segParaLabel(seg: number) {
   const m = Math.floor(seg / 60)
@@ -85,7 +86,7 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
 
   return (
     <div className="ad-curso-editor">
-      <a href="/admin/cursos" className="ad-voltar">← Cursos</a>
+      <a href="/admin/cursos" className="ad-voltar"><IconeChevronLeft size={14} /> Cursos</a>
       <div className="ad-editor-cab">
         <h1>{curso.titulo}</h1>
         <div className="ad-editor-cab-acoes">
@@ -273,10 +274,10 @@ function ModuloBloco({
             </button>
             <div className="ad-modulo-acoes">
               <span className="ad-modulo-contagem">{modulo.aulas.length} aula{modulo.aulas.length === 1 ? '' : 's'}</span>
-              <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima">↑</button>
-              <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo">↓</button>
-              <button type="button" onClick={() => setEditando(true)} title="Renomear">✎</button>
-              <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir módulo">🗑</button>
+              <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
+              <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
+              <button type="button" onClick={() => setEditando(true)} title="Renomear"><IconePencil size={13} /></button>
+              <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir módulo"><IconeTrash size={13} /></button>
             </div>
           </>
         )}
@@ -374,9 +375,9 @@ function AulaBloco({
         </button>
         <div className="ad-aula-acoes">
           <span className="ad-aula-meta">{segParaLabel(aula.duracaoSeg)} · {aula.xp} XP</span>
-          <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima">↑</button>
-          <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo">↓</button>
-          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir aula">🗑</button>
+          <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
+          <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
+          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir aula"><IconeTrash size={13} /></button>
         </div>
       </div>
 
@@ -465,7 +466,7 @@ function CapitulosBloco({ aula, cursoId, onErro, onRefresh }: {
           <li key={c.id}>
             <span>{c.titulo}</span>
             <span className="ad-sublista-meta">{segParaLabel(c.tempoSeg)}</span>
-            <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(c.id)}>🗑</button>
+            <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(c.id)}><IconeTrash size={13} /></button>
           </li>
         ))}
       </ul>
@@ -518,7 +519,7 @@ function MateriaisBloco({ aula, cursoId, onErro, onRefresh }: {
           <li key={m.id}>
             <span>{m.nome}</span>
             <span className="ad-sublista-meta">{m.tipo.toUpperCase()}</span>
-            <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(m.id)}>🗑</button>
+            <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(m.id)}><IconeTrash size={13} /></button>
           </li>
         ))}
       </ul>

@@ -3,6 +3,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { DadosNav } from '@/lib/queries/nav'
+import { IconeChevronDown, IconeMap, IconeBookOpen, IconeBarChart, IconeUser, IconeGlobe, IconeShield, IconeLogOut } from '@/components/Icones'
+import { FogoStreak, Moeda, Certificado } from '@/components/Emblemas'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -46,20 +48,20 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
           <div className="np-dropdown" ref={conteudosRef}>
             <button className={`np-dropdown-btn${conteudosAtivo ? ' ativo' : ''}`} onClick={() => setMenuConteudos(v => !v)} aria-expanded={menuConteudos}>
               Conteúdos
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+              <IconeChevronDown size={10} strokeWidth={2.5} />
             </button>
             {menuConteudos && (
               <div className="np-dropdown-menu">
                 <a href="/jornada" onClick={() => setMenuConteudos(false)}>
-                  <span className="np-dm-ico">🗺️</span>
+                  <span className="np-dm-ico"><IconeMap size={18} /></span>
                   <div><b>Trilhas</b><span>Sua jornada passo a passo</span></div>
                 </a>
                 <a href="/cursos" onClick={() => setMenuConteudos(false)}>
-                  <span className="np-dm-ico">📚</span>
+                  <span className="np-dm-ico"><IconeBookOpen size={18} /></span>
                   <div><b>Biblioteca de cursos</b><span>Todos os cursos por trilha</span></div>
                 </a>
                 <a href="/biblioteca" onClick={() => setMenuConteudos(false)}>
-                  <span className="np-dm-ico">📊</span>
+                  <span className="np-dm-ico"><IconeBarChart size={18} /></span>
                   <div><b>Planilhas e modelos</b><span>Ferramentas pra perícia</span></div>
                 </a>
               </div>
@@ -95,8 +97,8 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
                     <span className="np-barra alta"><i style={{ width: `${d.progressoPct}%` }}></i></span>
                     <p className="np-pop-meta num"><b>{fmtNum(d.xp)}</b> / {fmtNum(d.xpProximo)} XP · faltam <b>{fmtNum(d.faltaXp)}</b> para subir de nível</p>
                     <ul className="np-pop-lista">
-                      <li><span>🔥 Sequência</span><b className="num">{d.sequenciaDias} {d.sequenciaDias === 1 ? 'dia' : 'dias'}</b></li>
-                      <li><span>🪙 Moedas</span><b className="num">{fmtNum(d.moedas)}</b></li>
+                      <li><span><FogoStreak size={14} /> Sequência</span><b className="num">{d.sequenciaDias} {d.sequenciaDias === 1 ? 'dia' : 'dias'}</b></li>
+                      <li><span><Moeda size={14} /> Moedas</span><b className="num">{fmtNum(d.moedas)}</b></li>
                     </ul>
                     <a className="np-pop-btn" href="/perfil">Ver todas as conquistas</a>
                   </div>
@@ -105,13 +107,13 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
 
               <button className="np-pilula" aria-label={`${fmtNum(d.moedas)} moedas`}>
                 <span className="np-moeda" aria-hidden="true">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="9" /><path d="M12 7v10M9 9.5h4a1.5 1.5 0 0 1 0 3H9m0 0h4.5" strokeLinecap="round" /></svg>
+                  <Moeda size={14} />
                 </span>
                 <b className="num">{fmtNum(d.moedas)}</b>
               </button>
 
               <button className="np-pilula fogo" aria-label={`Sequência de ${d.sequenciaDias} dias`}>
-                <span aria-hidden="true">🔥</span>
+                <FogoStreak size={14} />
                 <b className="num">{d.sequenciaDias} {d.sequenciaDias === 1 ? 'dia' : 'dias'}</b>
               </button>
 
@@ -127,27 +129,27 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
                     </div>
 <div className="np-am-sep"></div>
                     <a href="/perfil" className="np-am-item" onClick={() => setMenuAvatar(false)}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                      <IconeUser size={16} strokeWidth={1.8} />
                       Meu perfil
                     </a>
                     <a href="/perfil#certificados" className="np-am-item" onClick={() => setMenuAvatar(false)}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="m8.5 14-2 7 5.5-3 5.5 3-2-7"/></svg>
+                      <Certificado size={16} variante="mono" />
                       Meus certificados
                     </a>
                     <a href={`/perito/${d.slug ?? ''}`} className="np-am-item" onClick={() => setMenuAvatar(false)}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                      <IconeGlobe size={16} strokeWidth={1.8} />
                       Perfil público
                     </a>
                     {d.isAdmin && (
                       <a href="/admin" className="np-am-item" onClick={() => setMenuAvatar(false)}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                        <IconeShield size={16} strokeWidth={1.8} />
                         Painel Admin
                       </a>
                     )}
                     <div className="np-am-sep"></div>
                     <form action="/api/auth/logout" method="POST">
                       <button type="submit" className="np-am-item np-am-sair">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        <IconeLogOut size={16} strokeWidth={1.8} />
                         Sair
                       </button>
                     </form>

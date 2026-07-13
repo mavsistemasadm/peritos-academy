@@ -6,6 +6,8 @@ import { useMemo, useState } from 'react'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
 import type { DadosDesafios, DesafioCard } from '@/lib/queries/desafios'
+import { IconeUsers, IconeClipboard, IconeClock, IconeSearch } from '@/components/Icones'
+import { XP, Moeda } from '@/components/Emblemas'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -21,17 +23,17 @@ function CardDesafio({ d }: { d: DesafioCard }) {
       <div className="des-capa" style={d.capa_url ? { backgroundImage: `url(${d.capa_url})` } : undefined}>
         <div className="des-capa-selos">
           <span className={`selo-plano ${d.plano}`}>{d.plano === 'free' ? 'FREE' : 'PREMIUM'}</span>
-          <span className="selo-part num">👥 {fmtNum(d.participantes)} participantes</span>
+          <span className="selo-part num"><IconeUsers size={12} /> {fmtNum(d.participantes)} participantes</span>
         </div>
       </div>
       <div className="des-corpo">
         <span className="des-cat">{d.categoria_nome}</span>
         <h3><span className="des-num num">#{d.numero}</span> {d.titulo}</h3>
         <div className="des-meta num">
-          <span>⚡ {fmtNum(d.xp)} XP</span>
-          <span>🪙 {fmtNum(d.moedas)} moedas</span>
-          <span>📋 {d.quesitos} quesitos</span>
-          <span>⏱️ {d.prazo_dias} {d.prazo_dias === 1 ? 'dia' : 'dias'}</span>
+          <span><XP size={13} /> {fmtNum(d.xp)} XP</span>
+          <span><Moeda size={13} /> {fmtNum(d.moedas)} moedas</span>
+          <span><IconeClipboard size={13} /> {d.quesitos} quesitos</span>
+          <span><IconeClock size={13} /> {d.prazo_dias} {d.prazo_dias === 1 ? 'dia' : 'dias'}</span>
         </div>
         <div className="des-rodape">
           {statusRotulo ? (
@@ -91,7 +93,7 @@ export default function DesafiosContent({ dados, nav }: { dados: DadosDesafios; 
             ))}
           </div>
           <label className="des-busca">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            <IconeSearch size={14} strokeWidth={2.2} />
             <input type="search" placeholder="Buscar por título ou número…" value={busca} onChange={e => setBusca(e.target.value)} />
           </label>
         </div>

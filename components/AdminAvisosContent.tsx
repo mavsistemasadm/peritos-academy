@@ -8,6 +8,7 @@ import type { NovidadeAdmin } from '@/lib/queries/admin-avisos'
 import {
   criarNovidade, atualizarNovidade, alternarPublicacaoNovidade, excluirNovidade, uploadImagemNovidade,
 } from '@/app/admin/avisos/actions'
+import { IconeTrash } from '@/components/Icones'
 
 export default function AdminAvisosContent({ novidades }: { novidades: NovidadeAdmin[] }) {
   const router = useRouter()
@@ -128,7 +129,7 @@ function NovidadeBloco({ novidade, expandido, onToggle, onErro }: {
             {novidade.publicado ? 'Publicado' : 'Rascunho'}
           </label>
           <span className="ad-modulo-contagem">{novidade.totalLeituras} leitura{novidade.totalLeituras === 1 ? '' : 's'}</span>
-          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir">🗑</button>
+          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir"><IconeTrash size={13} /></button>
         </div>
       </div>
 

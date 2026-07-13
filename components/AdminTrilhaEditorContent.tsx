@@ -10,6 +10,7 @@ import {
   criarEtapa, atualizarEtapa, excluirEtapa, moverEtapa,
   adicionarCursoNaEtapa, removerCursoDaEtapa, moverMissao,
 } from '@/app/admin/trilhas/actions'
+import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconePencil, IconeTrash } from '@/components/Icones'
 
 export default function AdminTrilhaEditorContent({ trilha, etapas, cursos }: {
   trilha: TrilhaAdmin; etapas: EtapaAdmin[]; cursos: CursoPicker[]
@@ -57,7 +58,7 @@ export default function AdminTrilhaEditorContent({ trilha, etapas, cursos }: {
 
   return (
     <div className="ad-curso-editor">
-      <a href="/admin/trilhas" className="ad-voltar">← Trilhas</a>
+      <a href="/admin/trilhas" className="ad-voltar"><IconeChevronLeft size={14} /> Trilhas</a>
       <div className="ad-editor-cab">
         <h1>{trilha.nome ?? 'Trilha sem nome'}</h1>
         <div className="ad-editor-cab-acoes">
@@ -210,10 +211,10 @@ function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggl
         </button>
         <div className="ad-modulo-acoes">
           <span className="ad-modulo-contagem">{etapa.missoes.length} curso{etapa.missoes.length === 1 ? '' : 's'}</span>
-          <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima">↑</button>
-          <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo">↓</button>
-          <button type="button" onClick={() => setEditando(v => !v)} title="Editar">✎</button>
-          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir etapa">🗑</button>
+          <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
+          <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
+          <button type="button" onClick={() => setEditando(v => !v)} title="Editar"><IconePencil size={13} /></button>
+          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir etapa"><IconeTrash size={13} /></button>
         </div>
       </div>
 
@@ -246,9 +247,9 @@ function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggl
               {etapa.missoes.map((m, i) => (
                 <li key={m.cursoId}>
                   <span>{m.curso.titulo}</span>
-                  <button type="button" disabled={pendente || i === 0} onClick={() => onMoverMissao(m.cursoId, 'up')} title="Mover para cima">↑</button>
-                  <button type="button" disabled={pendente || i === etapa.missoes.length - 1} onClick={() => onMoverMissao(m.cursoId, 'down')} title="Mover para baixo">↓</button>
-                  <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onRemoverCurso(m.cursoId)}>🗑</button>
+                  <button type="button" disabled={pendente || i === 0} onClick={() => onMoverMissao(m.cursoId, 'up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
+                  <button type="button" disabled={pendente || i === etapa.missoes.length - 1} onClick={() => onMoverMissao(m.cursoId, 'down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
+                  <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onRemoverCurso(m.cursoId)}><IconeTrash size={13} /></button>
                 </li>
               ))}
             </ul>

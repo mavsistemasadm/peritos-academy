@@ -6,6 +6,11 @@ import type { DadosPerfil } from '@/lib/queries/perfil'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
 import { salvarPerfil, uploadFoto } from '@/app/perfil/actions'
+import {
+  IconeCheck, IconeFileText, IconeZap, IconeLock, IconeMessageCircle, IconePencil,
+  IconeArrowUp, IconeCamera, IconeEye, IconeLink, IconeDownload, IconePlay,
+} from '@/components/Icones'
+import { Certificado, FogoStreak } from '@/components/Emblemas'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -31,19 +36,17 @@ function quandoAtividade(iso: string) {
 }
 
 const ICONE_INS: Record<string, React.ReactNode> = {
-  check: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5 9.5 18 20 6.5" /></svg>,
-  doc: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3v6h6M6 3h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" /></svg>,
-  raio: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7z" /></svg>,
-  cadeado: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="4" y="11" width="16" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>,
+  check: <IconeCheck size={26} />,
+  doc: <IconeFileText size={26} />,
+  raio: <IconeZap size={26} />,
+  cadeado: <IconeLock size={22} />,
 }
 const ICONE_ATV: Record<string, React.ReactNode> = {
-  comunidade: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.2-1L3 21l1.5-5.3c-.6-1.2-1-2.6-1-4.2A8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 9z" /></svg>,
-  anotacao: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>,
-  ranking: <>▲</>,
+  comunidade: <IconeMessageCircle size={13} />,
+  anotacao: <IconePencil size={13} />,
+  ranking: <IconeArrowUp size={13} />,
 }
-const IcoCert = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="9" r="6" /><path d="m8.5 14-2 7 5.5-3 5.5 3-2-7" /></svg>
-)
+const IcoCert = () => <Certificado size={22} />
 
 export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav: DadosNav }) {
   const [publico, setPublico] = useState(false)
@@ -133,7 +136,7 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
               )}
               <span className="nivel-chip num">{d.nivel}</span>
               <span className="avatar-overlay">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <IconeCamera size={18} strokeWidth={2} />
               </span>
               <input type="file" accept=".jpg,.jpeg,.png,.webp" hidden onChange={e => { const f = e.target.files?.[0]; if (f) handleFoto(f) }} />
             </label>
@@ -158,16 +161,16 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
 
           <div className="perfil-acoes privado">
             <button className="btn btn-fantasma" onClick={() => setEditando(v => !v)}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></svg>
+              <IconePencil size={15} strokeWidth={2} />
               {editando ? 'Fechar edição' : 'Editar perfil'}
             </button>
             <button className="btn btn-fantasma" onClick={() => { setPublico(true); scrollTo({ top: 0, behavior: 'smooth' }) }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg>
+              <IconeEye size={15} strokeWidth={2} />
               Ver como o público vê
             </button>
             <button className="btn btn-primario" onClick={() => copiar(location.href, 'perfil')}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3h4v4M21 3l-9 9M9 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3" /></svg>
-              {copiado === 'perfil' ? 'Link copiado ✓' : 'Compartilhar perfil'}
+              <IconeLink size={14} strokeWidth={2.2} />
+              {copiado === 'perfil' ? <><IconeCheck size={13} /> Link copiado</> : 'Compartilhar perfil'}
             </button>
           </div>
 
@@ -222,7 +225,7 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
                 )}
                 <div className="pe-acoes">
                   <button type="submit" className="btn btn-primario" disabled={salvandoPerfil}>
-                    {salvandoPerfil ? 'Salvando…' : '✓ Salvar alterações'}
+                    {salvandoPerfil ? 'Salvando…' : <><IconeCheck size={13} /> Salvar alterações</>}
                   </button>
                   <button type="button" className="btn btn-fantasma" onClick={() => setEditando(false)}>Cancelar</button>
                   {msgSalvo && <span className="pe-msg">{msgSalvo}</span>}
@@ -256,7 +259,7 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
                 <div className="n-item">
                   <span className="v">#{d.rankingPos}</span>
                   <span className="r">ranking da semana</span>
-                  <span className="sub"><b>{(d.rankingVar ?? 0) >= 0 ? `▲${d.rankingVar}` : `▼${Math.abs(d.rankingVar ?? 0)}`}</b> posições</span>
+                  <span className="sub"><b>{(d.rankingVar ?? 0) >= 0 ? <><IconeArrowUp size={11} />{d.rankingVar}</> : <><IconeArrowUp size={11} style={{ transform: 'rotate(180deg)' }} />{Math.abs(d.rankingVar ?? 0)}</>}</b> posições</span>
                 </div>
               )}
               <div className="n-item">
@@ -291,7 +294,7 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
                   {d.ritmoSubiu && <> — e nas últimas 4 semanas o ritmo subiu</>}. {d.diasFortes}
                 </p>
                 <span className="sequencia">
-                  <span className="chama" aria-hidden="true">🔥</span>
+                  <span className="chama" aria-hidden="true"><FogoStreak size={16} /></span>
                   Sequência atual: <b className="num">{d.sequenciaAtual} {d.sequenciaAtual === 1 ? 'dia' : 'dias'}</b> · recorde: {d.recorde}
                 </span>
               </div>
@@ -329,11 +332,11 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
                     <p className="meta num">Emitido em {c.emitido_rotulo} · nota final {c.nota?.toLocaleString('pt-BR', { minimumFractionDigits: 1 })} · {c.carga_horas}h</p>
                     <div className="cert-acoes">
                       <button className="mini-btn" onClick={() => copiar(`${location.origin}/certificado/${c.numero}`, c.numero!)}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" /></svg>
-                        {copiado === c.numero ? 'Copiado ✓' : 'Copiar link de verificação'}
+                        <IconeLink size={12} strokeWidth={2.2} />
+                        {copiado === c.numero ? <><IconeCheck size={12} /> Copiado</> : 'Copiar link de verificação'}
                       </button>
                       <button className="mini-btn">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16" /></svg>
+                        <IconeDownload size={12} strokeWidth={2.2} />
                         PDF
                       </button>
                     </div>
@@ -348,7 +351,7 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
                     <p className="meta num">{c.faltam_txt} · você está a {c.progresso_pct}%</p>
                     <div className="cert-acoes">
                       <a className="mini-btn" href={c.curso_slug ? `/curso/${c.curso_slug}` : '#'}>
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+                        <IconePlay size={11} />
                         Continuar curso
                       </a>
                     </div>
@@ -366,7 +369,7 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
               {d.atividades.map((a, i) => (
                 <li key={i} className={`atv${a.xp != null ? ' xp' : ''}`}>
                   <span className="atv-ponto" aria-hidden="true">
-                    {a.xp != null ? '✓' : (ICONE_ATV[a.tipo] ?? '·')}
+                    {a.xp != null ? <IconeCheck size={13} /> : (ICONE_ATV[a.tipo] ?? '·')}
                   </span>
                   <div className="atv-txt">
                     <p>

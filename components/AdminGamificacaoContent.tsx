@@ -9,6 +9,7 @@ import {
   atualizarConfigGamificacao, atualizarGatilho,
   criarNivel, atualizarNivel, excluirNivel, moverNivel, uploadSeloNivel,
 } from '@/app/admin/gamificacao/actions'
+import { IconeArrowUp, IconeArrowDown, IconePencil, IconeTrash } from '@/components/Icones'
 
 type Aba = 'definicoes' | 'gatilhos' | 'niveis'
 
@@ -307,14 +308,14 @@ function NivelLinha({ nivel, indice, total, onErro }: { nivel: NivelAdmin; indic
           {nivel.nome} <span className="ad-sublista-meta">— {nivel.pontosMinimos} XP mínimo</span>
         </span>
         <div className="ad-modulo-acoes">
-          <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima">↑</button>
-          <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo">↓</button>
+          <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
+          <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
           <label className="ad-btn-secundario ad-upload-btn" style={{ padding: '6px 10px', fontSize: 12 }}>
             Selo
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onUploadSelo} hidden disabled={pendente} />
           </label>
-          <button type="button" onClick={() => setEditando(v => !v)} title="Editar">✎</button>
-          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir">🗑</button>
+          <button type="button" onClick={() => setEditando(v => !v)} title="Editar"><IconePencil size={13} /></button>
+          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir"><IconeTrash size={13} /></button>
         </div>
       </div>
       {editando && (

@@ -10,6 +10,7 @@ import {
   criarQuestao, atualizarQuestao, excluirQuestao, moverQuestao,
   criarOpcao, marcarOpcaoCorreta, excluirOpcao,
 } from '@/app/admin/avaliacoes/actions'
+import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconeTrash } from '@/components/Icones'
 
 export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modulos }: {
   avaliacao: AvaliacaoAdmin; questoes: QuestaoAdmin[]; modulos: ModuloPicker[]
@@ -81,7 +82,7 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
 
   return (
     <div className="ad-curso-editor">
-      <a href="/admin/avaliacoes" className="ad-voltar">← Avaliações</a>
+      <a href="/admin/avaliacoes" className="ad-voltar"><IconeChevronLeft size={14} /> Avaliações</a>
       <div className="ad-editor-cab">
         <h1>{avaliacao.titulo}{avaliacao.numeroCaso ? <span className="ad-caso-numero"> · Caso #{avaliacao.numeroCaso}</span> : null}</h1>
         <div className="ad-editor-cab-acoes">
@@ -261,9 +262,9 @@ function QuestaoBloco({ questao, avaliacaoId, cursoId, indice, total, expandida,
         </button>
         <div className="ad-modulo-acoes">
           <span className="ad-modulo-contagem">{questao.tipo === 'valor' ? 'Numérica' : 'Múltipla escolha'}</span>
-          <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima">↑</button>
-          <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo">↓</button>
-          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir questão">🗑</button>
+          <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
+          <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
+          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir questão"><IconeTrash size={13} /></button>
         </div>
       </div>
 
@@ -312,7 +313,7 @@ function QuestaoBloco({ questao, avaliacaoId, cursoId, indice, total, expandida,
                       <input type="radio" name={`correta-${questao.id}`} checked={o.correta} disabled={pendente} onChange={() => onMarcarCorreta(o.id)} />
                       {o.texto}
                     </label>
-                    <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluirOpcao(o.id)}>🗑</button>
+                    <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluirOpcao(o.id)}><IconeTrash size={13} /></button>
                   </li>
                 ))}
               </ul>

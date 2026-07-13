@@ -8,12 +8,13 @@ import { baixarItem, alternarFavorita } from '@/app/biblioteca/actions'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
 import type { DadosBiblioteca, ItemBiblioteca } from '@/lib/queries/biblioteca'
+import { IconeBarChart, IconeFileText, IconeScale, IconeLock, IconeStar, IconeSearch, IconeDownload } from '@/components/Icones'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 const fmtData = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', month: 'short', year: 'numeric' })
 
 const ROTULO_TIPO: Record<string, string> = { planilha: 'Planilha', laudo: 'Modelo de laudo', peticao: 'Modelo de petição' }
-const ICONE_TIPO: Record<string, string> = { planilha: '📊', laudo: '📄', peticao: '⚖️' }
+const ICONE_TIPO: Record<string, typeof IconeBarChart> = { planilha: IconeBarChart, laudo: IconeFileText, peticao: IconeScale }
 
 function tamanhoBonito(kb: number | null) {
   if (!kb) return ''
@@ -92,7 +93,7 @@ export default function BibliotecaContent({ dados, nav }: { dados: DadosBibliote
         {/* aviso pra quem não tem acesso */}
         {!d.temAcesso && (
           <div className="bib-trava" role="note">
-            <b>🔒 Sua conta ainda não tem acesso à Biblioteca.</b>
+            <b><IconeLock size={14} /> Sua conta ainda não tem acesso à Biblioteca.</b>
             <span>Este é um benefício de um grupo de alunos. Fale com o suporte para saber como participar.</span>
           </div>
         )}
@@ -107,22 +108,25 @@ export default function BibliotecaContent({ dados, nav }: { dados: DadosBibliote
               </button>
             ))}
             <button role="tab" aria-selected={abaArea === 'top'} className={abaArea === 'top' ? 'ativa' : ''} onClick={() => setAbaArea('top')}>Mais baixadas</button>
-            <button role="tab" aria-selected={abaArea === 'favoritas'} className={abaArea === 'favoritas' ? 'ativa' : ''} onClick={() => setAbaArea('favoritas')}>⭐ Favoritas</button>
+            <button role="tab" aria-selected={abaArea === 'favoritas'} className={abaArea === 'favoritas' ? 'ativa' : ''} onClick={() => setAbaArea('favoritas')}><IconeStar size={13} /> Favoritas</button>
           </div>
 
           <div className="bib-filtros-linha2">
             {tiposPresentes.length > 1 && (
               <div className="tipos">
                 <button className={filtroTipo === 'todos' ? 'ativa' : ''} onClick={() => setFiltroTipo('todos')}>Todos os tipos</button>
-                {tiposPresentes.map(t => (
-                  <button key={t} className={filtroTipo === t ? 'ativa' : ''} onClick={() => setFiltroTipo(t)}>
-                    {ICONE_TIPO[t]} {ROTULO_TIPO[t]}
-                  </button>
-                ))}
+                {tiposPresentes.map(t => {
+                  const IconeT = ICONE_TIPO[t]
+                  return (
+                    <button key={t} className={filtroTipo === t ? 'ativa' : ''} onClick={() => setFiltroTipo(t)}>
+                      <IconeT size={13} /> {ROTULO_TIPO[t]}
+                    </button>
+                  )
+                })}
               </div>
             )}
             <label className="bib-busca">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+              <IconeSearch size={14} strokeWidth={2.2} />
               <input type="search" placeholder="Buscar por nome ou tema…" value={busca} onChange={e => setBusca(e.target.value)} />
             </label>
           </div>
@@ -135,17 +139,19 @@ export default function BibliotecaContent({ dados, nav }: { dados: DadosBibliote
           <p className="bib-vazio">Nada por aqui — tenta outra busca ou outra aba.</p>
         ) : (
           <div className="bib-grade">
-            {visiveis.map(item => (
+            {visiveis.map(item => {
+              const IconeT = ICONE_TIPO[item.tipo]
+              return (
               <article key={item.id} className={`bib-card${!d.temAcesso ? ' bloqueado' : ''}`}>
                 <div className="card-topo">
-                  <span className="tipo-selo">{ICONE_TIPO[item.tipo]} {ROTULO_TIPO[item.tipo]}</span>
+                  <span className="tipo-selo"><IconeT size={13} /> {ROTULO_TIPO[item.tipo]}</span>
                   {item.novo && <span className="selo-novo">Novo</span>}
                   <button
                     className={`fav${favs.has(item.id) ? ' ativa' : ''}`}
                     aria-label={favs.has(item.id) ? 'Remover das favoritas' : 'Adicionar às favoritas'}
                     onClick={() => favoritar(item.id)}
                     disabled={!d.temAcesso}
-                  >★</button>
+                  ><IconeStar size={14} /></button>
                 </div>
                 <h3>{item.nome}</h3>
                 {item.descricao && <p className="desc">{item.descricao}</p>}
@@ -156,7 +162,7 @@ export default function BibliotecaContent({ dados, nav }: { dados: DadosBibliote
                 </div>
                 <div className="card-rodape">
                   <span className="downloads num" title="Downloads">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4" /><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></svg>
+                    <IconeDownload size={13} strokeWidth={2.2} />
                     {fmtNum(item.downloads)}
                   </span>
                   {d.temAcesso ? (
@@ -164,11 +170,12 @@ export default function BibliotecaContent({ dados, nav }: { dados: DadosBibliote
                       {baixando === item.id ? 'Gerando link…' : item.baixada ? 'Baixar de novo' : 'Baixar'}
                     </button>
                   ) : (
-                    <span className="btn-baixar travado">🔒 Restrito</span>
+                    <span className="btn-baixar travado"><IconeLock size={12} /> Restrito</span>
                   )}
                 </div>
               </article>
-            ))}
+              )
+            })}
           </div>
         )}
       </main>

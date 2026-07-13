@@ -10,6 +10,7 @@ import {
   marcarTodasNotificacoesLidas,
 } from '@/app/avisos/actions'
 import type { DadosAvisos, Notificacao } from '@/lib/queries/avisos'
+import { IconeBell, IconeClose, IconeMegaphone, IconeMessageCircle, IconeCalendar, IconeMap } from '@/components/Icones'
 
 const fmtData = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo',
@@ -31,8 +32,8 @@ function tempoRelativo(iso: string) {
   return d === 1 ? 'ontem' : `há ${d} dias`
 }
 
-const ICONE_NOTIF: Record<string, string> = {
-  comunidade: '💬', evento: '📅', jornada: '▲', geral: '•',
+const ICONE_NOTIF: Record<string, typeof IconeBell> = {
+  comunidade: IconeMessageCircle, evento: IconeCalendar, jornada: IconeMap,
 }
 
 export default function AvisosGlobais({ dados }: { dados: DadosAvisos }) {
@@ -110,10 +111,12 @@ useEffect(() => {
               {notifs.length === 0 && (
                 <li className="sino-vazio">Nada por aqui — você está em dia.</li>
               )}
-              {notifs.map(n => (
+              {notifs.map(n => {
+                const IconeTipo = ICONE_NOTIF[n.tipo] ?? IconeBell
+                return (
                 <li key={n.id}>
                   <button className={`notif${n.lida ? '' : ' nao-lida'}`} onClick={() => clicarNotificacao(n)}>
-                    <span className="notif-ico" aria-hidden="true">{ICONE_NOTIF[n.tipo] ?? '•'}</span>
+                    <span className="notif-ico" aria-hidden="true"><IconeTipo size={14} /></span>
                     <span className="notif-txt">
                       <span>{n.prefixo}<b>{n.destaque}</b>{n.sufixo}</span>
                       <small className="num">{tempoRelativo(n.criado_em)}</small>
@@ -121,11 +124,12 @@ useEffect(() => {
                     {!n.lida && <span className="notif-ponto" aria-hidden="true"></span>}
                   </button>
                 </li>
-              ))}
+                )
+              })}
             </ul>
             {dados.novidades.length > 0 && (
               <button className="sino-novidades" onClick={() => { setSinoAberto(false); setPopupAberto(true) }}>
-                📣 Ver últimas novidades
+                <IconeMegaphone size={14} /> Ver últimas novidades
               </button>
             )}
           </div>
@@ -137,7 +141,7 @@ useEffect(() => {
           aria-expanded={sinoAberto}
           onClick={() => setSinoAberto(a => !a)}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+          <IconeBell size={18} strokeWidth={2} />
           {contador > 0 && <span className="sino-badge num">{contador > 9 ? '9+' : contador}</span>}
         </button>
       </div>
@@ -147,8 +151,8 @@ useEffect(() => {
         <div className="nov-overlay" role="dialog" aria-modal="true" aria-label="Últimas novidades" onClick={e => { if (e.target === e.currentTarget) fecharPopup() }}>
           <div className="nov-modal">
             <div className="nov-cab">
-              <span className="nov-titulo">📣 Últimas novidades</span>
-              <button className="nov-fechar" aria-label="Fechar" onClick={fecharPopup}>✕</button>
+              <span className="nov-titulo"><IconeMegaphone size={16} /> Últimas novidades</span>
+              <button className="nov-fechar" aria-label="Fechar" onClick={fecharPopup}><IconeClose size={14} /></button>
             </div>
 
             <div className="nov-corpo">

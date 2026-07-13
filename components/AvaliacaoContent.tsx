@@ -15,6 +15,8 @@ import type {
   QuestaoPublica,
   ResultadoCorrecao,
 } from "@/lib/queries/avaliacao";
+import { IconeChevronLeft, IconeCheck, IconeClose, IconePlay } from "@/components/Icones";
+import { XP, Trofeu } from "@/components/Emblemas";
 
 type Resposta = { opcaoId?: string; valor?: string };
 
@@ -229,7 +231,7 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter }: Props
 
       <div className="caso-topo">
         <Link className="sair" href={`/curso/${curso.slug}`}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5m6-7-7 7 7 7" /></svg>
+          <IconeChevronLeft size={13} strokeWidth={2.4} />
           Sair do caso
         </Link>
         <span className="caso-id num">
@@ -261,11 +263,11 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter }: Props
             {avaliacao.descricao && <p className="desc">{avaliacao.descricao}</p>}
             <div className="brief-dados num">
               <div className="bd"><span className="v">{nQ}</span><span className="r">quesitos</span></div>
-              <div className="bd"><span className="v gd">+{avaliacao.xp_total}</span><span className="r">XP em jogo</span></div>
+              <div className="bd"><span className="v gd"><XP size={16} /> +{avaliacao.xp_total}</span><span className="r">XP em jogo</span></div>
               <div className="bd"><span className="v">{avaliacao.nota_minima.toFixed(1).replace(".", ",")}</span><span className="r">nota mínima</span></div>
             </div>
             <button className="btn btn-primario" onClick={() => troca("quesito")}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5 9.5 18 20 6.5" /></svg>
+              <IconeCheck size={14} strokeWidth={2.4} />
               {ehProva ? "Aceitar a prova" : "Aceitar o caso"}
             </button>
             <p className="brief-nota">Sem limite de tempo. Responda com a convicção de quem assina o laudo.</p>
@@ -387,12 +389,12 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter }: Props
               {aprovado ? "." : " — revise e conclua as diligências."}
             </p>
             <div className="ganhos num">
-              <span className="ganho"><span className="gd">+{resultado.xp} XP</span> creditados</span>
+              <span className="ganho"><span className="gd"><XP size={15} /> +{resultado.xp} XP</span> creditados</span>
               {aprovado && resultado.media_curso !== null && (
                 <span className="ganho">Média do curso: <b style={{ marginLeft: 4 }}>{resultado.media_curso.toFixed(1).replace(".", ",")}</b></span>
               )}
               {perfeito && (
-                <span className="ganho">🏆 Conquista: <b style={{ marginLeft: 4 }}>{ehProva ? "Perito de carreira" : "Caçador de abusividades"}</b></span>
+                <span className="ganho"><Trofeu size={15} /> Conquista: <b style={{ marginLeft: 4 }}>{ehProva ? "Perito de carreira" : "Caçador de abusividades"}</b></span>
               )}
             </div>
             <div className="veredito-acoes anim">
@@ -439,7 +441,7 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter }: Props
                 return (
                   <li className={`rev-item ${g.correta ? "certo" : "errado"}`} key={qq.id}>
                     <div className="rev-linha">
-                      <span className="rev-status" aria-hidden="true">{g.correta ? "✓" : "✗"}</span>
+                      <span className="rev-status" aria-hidden="true">{g.correta ? <IconeCheck size={13} /> : <IconeClose size={13} />}</span>
                       <div className="rev-txt">
                         <span className="qn num">Quesito {String(i + 1).padStart(2, "0")}</span>
                         <b>{qq.enunciado}</b>
@@ -461,7 +463,7 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter }: Props
                                       className="rever-video"
                                       href={g.aula_id ? `/curso/${curso.slug}/aula/${g.aula_id}` : `/curso/${curso.slug}`}
                                     >
-                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+                                      <IconePlay size={12} />
                                       Rever no vídeo{g.aula_ref ? ` · ${g.aula_ref}` : ""}
                                     </Link>
                                   )}

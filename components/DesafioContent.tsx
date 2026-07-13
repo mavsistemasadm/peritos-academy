@@ -10,6 +10,12 @@ import {
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
 import type { DadosDesafio, EntregaGaleria } from '@/lib/queries/desafio'
+import {
+  IconeClipboard, IconeChevronLeft, IconeChevronRight, IconeCheck, IconeClose,
+  IconeUsers, IconeClock, IconeHourglass, IconeDownload, IconePaperclip, IconeUpload,
+  IconeSave, IconeBot, IconeAlertTriangle, IconeBookOpen, IconeHeart,
+} from '@/components/Icones'
+import { XP, Moeda } from '@/components/Emblemas'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -71,12 +77,12 @@ function IntimacaoAnimada({ ds, onAceitar }: { ds: DadosDesafio['desafio']; onAc
     <section className="dsc-cena dsc-intimacao">
       <div className="wrap">
         <div className={`dsc-intim-card anim-entrada${fase >= 1 ? ' visivel' : ''}`}>
-          <div className="dsc-intim-selo">📋 INTIMAÇÃO</div>
+          <div className="dsc-intim-selo"><IconeClipboard size={13} /> INTIMAÇÃO</div>
           <p className="dsc-intim-texto">{ds.intimacao_texto}</p>
         </div>
         <div className={`dsc-whats anim-sobe${fase >= 2 ? ' visivel' : ''}`}>
           <div className="dsc-whats-cab">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg>
+            <IconeChevronLeft size={14} strokeWidth={2} />
             <span className="dsc-whats-foto" aria-hidden="true">{ds.mensageiro_nome.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase()}</span>
             <div className="dsc-whats-quem"><b>{ds.mensageiro_nome}</b><span>{ds.mensageiro_cargo}</span></div>
           </div>
@@ -86,14 +92,14 @@ function IntimacaoAnimada({ ds, onAceitar }: { ds: DadosDesafio['desafio']; onAc
           </div>
         </div>
         <div className={`dsc-intim-recomp num anim-fade${fase >= 5 ? ' visivel' : ''}`}>
-          <div className="dsc-rw"><span className="dsc-rw-ico">⚡</span><b>{fmtNum(ds.xp)} XP</b><span>ao protocolar</span></div>
-          <div className="dsc-rw"><span className="dsc-rw-ico">🪙</span><b>{fmtNum(ds.moedas)} moedas</b><span>ao aprovar</span></div>
-          <div className="dsc-rw"><span className="dsc-rw-ico">⏱️</span><b>{ds.prazo_dias} {ds.prazo_dias === 1 ? 'dia' : 'dias'}</b><span>de prazo</span></div>
-          <div className="dsc-rw"><span className="dsc-rw-ico">👥</span><b>{fmtNum(ds.participantes)}</b><span>participantes</span></div>
+          <div className="dsc-rw"><span className="dsc-rw-ico"><XP size={16} /></span><b>{fmtNum(ds.xp)} XP</b><span>ao protocolar</span></div>
+          <div className="dsc-rw"><span className="dsc-rw-ico"><Moeda size={16} /></span><b>{fmtNum(ds.moedas)} moedas</b><span>ao aprovar</span></div>
+          <div className="dsc-rw"><span className="dsc-rw-ico"><IconeClock size={16} /></span><b>{ds.prazo_dias} {ds.prazo_dias === 1 ? 'dia' : 'dias'}</b><span>de prazo</span></div>
+          <div className="dsc-rw"><span className="dsc-rw-ico"><IconeUsers size={16} /></span><b>{fmtNum(ds.participantes)}</b><span>participantes</span></div>
         </div>
         <div className={`anim-fade${fase >= 6 ? ' visivel' : ''}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s-3)' }}>
           <button className="dsc-btn-aceitar" onClick={onAceitar}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5 9.5 18 20 6.5" /></svg>
+            <IconeCheck size={14} strokeWidth={2.6} />
             Aceitar a nomeação
           </button>
           <p className="dsc-nota-prazo">Ao aceitar, o prazo de {ds.prazo_dias} dias começa a correr. Você pode sair e voltar — o relógio continua.</p>
@@ -203,10 +209,10 @@ const aprovado = nota !== null && nota >= ds.nota_minima
       <NavPlataforma dados={nav} />
       <div className="dsc-barra-topo">
         <div className="dsc-barra-inner">
-          <a className="dsc-voltar" href="/desafios"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5m6-7-7 7 7 7" /></svg> Desafios</a>
+          <a className="dsc-voltar" href="/desafios"><IconeChevronLeft size={13} strokeWidth={2.4} /> Desafios</a>
           <span className="dsc-id num">Desafio <b>#{ds.numero}</b> · {ds.categoria_nome}</span>
           {(cena === 'autos' || cena === 'perguntas') && !prazoExpirado && dados.tempoRestanteSeg !== null && <Contagem seg={dados.tempoRestanteSeg} onExpirou={() => setPrazoExpirado(true)} />}
-          {(cena === 'autos' || cena === 'perguntas') && prazoExpirado && <span className="dsc-expirado">⏱️ Prazo expirado</span>}
+          {(cena === 'autos' || cena === 'perguntas') && prazoExpirado && <span className="dsc-expirado"><IconeHourglass size={13} /> Prazo expirado</span>}
         </div>
         <div className="dsc-progresso"><i style={{ width: `${(respondidas / nQ) * 100}%` }}></i></div>
       </div>
@@ -222,7 +228,7 @@ const aprovado = nota !== null && nota >= ds.nota_minima
               <h2>Sobre este desafio.</h2>
               {ds.instrucoes.map((p, i) => <p key={i}>{p}</p>)}
             </div>
-            <button className="dsc-btn-comecar" onClick={() => setCena('perguntas')}>Começar as perguntas <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg></button>
+            <button className="dsc-btn-comecar" onClick={() => setCena('perguntas')}>Começar as perguntas <IconeChevronRight size={14} strokeWidth={2.4} /></button>
           </div>
           <aside className="dsc-lateral">
             <div className="dsc-docs">
@@ -231,14 +237,14 @@ const aprovado = nota !== null && nota >= ds.nota_minima
                 <button className="dsc-doc" key={i} onClick={() => baixarDoc(doc.path)} disabled={baixando === doc.path}>
                   <span className="dsc-doc-ico" aria-hidden="true">{doc.formato.toUpperCase()}</span>
                   <span className="dsc-doc-txt"><b>{doc.nome}</b><span className="num">.{doc.formato} · {tamanhoBonito(doc.tamanho_kb)}</span></span>
-                  <span className="dsc-doc-dl">{baixando === doc.path ? '…' : '↓'}</span>
+                  <span className="dsc-doc-dl">{baixando === doc.path ? '…' : <IconeDownload size={12} />}</span>
                 </button>
               ))}
             </div>
             <div className="dsc-resumo num">
               <div><span>Perguntas</span><b>{nQ}</b></div>
               <div><span>Prazo</span><b>{ds.prazo_dias} dias</b></div>
-              <div><span>Recompensa</span><b>⚡{fmtNum(ds.xp)} + 🪙{fmtNum(ds.moedas)}</b></div>
+              <div><span>Recompensa</span><b><XP size={13} />{fmtNum(ds.xp)} + <Moeda size={13} />{fmtNum(ds.moedas)}</b></div>
             </div>
           </aside>
         </div></div></section>
@@ -266,24 +272,24 @@ const aprovado = nota !== null && nota >= ds.nota_minima
               </div>
             )}
             <div className="dsc-perg-nav">
-              <button className="dsc-perg-btn-sec" style={{ visibility: atual === 0 ? 'hidden' : 'visible' }} onClick={() => irPara(atual - 1)}>← Anterior</button>
+              <button className="dsc-perg-btn-sec" style={{ visibility: atual === 0 ? 'hidden' : 'visible' }} onClick={() => irPara(atual - 1)}><IconeChevronLeft size={13} /> Anterior</button>
               {!ultima ? (
-                <button className="dsc-perg-btn-pri" disabled={!atualRespondida} onClick={() => irPara(atual + 1)}>Próxima →</button>
+                <button className="dsc-perg-btn-pri" disabled={!atualRespondida} onClick={() => irPara(atual + 1)}>Próxima <IconeChevronRight size={13} /></button>
               ) : (
                 <div className="dsc-perg-final">
                   <div className={`dsc-upload${arquivoPath ? ' enviado' : ''}`}>
                     {arquivoPath ? (
-                      <div className="dsc-upload-ok"><span>📎</span><div><b>{arquivoNome}</b><button className="dsc-upload-trocar" onClick={() => { setArquivoPath(null); setArquivoNome(null) }}>Trocar arquivo</button></div></div>
+                      <div className="dsc-upload-ok"><span><IconePaperclip size={16} /></span><div><b>{arquivoNome}</b><button className="dsc-upload-trocar" onClick={() => { setArquivoPath(null); setArquivoNome(null) }}>Trocar arquivo</button></div></div>
                     ) : (
                       <label className="dsc-upload-label">
                         <input type="file" accept=".xls,.xlsx,.xlsm,.pdf,.docx" hidden onChange={e => { const f = e.target.files?.[0]; if (f) enviarArquivo(f) }} />
-                        <span className="dsc-upload-ico">{uploading ? '⏳' : '📤'}</span>
+                        <span className="dsc-upload-ico">{uploading ? <IconeHourglass size={18} /> : <IconeUpload size={18} />}</span>
                         <div><b>{uploading ? 'Enviando planilha…' : 'Enviar sua planilha'}</b><span>.xlsx, .xls, .xlsm, .pdf ou .docx · máx 10 MB</span></div>
                       </label>
                     )}
                   </div>
                   <button className="dsc-perg-btn-protocolar" disabled={!prontoProtocolar || protocolando || prazoExpirado} onClick={protocolar}>
-                    {protocolando ? 'Protocolando laudo…' : !todasRespondidas ? `Faltam ${nQ - respondidas}` : !arquivoPath ? 'Envie a planilha para protocolar' : 'Protocolar laudo ✓'}
+                    {protocolando ? 'Protocolando laudo…' : !todasRespondidas ? `Faltam ${nQ - respondidas}` : !arquivoPath ? 'Envie a planilha para protocolar' : <>Protocolar laudo <IconeCheck size={13} /></>}
                   </button>
                 </div>
               )}
@@ -291,7 +297,7 @@ const aprovado = nota !== null && nota >= ds.nota_minima
             <p className="dsc-perg-dica">{q.tipo === 'multipla' ? <>Use <kbd>A</kbd>–<kbd>D</kbd> e <kbd>Enter</kbd></> : q.tipo === 'texto' ? <>Shift+Enter pra nova linha · Enter pra avançar</> : <>Enter pra avançar · ← → pra navegar</>}</p>
           </div>
           <div className="dsc-perg-pontos">{ds.quesitos.map((qq, i) => <button key={qq.ordem} className={`dsc-ponto${i === atual ? ' aqui' : ''}${(respostas[String(qq.ordem)] ?? '').trim() ? ' resp' : ''}`} onClick={() => irPara(i)} aria-label={`Ir para pergunta ${i + 1}`} />)}</div>
-          <button className="dsc-perg-salvar" onClick={salvar} disabled={salvando}>{salvando ? 'Salvando…' : '💾 Salvar rascunho'}</button>
+          <button className="dsc-perg-salvar" onClick={salvar} disabled={salvando}>{salvando ? 'Salvando…' : <><IconeSave size={13} /> Salvar rascunho</>}</button>
         </div></div></section>
       )}
 
@@ -302,8 +308,8 @@ const aprovado = nota !== null && nota >= ds.nota_minima
           <p className="dsc-veredito-sub">{aprovado ? 'Parecer sólido: ' : 'O caso continua: '}<b className="num">{feedbacks?.filter(f => f.nota >= 6).length ?? 0} de {nQ}</b> perguntas aprovadas.</p>
           {(xpGanho > 0 || moedasGanho > 0) && (
             <div className="dsc-ganhos num">
-              {xpGanho > 0 && <span className="dsc-ganho">⚡ +{fmtNum(xpGanho)} XP creditados</span>}
-              {moedasGanho > 0 && <span className="dsc-ganho">🪙 +{fmtNum(moedasGanho)} moedas</span>}
+              {xpGanho > 0 && <span className="dsc-ganho"><XP size={14} /> +{fmtNum(xpGanho)} XP creditados</span>}
+              {moedasGanho > 0 && <span className="dsc-ganho"><Moeda size={14} /> +{fmtNum(moedasGanho)} moedas</span>}
             </div>
           )}
           {feedbacks && feedbacks.length > 0 && (
@@ -314,23 +320,23 @@ const aprovado = nota !== null && nota >= ds.nota_minima
                 return (
                   <div className={`dsc-fb${acertou ? ' ok' : ' erro'}`} key={f.quesito_ordem}>
                     <div className="dsc-fb-cab">
-                      <span className="dsc-fb-status">{acertou ? '✓' : '✗'}</span>
+                      <span className="dsc-fb-status">{acertou ? <IconeCheck size={13} /> : <IconeClose size={13} />}</span>
                       <span className="dsc-fb-qnum num">Pergunta {String(f.quesito_ordem).padStart(2, '0')}</span>
                       <span className="dsc-fb-nota num">{f.nota.toFixed(1).replace('.', ',')}/10</span>
                     </div>
                     {qq && <p className="dsc-fb-enunciado">{qq.enunciado}</p>}
                     {acertou ? (
-                      <div className="dsc-fb-acertou"><span className="dsc-fb-acertou-ico">🎯</span><div><b>Resposta correta!</b><p>{f.feedback}</p></div></div>
+                      <div className="dsc-fb-acertou"><span className="dsc-fb-acertou-ico"><IconeCheck size={16} /></span><div><b>Resposta correta!</b><p>{f.feedback}</p></div></div>
                     ) : (
                       <>
                         <p className="dsc-fb-resp">Sua resposta: <b>{respostas[String(f.quesito_ordem)] ?? '—'}</b></p>
-                        <div className="dsc-fb-ia"><span className="dsc-fb-ia-ico" aria-hidden="true">🤖</span><p>{f.feedback}</p></div>
-                        {f.sugerir_refazer && <span className="dsc-fb-refazer">⚠️ Sugerimos revisar esta pergunta</span>}
+                        <div className="dsc-fb-ia"><span className="dsc-fb-ia-ico" aria-hidden="true"><IconeBot size={16} /></span><p>{f.feedback}</p></div>
+                        {f.sugerir_refazer && <span className="dsc-fb-refazer"><IconeAlertTriangle size={13} /> Sugerimos revisar esta pergunta</span>}
                         {explicacoes[f.quesito_ordem] ? (
-                          <div className="dsc-fb-explicacao"><span className="dsc-fb-explicacao-ico">📖</span><div><b>Explicação do professor</b><p>{explicacoes[f.quesito_ordem]}</p></div></div>
+                          <div className="dsc-fb-explicacao"><span className="dsc-fb-explicacao-ico"><IconeBookOpen size={16} /></span><div><b>Explicação do professor</b><p>{explicacoes[f.quesito_ordem]}</p></div></div>
                         ) : (
                           <button className="dsc-fb-btn-explicar" onClick={() => pedirExplicacao(f.quesito_ordem)} disabled={explicando === f.quesito_ordem}>
-                            {explicando === f.quesito_ordem ? '⏳ Consultando o professor…' : '📖 Entender melhor'}
+                            {explicando === f.quesito_ordem ? <><IconeHourglass size={13} /> Consultando o professor…</> : <><IconeBookOpen size={13} /> Entender melhor</>}
                           </button>
                         )}
                       </>
@@ -342,9 +348,9 @@ const aprovado = nota !== null && nota >= ds.nota_minima
           )}
 <div className="dsc-veredito-acoes">
             {!aprovado && <p className="dsc-veredito-minima num">Nota mínima para aprovação: <b>{ds.nota_minima.toFixed(1).replace('.', ',')}</b></p>}
-            {ds.gabarito_path && aprovado && <button className="dsc-btn-gab" onClick={baixarGab} disabled={baixando === 'gabarito'}>{baixando === 'gabarito' ? 'Gerando link…' : '📎 Baixar gabarito do professor'}</button>}
-            <button className="dsc-btn-galeria" onClick={() => setCena('galeria')}>👥 Ver entregas da comunidade</button>
-            <a className="dsc-btn-voltar" href="/desafios">← Voltar aos desafios</a>
+            {ds.gabarito_path && aprovado && <button className="dsc-btn-gab" onClick={baixarGab} disabled={baixando === 'gabarito'}>{baixando === 'gabarito' ? 'Gerando link…' : <><IconePaperclip size={13} /> Baixar gabarito do professor</>}</button>}
+            <button className="dsc-btn-galeria" onClick={() => setCena('galeria')}><IconeUsers size={13} /> Ver entregas da comunidade</button>
+            <a className="dsc-btn-voltar" href="/desafios"><IconeChevronLeft size={12} /> Voltar aos desafios</a>
           </div>
                   </div></section>
       )}
@@ -360,12 +366,12 @@ const aprovado = nota !== null && nota >= ds.nota_minima
                   <span className="dsc-gal-avatar" aria-hidden="true">{e.usuario_iniciais}</span>
                   <div className="dsc-gal-quem"><b>{e.usuario_nome}</b><span className="num">{e.nota !== null ? `Nota ${e.nota.toFixed(1).replace('.', ',')}` : 'Aguardando correção'}{e.tempo_seg !== null ? ` · ${tempoGasto(e.tempo_seg)}` : ''}</span></div>
                 </div>
-                <div className="dsc-gal-rodape"><button className={`dsc-gal-curtir${e.jaCurtiu ? ' curtido' : ''}`} onClick={() => curtir(e.id)}>❤️ {e.curtidas}</button></div>
+                <div className="dsc-gal-rodape"><button className={`dsc-gal-curtir${e.jaCurtiu ? ' curtido' : ''}`} onClick={() => curtir(e.id)}><IconeHeart size={13} /> {e.curtidas}</button></div>
               </div>
             ))}</div>
           )}
           <div className="dsc-gal-acoes">
-            <button className="dsc-btn-galeria" onClick={() => setCena('veredito')}>← Voltar ao veredito</button>
+            <button className="dsc-btn-galeria" onClick={() => setCena('veredito')}><IconeChevronLeft size={13} /> Voltar ao veredito</button>
             <a className="dsc-btn-voltar" href="/desafios">Voltar aos desafios</a>
           </div>
         </div></section>

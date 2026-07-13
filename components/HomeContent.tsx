@@ -6,6 +6,8 @@ import { useEffect, useRef } from 'react'
 import type { DadosHome, CursoCard } from '@/lib/queries/home'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
+import { IconePlay, IconeCheck, IconeStar } from '@/components/Icones'
+import { AoVivo } from '@/components/Emblemas'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -79,7 +81,7 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
           </p>
           <div className="hero-ctas">
             <a className="btn btn-primario" href={d.continuarCurso ? `/curso/${d.continuarCurso.slug}` : '/jornada'}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+<IconePlay size={13} />
               {d.continuarCurso && d.continuarCurso.progressoPct > 0 ? 'Continuar de onde parei' : 'Começar agora'}
             </a>
             <a className="btn btn-fantasma" href="/jornada">Ver minha jornada</a>
@@ -143,12 +145,12 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
             <ol className="etapas" style={{ listStyle: 'none' }}>
               {d.trilho.map(e => (
                 <li key={e.numero} className={`etapa${e.estado === 'feita' ? ' feita' : e.estado === 'atual' ? ' atual' : ''}`}>
-                  <span className="no" aria-hidden="true">{e.estado === 'feita' ? '✓' : String(e.numero).padStart(2, '0')}</span>
+                  <span className="no" aria-hidden="true">{e.estado === 'feita' ? <IconeCheck size={13} /> : String(e.numero).padStart(2, '0')}</span>
                   <div><div className="nome">{e.nome}</div><div className={`estado${e.estado === 'atual' ? ' num' : ''}`}>{e.detalhe}</div></div>
                 </li>
               ))}
               <li className="etapa marco">
-                <span className="no" aria-hidden="true">✦</span>
+                <span className="no" aria-hidden="true"><IconeStar size={13} /></span>
                 <div><div className="nome">Perito de Elite</div><div className="estado">Certificação</div></div>
               </li>
             </ol>
@@ -200,7 +202,7 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
           <div className="duo-grid">
             {d.eventoLive && (
               <article className="painel painel-live reveal">
-                <span className="selo-vivo"><span className="ponto" aria-hidden="true"></span>{d.eventoLive.horaRotulo}</span>
+                <span className="selo-vivo"><AoVivo size={10} />{d.eventoLive.horaRotulo}</span>
                 <span className="eyebrow" style={{ marginTop: 'var(--s-6)' }}>Sala de análise</span>
                 <h3>{d.eventoLive.titulo}</h3>
                 {d.eventoLive.descricao && <p className="sub">{d.eventoLive.descricao}</p>}

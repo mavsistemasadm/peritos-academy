@@ -73,6 +73,15 @@ Sequência de build de cada página:
 - Bucket Storage `planilhas` (privado, uploads de aluno/documentos), `capas` (público, imagens de capa)
 - Tabelas duplicadas/legadas — nunca usadas pelo app, não construir em cima: `posts`/`post_comentarios`/`post_reacoes` (substituídas por `comunidade_*`), `duvidas`/`duvida_respostas` (substituídas por `aula_duvidas`), `questoes`/`tentativas`/`materiais`/`progresso_aulas`
 
+## Sistema de ícones (dois níveis)
+Toda a plataforma usa dois arquivos centrais em vez de SVGs inline espalhados pelos componentes.
+
+- **`components/Icones.tsx`** — Nível 1, ícones de interface (navegação, ações, formulários, admin). `stroke="currentColor"`, `fill="none"`, traço 1.5px, `strokeLinecap`/`strokeLinejoin` round, viewBox 24x24, prop `size` (default 16). A cor vem do texto ao redor — não hardcodear cor.
+- **`components/Emblemas.tsx`** — Nível 2, emblemas de gamificação/status (`FogoStreak`, `Moeda`, `XP`, `Certificado`, `InsigniaEtapa`, `SeloNivel`, `Trofeu`, `AoVivo`). Cores próprias fixas (fogo=sequência, dourado=moeda/XP, verde=conquista/ao vivo online, vermelho=ao vivo/transmissão, roxo=nível), gradientes com `useId()` pra não colidir quando o mesmo emblema renderiza várias vezes na página. Todo emblema aceita `variante: 'cor' | 'mono'` — mono renderiza o mesmo desenho em traço 1.5px `currentColor` sem gradiente, pra usar em contexto de navegação/lista (ex. "Meus certificados" no menu) em vez do dourado cheio (reservado pra contexto de conquista: popup, jornada, perfil).
+- Regra de decisão: ação ou navegação → Nível 1; conquista ou status → Nível 2. Na dúvida, Nível 1.
+- SVGs inline só sobrevivem quando são gauges/data-viz específicos de uma página (anéis de progresso em `AulaContent`, radar de competências em `PeritoPublicoContent`) — nunca ícone funcional solto.
+- ⚠️ **Pendência**: `config_gamificacao.moeda_icone` é editável no admin (input de emoji em `AdminGamificacaoContent`) mas nada no app lê esse campo — os usos de `Moeda` no código são todos o emblema fixo do Nível 2, não o emoji configurado. Ligar `moeda_icone` aos usos de `Moeda` ou remover o campo do admin.
+
 ## Componentes-chave
 - `NavPlataforma` — nav única, dropdown "Conteúdos" + menu avatar; prop `ativo` e tipo `Aba`
 - `AulaContent` — player, trilho, marca conclusão via `aula_progresso`, dispara certificado

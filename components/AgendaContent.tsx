@@ -7,6 +7,8 @@ import { reservarLugar, publicarEvento, type NovoEvento } from '@/app/agenda/act
 import type { DadosAgenda, Evento } from '@/lib/queries/agenda'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
+import { IconeClose, IconeEye, IconeStar, IconeCalendarPlus, IconePlay, IconePlus, IconeCheck } from '@/components/Icones'
+import { AoVivo } from '@/components/Emblemas'
 
 const TZ = 'America/Sao_Paulo'
 
@@ -81,7 +83,7 @@ function linkCalendario(ev: Evento) {
 function BotaoReservar({ ev, primario = false }: { ev: Evento; primario?: boolean }) {
   const [reservado, setReservado] = useState(ev.reservado)
   const [pendente, start] = useTransition()
-  if (reservado) return <button className="btn reservado">✓ Reservado</button>
+  if (reservado) return <button className="btn reservado"><IconeCheck size={13} /> Reservado</button>
   return (
     <button
       className={`btn ${primario ? 'btn-primario' : 'btn-fantasma'} res`}
@@ -105,7 +107,7 @@ function LinhaEvento({ ev, vivo }: { ev: Evento; vivo: boolean }) {
       <div className="ev-sep" aria-hidden="true"></div>
       <div className="ev-corpo">
         <div className="ev-selos">
-          {vivo && <span className="selo-vivo"><span className="ponto" aria-hidden="true"></span>Ao vivo agora</span>}
+          {vivo && <span className="selo-vivo"><AoVivo size={10} />Ao vivo agora</span>}
           <span className="selo-tipo" style={TIPO_ESTILO[ev.tipo]}>{TIPO_ROTULO[ev.tipo]}</span>
           {ev.alvo_rotulo && <span className="selo-exclusivo">Exclusivo · {ev.alvo_rotulo}</span>}
         </div>
@@ -211,7 +213,7 @@ function ModalNovoEvento({ aberto, fechar, aoPublicar }:
             <h2>Novo evento.</h2>
           </div>
           <button className="fechar" onClick={fechar} aria-label="Fechar">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+            <IconeClose size={15} strokeWidth={2.2} />
           </button>
         </div>
 
@@ -280,7 +282,7 @@ function ModalNovoEvento({ aberto, fechar, aoPublicar }:
 
         <div className="alcance">
           <span className="olho" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg>
+            <IconeEye size={16} strokeWidth={2} />
           </span>
           <p>Este evento ficará visível para <b className="num">{op.alcance}</b>{op.vis !== 'todos' && <> — e aparecerá com o selo de exclusividade</>}.</p>
         </div>
@@ -384,7 +386,7 @@ export default function AgendaContent({ dados, nav }: { dados: DadosAgenda; nav:
                   <span className="selo-tipo">{TIPO_ROTULO[heroEv.tipo]} · ao vivo</span>
                   {heroEv.alvo_rotulo && (
                     <span className="selo-exclusivo">
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 2 2.9 6.3 6.6.6-5 4.5 1.5 6.6L12 16.7 6 20l1.5-6.6-5-4.5 6.6-.6z" /></svg>
+                      <IconeStar size={11} strokeWidth={2.5} />
                       Exclusivo · {heroEv.alvo_rotulo}
                     </span>
                   )}
@@ -400,7 +402,7 @@ export default function AgendaContent({ dados, nav }: { dados: DadosAgenda; nav:
                 <div className="prox-acoes">
                   <BotaoReservar ev={heroEv} primario />
                   <a className="btn btn-fantasma" href={linkCalendario(heroEv)} target="_blank" rel="noreferrer">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="5" width="16" height="16" rx="2" /><path d="M8 3v4M16 3v4M4 11h16" /></svg>
+                    <IconeCalendarPlus size={14} strokeWidth={2} />
                     Adicionar ao calendário
                   </a>
                 </div>
@@ -448,7 +450,7 @@ export default function AgendaContent({ dados, nav }: { dados: DadosAgenda; nav:
                       : ({ ['--capa' as string]: 'linear-gradient(150deg,#12241D,#0A0D0B)' })}>
                     <div className="grav-thumb">
                       <span className="grav-play" aria-hidden="true">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z" /></svg>
+                        <IconePlay size={17} />
                       </span>
                       <span className="grav-dur num">{duracaoGrav(g.duracao_seg)}</span>
                     </div>
@@ -466,7 +468,7 @@ export default function AgendaContent({ dados, nav }: { dados: DadosAgenda; nav:
 
       {/* botão do produtor */}
       <button className="fab-novo" onClick={() => setModal(true)}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+        <IconePlus size={15} strokeWidth={2.4} />
         Novo evento
       </button>
 

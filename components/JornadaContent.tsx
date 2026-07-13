@@ -6,6 +6,8 @@ import { useEffect, useRef } from 'react'
 import type { DadosJornada, Etapa, Missao } from '@/lib/queries/jornada'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
+import { IconeCheck, IconeLock, IconePlay } from '@/components/Icones'
+import { InsigniaEtapa, Certificado } from '@/components/Emblemas'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 const pad2 = (n: number) => String(n).padStart(2, '0')
@@ -43,7 +45,7 @@ function CardEtapa({ e }: { e: Etapa }) {
   return (
     <div className={`etapa ${e.estado} reveal`}>
       <div className={`etapa-no${e.estado === 'feita' ? '' : ' num'}`} aria-hidden="true">
-        {e.estado === 'feita' ? '✓' : pad2(e.numero)}
+        {e.estado === 'feita' ? <IconeCheck size={13} /> : pad2(e.numero)}
       </div>
       <div className="etapa-corpo">
         <span className="fantasma num" aria-hidden="true">{pad2(e.numero)}</span>
@@ -63,7 +65,7 @@ function CardEtapa({ e }: { e: Etapa }) {
           {e.estado === 'feita' && e.recompensa_nome && (
             <span className="recompensa ganha">
               <span className="mini-selo" aria-hidden="true">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5 9.5 18 20 6.5" /></svg>
+                <IconeCheck size={13} strokeWidth={2.6} />
               </span>
               Insígnia {e.recompensa_nome} · +{e.recompensa_xp} XP recebidos
             </span>
@@ -71,14 +73,14 @@ function CardEtapa({ e }: { e: Etapa }) {
           {e.estado === 'atual' && e.recompensa_nome && (
             <span className="recompensa">
               <span className="mini-selo" aria-hidden="true">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><circle cx="12" cy="9" r="5.5" /><path d="m9 13.5-1.5 6 4.5-2.5 4.5 2.5-1.5-6" /></svg>
+                <InsigniaEtapa size={14} />
               </span>
               Ao concluir: Insígnia <b style={{ margin: '0 4px' }}>{e.recompensa_nome}</b> · +{e.recompensa_xp} XP
             </span>
           )}
           {e.estado === 'travada' && e.trava_txt && (
             <span className="trava">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="4" y="11" width="16" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+              <IconeLock size={14} strokeWidth={2} />
               {e.trava_txt}
             </span>
           )}
@@ -182,19 +184,19 @@ export default function JornadaContent({ dados, nav }: { dados: DadosJornada; na
             {/* MARCO FINAL */}
             <div className="marco reveal">
               <div className="marco-no" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="9" r="6" /><path d="m8.5 14-2 7 5.5-3 5.5 3-2-7" /></svg>
+                <Certificado size={22} />
               </div>
               <div className="marco-cartao">
                 <span className="rotulo-etapa">Marco final · Certificação</span>
                 <h2>Perito de Elite.</h2>
                 <p>O título que resume a jornada: certificação verificável, com registro público e QR de autenticidade — pronta para o seu perfil profissional e para os autos.</p>
                 <div className="marco-itens">
-                  <span className="marco-item"><span className="ok" aria-hidden="true">✓</span>Certificado verificável com registro público</span>
-                  <span className="marco-item"><span className="ok" aria-hidden="true">✓</span>Insígnia máxima no perfil e no ranking</span>
-                  <span className="marco-item"><span className="ok" aria-hidden="true">✓</span>Selo Perito de Elite na comunidade</span>
+                  <span className="marco-item"><span className="ok" aria-hidden="true"><IconeCheck size={13} /></span>Certificado verificável com registro público</span>
+                  <span className="marco-item"><span className="ok" aria-hidden="true"><IconeCheck size={13} /></span>Insígnia máxima no perfil e no ranking</span>
+                  <span className="marco-item"><span className="ok" aria-hidden="true"><IconeCheck size={13} /></span>Selo Perito de Elite na comunidade</span>
                 </div>
                 <a className="btn btn-primario" href="/curso/segredos-bancarios">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+                  <IconePlay size={13} />
                   Continuar a jornada
                 </a>
               </div>

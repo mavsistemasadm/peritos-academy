@@ -11,6 +11,8 @@ import type { AulaCompleta, Anotacao, Duvida } from "@/lib/queries/aula";
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
 import { verificarCertificado } from '@/app/curso/[slug]/aula/[aulaId]/actions'
+import { IconeChevronLeft, IconeChevronRight, IconePlay, IconeCheck, IconeDownload, IconeSend, IconeHeadset, IconeAlertTriangle } from '@/components/Icones'
+import { Certificado, XP } from '@/components/Emblemas'
 
 
 let _sb: SupabaseClient | null = null;
@@ -196,7 +198,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
       <div className="nav-aula-ctx">
         <div className="nav-inner">
           <Link className="nav-contexto" href={`/curso/${curso.slug}`} aria-label="Voltar para o curso">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, color: "var(--cinza)" }}><path d="M19 12H5m6-7-7 7 7 7" /></svg>
+            <IconeChevronLeft size={14} strokeWidth={2.4} style={{ flexShrink: 0, color: "var(--cinza)" }} />
             <span className="curso">{curso.titulo}</span>
             <span className="sep">/</span>
             <span className="aula-atual num">Módulo {mm} · Aula {aula.ordem} de {modulo.totalAulas}</span>
@@ -237,7 +239,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
                       <div className="player-veu" aria-hidden="true"></div>
                       <span className="cap-atual num">Vídeo em breve</span>
                       <span className="play-grande" aria-hidden="true">
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z" /></svg>
+                        <IconePlay size={26} />
                       </span>
                     </>
                   )}
@@ -253,19 +255,19 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
                 <div className="aula-acoes">
                   {anterior ? (
                     <Link className="btn btn-fantasma btn-nav-aula" href={`/curso/${curso.slug}/aula/${anterior.id}`} aria-label="Aula anterior">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                      <IconeChevronLeft size={14} strokeWidth={2.4} />
                     </Link>
                   ) : null}
                   <button className={`btn btn-fantasma btn-concluir${concluida ? " feito" : ""}`} onClick={marcarConcluida}>
                     <span className="rotulo-b">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5 9.5 18 20 6.5" /></svg>
+                      <IconeCheck size={14} strokeWidth={2.6} />
                       <span>{concluida ? "Concluída" : `Marcar como concluída · +${aula.xp} XP`}</span>
                     </span>
                   </button>
                   {proxima ? (
                     <Link className="btn btn-primario btn-nav-aula" href={`/curso/${curso.slug}/aula/${proxima.id}`} aria-label="Próxima aula">
                       Próxima
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                      <IconeChevronRight size={14} strokeWidth={2.4} />
                     </Link>
                   ) : null}
                 </div>
@@ -333,7 +335,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
                             <span className={`arq-ico ${m.tipo}`} aria-hidden="true">{m.tipo === "xls" ? "XLSX" : "PDF"}</span>
                             <span className="arq-txt"><b>{m.nome}</b><span>{m.descricao}</span></span>
                             <span className="arq-baixar">
-                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 19h16" /></svg>
+                              <IconeDownload size={13} strokeWidth={2.2} />
                               Baixar
                             </span>
                           </a>
@@ -350,7 +352,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
                     <textarea ref={notaTaRef} value={notaTxt} onChange={(e) => setNotaTxt(e.target.value)}
                       placeholder="Anotar neste momento da aula…" aria-label={`Nova anotação ancorada em ${momento}`} />
                     <button className="enviar" onClick={salvarNota} aria-label="Salvar anotação">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5 9.5 18 20 6.5" /></svg>
+                      <IconeCheck size={15} strokeWidth={2.4} />
                     </button>
                   </div>
                   <p className="dica-tecla">Dica: pressione <kbd>N</kbd> durante o vídeo para anotar sem pausar o raciocínio.</p>
@@ -372,7 +374,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
                     <textarea value={duvidaTxt} onChange={(e) => setDuvidaTxt(e.target.value)}
                       placeholder="Pergunte sobre este momento da aula…" aria-label={`Nova dúvida ancorada em ${momento}`} />
                     <button className="enviar" onClick={enviarDuvida} aria-label="Enviar dúvida">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 14-7-4 14-3.5-5.5z" /></svg>
+                      <IconeSend size={15} strokeWidth={2.2} />
                     </button>
                   </div>
 
@@ -412,21 +414,21 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
                   <div className="suporte-grid">
                     <button className="suporte-opcao">
                       <span className="sup-ico" aria-hidden="true">
-                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.2-1L3 21l1.5-5.3c-.6-1.2-1-2.6-1-4.2A8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 9z" /></svg>
+                        <IconeHeadset size={19} strokeWidth={2} />
                       </span>
                       <b>Falar com o suporte</b>
                       <span>Dúvida técnica ou de acesso. Resposta média em 2h úteis.</span>
                     </button>
                     <button className="suporte-opcao">
                       <span className="sup-ico" aria-hidden="true">
-                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 9v4m0 4h.01M4.9 19h14.2a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0L3.2 16a2 2 0 0 0 1.7 3z" /></svg>
+                        <IconeAlertTriangle size={19} strokeWidth={2} />
                       </span>
                       <b>Reportar um problema</b>
                       <span>Vídeo, áudio ou material com erro nesta aula.</span>
                     </button>
                   </div>
                   <p className="contexto-nota">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: "var(--verde)" }}><path d="M4 12.5 9.5 18 20 6.5" /></svg>
+                    <IconeCheck size={14} strokeWidth={2} style={{ color: "var(--verde)" }} />
                     Seu chamado já vai com o contexto anexado:
                     <span className="chip-ctx">Aula · {aula.titulo}</span>
                     <span className="chip-ctx num">Momento · {momento}</span>
@@ -450,7 +452,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
                     <li className={cls} key={t.id}>
                       <Link href={`/curso/${curso.slug}/aula/${t.id}`} aria-current={t.atual || undefined}>
                         <span className={`t-estado${!feita && !t.atual ? " num" : ""}`} aria-hidden="true">
-                          {t.atual && !feita ? <span className="eq"><i></i><i></i><i></i></span> : feita ? "✓" : t.ordem}
+                          {t.atual && !feita ? <span className="eq"><i></i><i></i><i></i></span> : feita ? <IconeCheck size={12} /> : t.ordem}
                         </span>
                         <span className="t-txt">
                           <b>{t.titulo}</b>
@@ -471,7 +473,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
                       <b>{proximoModulo.titulo}</b>
                       <span className="num">{proximoModulo.totalAulas} aulas · {fmtDurSeg(proximoModulo.duracaoModuloSeg)}</span>
                     </span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--cinza)", flexShrink: 0 }}><path d="m9 18 6-6-6-6" /></svg>
+                    <IconeChevronRight size={14} strokeWidth={2.2} style={{ color: "var(--cinza)", flexShrink: 0 }} />
                   </Link>
                 </>
               )}
@@ -483,7 +485,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
 
 {/* toast de XP */}
       <div className={`toast-xp${toast ? " visivel" : ""}`} role="status">
-        <span className="xp num">+{aula.xp} XP</span>
+        <span className="xp num"><XP size={14} /> +{aula.xp} XP</span>
         <span>Aula concluída{faltamModulo > 0 ? ` · faltam ${faltamModulo} para o módulo` : " · módulo completo!"}</span>
       </div>
 
@@ -505,7 +507,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
             </div>
             <div className="cert-popup-body">
               <div className="cert-popup-selo">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#20D9A6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="9" r="6" /><path d="m8.5 14-2 7 5.5-3 5.5 3-2-7" /></svg>
+                <Certificado size={48} />
               </div>
               <h2>Certificado emitido!</h2>
               <p className="cert-popup-curso">{certPopup.curso}</p>

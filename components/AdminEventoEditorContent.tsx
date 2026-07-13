@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import type { EventoAdmin } from '@/lib/queries/admin-agenda'
 import type { CursoPicker } from '@/lib/queries/admin-trilhas'
 import { atualizarEvento, uploadThumbEvento, alternarPublicacaoEvento, excluirEvento } from '@/app/admin/agenda/actions'
+import { IconeChevronLeft } from '@/components/Icones'
 
 function paraDatetimeLocal(iso: string | null) {
   if (!iso) return ''
@@ -67,7 +68,7 @@ export default function AdminEventoEditorContent({ evento, cursos }: { evento: E
 
   return (
     <div className="ad-curso-editor">
-      <a href="/admin/agenda" className="ad-voltar">← Agenda</a>
+      <a href="/admin/agenda" className="ad-voltar"><IconeChevronLeft size={14} /> Agenda</a>
       <div className="ad-editor-cab">
         <h1>{evento.titulo}</h1>
         <div className="ad-editor-cab-acoes">

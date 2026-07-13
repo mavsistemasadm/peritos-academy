@@ -3,6 +3,7 @@
 
 import { useState } from 'react'
 import { criarClienteBrowser } from '@/lib/supabase/client'
+import { IconeChevronRight } from '@/components/Icones'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -98,7 +99,7 @@ export default function LoginContent({ selos }: { selos: Selos }) {
             <button type="submit" className="btn btn-primario" disabled={estado === 'enviando'}>
               {estado === 'enviando' ? 'Entrando…' : 'Entrar'}
               {estado !== 'enviando' && (
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+                <IconeChevronRight size={13} strokeWidth={2.4} />
               )}
             </button>
           </form>

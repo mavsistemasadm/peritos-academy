@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
+import { IconeChevronLeft, IconePlay, IconePlus, IconeCheck, IconeLock } from '@/components/Icones'
+import { Certificado } from '@/components/Emblemas'
 
 type Aula = {
   id: string;
@@ -122,7 +124,7 @@ export function CursoContent({ curso, modulos, conquistas, relacionados, nav }: 
         <div className="wrap">
           <div className="hero-conteudo">
             <a className="volta" href="/">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5m6-7-7 7 7 7" /></svg>
+              <IconeChevronLeft size={13} strokeWidth={2.4} />
               Biblioteca
             </a>
             <div className="hero-chips">
@@ -133,7 +135,7 @@ export function CursoContent({ curso, modulos, conquistas, relacionados, nav }: 
             {curso.subtitulo && <p className="sub">{curso.subtitulo}</p>}
             <div className="hero-ctas">
               <a className="btn btn-primario" href="#modulos">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+<IconePlay size={13} />
                 Começar curso
               </a>
               <a className="btn btn-fantasma" href="#modulos">Ver conteúdo</a>
@@ -203,7 +205,7 @@ export function CursoContent({ curso, modulos, conquistas, relacionados, nav }: 
                             <span className="meta num">{modulo.aulas?.length || 0} aulas · {fmtDur(totMin)}</span>
                           </span>
                           <span className="mod-toggle" aria-hidden="true" style={aberto ? { transform: "rotate(45deg)" } : undefined}>
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+<IconePlus size={15} strokeWidth={2.2} />
                           </span>
                         </button>
                         {aberto && (
@@ -261,7 +263,7 @@ export function CursoContent({ curso, modulos, conquistas, relacionados, nav }: 
                     {curso.objetivos.map((obj, i) => (
                       <li key={i} style={{ ["--i" as string]: i } as Record<string, number>}>
                         <span className="check" aria-hidden="true">
-                          <svg viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6.5" /></svg>
+                          <IconeCheck size={10} />
                         </span>
                         {obj}
                       </li>
@@ -278,7 +280,7 @@ export function CursoContent({ curso, modulos, conquistas, relacionados, nav }: 
                 </div>
                 <div className="cert">
                   <span className="cert-selo" aria-hidden="true">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="9" r="6" /><path d="m8.5 14-2 7 5.5-3 5.5 3-2-7" /></svg>
+                    <Certificado size={18} />
                   </span>
                   <div>
                     <b>Certificado verificável</b>
@@ -294,7 +296,7 @@ export function CursoContent({ curso, modulos, conquistas, relacionados, nav }: 
                     {conquistas.map((cq) => (
                       <li className="bloqueada" key={cq.id}>
                         <span className="cq-badge" aria-hidden="true">
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="4" y="11" width="16" height="9" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>
+                          <IconeLock size={15} strokeWidth={2} />
                         </span>
                         <span className="cq-txt">
                           <b>{cq.nome}</b>
@@ -308,7 +310,7 @@ export function CursoContent({ curso, modulos, conquistas, relacionados, nav }: 
 
               <div className="bloco reveal">
                 <a className="btn btn-primario" href="#modulos" style={{ width: "100%", justifyContent: "center" }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" /></svg>
+  <IconePlay size={13} />
                   Começar agora
                 </a>
               </div>

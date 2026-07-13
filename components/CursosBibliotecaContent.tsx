@@ -5,6 +5,7 @@ import { useState } from 'react'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
 import type { DadosBibliotecaCursos, TrilhaAgrupada } from '@/lib/queries/cursos-biblioteca'
+import { IconeSearch, IconeClock, IconeUser } from '@/components/Icones'
 
 function fmtDuracao(seg: number) {
   const h = Math.floor(seg / 3600)
@@ -67,7 +68,7 @@ export default function CursosBibliotecaContent({ dados, nav }: { dados: DadosBi
 
         {/* busca */}
         <div className="bc-busca">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+          <IconeSearch size={16} strokeWidth={2} />
           <input
             type="text"
             placeholder="Buscar curso..."
@@ -116,8 +117,8 @@ export default function CursosBibliotecaContent({ dados, nav }: { dados: DadosBi
                       <h3>{c.titulo}</h3>
                       {c.subtitulo && <p className="bc-card-sub">{c.subtitulo}</p>}
                       <div className="bc-card-meta num">
-                        {c.duracao_seg > 0 && <span>⏱ {fmtDuracao(c.duracao_seg)}</span>}
-                        {c.instrutor_nome && <span>👤 {c.instrutor_nome}</span>}
+                        {c.duracao_seg > 0 && <span><IconeClock size={12} /> {fmtDuracao(c.duracao_seg)}</span>}
+                        {c.instrutor_nome && <span><IconeUser size={12} /> {c.instrutor_nome}</span>}
                       </div>
                     </div>
                   </a>
