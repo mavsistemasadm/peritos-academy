@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react'
 import type { DadosHome, CursoCard } from '@/lib/queries/home'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
-import { IconePlay, IconeCheck, IconeStar } from '@/components/Icones'
+import { IconePlay, IconeCheck } from '@/components/Icones'
 import { AoVivo } from '@/components/Emblemas'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
@@ -41,6 +41,8 @@ function CardCurso({ c }: { c: CursoCard }) {
 export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: DadosNav }) {
   const d = dados
   const raiz = useRef<HTMLDivElement>(null)
+  const trilhoFeitas = d.trilho.filter(e => e.estado === 'feita').length
+  const trilhoPct = d.trilho.length ? Math.round((trilhoFeitas / d.trilho.length) * 100) : 0
 
   // reveals + barras
   useEffect(() => {
@@ -135,24 +137,20 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
           <div className="secao-cab reveal">
             <div>
               <span className="eyebrow">Sua evolução</span>
-              <h2 className="h2">Do conhecimento à autoridade.</h2>
-              <p className="sub">Uma jornada construída para gerar resultados visíveis na sua carreira.</p>
+              <h2 className="h2">{d.evolucaoTitulo}</h2>
+              {d.evolucaoDescricao && <p className="sub">{d.evolucaoDescricao}</p>}
             </div>
             <a className="link-secao" href="/jornada">Explorar todas as trilhas <span className="seta">→</span></a>
           </div>
           <div className="trilho reveal">
-            <div className="trilho-linha" aria-hidden="true"><i></i></div>
+            <div className="trilho-linha" aria-hidden="true"><i style={{ width: `${trilhoPct}%` }}></i></div>
             <ol className="etapas" style={{ listStyle: 'none' }}>
               {d.trilho.map(e => (
                 <li key={e.numero} className={`etapa${e.estado === 'feita' ? ' feita' : e.estado === 'atual' ? ' atual' : ''}`}>
                   <span className="no" aria-hidden="true">{e.estado === 'feita' ? <IconeCheck size={13} /> : String(e.numero).padStart(2, '0')}</span>
-                  <div><div className="nome">{e.nome}</div><div className={`estado${e.estado === 'atual' ? ' num' : ''}`}>{e.detalhe}</div></div>
+                  <div><div className="nome" title={e.nome}>{e.nome}</div><div className={`estado${e.estado === 'atual' ? ' num' : ''}`}>{e.detalhe}</div></div>
                 </li>
               ))}
-              <li className="etapa marco">
-                <span className="no" aria-hidden="true"><IconeStar size={13} /></span>
-                <div><div className="nome">{d.marcoFinalNome}</div><div className="estado">Formação completa</div></div>
-              </li>
             </ol>
           </div>
         </div>
@@ -218,7 +216,7 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
             <aside className="painel painel-com reveal">
               <div className="cab">
                 <h3>Peritos em movimento.</h3>
-                <span className="online num"><span className="ponto" aria-hidden="true"></span>{d.online} online</span>
+                {d.online > 0 && <span className="online num"><span className="ponto" aria-hidden="true"></span>{d.online} online</span>}
               </div>
               {d.movimento.length > 0 ? (
                 <ul className="mov">

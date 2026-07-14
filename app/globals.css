@@ -145,19 +145,21 @@
 .pagina-home .secao-cab p{margin-top:var(--s-2)}
 .pagina-home .trilho{position:relative;padding:var(--s-2) 0 0}
 .pagina-home .trilho-linha{position:absolute;top:33px;left:10%;right:10%;height:2px;background:rgba(255,255,255,.10)}
-.pagina-home .trilho-linha i{position:absolute;inset:0 auto 0 0;width:31%;background:var(--grad-marca);border-radius:2px}
-.pagina-home .etapas{display:grid;grid-template-columns:repeat(5,1fr);position:relative}
-.pagina-home .etapa{display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--s-3)}
-.pagina-home .etapa .no{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:650;background:var(--carvao);border:1px solid var(--linha);color:var(--cinza);position:relative;z-index:1;transition:transform .25s}
+.pagina-home .trilho-linha i{position:absolute;inset:0 auto 0 0;width:0;background:var(--grad-marca);border-radius:2px;transition:width .8s var(--suave,ease)}
+/* flex (não grid fixo) — o nº de etapas vem do banco e varia por trilha;
+   nunca quebra em duas linhas: encolhe até min-width e, se ainda não couber,
+   rola horizontalmente (scrollbar discreta) em vez de estourar o layout */
+.pagina-home .etapas{display:flex;flex-wrap:nowrap;gap:clamp(6px,2vw,var(--s-3));position:relative;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:4px}
+.pagina-home .etapa{display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--s-3);flex:1 1 0;min-width:64px}
+.pagina-home .etapa .no{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:650;background:var(--carvao);border:1px solid var(--linha);color:var(--cinza);position:relative;z-index:1;transition:transform .25s;flex-shrink:0}
 .pagina-home .etapa:hover .no{transform:scale(1.08)}
 .pagina-home .etapa.feita .no{background:linear-gradient(135deg,rgba(32,217,166,.16),rgba(54,220,209,.10));border-color:rgba(32,217,166,.45);color:var(--verde)}
 .pagina-home .etapa.atual .no{background:var(--creme);border-color:var(--creme);color:var(--carvao);box-shadow:0 0 0 6px rgba(241,242,223,.08)}
-.pagina-home .etapa.marco .no{border-style:dashed}
-.pagina-home .etapa .nome{font-size:14px;font-weight:620;letter-spacing:-.01em;color:var(--creme)}
+.pagina-home .etapa .nome{font-size:14px;font-weight:620;letter-spacing:-.01em;color:var(--creme);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
 .pagina-home .etapa .estado{font-size:12px;font-weight:550;color:var(--cinza)}
 .pagina-home .etapa.feita .estado{color:var(--verde)}
 .pagina-home .etapa.atual .estado{color:var(--cinza-claro)}
-@media(max-width:820px){.pagina-home .trilho-linha{display:none}.pagina-home .etapas{grid-template-columns:1fr;gap:var(--s-4);justify-items:start}.pagina-home .etapa{flex-direction:row;text-align:left}.pagina-home .etapa .no{flex-shrink:0}}
+@media(max-width:820px){.pagina-home .trilho-linha{display:none}.pagina-home .etapas{gap:var(--s-4)}.pagina-home .etapa{min-width:56px}.pagina-home .etapa .nome{max-width:88px;font-size:12.5px}}
 
 /* VITRINE */
 .pagina-home .vitrine{padding:var(--s-9) 0;background:var(--carvao)}
@@ -4321,15 +4323,13 @@ body.teatro .trilho-aulas{display:none}
   letter-spacing:.04em;color:var(--cinza);
 }
 .pagina-admin .ad-form input,
-.pagina-admin .ad-form textarea,
-.pagina-admin .ad-form select{
+.pagina-admin .ad-form textarea{
   width:100%;font:inherit;font-size:14px;font-weight:400;color:var(--creme);
   background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:10px;
   padding:10px 14px;outline:none;transition:border-color .2s;resize:vertical;
 }
 .pagina-admin .ad-form input:focus,
-.pagina-admin .ad-form textarea:focus,
-.pagina-admin .ad-form select:focus{border-color:rgba(32,217,166,.4)}
+.pagina-admin .ad-form textarea:focus{border-color:rgba(32,217,166,.4)}
 .pagina-admin .ad-form-linha{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--s-3)}
 .pagina-admin .ad-checkbox-linha{
   flex-direction:row !important;align-items:center;gap:8px !important;font-size:13px !important;
@@ -4339,14 +4339,32 @@ body.teatro .trilho-aulas{display:none}
 .pagina-admin .ad-checkbox-linha input{width:16px;height:16px;accent-color:#20D9A6;cursor:pointer}
 
 .pagina-admin .ad-nova-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:var(--s-3)}
-.pagina-admin .ad-nova-linha input,
-.pagina-admin .ad-nova-linha select{
+.pagina-admin .ad-nova-linha input{
   flex:1;min-width:160px;font:inherit;font-size:13.5px;color:var(--creme);
   background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:10px;
   padding:9px 12px;outline:none;transition:border-color .2s;
 }
-.pagina-admin .ad-nova-linha input:focus,
-.pagina-admin .ad-nova-linha select:focus{border-color:rgba(32,217,166,.4)}
+.pagina-admin .ad-nova-linha input:focus{border-color:rgba(32,217,166,.4)}
+
+/* select nativo — regra única pra TODO o admin (cobre .ad-form, .ad-nova-linha,
+   .ad-busca-card e qualquer <select> solto num .ad-form-linha): sem isso, campos
+   fora de .ad-form/.ad-nova-linha ficavam com a aparência branca nativa do SO,
+   ilegível contra o tema escuro. Largura natural (não estica pra 100%) — um
+   campo de 3 opções não deve ocupar a seção inteira; listas longas (curso,
+   módulo) ainda crescem até o limite do próprio grid/flex container. */
+.pagina-admin select{
+  font:inherit;font-size:13.5px;font-weight:400;color:var(--creme);
+  background-color:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:10px;
+  padding:9px 34px 9px 12px;outline:none;transition:border-color .2s;
+  width:auto;min-width:160px;max-width:100%;cursor:pointer;
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23989E99' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;background-size:14px;
+}
+.pagina-admin select:focus{border-color:rgba(32,217,166,.4)}
+.pagina-admin select option{background:#12151a;color:var(--creme)}
+.pagina-admin .ad-form select,
+.pagina-admin .ad-nova-linha select{min-width:160px}
 .pagina-admin .ad-input-sm{flex:0 0 110px !important;min-width:0 !important}
 
 .pagina-admin .ad-modulos-lista{display:flex;flex-direction:column;gap:10px}

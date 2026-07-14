@@ -51,7 +51,7 @@ export type DadosJornada = {
   seloConquistadoEm: string | null
   trilhaPrincipalNome: string | null
   trilhaPrincipalSlug: string | null
-  marcosTrilhaPrincipal: Marco[]   // etapas da formação sempre (mesmo já concluída) — pra seção "5 etapas" da home
+  trilhaProtagonistaHome: PainelTrilha   // trilha de atividade mais recente (default = principal) — pra seção "Sua evolução" da home
   painelFormacao: PainelTrilha | null   // null quando a formação já foi concluída
   painelProtagonista: PainelTrilha | null // território de atividade mais recente pós-formação
   tambemEmAndamento: Territorio[]        // até 3, exclui o protagonista
@@ -324,8 +324,6 @@ export async function carregarJornada(): Promise<DadosJornada> {
   const painelFormacao = (trilhaPrincipalRow && principalTemConteudo && !seloConquistado)
     ? montaPainel(trilhaPrincipalRow.id, trilhaPrincipalRow.nome ?? 'Formação Pericial de Alta Performance', trilhaPrincipalRow.slug, trilhaPrincipalRow.descricao, 'Trilha obrigatória', 'Selo de Excelência', true)
     : null
-  const marcosTrilhaPrincipal = trilhaPrincipalRow ? marcosDeEtapas(trilhaPrincipalRow.id) : []
-
   // ---------- territórios (todas as não-principais) ----------
   const territoriosRows = trilhas.filter(t => !t.principal)
   const territorios: Territorio[] = territoriosRows.map(t => {
@@ -342,6 +340,46 @@ export async function carregarJornada(): Promise<DadosJornada> {
       proximoCursoNome: prox.cursoNome, proximoHref: prox.href,
     }
   })
+
+  // ---------- trilha protagonista da HOME (mais atividade recente; default = principal) ----------
+  // Independente do selo já ter sido conquistado ou não — todas as trilhas são
+  // abertas, então o usuário pode ter progresso num território antes mesmo de
+  // fechar a Formação. Usado só pela seção "Sua evolução" da home.
+  const candidatosHome: { id: string; nome: string; slug: string | null; descricao: string | null; ultimaAtividadeEm: string | null; numEtapas: number; ehPrincipal: boolean }[] = []
+  if (trilhaPrincipalRow) {
+    candidatosHome.push({
+      id: trilhaPrincipalRow.id, nome: trilhaPrincipalRow.nome ?? 'Formação Pericial de Alta Performance',
+      slug: trilhaPrincipalRow.slug, descricao: trilhaPrincipalRow.descricao,
+      ultimaAtividadeEm: trilhaUltimaAtividade(trilhaPrincipalRow.id),
+      numEtapas: (etapasPorTrilha.get(trilhaPrincipalRow.id) ?? []).length,
+      ehPrincipal: true,
+    })
+  }
+  for (const t of territoriosRows) {
+    candidatosHome.push({
+      id: t.id, nome: t.nome ?? '', slug: t.slug, descricao: t.descricao,
+      ultimaAtividadeEm: trilhaUltimaAtividade(t.id),
+      numEtapas: (etapasPorTrilha.get(t.id) ?? []).length,
+      ehPrincipal: false,
+    })
+  }
+  const vencedorHome = candidatosHome.filter(c => c.ultimaAtividadeEm)
+    .sort((a, b) => (b.ultimaAtividadeEm! > a.ultimaAtividadeEm! ? 1 : -1))[0]
+    ?? candidatosHome.find(c => c.ehPrincipal)
+    ?? candidatosHome[0]
+    ?? null
+  const trilhaProtagonistaHome: PainelTrilha = vencedorHome
+    ? montaPainel(
+        vencedorHome.id, vencedorHome.nome, vencedorHome.slug, vencedorHome.descricao,
+        vencedorHome.ehPrincipal ? 'Trilha obrigatória' : 'Território em destaque',
+        vencedorHome.ehPrincipal ? 'Selo de Excelência' : `insígnia ${vencedorHome.nome}`,
+        vencedorHome.numEtapas !== 1,
+      )
+    : {
+        id: '', nome: 'Sua jornada', slug: null, descricao: null, tag: '',
+        marcos: [], marcosFeitos: 0, marcosTotal: 0, progressoPct: 0,
+        proximoRotulo: 'Próximo curso', proximoTexto: null, continuarHref: null, marcoFinalRotulo: '',
+      }
 
   // ---------- protagonista pós-formação ----------
   let painelProtagonista: PainelTrilha | null = null
@@ -367,7 +405,7 @@ export async function carregarJornada(): Promise<DadosJornada> {
     seloConquistadoEm: seloExcelenciaEm,
     trilhaPrincipalNome: trilhaPrincipalRow?.nome ?? null,
     trilhaPrincipalSlug: trilhaPrincipalRow?.slug ?? null,
-    marcosTrilhaPrincipal,
+    trilhaProtagonistaHome,
     painelFormacao,
     painelProtagonista,
     tambemEmAndamento,

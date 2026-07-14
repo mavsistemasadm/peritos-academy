@@ -52,9 +52,10 @@ export type DadosHome = {
   proximaConquista: string
   proximaConquistaFalta: string
   eventoHoje: { titulo: string; hora: string } | null
-  // jornada
+  // jornada — sempre a trilha protagonista (mais atividade recente; default = Formação)
   trilho: EtapaTrilho[]
-  marcoFinalNome: string
+  evolucaoTitulo: string
+  evolucaoDescricao: string | null
   // vitrines
   vitrine: CursoCard[]         // régua de recomendação, até 3
   // ao vivo + comunidade
@@ -228,8 +229,8 @@ export async function carregarHome(): Promise<DadosHome | null> {
   const proximoNivel = ordenados.find(n => n.pontos_minimos > xp) ?? null
   const faltaXp = proximoNivel ? Math.max(0, proximoNivel.pontos_minimos - xp) : 0
 
-  // ---------- trilho (5 etapas da formação, sempre) ----------
-  const trilho: EtapaTrilho[] = jornada.marcosTrilhaPrincipal.map((m, i) => ({
+  // ---------- trilho: trilha protagonista (mais atividade recente; default = Formação) ----------
+  const trilho: EtapaTrilho[] = jornada.trilhaProtagonistaHome.marcos.map((m, i) => ({
     numero: i + 1, nome: m.nome,
     estado: m.estado === 'feita' ? 'feita' : m.estado === 'atual' ? 'atual' : 'a-seguir',
     detalhe: m.estado === 'feita' ? 'Concluído' : m.estado === 'atual' ? 'Em andamento' : 'A seguir',
@@ -289,7 +290,8 @@ export async function carregarHome(): Promise<DadosHome | null> {
       ? { titulo: eventoHojeRaw.titulo, hora: fmtHora.format(new Date(eventoHojeRaw.inicia_em)).replace(':', 'h') }
       : null,
     trilho,
-    marcoFinalNome: 'Selo de Excelência',
+    evolucaoTitulo: jornada.trilhaProtagonistaHome.nome || 'Sua jornada',
+    evolucaoDescricao: jornada.trilhaProtagonistaHome.descricao,
     vitrine: regua,
     eventoLive: eventoLiveRaw
       ? {
