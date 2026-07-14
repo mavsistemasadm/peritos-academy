@@ -11,12 +11,13 @@ import {
   adicionarCursoNaEtapa, removerCursoDaEtapa, moverMissao,
 } from '@/app/admin/trilhas/actions'
 import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconePencil, IconeTrash } from '@/components/Icones'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 export default function AdminTrilhaEditorContent({ trilha, etapas, cursos }: {
   trilha: TrilhaAdmin; etapas: EtapaAdmin[]; cursos: CursoPicker[]
 }) {
   const router = useRouter()
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
   const [pendente, startTransition] = useTransition()
   const [etapaExpandida, setEtapaExpandida] = useState<string | null>(etapas[0]?.id ?? null)
   const [novaEtapaNome, setNovaEtapaNome] = useState('')
@@ -25,39 +26,37 @@ export default function AdminTrilhaEditorContent({ trilha, etapas, cursos }: {
 
   function onSalvarDados(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarTrilha(trilha.id, fd)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Dados gerais salvos com sucesso'); refresh() }
     })
   }
 
   function onExcluirTrilha() {
     if (!confirm(`Excluir a trilha "${trilha.nome}"? Isso apaga suas etapas. Essa ação não pode ser desfeita.`)) return
-    setErro(null)
     startTransition(async () => {
       const r = await excluirTrilha(trilha.id)
-      if (!r.ok) setErro(r.erro)
+      if (!r.ok) toast.erro(r.erro)
       else router.push('/admin/trilhas')
     })
   }
 
   function onCriarEtapa() {
     if (!novaEtapaNome.trim()) return
-    setErro(null)
     const fd = new FormData()
     fd.set('nome', novaEtapaNome)
     startTransition(async () => {
       const r = await criarEtapa(trilha.id, fd)
-      if (!r.ok) setErro(r.erro)
-      else { setNovaEtapaNome(''); refresh() }
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Etapa criada com sucesso'); setNovaEtapaNome(''); refresh() }
     })
   }
 
   return (
     <div className="ad-curso-editor">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <a href="/admin/trilhas" className="ad-voltar"><IconeChevronLeft size={14} /> Trilhas</a>
       <div className="ad-editor-cab">
         <h1>{trilha.nome ?? 'Trilha sem nome'}</h1>
@@ -65,8 +64,6 @@ export default function AdminTrilhaEditorContent({ trilha, etapas, cursos }: {
           <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={onExcluirTrilha}>Excluir trilha</button>
         </div>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       <section className="ad-card ad-card-dados">
         <h2>Dados gerais</h2>
@@ -102,7 +99,7 @@ export default function AdminTrilhaEditorContent({ trilha, etapas, cursos }: {
             value={novaEtapaNome}
             onChange={e => setNovaEtapaNome(e.target.value)}
           />
-          <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriarEtapa}>+ Etapa</button>
+          <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriarEtapa}>{pendente ? 'Criando...' : '+ Etapa'}</button>
         </div>
 
         {etapas.length === 0 && <p className="ad-vazio">Nenhuma etapa cadastrada ainda.</p>}
@@ -118,7 +115,8 @@ export default function AdminTrilhaEditorContent({ trilha, etapas, cursos }: {
               cursos={cursos}
               expandida={etapaExpandida === e.id}
               onToggle={() => setEtapaExpandida(etapaExpandida === e.id ? null : e.id)}
-              onErro={setErro}
+              onErro={toast.erro}
+              onSucesso={toast.sucesso}
               onRefresh={refresh}
             />
           ))}
@@ -128,7 +126,7 @@ export default function AdminTrilhaEditorContent({ trilha, etapas, cursos }: {
   )
 }
 
-function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggle, onErro, onRefresh }: {
+function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggle, onErro, onSucesso, onRefresh }: {
   etapa: EtapaAdmin
   trilhaId: string
   indice: number
@@ -136,7 +134,8 @@ function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggl
   cursos: CursoPicker[]
   expandida: boolean
   onToggle: () => void
-  onErro: (erro: string | null) => void
+  onErro: (erro: string) => void
+  onSucesso: (mensagem: string) => void
   onRefresh: () => void
 }) {
   const [pendente, startTransition] = useTransition()
@@ -144,17 +143,15 @@ function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggl
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarEtapa(etapa.id, trilhaId, fd)
       if (!r.ok) onErro(r.erro)
-      else { setEditando(false); onRefresh() }
+      else { onSucesso('Etapa salva com sucesso'); setEditando(false); onRefresh() }
     })
   }
 
   function onMover(direcao: 'up' | 'down') {
-    onErro(null)
     startTransition(async () => {
       const r = await moverEtapa(trilhaId, etapa.id, direcao)
       if (!r.ok) onErro(r.erro)
@@ -164,36 +161,33 @@ function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggl
 
   function onExcluir() {
     if (!confirm(`Excluir a etapa "${etapa.nome}"?`)) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirEtapa(etapa.id, trilhaId)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Etapa excluída com sucesso'); onRefresh() }
     })
   }
 
   function onVincularCursos(cursoIds: string[]) {
-    onErro(null)
     startTransition(async () => {
       for (const cursoId of cursoIds) {
         const r = await adicionarCursoNaEtapa(etapa.id, trilhaId, cursoId)
         if (!r.ok) { onErro(r.erro); return }
       }
+      onSucesso(cursoIds.length === 1 ? 'Curso vinculado com sucesso' : `${cursoIds.length} cursos vinculados com sucesso`)
       onRefresh()
     })
   }
 
   function onRemoverCurso(cursoId: string) {
-    onErro(null)
     startTransition(async () => {
       const r = await removerCursoDaEtapa(etapa.id, trilhaId, cursoId)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Curso removido com sucesso'); onRefresh() }
     })
   }
 
   function onMoverMissao(cursoId: string, direcao: 'up' | 'down') {
-    onErro(null)
     startTransition(async () => {
       const r = await moverMissao(etapa.id, trilhaId, cursoId, direcao)
       if (!r.ok) onErro(r.erro)
@@ -320,7 +314,7 @@ function CursoPickerMultiplo({ cursos, pendente, onVincular }: {
         disabled={pendente || selecionados.size === 0}
         onClick={vincular}
       >
-        Vincular selecionados{selecionados.size > 0 ? ` (${selecionados.size})` : ''}
+        {pendente ? 'Vinculando...' : `Vincular selecionados${selecionados.size > 0 ? ` (${selecionados.size})` : ''}`}
       </button>
     </div>
   )

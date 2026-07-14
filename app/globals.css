@@ -3995,6 +3995,25 @@ body.teatro .trilho-aulas{display:none}
   padding:10px 14px;border-radius:12px;background:rgba(224,107,107,.08);border:1px solid rgba(224,107,107,.25);
 }
 
+/* ---------- Toast de feedback (components/AdminToast.tsx) ---------- */
+.pagina-admin .ad-toast-pilha{
+  position:fixed;top:calc(var(--nav-h,64px) + 16px);right:20px;z-index:900;
+  display:flex;flex-direction:column;gap:8px;max-width:360px;
+}
+.pagina-admin .ad-toast{
+  display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:12px;
+  font-size:13.5px;font-weight:600;line-height:1.4;
+  box-shadow:0 12px 30px -10px rgba(0,0,0,.5);
+  animation:ad-toast-entrar .25s var(--suave,ease-out);
+}
+.pagina-admin .ad-toast-sucesso{color:var(--verde);background:#0E1210;border:1px solid rgba(32,217,166,.35)}
+.pagina-admin .ad-toast-erro{color:#E0776B;background:#0E1210;border:1px solid rgba(224,107,107,.35)}
+.pagina-admin .ad-toast-ico{flex-shrink:0;margin-top:1px}
+.pagina-admin .ad-toast-msg{flex:1;color:var(--creme)}
+.pagina-admin .ad-toast-fechar{flex-shrink:0;color:var(--cinza);opacity:.7;transition:opacity .15s}
+.pagina-admin .ad-toast-fechar:hover{opacity:1}
+@keyframes ad-toast-entrar{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+
 
 
 
@@ -4133,6 +4152,13 @@ body.teatro .trilho-aulas{display:none}
 .pagina-admin .ad-upload-btn{display:inline-flex;cursor:pointer}
 
 .pagina-admin .ad-form{display:flex;flex-direction:column;gap:var(--s-3)}
+/* botões de ação dentro de containers flex-column (ad-form, ad-picker) não
+   devem esticar pra largura total — largura natural do conteúdo, alinhado
+   à esquerda (mesmo bug corrigido em todo formulário "Salvar..." do admin) */
+.pagina-admin .ad-form > button[type="submit"],
+.pagina-admin .ad-picker > button{
+  align-self:flex-start;min-height:42px;
+}
 .pagina-admin .ad-form label{
   display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:650;
   letter-spacing:.04em;color:var(--cinza);
