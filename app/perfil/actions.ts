@@ -18,6 +18,7 @@ export async function salvarPerfil(formData: FormData) {
   const mostrar_tel = formData.get('mostrar_tel') === 'on'
   const mostrar_email = formData.get('mostrar_email') === 'on'
   const perfil_publico = formData.get('perfil_publico') === 'on'
+  const sons_conquista = formData.get('sons_conquista') === 'on'
 
   if (!nome || nome.length < 3) return { ok: false as const, erro: 'Nome precisa ter pelo menos 3 caracteres.' }
 
@@ -31,13 +32,14 @@ export async function salvarPerfil(formData: FormData) {
 
   const { error } = await supabase
     .from('perfis')
-    .update({ nome, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, slug })
+    .update({ nome, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, sons_conquista, slug })
     .eq('id', auth.user.id)
 
   if (error) return { ok: false as const, erro: error.message }
 
   revalidatePath('/perfil')
   revalidatePath(`/perito/${slug}`)
+  revalidatePath('/', 'layout')
   return { ok: true as const, slug }
 }
 

@@ -122,6 +122,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
 // verifica se completou o curso e emite certificado
     const cert = await verificarCertificado(curso.id)
     if (cert.gerado) {
+      sessionStorage.setItem('cert-popup-aberto', '1')
       setCertPopup({ numero: cert.numero!, curso: cert.curso_titulo!, nota: cert.nota })
     }
 
@@ -137,6 +138,10 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
         } else setContador(s);
       }, 1000);
     }
+  };
+  const fecharCertPopup = () => {
+    sessionStorage.removeItem('cert-popup-aberto');
+    setCertPopup(null);
   };
   const ficar = () => { if (regressivaRef.current) clearInterval(regressivaRef.current); setProxVisivel(false); };
   const irAgora = () => {
@@ -483,7 +488,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
 
       {/* popup de certificado */}
       {certPopup && (
-        <div className="cert-popup-overlay" onClick={() => setCertPopup(null)}>
+        <div className="cert-popup-overlay" onClick={fecharCertPopup}>
           <div className="cert-popup" onClick={e => e.stopPropagation()}>
             <div className="cert-popup-confete" aria-hidden="true">
               {Array.from({ length: 40 }).map((_, i) => (
@@ -508,7 +513,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
               <p className="cert-popup-desc">Seu certificado já está disponível no seu perfil e pode ser verificado publicamente.</p>
               <div className="cert-popup-acoes">
                 <a className="btn btn-primario" href="/perfil#certificados">Ver meus certificados</a>
-                <button className="btn btn-fantasma" onClick={() => setCertPopup(null)}>Continuar estudando</button>
+                <button className="btn btn-fantasma" onClick={fecharCertPopup}>Continuar estudando</button>
               </div>
             </div>
           </div>

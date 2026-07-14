@@ -217,6 +217,10 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
                     <input type="checkbox" name="perfil_publico" defaultChecked={d.perfil_publico} />
                     <span>Perfil público ativo</span>
                   </label>
+                  <label className="pe-toggle">
+                    <input type="checkbox" name="sons_conquista" defaultChecked={d.sons_conquista} />
+                    <span>Sons de conquista</span>
+                  </label>
                 </div>
                 {d.slug && d.perfil_publico && (
                   <p className="pe-link-publico">

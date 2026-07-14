@@ -4,6 +4,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { criarClienteServidor } from '@/lib/supabase/server'
+import type { Notificacao } from '@/lib/queries/avisos'
 
 // ---------- NOVIDADES ----------
 
@@ -72,4 +73,19 @@ export async function marcarTodasNotificacoesLidas() {
 
   revalidatePath('/', 'layout')
   return { ok: true }
+}
+
+// Busca a próxima página de notificações (painel do sino, "carregar mais")
+export async function buscarMaisNotificacoes(offset: number): Promise<{ ok: true; notificacoes: Notificacao[] } | { ok: false }> {
+  const supabase = await criarClienteServidor()
+  const { data: auth } = await supabase.auth.getUser()
+  if (!auth?.user) return { ok: false }
+
+  const { data, error } = await supabase.from('notificacoes')
+    .select('*')
+    .order('criado_em', { ascending: false })
+    .range(offset, offset + 11)
+
+  if (error) return { ok: false }
+  return { ok: true, notificacoes: (data ?? []) as Notificacao[] }
 }

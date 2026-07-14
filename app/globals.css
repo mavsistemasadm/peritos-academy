@@ -2790,6 +2790,13 @@ body.teatro .trilho-aulas{display:none}
   transition:background .2s;
 }
 .avisos-globais .sino-novidades:hover{background:rgba(32,217,166,.06)}
+.avisos-globais .sino-carregar-mais{
+  display:block;width:100%;padding:11px 18px;text-align:center;
+  font-size:12.5px;font-weight:600;color:var(--cinza-claro);
+  border-top:1px solid var(--linha-suave);transition:background .2s,color .2s;
+}
+.avisos-globais .sino-carregar-mais:hover{background:rgba(255,255,255,.04);color:var(--creme)}
+.avisos-globais .sino-carregar-mais:disabled{opacity:.6}
 
 /* ---------- POPUP DE NOVIDADES ---------- */
 .avisos-globais .nov-overlay{
@@ -4895,4 +4902,112 @@ body.teatro .trilho-aulas{display:none}
   .pagina-comunidade .topo-stats{ gap:16px; }
   .pagina-comunidade .compor{ padding:14px; }
   .pagina-comunidade .compor .foto-p{ display:none; }
+}
+
+/* ==================================================================
+   CONQUISTA TOAST — celebrações (components/ConquistaToast.tsx)
+   ================================================================== */
+.conquista-toast{--dourado:#E0B96B; --r-card:20px}
+
+/* ---------- toast padrão (canto superior) ---------- */
+.ct-toast{
+  position:fixed;top:calc(var(--nav-h,64px) + 16px);right:24px;z-index:700;
+  display:flex;align-items:flex-start;gap:14px;position:relative;
+  max-width:380px;padding:16px 18px;border-radius:var(--r-card);
+  background:#0E1210;border:1px solid var(--linha);
+  box-shadow:0 30px 70px -20px rgba(0,0,0,.75);
+  animation:ct-entrar .4s var(--suave);
+  overflow:hidden;
+}
+.ct-toast.ct-saindo{animation:ct-sair .32s var(--suave) forwards}
+@keyframes ct-entrar{from{opacity:0;transform:translateY(-16px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes ct-sair{to{opacity:0;transform:translateY(-12px) scale(.97)}}
+
+.ct-toast-ico{
+  width:44px;height:44px;border-radius:14px;flex-shrink:0;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,rgba(224,185,107,.18),rgba(224,185,107,.05));
+  border:1px solid rgba(224,185,107,.35);color:var(--dourado);
+}
+.ct-toast-corpo{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;padding-top:2px}
+.ct-toast-corpo b{font-size:14.5px;font-weight:680;color:var(--creme);letter-spacing:-.01em}
+.ct-toast-corpo span{font-size:13px;color:var(--cinza-claro);line-height:1.4}
+.ct-toast-nota{font-weight:650;color:var(--verde) !important}
+
+/* avaliação aprovada — verde + dourado */
+.ct-avaliacao{border-color:rgba(32,217,166,.35);background:linear-gradient(160deg,rgba(32,217,166,.08),#0E1210 55%)}
+.ct-avaliacao .ct-toast-ico{background:linear-gradient(135deg,rgba(32,217,166,.2),rgba(224,185,107,.08));border-color:rgba(32,217,166,.4);color:var(--verde)}
+
+/* curso concluído — capa no topo + selo de certificado sobreposto */
+.ct-curso{padding:0;overflow:hidden}
+.ct-curso-capa{width:100%;height:110px;object-fit:cover;display:block}
+.ct-curso .ct-toast-ico{position:absolute;top:88px;left:16px;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+.ct-curso .ct-toast-corpo{padding:34px 18px 16px 18px}
+
+/* streak */
+.ct-streak .ct-toast-ico{color:#E0773C;border-color:rgba(224,119,60,.4);background:linear-gradient(135deg,rgba(224,119,60,.2),rgba(224,119,60,.05))}
+.ct-streak-fogo{animation:ct-pulsar-fogo 1s ease-in-out infinite}
+@keyframes ct-pulsar-fogo{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+/* primeira aula */
+.ct-primeira{border-color:rgba(54,220,209,.3);background:linear-gradient(160deg,rgba(54,220,209,.07),#0E1210 55%)}
+.ct-primeira .ct-toast-ico{color:var(--ciano);border-color:rgba(54,220,209,.4);background:linear-gradient(135deg,rgba(54,220,209,.2),rgba(54,220,209,.05))}
+
+/* ---------- subida de nível — overlay full-screen ---------- */
+.ct-overlay{
+  position:fixed;inset:0;z-index:800;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:40px 24px;text-align:center;
+  background:radial-gradient(circle at 50% 40%,rgba(224,185,107,.14),rgba(4,6,5,.94) 65%);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  animation:ct-fade-in .4s var(--suave);
+}
+.ct-overlay.ct-saindo{animation:ct-fade-out .32s var(--suave) forwards}
+@keyframes ct-fade-in{from{opacity:0}to{opacity:1}}
+@keyframes ct-fade-out{to{opacity:0}}
+
+.ct-particulas{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.ct-particulas span{
+  position:absolute;bottom:-10%;width:5px;height:5px;border-radius:50%;
+  background:var(--dourado);opacity:0;
+  animation:ct-particula 2.8s ease-in infinite;
+}
+@keyframes ct-particula{
+  0%{opacity:0;transform:translateY(0) scale(.6)}
+  15%{opacity:.9}
+  100%{opacity:0;transform:translateY(-90vh) scale(1.1)}
+}
+
+.ct-nivel-selos{position:relative;display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:20px}
+.ct-selo-antigo{
+  width:64px;height:64px;object-fit:contain;opacity:.4;filter:grayscale(.5);
+  animation:ct-selo-sai .6s var(--suave) forwards;
+}
+@keyframes ct-selo-sai{from{opacity:.7;transform:translateX(0) scale(1)}to{opacity:.25;transform:translateX(-8px) scale(.85)}}
+.ct-selo-novo{
+  width:150px;height:150px;object-fit:contain;
+  filter:drop-shadow(0 0 40px rgba(224,185,107,.55));
+  animation:ct-selo-crescer .7s var(--suave) both;
+}
+.ct-selo-fallback{display:grid;place-items:center}
+@keyframes ct-selo-crescer{
+  0%{opacity:0;transform:scale(.4) rotate(-8deg)}
+  60%{opacity:1;transform:scale(1.08) rotate(2deg)}
+  100%{opacity:1;transform:scale(1) rotate(0)}
+}
+
+.ct-nivel-rotulo{font-size:14px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--cinza-claro)}
+.ct-nivel-nome{
+  font-size:clamp(28px,5vw,44px);font-weight:750;letter-spacing:-.02em;
+  background:linear-gradient(120deg,#F1F2DF 0%,var(--dourado) 60%,#F1F2DF 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin:2px 0 8px;
+}
+.ct-nivel-xp{font-size:16px;font-weight:650;color:var(--dourado)}
+.ct-nivel-dica{margin-top:22px;font-size:12.5px;color:var(--cinza)}
+
+@media (max-width:520px){
+  .ct-toast{right:12px;left:12px;max-width:none}
+  .ct-selo-novo{width:110px;height:110px}
+  .ct-selo-antigo{width:48px;height:48px}
 }

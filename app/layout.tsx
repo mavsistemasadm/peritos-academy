@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { carregarAvisos } from "@/lib/queries/avisos";
 import AvisosGlobais from "@/components/AvisosGlobais";
+import ConquistaToast from "@/components/ConquistaToast";
 import { creditarLoginDiario } from "@/lib/gamificacao/login-diario";
 import { carregarConfigPlataforma } from "@/lib/queries/config-plataforma";
 
@@ -39,6 +40,7 @@ export default async function RootLayout({
       <body className="min-h-screen">
         {children}
         <AvisosGlobais dados={avisos} />
+        <ConquistaToast logado={avisos.logado} sonsConquista={avisos.sonsConquista} />
         {config.textoRodape && <footer className="rodape-global">{config.textoRodape}</footer>}
       </body>
     </html>

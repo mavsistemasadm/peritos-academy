@@ -8,9 +8,11 @@ import {
   marcarTodasNovidadesLidas,
   marcarNotificacaoLida,
   marcarTodasNotificacoesLidas,
+  buscarMaisNotificacoes,
 } from '@/app/avisos/actions'
 import type { DadosAvisos, Notificacao } from '@/lib/queries/avisos'
-import { IconeBell, IconeClose, IconeMegaphone, IconeMessageCircle, IconeCalendar, IconeMap } from '@/components/Icones'
+import { IconeBell, IconeClose, IconeMegaphone, IconeMessageCircle, IconeCalendar, IconeMap, IconeCheck, IconeSend, IconeStar } from '@/components/Icones'
+import { Trofeu, Certificado, FogoStreak, XP, SeloNivel } from '@/components/Emblemas'
 
 const fmtData = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo',
@@ -34,6 +36,36 @@ function tempoRelativo(iso: string) {
 
 const ICONE_NOTIF: Record<string, typeof IconeBell> = {
   comunidade: IconeMessageCircle, evento: IconeCalendar, jornada: IconeMap,
+  modulo_concluido: IconeCheck, desafio_entrega: IconeSend,
+  comunidade_resposta: IconeMessageCircle, duvida_respondida: IconeMessageCircle,
+  comunidade_melhor_resposta: IconeStar,
+}
+
+// Conquista/status usa Nível 2 (Emblemas, variante mono); ação/navegação usa Nível 1 (Icones) — regra já documentada no CLAUDE.md.
+function iconeNotificacao(n: Notificacao) {
+  const nivelOrdem = typeof n.dados?.nivel_ordem === 'number' ? n.dados.nivel_ordem : undefined
+  switch (n.emblema ?? n.tipo) {
+    case 'selo_nivel':
+    case 'nivel_up':
+      return <SeloNivel variante="mono" size={14} nivel={nivelOrdem} />
+    case 'trofeu':
+    case 'avaliacao_aprovada':
+      return <Trofeu variante="mono" size={14} />
+    case 'certificado':
+    case 'curso_concluido':
+    case 'certificado_disponivel':
+      return <Certificado variante="mono" size={14} />
+    case 'fogo_streak':
+    case 'streak':
+      return <FogoStreak variante="mono" size={14} />
+    case 'xp':
+    case 'primeira_aula':
+      return <XP variante="mono" size={14} />
+    default: {
+      const IconeTipo = ICONE_NOTIF[n.tipo] ?? IconeBell
+      return <IconeTipo size={14} />
+    }
+  }
 }
 
 export default function AvisosGlobais({ dados }: { dados: DadosAvisos }) {
@@ -41,6 +73,8 @@ export default function AvisosGlobais({ dados }: { dados: DadosAvisos }) {
   const [sinoAberto, setSinoAberto] = useState(false)
   const [notifs, setNotifs] = useState<Notificacao[]>(dados.notificacoes)
   const [novidadesLidas, setNovidadesLidas] = useState(false)
+  const [temMaisNotifs, setTemMaisNotifs] = useState(dados.notificacoes.length >= 12)
+  const [carregandoMais, setCarregandoMais] = useState(false)
   const [, start] = useTransition()
   const areaSino = useRef<HTMLDivElement>(null)
 
@@ -94,6 +128,18 @@ useEffect(() => {
     start(async () => { await marcarTodasNotificacoesLidas() })
   }
 
+  async function carregarMaisNotifs() {
+    setCarregandoMais(true)
+    const res = await buscarMaisNotificacoes(notifs.length)
+    if (res.ok) {
+      setNotifs(ns => [...ns, ...res.notificacoes])
+      if (res.notificacoes.length < 12) setTemMaisNotifs(false)
+    } else {
+      setTemMaisNotifs(false)
+    }
+    setCarregandoMais(false)
+  }
+
   return (
     <div className="avisos-globais">
 
@@ -111,12 +157,10 @@ useEffect(() => {
               {notifs.length === 0 && (
                 <li className="sino-vazio">Nada por aqui — você está em dia.</li>
               )}
-              {notifs.map(n => {
-                const IconeTipo = ICONE_NOTIF[n.tipo] ?? IconeBell
-                return (
+              {notifs.map(n => (
                 <li key={n.id}>
                   <button className={`notif${n.lida ? '' : ' nao-lida'}`} onClick={() => clicarNotificacao(n)}>
-                    <span className="notif-ico" aria-hidden="true"><IconeTipo size={14} /></span>
+                    <span className="notif-ico" aria-hidden="true">{iconeNotificacao(n)}</span>
                     <span className="notif-txt">
                       <span>{n.prefixo}<b>{n.destaque}</b>{n.sufixo}</span>
                       <small className="num">{tempoRelativo(n.criado_em)}</small>
@@ -124,9 +168,13 @@ useEffect(() => {
                     {!n.lida && <span className="notif-ponto" aria-hidden="true"></span>}
                   </button>
                 </li>
-                )
-              })}
+              ))}
             </ul>
+            {temMaisNotifs && notifs.length > 0 && (
+              <button className="sino-carregar-mais" onClick={carregarMaisNotifs} disabled={carregandoMais}>
+                {carregandoMais ? 'Carregando…' : 'Carregar mais'}
+              </button>
+            )}
             {dados.novidades.length > 0 && (
               <button className="sino-novidades" onClick={() => { setSinoAberto(false); setPopupAberto(true) }}>
                 <IconeMegaphone size={14} /> Ver últimas novidades

@@ -147,33 +147,43 @@ Toda a plataforma usa dois arquivos centrais em vez de SVGs inline espalhados pe
 - `Select-String -Recurse` não existe; usar `Get-ChildItem -Recurse -Include | Select-String`
 - `.env.local` (gitignorado) não existe em checkouts/worktrees novos — `npm run dev` quebra com "Your project's URL and Key are required" até criar um com `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY`. Pegar os valores via MCP (`get_project_url` + `get_publishable_keys`, projeto `abpbxvbmyogmsokboveu`) em vez de pedir pro usuário — é só a chave anon, segura de circular.
 
-## Sistema de Notificações
-Arquitetura multi-canal desde o início (in-app, email, push, whatsapp), mesmo a Fase 1 só ligando in-app — a ideia é nunca precisar refazer os gatilhos quando um canal novo entrar.
+## Sistema de Notificações e Celebrações — Fase 1 (in-app) ✅ CONCLUÍDA — 2026-07-14
+⚠️ **A spec original desta seção (catálogo multi-canal `notif_tipos`/`notif_fila_*`/`criar_notificacao()`) nunca chegou a ser construída** — era só documentação de intenção, sem lastro no banco. O que existe de fato hoje é mais simples, descrito abaixo. Se um canal extra (email/push/whatsapp) for necessário no futuro, o catálogo fica pra Fase 2 — não reintroduzir essas tabelas sem checar primeiro se ainda fazem sentido do jeito que foram desenhadas originalmente.
 
 ### Tabelas
-- `notificacoes` (JÁ EXISTE, já tem UI funcionando): `usuario_id`, `tipo`, `prefixo`/`destaque`/`sufixo` (frase montada em 3 partes, `destaque` em negrito), `link_url`, `lida`, `criado_em`. RLS hoje só tem SELECT/UPDATE do próprio usuário — **sem INSERT** (ninguém escreve nela ainda, só existem 3 linhas de seed).
-- `novidade_leituras` (JÁ EXISTE) — **não é notificação pessoal**, é o controle de leitura de `novidades` (avisos/banners do admin, Bloco 2). Não confundir os dois sistemas: avisos = broadcast institucional; notificações = eventos pessoais do usuário.
-- `notif_tipos` (nova) — catálogo: `codigo` (pk, ex. `curso_concluido`), `categoria` (agenda/trilha/conteudo/avaliacoes/gamificacao/comunidade/financeiro/administrativo), `nome`, `descricao`, `canal_in_app`, `canal_email`, `canal_push`, `canal_whatsapp` (bool, editável no admin), `ativo`.
-- `notif_fila_email`, `notif_fila_push`, `notif_fila_whatsapp` (novas, outbox) — criadas vazias na Fase 1. A função de disparo já escreve nelas quando o canal correspondente está ligado no catálogo; só não existe processador ainda. Fase 2/3 = só criar o worker que lê a fila, zero mudança nos gatilhos.
-- `evento_notif_enviadas` (nova) — dedupe dos lembretes de agenda (evento_id + tipo_lembrete), pra pg_cron não mandar duplicado.
+- `notificacoes`: `usuario_id`, `tipo`, `prefixo`/`destaque`/`sufixo` (frase em 3 partes, `destaque` em negrito — usado tanto pelo sino quanto pelos toasts), `link_url`, `emblema` (chave textual do ícone — `trofeu`/`certificado`/`fogo_streak`/`xp`/`selo_nivel`, resolvida em TS, ver `AvisosGlobais.tsx`/`ConquistaToast.tsx`), `dados` (jsonb, payload estruturado pro toast — nível/nota/curso/streak, cada tipo com seu formato), `celebracao` (bool — `true` só nos 5 tipos que também viram toast; sino mostra todo mundo), `lida`, `criado_em`. Índice parcial `idx_notificacoes_celebracao (usuario_id, criado_em) WHERE celebracao` — mantém o polling do toast barato.
+- `perfis.sons_conquista` (bool, default `true`) — preferência de som, editável em `/perfil` (mesmo bloco de toggles de `mostrar_tel` etc.).
+- RLS de `notificacoes`: SELECT/UPDATE só a própria linha, igual antes. **Nenhuma policy de INSERT existe nem deve existir** — a única escrita é via `notificar()`.
 
-### Chokepoint único: `criar_notificacao()`
-Função SQL `security definer` — todo gatilho (trigger de tabela ou pg_cron) chama só ela, nunca insere direto em `notificacoes`. Ela: 1) confere `notif_tipos.ativo` e `canal_in_app` pro tipo — se desligado no admin, não insere nada (kill-switch); 2) insere em `notificacoes`; 3) se `canal_email`/`canal_push`/`canal_whatsapp` estiverem ligados, insere na fila correspondente (hoje sempre vazio na Fase 1 porque nenhum tipo liga esses canais ainda). Isso é o que permite ligar email depois só mudando uma linha no catálogo.
+### Chokepoint único: `notificar()`
+Função `security definer`, assinatura `notificar(p_usuario, p_tipo, p_prefixo, p_destaque, p_sufixo, p_link_url?, p_emblema?, p_dados?, p_celebracao?)`. **`REVOKE EXECUTE ... FROM authenticated, anon`** logo após criada — só é chamável de dentro de outra função `SECURITY DEFINER` (que herda privilégio do dono ao executar), nunca via `supabase.rpc()` direto do navegador. Isso foi um retrabalho: a primeira tentativa só revogou de `PUBLIC`, mas o Supabase concede EXECUTE direto pra `authenticated`/`anon` via `alter default privileges` em toda função nova — revogar de `PUBLIC` sozinho não bastou, precisou nomear os papéis explicitamente. Confirmado via `has_function_privilege(...)` que só o dono (`postgres`) executa.
 
-### Categorias e gatilhos (Fase 1 = todos in-app)
-- **Agenda**: lembrete de live 1 dia / 1h / 30min antes + "começou agora" — via `pg_cron` rodando a cada 5 min, olha `eventos.inicia_em` + `evento_reservas`, dedupe em `evento_notif_enviadas`.
-- **Marcos de trilha** (in-app + email desde que a Fase 2 ligue o canal): terminou curso, passou em prova difícil, completou etapa, desbloqueou próxima etapa, insígnia de peso, subiu de nível.
-- **Conteúdo**: nova aula/avaliação publicada num curso em que o aluno está matriculado.
-- **Avaliações**: aprovado/reprovado ao submeter (via RPC `submeter_avaliacao`).
-- **Gamificação**: XP ganho, nível, insígnias (mesmo gatilho de "marcos de trilha").
-- **Comunidade**: dúvida de aula respondida, comentário no seu post, marcado como melhor resposta.
-- **Financeiro**: reservado pro Asaas (assinatura confirmada/atrasada/cancelada) — só o catálogo existe por enquanto, sem integração real.
-- **Administrativo**: boas-vindas ao criar conta.
+### Pontos de disparo (todos plugados nos gatilhos que já credam XP — nenhum gatilho novo de gamificação foi criado, nenhum valor de pontos foi alterado)
+- **Subida de nível**: detectada dentro do próprio `creditar_gamificacao` (compara `perfis.nivel` antes/depois do crédito) — cobre qualquer gatilho que cause a subida, não só um específico.
+- **Primeira aula concluída** (global, 1ª vez do usuário) e **módulo concluído**: `gam_trg_aula_progresso`.
+- **Curso concluído**: `gam_verificar_progresso_curso` (guardado por checar se `creditar_gamificacao('concluir_curso',...)` de fato creditou — evita notificar de novo em toda re-checagem de progresso do curso já completo).
+- **Certificado disponível** (sino só, sem toast — ver coordenação com popup abaixo): `gam_trg_certificados`.
+- **Desafio enviado**: `gam_trg_desafio_entrega`.
+- **Avaliação aprovada**: `submeter_avaliacao`.
+- **Streak 7/30 dias**: dentro do próprio `gam_calcular_streak` (não em `login-diario.ts`/RPC exposta — expor isso ao cliente seria a mesma brecha de segurança do `notificar()` sem revoke). Função deixou de ser `STABLE` (agora pode escrever); dedupe por "já notificado hoje pra esse streak" evita duplicar a cada chamada do nav enquanto o streak não muda.
+- **Comentário no seu post / dúvida respondida / marcado como melhor resposta**: `trg_notif_comunidade_comentarios`, `trg_notif_aula_duvida_resposta`, `trg_notif_comunidade_melhor_resposta` — triggers novos, só notificam (não creditam XP), notificam o dono do conteúdo (diferente de quem ganha XP pela ação).
 
-✅ **Gap resolvido**: o motor de gamificação (abaixo) agora credita `perfis.xp`/`nivel`/`moedas` de verdade — os gatilhos de "subiu de nível", "completou etapa" e "desbloqueou próxima etapa" deixaram de ser dormentes. Só `perfil_insignias` (insígnias visuais avulsas) segue sem gatilho vivo — não faz parte do catálogo de `gamificacao_gatilhos`.
+Todos os 11 tipos testados de ponta a ponta via SQL direto com usuários descartáveis (inclusive um cenário de 3 conquistas simultâneas — nível + curso + primeira aula no mesmo INSERT — e o dedupe de streak chamando `gam_calcular_streak` 3x seguidas), dados apagados ao final.
 
-### Admin
-Seção "Notificações": matriz `notif_tipos` (categoria → tipo → toggle por canal) + log das últimas notificações disparadas (suporte/debug).
+### Sino (`AvisosGlobais.tsx`)
+Já existia funcionando (leitura/marcar-lida), só faltava quem escrevesse — agora escreve. Ícones por tipo: celebração usa `Emblemas` variante `mono` (`Trofeu`/`Certificado`/`FogoStreak`/`XP`/`SeloNivel` — regra "conquista/status → Nível 2" já documentada), ação simples usa `Icones` Nível 1. Paginação: botão "Carregar mais" (`buscarMaisNotificacoes` em `app/avisos/actions.ts`), substituindo o `.limit(12)` fixo.
+
+### Toasts (`components/ConquistaToast.tsx`)
+5 tipos com identidade própria (nível — overlay full-screen com badge PNG de `public/niveis/`; avaliação aprovada — verde+dourado, `Trofeu`; curso concluído — capa do curso, `Certificado`; streak — `FogoStreak` pulsando + contador animado; primeira aula — `XP`). Montado em `app/layout.tsx` ao lado de `AvisosGlobais`.
+- **Detecção: polling a cada 8s, não Realtime.** Decisão deliberada — Realtime exigiria configurar publicação/canal autenticado pela primeira vez no projeto (nenhum precedente pra copiar); o ganho de latência não importa pro caso de uso (celebração, não chat). Pausa em `document.hidden` (`visibilitychange`), retoma com checagem imediata ao voltar o foco.
+- **Fila com prioridade** quando várias conquistas chegam juntas: `nivel_up > curso_concluido > avaliacao_aprovada > streak > primeira_aula`.
+- **Coordenação com o popup de certificado** (`AulaContent.tsx`): flag `sessionStorage['cert-popup-aberto']` setada quando o popup de certificado (já existente, com confete) abre e limpa quando fecha; o toast de `curso_concluido` espera essa flag limpar (com teto de ~10s) antes de aparecer, pra não duplicar festa quando os dois coincidem.
+
+### Sons (`lib/sons/`)
+Sintetizados via Web Audio API (osciladores + ruído filtrado via `AudioBuffer`) — **sem nenhum arquivo de áudio**. `lib/sons/index.ts` expõe só `tocarSom(tipo)`; cada tipo tem seu arquivo (`nivel.ts`, `avaliacao.ts`, `curso.ts`, `streak.ts`, `primeiraAula.ts`) — trocar por arquivo de áudio no futuro é só reescrever o corpo desses arquivos, os call sites não mudam. Volume mestre 40%. `AudioContext` criado lazy, com listener de `pointerdown`/`keydown` pra tentar destravar autoplay cedo; qualquer falha (autoplay bloqueado, contexto indisponível) é engolida em silêncio — o toast visual nunca depende do som. Toggle "Sons de conquista" em `/perfil` (`perfis.sons_conquista`).
+
+### Fora do escopo desta fase (fica pra Fase 2)
+Email/push/whatsapp (o catálogo `notif_tipos`/filas mencionado na spec antiga, se algum dia for necessário), calibragem dos textos/durações dos toasts, cron de lembretes de agenda/aniversário (pendência antiga, não relacionada a esta fase), notificação de "nova aula/avaliação publicada" e "boas-vindas" (não pedidas nesta missão).
 
 ## Gamificação (módulo 16 do admin)
 Motor de XP/moedas/níveis com gatilhos configuráveis. Fonte da verdade é um **ledger append-only** (`gamificacao_extrato`), não um contador incremental — todo crédito é uma linha nova, o saldo é a soma.
@@ -315,7 +325,7 @@ Testado via dev server local + toggle no banco com reversão imediata: `comunida
 2. ~~Gestão de Cursos → Módulos → Aulas, Trilhas/Etapas, Avaliações/Questões~~ ✅ feito (Bloco 1)
 3. ~~Desafios, Certificados, Comunidade, Agenda, Avisos/Novidades~~ ✅ feito (Bloco 2)
 4. ~~Gamificação (XP/moedas/níveis/gatilhos)~~ ✅ feito — ver seção acima
-5. Sistema de Notificações (Fase 1: in-app) — ver seção acima
+5. ~~Sistema de Notificações e Celebrações (Fase 1: in-app + toasts + sons)~~ ✅ feito — ver seção acima; Fase 2 (email/push/whatsapp) pendente
 6. ~~Configurações da plataforma + logo global~~ ✅ feito — ver seção acima
 7. ~~Financeiro Asaas (assinaturas, cobranças, webhooks liberam/suspendem acesso)~~ ✅ estrutura feita — ver seção acima; integração real (chaves, checkout, validação de webhook) pendente
 8. ~~Usuários~~ ✅ feito — ver seção acima (impersonação fica pra depois, ver pendência). Relatórios tem spec registrada (ver seção abaixo), construção adiada de propósito pra pós-lançamento.
