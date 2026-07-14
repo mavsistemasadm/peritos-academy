@@ -84,18 +84,17 @@ export default function AdminCertificadosContent({ certificados, cursos }: { cer
   )
 }
 
-function CursoCertificadoLinha({ curso, onErro }: { curso: CursoCertificavel; onErro: (e: string | null) => void }) {
+function CursoCertificadoLinha({ curso, onErro, onSucesso }: { curso: CursoCertificavel; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarCursoCertificado(curso.id, fd)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Configuração de certificado salva com sucesso'); router.refresh() }
     })
   }
 
