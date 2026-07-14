@@ -5,38 +5,39 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { TrilhaListaItem } from '@/lib/queries/admin-trilhas'
 import { criarTrilha, excluirTrilha } from '@/app/admin/trilhas/actions'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 export default function AdminTrilhasContent({ trilhas }: { trilhas: TrilhaListaItem[] }) {
   const router = useRouter()
+  const toast = useAdminToast()
   const [criando, setCriando] = useState(false)
   const [nome, setNome] = useState('')
-  const [erro, setErro] = useState<string | null>(null)
   const [pendente, startTransition] = useTransition()
 
   function onCriar() {
-    setErro(null)
-    if (nome.trim().length < 3) { setErro('Nome precisa ter pelo menos 3 caracteres.'); return }
+    if (nome.trim().length < 3) { toast.erro('Nome precisa ter pelo menos 3 caracteres.'); return }
     const fd = new FormData()
     fd.set('nome', nome)
     startTransition(async () => {
       const r = await criarTrilha(fd)
-      if (!r.ok) { setErro(r.erro); return }
+      if (!r.ok) { toast.erro(r.erro); return }
+      toast.sucesso('Trilha criada com sucesso')
       router.push(`/admin/trilhas/${r.id}`)
     })
   }
 
   function onExcluir(id: string, nome: string) {
     if (!confirm(`Excluir a trilha "${nome}"? Isso apaga suas etapas. Essa ação não pode ser desfeita.`)) return
-    setErro(null)
     startTransition(async () => {
       const r = await excluirTrilha(id)
-      if (!r.ok) setErro(r.erro)
-      else router.refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Trilha excluída com sucesso'); router.refresh() }
     })
   }
 
   return (
     <div className="ad-trilhas">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <div className="ad-cursos-cab">
         <div>
           <h1>Trilhas</h1>
@@ -46,8 +47,6 @@ export default function AdminTrilhasContent({ trilhas }: { trilhas: TrilhaListaI
           + Nova trilha
         </button>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       {criando && (
         <div className="ad-busca-card">

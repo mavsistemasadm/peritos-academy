@@ -6,16 +6,17 @@ import { useRouter } from 'next/navigation'
 import type { AvaliacaoListaItem } from '@/lib/queries/admin-avaliacoes'
 import type { CursoPicker } from '@/lib/queries/admin-trilhas'
 import { criarAvaliacao, alternarPublicacaoAvaliacao, excluirAvaliacao } from '@/app/admin/avaliacoes/actions'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 export default function AdminAvaliacoesContent({ avaliacoes, cursos, cursoFiltro }: {
   avaliacoes: AvaliacaoListaItem[]; cursos: CursoPicker[]; cursoFiltro: string
 }) {
   const router = useRouter()
+  const toast = useAdminToast()
   const [criando, setCriando] = useState(false)
   const [titulo, setTitulo] = useState('')
   const [cursoId, setCursoId] = useState(cursoFiltro || '')
   const [tipo, setTipo] = useState<'avaliacao' | 'prova'>('avaliacao')
-  const [erro, setErro] = useState<string | null>(null)
   const [pendente, startTransition] = useTransition()
 
   function onFiltrar(valor: string) {
@@ -23,41 +24,40 @@ export default function AdminAvaliacoesContent({ avaliacoes, cursos, cursoFiltro
   }
 
   function onCriar() {
-    setErro(null)
-    if (!cursoId) { setErro('Selecione um curso.'); return }
-    if (titulo.trim().length < 3) { setErro('Título precisa ter pelo menos 3 caracteres.'); return }
+    if (!cursoId) { toast.erro('Selecione um curso.'); return }
+    if (titulo.trim().length < 3) { toast.erro('Título precisa ter pelo menos 3 caracteres.'); return }
     const fd = new FormData()
     fd.set('curso_id', cursoId)
     fd.set('titulo', titulo)
     fd.set('tipo', tipo)
     startTransition(async () => {
       const r = await criarAvaliacao(fd)
-      if (!r.ok) { setErro(r.erro); return }
+      if (!r.ok) { toast.erro(r.erro); return }
+      toast.sucesso('Avaliação criada com sucesso')
       router.push(`/admin/avaliacoes/${r.id}`)
     })
   }
 
   function onAlternarPublicacao(id: string, curso_id: string, publicado: boolean) {
-    setErro(null)
     startTransition(async () => {
       const r = await alternarPublicacaoAvaliacao(id, curso_id, publicado)
-      if (!r.ok) setErro(r.erro)
-      else router.refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso(publicado ? 'Avaliação publicada com sucesso' : 'Avaliação voltou a rascunho'); router.refresh() }
     })
   }
 
   function onExcluir(id: string, curso_id: string, titulo: string) {
     if (!confirm(`Excluir a avaliação "${titulo}"? Isso apaga as questões vinculadas. Essa ação não pode ser desfeita.`)) return
-    setErro(null)
     startTransition(async () => {
       const r = await excluirAvaliacao(id, curso_id)
-      if (!r.ok) setErro(r.erro)
-      else router.refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Avaliação excluída com sucesso'); router.refresh() }
     })
   }
 
   return (
     <div className="ad-cursos">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <div className="ad-cursos-cab">
         <div>
           <h1>Avaliações</h1>
@@ -76,8 +76,6 @@ export default function AdminAvaliacoesContent({ avaliacoes, cursos, cursoFiltro
           ))}
         </select>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       {criando && (
         <div className="ad-busca-card">

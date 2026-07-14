@@ -6,41 +6,39 @@ import type { FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import type { CertificadoAdmin, CursoCertificavel } from '@/lib/queries/admin-certificados'
 import { revogarCertificado, reemitirCertificado, atualizarCursoCertificado } from '@/app/admin/certificados/actions'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 export default function AdminCertificadosContent({ certificados, cursos }: { certificados: CertificadoAdmin[]; cursos: CursoCertificavel[] }) {
   const router = useRouter()
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
   const [pendente, startTransition] = useTransition()
 
   function onRevogar(id: string, numero: string) {
     if (!confirm(`Revogar o certificado ${numero}? O aluno perde o certificado até que seja reemitido.`)) return
-    setErro(null)
     startTransition(async () => {
       const r = await revogarCertificado(id)
-      if (!r.ok) setErro(r.erro)
-      else router.refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Certificado revogado com sucesso'); router.refresh() }
     })
   }
 
   function onReemitir(id: string) {
-    setErro(null)
     startTransition(async () => {
       const r = await reemitirCertificado(id)
-      if (!r.ok) setErro(r.erro)
-      else router.refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Certificado reemitido com sucesso'); router.refresh() }
     })
   }
 
   return (
     <div className="ad-cursos">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <div className="ad-cursos-cab">
         <div>
           <h1>Certificados</h1>
           <p className="ad-sub">Certificados emitidos automaticamente ao concluir um curso com certificação.</p>
         </div>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       <section className="ad-card">
         <h2>Cursos com certificação</h2>
@@ -49,7 +47,7 @@ export default function AdminCertificadosContent({ certificados, cursos }: { cer
           <table className="ad-tabela">
             <thead><tr><th>Curso</th><th>Emite certificado</th><th>Carga horária (h)</th><th></th></tr></thead>
             <tbody>
-              {cursos.map(c => <CursoCertificadoLinha key={c.id} curso={c} onErro={setErro} />)}
+              {cursos.map(c => <CursoCertificadoLinha key={c.id} curso={c} onErro={toast.erro} onSucesso={toast.sucesso} />)}
             </tbody>
           </table>
         </div>

@@ -12,6 +12,7 @@ import {
   criarCapitulo, excluirCapitulo, uploadMateriais, renomearMaterial, moverMaterial, excluirMaterial,
 } from '@/app/admin/cursos/actions'
 import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconePencil, IconeTrash, IconeUpload } from '@/components/Icones'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 function segParaLabel(seg: number) {
   const m = Math.floor(seg / 60)
@@ -21,7 +22,7 @@ function segParaLabel(seg: number) {
 
 export default function AdminCursoEditorContent({ curso, modulos }: { curso: CursoAdmin; modulos: ModuloAdmin[] }) {
   const router = useRouter()
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
   const [pendente, startTransition] = useTransition()
   const [moduloExpandido, setModuloExpandido] = useState<string | null>(modulos[0]?.id ?? null)
   const [aulaExpandida, setAulaExpandida] = useState<string | null>(null)
@@ -31,61 +32,57 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
 
   function onSalvarDados(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarCurso(curso.id, fd)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Dados gerais salvos com sucesso'); refresh() }
     })
   }
 
   function onUploadCapa(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    setErro(null)
     const fd = new FormData()
     fd.set('capa', file)
     startTransition(async () => {
       const r = await uploadCapaCurso(curso.id, fd)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Capa atualizada com sucesso'); refresh() }
     })
   }
 
   function onAlternarPublicacao(publicado: boolean) {
-    setErro(null)
     startTransition(async () => {
       const r = await alternarPublicacaoCurso(curso.id, publicado)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso(publicado ? 'Curso publicado com sucesso' : 'Curso voltou a rascunho'); refresh() }
     })
   }
 
   function onExcluirCurso() {
     if (!confirm(`Excluir o curso "${curso.titulo}"? Isso apaga módulos, aulas e avaliações vinculadas. Essa ação não pode ser desfeita.`)) return
-    setErro(null)
     startTransition(async () => {
       const r = await excluirCurso(curso.id)
-      if (!r.ok) setErro(r.erro)
+      if (!r.ok) toast.erro(r.erro)
       else router.push('/admin/cursos')
     })
   }
 
   function onCriarModulo() {
     if (!novoModuloTitulo.trim()) return
-    setErro(null)
     const fd = new FormData()
     fd.set('titulo', novoModuloTitulo)
     startTransition(async () => {
       const r = await criarModulo(curso.id, fd)
-      if (!r.ok) setErro(r.erro)
-      else { setNovoModuloTitulo(''); refresh() }
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Módulo criado com sucesso'); setNovoModuloTitulo(''); refresh() }
     })
   }
 
   return (
     <div className="ad-curso-editor">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <a href="/admin/cursos" className="ad-voltar"><IconeChevronLeft size={14} /> Cursos</a>
       <div className="ad-editor-cab">
         <h1>{curso.titulo}</h1>
@@ -97,8 +94,6 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
           <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={onExcluirCurso}>Excluir curso</button>
         </div>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       <div className="ad-editor-grid">
         <section className="ad-card">
@@ -194,7 +189,8 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
               aulaExpandida={aulaExpandida}
               onToggle={() => setModuloExpandido(moduloExpandido === m.id ? null : m.id)}
               onToggleAula={id => setAulaExpandida(aulaExpandida === id ? null : id)}
-              onErro={setErro}
+              onErro={toast.erro}
+              onSucesso={toast.sucesso}
               onRefresh={refresh}
             />
           ))}
@@ -205,7 +201,7 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
 }
 
 function ModuloBloco({
-  modulo, cursoId, indice, total, expandido, aulaExpandida, onToggle, onToggleAula, onErro, onRefresh,
+  modulo, cursoId, indice, total, expandido, aulaExpandida, onToggle, onToggleAula, onErro, onSucesso, onRefresh,
 }: {
   modulo: ModuloAdmin
   cursoId: string
@@ -215,7 +211,8 @@ function ModuloBloco({
   aulaExpandida: string | null
   onToggle: () => void
   onToggleAula: (id: string) => void
-  onErro: (erro: string | null) => void
+  onErro: (erro: string) => void
+  onSucesso: (m: string) => void
   onRefresh: () => void
 }) {
   const [pendente, startTransition] = useTransition()
@@ -225,18 +222,16 @@ function ModuloBloco({
 
   function onSalvarTitulo() {
     if (!titulo.trim()) return
-    onErro(null)
     const fd = new FormData()
     fd.set('titulo', titulo)
     startTransition(async () => {
       const r = await atualizarModulo(modulo.id, cursoId, fd)
       if (!r.ok) onErro(r.erro)
-      else { setEditando(false); onRefresh() }
+      else { onSucesso('Módulo renomeado com sucesso'); setEditando(false); onRefresh() }
     })
   }
 
   function onMover(direcao: 'up' | 'down') {
-    onErro(null)
     startTransition(async () => {
       const r = await moverModulo(cursoId, modulo.id, direcao)
       if (!r.ok) onErro(r.erro)
@@ -246,23 +241,21 @@ function ModuloBloco({
 
   function onExcluir() {
     if (!confirm(`Excluir o módulo "${modulo.titulo}" e todas as suas aulas?`)) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirModulo(modulo.id, cursoId)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Módulo excluído com sucesso'); onRefresh() }
     })
   }
 
   function onCriarAula() {
     if (!novaAulaTitulo.trim()) return
-    onErro(null)
     const fd = new FormData()
     fd.set('titulo', novaAulaTitulo)
     startTransition(async () => {
       const r = await criarAula(modulo.id, cursoId, fd)
       if (!r.ok) onErro(r.erro)
-      else { setNovaAulaTitulo(''); onRefresh() }
+      else { onSucesso('Aula criada com sucesso'); setNovaAulaTitulo(''); onRefresh() }
     })
   }
 
@@ -304,6 +297,7 @@ function ModuloBloco({
               expandida={aulaExpandida === a.id}
               onToggle={() => onToggleAula(a.id)}
               onErro={onErro}
+              onSucesso={onSucesso}
               onRefresh={onRefresh}
             />
           ))}
@@ -318,7 +312,7 @@ function ModuloBloco({
 }
 
 function AulaBloco({
-  aula, cursoId, moduloId, indice, total, expandida, onToggle, onErro, onRefresh,
+  aula, cursoId, moduloId, indice, total, expandida, onToggle, onErro, onSucesso, onRefresh,
 }: {
   aula: AulaAdmin
   cursoId: string
@@ -327,13 +321,13 @@ function AulaBloco({
   total: number
   expandida: boolean
   onToggle: () => void
-  onErro: (erro: string | null) => void
+  onErro: (erro: string) => void
+  onSucesso: (m: string) => void
   onRefresh: () => void
 }) {
   const [pendente, startTransition] = useTransition()
 
   function onMover(direcao: 'up' | 'down') {
-    onErro(null)
     startTransition(async () => {
       const r = await moverAula(moduloId, cursoId, aula.id, direcao)
       if (!r.ok) onErro(r.erro)
@@ -343,35 +337,32 @@ function AulaBloco({
 
   function onExcluir() {
     if (!confirm(`Excluir a aula "${aula.titulo}"?`)) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirAula(aula.id, cursoId)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Aula excluída com sucesso'); onRefresh() }
     })
   }
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarAula(aula.id, cursoId, fd)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Aula salva com sucesso'); onRefresh() }
     })
   }
 
   function onUploadCapa(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    onErro(null)
     const fd = new FormData()
     fd.set('capa', file)
     startTransition(async () => {
       const r = await uploadCapaAula(aula.id, cursoId, fd)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Capa da aula atualizada com sucesso'); onRefresh() }
     })
   }
 
@@ -428,16 +419,16 @@ function AulaBloco({
             </label>
           </div>
 
-          <CapitulosBloco aula={aula} cursoId={cursoId} onErro={onErro} onRefresh={onRefresh} />
-          <MateriaisBloco aula={aula} cursoId={cursoId} onErro={onErro} onRefresh={onRefresh} />
+          <CapitulosBloco aula={aula} cursoId={cursoId} onErro={onErro} onSucesso={onSucesso} onRefresh={onRefresh} />
+          <MateriaisBloco aula={aula} cursoId={cursoId} onErro={onErro} onSucesso={onSucesso} onRefresh={onRefresh} />
         </div>
       )}
     </div>
   )
 }
 
-function CapitulosBloco({ aula, cursoId, onErro, onRefresh }: {
-  aula: AulaAdmin; cursoId: string; onErro: (e: string | null) => void; onRefresh: () => void
+function CapitulosBloco({ aula, cursoId, onErro, onSucesso, onRefresh }: {
+  aula: AulaAdmin; cursoId: string; onErro: (e: string) => void; onSucesso: (m: string) => void; onRefresh: () => void
 }) {
   const [pendente, startTransition] = useTransition()
   const [titulo, setTitulo] = useState('')
@@ -445,23 +436,21 @@ function CapitulosBloco({ aula, cursoId, onErro, onRefresh }: {
 
   function onCriar() {
     if (!titulo.trim()) return
-    onErro(null)
     const fd = new FormData()
     fd.set('titulo', titulo)
     fd.set('tempo_seg', tempo || '0')
     startTransition(async () => {
       const r = await criarCapitulo(aula.id, cursoId, fd)
       if (!r.ok) onErro(r.erro)
-      else { setTitulo(''); setTempo(''); onRefresh() }
+      else { onSucesso('Capítulo criado com sucesso'); setTitulo(''); setTempo(''); onRefresh() }
     })
   }
 
   function onExcluir(id: string) {
-    onErro(null)
     startTransition(async () => {
       const r = await excluirCapitulo(id, cursoId)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Capítulo excluído com sucesso'); onRefresh() }
     })
   }
 
@@ -493,8 +482,8 @@ function fmtBytes(bytes: number | null) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-function MateriaisBloco({ aula, cursoId, onErro, onRefresh }: {
-  aula: AulaAdmin; cursoId: string; onErro: (e: string | null) => void; onRefresh: () => void
+function MateriaisBloco({ aula, cursoId, onErro, onSucesso, onRefresh }: {
+  aula: AulaAdmin; cursoId: string; onErro: (e: string) => void; onSucesso: (m: string) => void; onRefresh: () => void
 }) {
   const [pendente, startTransition] = useTransition()
   const [editandoId, setEditandoId] = useState<string | null>(null)
@@ -503,28 +492,25 @@ function MateriaisBloco({ aula, cursoId, onErro, onRefresh }: {
   function onUpload(e: ChangeEvent<HTMLInputElement>) {
     const arquivos = e.target.files
     if (!arquivos || arquivos.length === 0) return
-    onErro(null)
     const fd = new FormData()
     Array.from(arquivos).forEach(f => fd.append('arquivos', f))
     startTransition(async () => {
       const r = await uploadMateriais(aula.id, cursoId, fd)
       if (!r.ok) onErro(r.erro)
-      else { e.target.value = ''; onRefresh() }
+      else { onSucesso('Materiais enviados com sucesso'); e.target.value = ''; onRefresh() }
     })
   }
 
   function onSalvarNome(id: string) {
     if (!nomeEditado.trim()) return
-    onErro(null)
     startTransition(async () => {
       const r = await renomearMaterial(id, cursoId, nomeEditado)
       if (!r.ok) onErro(r.erro)
-      else { setEditandoId(null); onRefresh() }
+      else { onSucesso('Material renomeado com sucesso'); setEditandoId(null); onRefresh() }
     })
   }
 
   function onMover(id: string, direcao: 'up' | 'down') {
-    onErro(null)
     startTransition(async () => {
       const r = await moverMaterial(aula.id, cursoId, id, direcao)
       if (!r.ok) onErro(r.erro)
@@ -534,11 +520,10 @@ function MateriaisBloco({ aula, cursoId, onErro, onRefresh }: {
 
   function onExcluir(id: string, nome: string) {
     if (!confirm(`Excluir o material "${nome}"? Essa ação não pode ser desfeita.`)) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirMaterial(id, cursoId)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Material excluído com sucesso'); onRefresh() }
     })
   }
 

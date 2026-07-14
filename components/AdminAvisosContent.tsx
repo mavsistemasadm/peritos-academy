@@ -9,23 +9,24 @@ import {
   criarNovidade, atualizarNovidade, alternarPublicacaoNovidade, excluirNovidade, uploadImagemNovidade,
 } from '@/app/admin/avisos/actions'
 import { IconeTrash } from '@/components/Icones'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 export default function AdminAvisosContent({ novidades }: { novidades: NovidadeAdmin[] }) {
   const router = useRouter()
+  const toast = useAdminToast()
   const [criando, setCriando] = useState(false)
   const [titulo, setTitulo] = useState('')
-  const [erro, setErro] = useState<string | null>(null)
   const [pendente, startTransition] = useTransition()
   const [expandido, setExpandido] = useState<string | null>(null)
 
   function onCriar() {
-    setErro(null)
-    if (!titulo.trim()) { setErro('Título é obrigatório.'); return }
+    if (!titulo.trim()) { toast.erro('Título é obrigatório.'); return }
     const fd = new FormData()
     fd.set('titulo', titulo)
     startTransition(async () => {
       const r = await criarNovidade(fd)
-      if (!r.ok) { setErro(r.erro); return }
+      if (!r.ok) { toast.erro(r.erro); return }
+      toast.sucesso('Aviso criado com sucesso')
       setTitulo(''); setCriando(false)
       if (r.id) setExpandido(r.id)
       router.refresh()
@@ -34,6 +35,7 @@ export default function AdminAvisosContent({ novidades }: { novidades: NovidadeA
 
   return (
     <div className="ad-cursos">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <div className="ad-cursos-cab">
         <div>
           <h1>Avisos e novidades</h1>
@@ -41,8 +43,6 @@ export default function AdminAvisosContent({ novidades }: { novidades: NovidadeA
         </div>
         <button type="button" className="ad-btn-primario" onClick={() => setCriando(v => !v)}>+ Novo aviso</button>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       {criando && (
         <div className="ad-busca-card">
@@ -59,15 +59,15 @@ export default function AdminAvisosContent({ novidades }: { novidades: NovidadeA
       <div className="ad-modulos-lista">
         {novidades.length === 0 && <p className="ad-vazio">Nenhum aviso cadastrado ainda.</p>}
         {novidades.map(n => (
-          <NovidadeBloco key={n.id} novidade={n} expandido={expandido === n.id} onToggle={() => setExpandido(expandido === n.id ? null : n.id)} onErro={setErro} />
+          <NovidadeBloco key={n.id} novidade={n} expandido={expandido === n.id} onToggle={() => setExpandido(expandido === n.id ? null : n.id)} onErro={toast.erro} onSucesso={toast.sucesso} />
         ))}
       </div>
     </div>
   )
 }
 
-function NovidadeBloco({ novidade, expandido, onToggle, onErro }: {
-  novidade: NovidadeAdmin; expandido: boolean; onToggle: () => void; onErro: (e: string | null) => void
+function NovidadeBloco({ novidade, expandido, onToggle, onErro, onSucesso }: {
+  novidade: NovidadeAdmin; expandido: boolean; onToggle: () => void; onErro: (e: string) => void; onSucesso: (m: string) => void
 }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
@@ -76,44 +76,40 @@ function NovidadeBloco({ novidade, expandido, onToggle, onErro }: {
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarNovidade(novidade.id, fd)
       if (!r.ok) onErro(r.erro)
-      else refresh()
+      else { onSucesso('Aviso salvo com sucesso'); refresh() }
     })
   }
 
   function onUploadImagem(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    onErro(null)
     const fd = new FormData()
     fd.set('imagem', file)
     startTransition(async () => {
       const r = await uploadImagemNovidade(novidade.id, fd)
       if (!r.ok) onErro(r.erro)
-      else refresh()
+      else { onSucesso('Imagem atualizada com sucesso'); refresh() }
     })
   }
 
   function onAlternarPublicacao(publicado: boolean) {
-    onErro(null)
     startTransition(async () => {
       const r = await alternarPublicacaoNovidade(novidade.id, publicado)
       if (!r.ok) onErro(r.erro)
-      else refresh()
+      else { onSucesso(publicado ? 'Aviso publicado com sucesso' : 'Aviso voltou a rascunho'); refresh() }
     })
   }
 
   function onExcluir() {
     if (!confirm(`Excluir o aviso "${novidade.titulo}"?`)) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirNovidade(novidade.id)
       if (!r.ok) onErro(r.erro)
-      else refresh()
+      else { onSucesso('Aviso excluído com sucesso'); refresh() }
     })
   }
 

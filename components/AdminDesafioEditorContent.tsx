@@ -12,6 +12,7 @@ import {
 } from '@/app/admin/desafios/actions'
 import { baixarDocumento } from '@/app/desafios/actions'
 import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconeTrash } from '@/components/Icones'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 function segParaLabel(seg: number | null) {
   if (seg === null) return '—'
@@ -24,7 +25,7 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
   desafio: DesafioAdmin; categorias: CategoriaAdmin[]; entregas: EntregaAdmin[]
 }) {
   const router = useRouter()
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
   const [pendente, startTransition] = useTransition()
   const [quesitoExpandido, setQuesitoExpandido] = useState<number | null>(null)
   const [novoTipo, setNovoTipo] = useState<Quesito['tipo']>('valor')
@@ -33,67 +34,63 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
 
   function onSalvarDados(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarDesafio(desafio.id, fd)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Dados gerais salvos com sucesso'); refresh() }
     })
   }
 
   function onUploadCapa(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    setErro(null)
     const fd = new FormData()
     fd.set('capa', file)
     startTransition(async () => {
       const r = await uploadCapaDesafio(desafio.id, fd)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Capa atualizada com sucesso'); refresh() }
     })
   }
 
   function onAlternarPublicacao(publicado: boolean) {
-    setErro(null)
     startTransition(async () => {
       const r = await alternarPublicacaoDesafio(desafio.id, publicado)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso(publicado ? 'Desafio publicado com sucesso' : 'Desafio voltou a rascunho'); refresh() }
     })
   }
 
   function onExcluirDesafio() {
     if (!confirm(`Excluir o desafio "${desafio.titulo}"? Essa ação não pode ser desfeita.`)) return
-    setErro(null)
     startTransition(async () => {
       const r = await excluirDesafio(desafio.id)
-      if (!r.ok) setErro(r.erro)
+      if (!r.ok) toast.erro(r.erro)
       else router.push('/admin/desafios')
     })
   }
 
   function onCriarQuesito() {
-    setErro(null)
     const fd = new FormData()
     fd.set('tipo', novoTipo)
     fd.set('enunciado', 'Nova questão — edite o enunciado abaixo')
     startTransition(async () => {
       const r = await adicionarQuesito(desafio.id, fd)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Quesito criado com sucesso'); refresh() }
     })
   }
 
   async function onBaixar(path: string) {
     const r = await baixarDocumento(path)
-    if (!r.ok) { setErro(r.erro); return }
+    if (!r.ok) { toast.erro(r.erro); return }
     window.open(r.url, '_blank')
   }
 
   return (
     <div className="ad-curso-editor">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <a href="/admin/desafios" className="ad-voltar"><IconeChevronLeft size={14} /> Desafios</a>
       <div className="ad-editor-cab">
         <h1>{desafio.numero ? `#${desafio.numero} — ` : ''}{desafio.titulo}</h1>
@@ -105,8 +102,6 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
           <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={onExcluirDesafio}>Excluir desafio</button>
         </div>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       <div className="ad-editor-grid">
         <section className="ad-card">
@@ -186,11 +181,11 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
               <span>{doc.nome}</span>
               <span className="ad-sublista-meta">{doc.formato.toUpperCase()} · {doc.tamanho_kb} KB</span>
               <button type="button" className="ad-btn-secundario" onClick={() => onBaixar(doc.path)}>Baixar</button>
-              <DocumentoExcluirBotao desafioId={desafio.id} indice={i} onErro={setErro} onRefresh={refresh} />
+              <DocumentoExcluirBotao desafioId={desafio.id} indice={i} onErro={toast.erro} onSucesso={toast.sucesso} onRefresh={refresh} />
             </li>
           ))}
         </ul>
-        <NovoDocumentoForm desafioId={desafio.id} onErro={setErro} onRefresh={refresh} />
+        <NovoDocumentoForm desafioId={desafio.id} onErro={toast.erro} onSucesso={toast.sucesso} onRefresh={refresh} />
       </section>
 
       <section className="ad-card">
@@ -198,7 +193,7 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
         {desafio.gabaritoPath
           ? <div className="ad-nova-linha"><span>{desafio.gabaritoPath.split('/').pop()}</span><button type="button" className="ad-btn-secundario" onClick={() => onBaixar(desafio.gabaritoPath!)}>Baixar</button></div>
           : <p className="ad-vazio-sm">Nenhum gabarito enviado ainda.</p>}
-        <GabaritoForm desafioId={desafio.id} onErro={setErro} onRefresh={refresh} />
+        <GabaritoForm desafioId={desafio.id} onErro={toast.erro} onSucesso={toast.sucesso} onRefresh={refresh} />
       </section>
 
       <section className="ad-card">
@@ -224,7 +219,8 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
               total={desafio.quesitos.length}
               expandido={quesitoExpandido === i}
               onToggle={() => setQuesitoExpandido(quesitoExpandido === i ? null : i)}
-              onErro={setErro}
+              onErro={toast.erro}
+              onSucesso={toast.sucesso}
               onRefresh={refresh}
             />
           ))}
@@ -260,15 +256,14 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
   )
 }
 
-function QuesitoBloco({ quesito, indice, desafioId, total, expandido, onToggle, onErro, onRefresh }: {
+function QuesitoBloco({ quesito, indice, desafioId, total, expandido, onToggle, onErro, onSucesso, onRefresh }: {
   quesito: Quesito; indice: number; desafioId: string; total: number; expandido: boolean
-  onToggle: () => void; onErro: (e: string | null) => void; onRefresh: () => void
+  onToggle: () => void; onErro: (e: string) => void; onSucesso: (m: string) => void; onRefresh: () => void
 }) {
   const [pendente, startTransition] = useTransition()
   const [tipo, setTipo] = useState(quesito.tipo)
 
   function onMover(direcao: 'up' | 'down') {
-    onErro(null)
     startTransition(async () => {
       const r = await moverQuesito(desafioId, indice, direcao)
       if (!r.ok) onErro(r.erro)
@@ -278,22 +273,20 @@ function QuesitoBloco({ quesito, indice, desafioId, total, expandido, onToggle, 
 
   function onExcluir() {
     if (!confirm('Excluir este quesito?')) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirQuesito(desafioId, indice)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Quesito excluído com sucesso'); onRefresh() }
     })
   }
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarQuesito(desafioId, indice, fd)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Quesito salvo com sucesso'); onRefresh() }
     })
   }
 
@@ -353,7 +346,7 @@ function QuesitoBloco({ quesito, indice, desafioId, total, expandido, onToggle, 
   )
 }
 
-function NovoDocumentoForm({ desafioId, onErro, onRefresh }: { desafioId: string; onErro: (e: string | null) => void; onRefresh: () => void }) {
+function NovoDocumentoForm({ desafioId, onErro, onSucesso, onRefresh }: { desafioId: string; onErro: (e: string) => void; onSucesso: (m: string) => void; onRefresh: () => void }) {
   const [pendente, startTransition] = useTransition()
   const [nome, setNome] = useState('')
 
@@ -361,14 +354,13 @@ function NovoDocumentoForm({ desafioId, onErro, onRefresh }: { desafioId: string
     const file = e.target.files?.[0]
     if (!file) return
     if (!nome.trim()) { onErro('Informe o nome do documento antes de escolher o arquivo.'); return }
-    onErro(null)
     const fd = new FormData()
     fd.set('nome', nome)
     fd.set('arquivo', file)
     startTransition(async () => {
       const r = await uploadDocumento(desafioId, fd)
       if (!r.ok) onErro(r.erro)
-      else { setNome(''); onRefresh() }
+      else { onSucesso('Documento enviado com sucesso'); setNome(''); onRefresh() }
     })
   }
 
@@ -383,32 +375,30 @@ function NovoDocumentoForm({ desafioId, onErro, onRefresh }: { desafioId: string
   )
 }
 
-function DocumentoExcluirBotao({ desafioId, indice, onErro, onRefresh }: { desafioId: string; indice: number; onErro: (e: string | null) => void; onRefresh: () => void }) {
+function DocumentoExcluirBotao({ desafioId, indice, onErro, onSucesso, onRefresh }: { desafioId: string; indice: number; onErro: (e: string) => void; onSucesso: (m: string) => void; onRefresh: () => void }) {
   const [pendente, startTransition] = useTransition()
   function onExcluir() {
-    onErro(null)
     startTransition(async () => {
       const r = await excluirDocumento(desafioId, indice)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Documento excluído com sucesso'); onRefresh() }
     })
   }
   return <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir}><IconeTrash size={13} /></button>
 }
 
-function GabaritoForm({ desafioId, onErro, onRefresh }: { desafioId: string; onErro: (e: string | null) => void; onRefresh: () => void }) {
+function GabaritoForm({ desafioId, onErro, onSucesso, onRefresh }: { desafioId: string; onErro: (e: string) => void; onSucesso: (m: string) => void; onRefresh: () => void }) {
   const [pendente, startTransition] = useTransition()
 
   function onEnviar(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    onErro(null)
     const fd = new FormData()
     fd.set('arquivo', file)
     startTransition(async () => {
       const r = await uploadGabarito(desafioId, fd)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Gabarito enviado com sucesso'); onRefresh() }
     })
   }
 

@@ -8,6 +8,7 @@ import type { EventoAdmin } from '@/lib/queries/admin-agenda'
 import type { CursoPicker } from '@/lib/queries/admin-trilhas'
 import { atualizarEvento, uploadThumbEvento, alternarPublicacaoEvento, excluirEvento } from '@/app/admin/agenda/actions'
 import { IconeChevronLeft } from '@/components/Icones'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 function paraDatetimeLocal(iso: string | null) {
   if (!iso) return ''
@@ -18,56 +19,53 @@ function paraDatetimeLocal(iso: string | null) {
 
 export default function AdminEventoEditorContent({ evento, cursos }: { evento: EventoAdmin; cursos: CursoPicker[] }) {
   const router = useRouter()
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
   const [pendente, startTransition] = useTransition()
 
   function refresh() { router.refresh() }
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarEvento(evento.id, fd)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Evento salvo com sucesso'); refresh() }
     })
   }
 
   function onUploadThumb(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    setErro(null)
     const fd = new FormData()
     fd.set('thumb', file)
     startTransition(async () => {
       const r = await uploadThumbEvento(evento.id, fd)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Thumbnail atualizada com sucesso'); refresh() }
     })
   }
 
   function onAlternarPublicacao(publicado: boolean) {
-    setErro(null)
     startTransition(async () => {
       const r = await alternarPublicacaoEvento(evento.id, publicado)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso(publicado ? 'Evento publicado com sucesso' : 'Evento voltou a rascunho'); refresh() }
     })
   }
 
   function onExcluir() {
     if (!confirm(`Excluir o evento "${evento.titulo}"?`)) return
-    setErro(null)
     startTransition(async () => {
       const r = await excluirEvento(evento.id)
-      if (!r.ok) setErro(r.erro)
+      if (!r.ok) toast.erro(r.erro)
       else router.push('/admin/agenda')
     })
   }
 
   return (
     <div className="ad-curso-editor">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <a href="/admin/agenda" className="ad-voltar"><IconeChevronLeft size={14} /> Agenda</a>
       <div className="ad-editor-cab">
         <h1>{evento.titulo}</h1>
@@ -79,8 +77,6 @@ export default function AdminEventoEditorContent({ evento, cursos }: { evento: E
           <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={onExcluir}>Excluir evento</button>
         </div>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       <div className="ad-editor-grid">
         <section className="ad-card">

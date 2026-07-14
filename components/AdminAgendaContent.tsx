@@ -5,6 +5,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { EventoAdmin } from '@/lib/queries/admin-agenda'
 import { criarEvento, alternarPublicacaoEvento, excluirEvento } from '@/app/admin/agenda/actions'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 const NOME_TIPO: Record<string, string> = {
   sala_analise: 'Sala de análise', aula_ao_vivo: 'Aula ao vivo', plantao: 'Plantão',
@@ -13,46 +14,45 @@ const NOME_TIPO: Record<string, string> = {
 
 export default function AdminAgendaContent({ eventos }: { eventos: EventoAdmin[] }) {
   const router = useRouter()
+  const toast = useAdminToast()
   const [criando, setCriando] = useState(false)
   const [titulo, setTitulo] = useState('')
   const [tipo, setTipo] = useState('aula_ao_vivo')
-  const [erro, setErro] = useState<string | null>(null)
   const [pendente, startTransition] = useTransition()
 
   function onCriar() {
-    setErro(null)
-    if (titulo.trim().length < 3) { setErro('Título precisa ter pelo menos 3 caracteres.'); return }
+    if (titulo.trim().length < 3) { toast.erro('Título precisa ter pelo menos 3 caracteres.'); return }
     const fd = new FormData()
     fd.set('titulo', titulo)
     fd.set('tipo', tipo)
     startTransition(async () => {
       const r = await criarEvento(fd)
-      if (!r.ok) { setErro(r.erro); return }
+      if (!r.ok) { toast.erro(r.erro); return }
+      toast.sucesso('Evento criado com sucesso')
       router.push(`/admin/agenda/${r.id}`)
     })
   }
 
   function onAlternarPublicacao(id: string, publicado: boolean) {
-    setErro(null)
     startTransition(async () => {
       const r = await alternarPublicacaoEvento(id, publicado)
-      if (!r.ok) setErro(r.erro)
-      else router.refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso(publicado ? 'Evento publicado com sucesso' : 'Evento voltou a rascunho'); router.refresh() }
     })
   }
 
   function onExcluir(id: string, titulo: string) {
     if (!confirm(`Excluir o evento "${titulo}"?`)) return
-    setErro(null)
     startTransition(async () => {
       const r = await excluirEvento(id)
-      if (!r.ok) setErro(r.erro)
-      else router.refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Evento excluído com sucesso'); router.refresh() }
     })
   }
 
   return (
     <div className="ad-cursos">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <div className="ad-cursos-cab">
         <div>
           <h1>Agenda</h1>
@@ -60,8 +60,6 @@ export default function AdminAgendaContent({ eventos }: { eventos: EventoAdmin[]
         </div>
         <button type="button" className="ad-btn-primario" onClick={() => setCriando(v => !v)}>+ Novo evento</button>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       {criando && (
         <div className="ad-busca-card">

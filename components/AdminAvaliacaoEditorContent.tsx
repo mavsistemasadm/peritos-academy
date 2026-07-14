@@ -11,12 +11,13 @@ import {
   criarOpcao, marcarOpcaoCorreta, excluirOpcao,
 } from '@/app/admin/avaliacoes/actions'
 import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconeTrash } from '@/components/Icones'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modulos }: {
   avaliacao: AvaliacaoAdmin; questoes: QuestaoAdmin[]; modulos: ModuloPicker[]
 }) {
   const router = useRouter()
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
   const [pendente, startTransition] = useTransition()
   const [tipo, setTipo] = useState(avaliacao.tipo)
   const [questaoExpandida, setQuestaoExpandida] = useState<string | null>(questoes[0]?.id ?? null)
@@ -26,62 +27,58 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
 
   function onSalvarDados(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarAvaliacao(avaliacao.id, avaliacao.cursoId, fd)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Dados gerais salvos com sucesso'); refresh() }
     })
   }
 
   function onUploadCapa(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    setErro(null)
     const fd = new FormData()
     fd.set('capa', file)
     startTransition(async () => {
       const r = await uploadCapaAvaliacao(avaliacao.id, avaliacao.cursoId, fd)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Capa atualizada com sucesso'); refresh() }
     })
   }
 
   function onAlternarPublicacao(publicado: boolean) {
-    setErro(null)
     startTransition(async () => {
       const r = await alternarPublicacaoAvaliacao(avaliacao.id, avaliacao.cursoId, publicado)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso(publicado ? 'Avaliação publicada com sucesso' : 'Avaliação voltou a rascunho'); refresh() }
     })
   }
 
   function onExcluir() {
     if (!confirm(`Excluir a avaliação "${avaliacao.titulo}"? Isso apaga as questões vinculadas.`)) return
-    setErro(null)
     startTransition(async () => {
       const r = await excluirAvaliacao(avaliacao.id, avaliacao.cursoId)
-      if (!r.ok) setErro(r.erro)
+      if (!r.ok) toast.erro(r.erro)
       else router.push('/admin/avaliacoes')
     })
   }
 
   function onCriarQuestao() {
-    setErro(null)
     const fd = new FormData()
     fd.set('tipo', novoTipo)
     fd.set('enunciado', 'Nova questão — edite o enunciado abaixo')
     if (novoTipo === 'valor') fd.set('resposta_valor', '0')
     startTransition(async () => {
       const r = await criarQuestao(avaliacao.id, avaliacao.cursoId, fd)
-      if (!r.ok) setErro(r.erro)
-      else refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Questão criada com sucesso'); refresh() }
     })
   }
 
   return (
     <div className="ad-curso-editor">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <a href="/admin/avaliacoes" className="ad-voltar"><IconeChevronLeft size={14} /> Avaliações</a>
       <div className="ad-editor-cab">
         <h1>{avaliacao.titulo}{avaliacao.numeroCaso ? <span className="ad-caso-numero"> · Caso #{avaliacao.numeroCaso}</span> : null}</h1>
@@ -93,8 +90,6 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
           <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={onExcluir}>Excluir avaliação</button>
         </div>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       <div className="ad-editor-grid">
         <section className="ad-card">
@@ -169,7 +164,8 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
               total={questoes.length}
               expandida={questaoExpandida === q.id}
               onToggle={() => setQuestaoExpandida(questaoExpandida === q.id ? null : q.id)}
-              onErro={setErro}
+              onErro={toast.erro}
+              onSucesso={toast.sucesso}
               onRefresh={refresh}
             />
           ))}
@@ -179,7 +175,7 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
   )
 }
 
-function QuestaoBloco({ questao, avaliacaoId, cursoId, indice, total, expandida, onToggle, onErro, onRefresh }: {
+function QuestaoBloco({ questao, avaliacaoId, cursoId, indice, total, expandida, onToggle, onErro, onSucesso, onRefresh }: {
   questao: QuestaoAdmin
   avaliacaoId: string
   cursoId: string
@@ -187,7 +183,8 @@ function QuestaoBloco({ questao, avaliacaoId, cursoId, indice, total, expandida,
   total: number
   expandida: boolean
   onToggle: () => void
-  onErro: (erro: string | null) => void
+  onErro: (erro: string) => void
+  onSucesso: (mensagem: string) => void
   onRefresh: () => void
 }) {
   const [pendente, startTransition] = useTransition()
@@ -195,7 +192,6 @@ function QuestaoBloco({ questao, avaliacaoId, cursoId, indice, total, expandida,
   const [novaOpcaoTexto, setNovaOpcaoTexto] = useState('')
 
   function onMover(direcao: 'up' | 'down') {
-    onErro(null)
     startTransition(async () => {
       const r = await moverQuestao(avaliacaoId, cursoId, questao.id, direcao)
       if (!r.ok) onErro(r.erro)
@@ -205,39 +201,35 @@ function QuestaoBloco({ questao, avaliacaoId, cursoId, indice, total, expandida,
 
   function onExcluir() {
     if (!confirm('Excluir esta questão e suas opções?')) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirQuestao(questao.id, avaliacaoId, cursoId)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Questão excluída com sucesso'); onRefresh() }
     })
   }
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarQuestao(questao.id, avaliacaoId, cursoId, fd)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Questão salva com sucesso'); onRefresh() }
     })
   }
 
   function onCriarOpcao() {
     if (!novaOpcaoTexto.trim()) return
-    onErro(null)
     const fd = new FormData()
     fd.set('texto', novaOpcaoTexto)
     startTransition(async () => {
       const r = await criarOpcao(questao.id, avaliacaoId, cursoId, fd)
       if (!r.ok) onErro(r.erro)
-      else { setNovaOpcaoTexto(''); onRefresh() }
+      else { onSucesso('Opção criada com sucesso'); setNovaOpcaoTexto(''); onRefresh() }
     })
   }
 
   function onMarcarCorreta(opcaoId: string) {
-    onErro(null)
     startTransition(async () => {
       const r = await marcarOpcaoCorreta(opcaoId, questao.id, avaliacaoId, cursoId)
       if (!r.ok) onErro(r.erro)
@@ -246,11 +238,10 @@ function QuestaoBloco({ questao, avaliacaoId, cursoId, indice, total, expandida,
   }
 
   function onExcluirOpcao(opcaoId: string) {
-    onErro(null)
     startTransition(async () => {
       const r = await excluirOpcao(opcaoId, avaliacaoId, cursoId)
       if (!r.ok) onErro(r.erro)
-      else onRefresh()
+      else { onSucesso('Opção removida com sucesso'); onRefresh() }
     })
   }
 

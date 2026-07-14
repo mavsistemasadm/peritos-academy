@@ -13,6 +13,7 @@ import {
 } from '@/app/admin/usuarios/actions'
 import { IconeUser, IconeMail, IconeMapPin, IconeCalendar, IconeClock, IconeLock, IconeEye } from '@/components/Icones'
 import { XP, Moeda, SeloNivel, FogoStreak, Certificado } from '@/components/Emblemas'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 type Aba = 'geral' | 'progresso' | 'gamificacao' | 'financeiro' | 'comunidade' | 'auditoria'
 
@@ -34,10 +35,11 @@ export default function AdminUsuarioFichaContent({ ficha, extratoInicial, comuni
   ficha: FichaUsuario; extratoInicial: ExtratoPaginado; comunidade: ComunidadeUsuario; auditoria: AuditoriaLinha[]; cursos: CursoParaCertificado[]
 }) {
   const [aba, setAba] = useState<Aba>('geral')
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
 
   return (
     <div className="ad-cursos">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <div className="ad-cursos-cab">
         <div>
           <h1>{ficha.nome}</h1>
@@ -48,8 +50,6 @@ export default function AdminUsuarioFichaContent({ ficha, extratoInicial, comuni
         </button>
       </div>
 
-      {erro && <p className="ad-erro">{erro}</p>}
-
       <div className="ad-abas">
         <button type="button" className={`ad-aba${aba === 'geral' ? ' ativa' : ''}`} onClick={() => setAba('geral')}>Visão geral</button>
         <button type="button" className={`ad-aba${aba === 'progresso' ? ' ativa' : ''}`} onClick={() => setAba('progresso')}>Progresso</button>
@@ -59,9 +59,9 @@ export default function AdminUsuarioFichaContent({ ficha, extratoInicial, comuni
         <button type="button" className={`ad-aba${aba === 'auditoria' ? ' ativa' : ''}`} onClick={() => setAba('auditoria')}>Auditoria ({auditoria.length})</button>
       </div>
 
-      {aba === 'geral' && <VisaoGeralAba ficha={ficha} onErro={setErro} />}
-      {aba === 'progresso' && <ProgressoAba ficha={ficha} cursos={cursos} onErro={setErro} />}
-      {aba === 'gamificacao' && <GamificacaoAba ficha={ficha} extratoInicial={extratoInicial} onErro={setErro} />}
+      {aba === 'geral' && <VisaoGeralAba ficha={ficha} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'progresso' && <ProgressoAba ficha={ficha} cursos={cursos} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'gamificacao' && <GamificacaoAba ficha={ficha} extratoInicial={extratoInicial} onErro={toast.erro} onSucesso={toast.sucesso} />}
       {aba === 'financeiro' && <FinanceiroAba ficha={ficha} />}
       {aba === 'comunidade' && <ComunidadeAba comunidade={comunidade} />}
       {aba === 'auditoria' && <AuditoriaAba auditoria={auditoria} />}
@@ -72,22 +72,22 @@ export default function AdminUsuarioFichaContent({ ficha, extratoInicial, comuni
 // ============================================================
 // Visão geral
 // ============================================================
-function VisaoGeralAba({ ficha, onErro }: { ficha: FichaUsuario; onErro: (e: string | null) => void }) {
+function VisaoGeralAba({ ficha, onErro, onSucesso }: { ficha: FichaUsuario; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
 
   function acaoComJustificativa(
     fn: (id: string, justificativa: string) => Promise<{ ok: true } | { ok: false; erro: string }>,
     rotulo: string,
+    mensagemSucesso: string,
   ) {
     if (!confirm(`${rotulo} a conta de ${ficha.nome}?`)) return
     const justificativa = (prompt(`Justificativa (obrigatória) — ${rotulo}:`) ?? '').trim()
     if (!justificativa) { onErro('Justificativa é obrigatória — ação cancelada.'); return }
-    onErro(null)
     startTransition(async () => {
       const r = await fn(ficha.id, justificativa)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso(mensagemSucesso); router.refresh() }
     })
   }
 
@@ -119,18 +119,18 @@ function VisaoGeralAba({ ficha, onErro }: { ficha: FichaUsuario; onErro: (e: str
         <h2>Ações administrativas</h2>
         <div className="ad-fin-detalhe-acoes">
           {ficha.status !== 'ativo' && (
-            <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(reativarUsuario, 'Reativar')}>Reativar</button>
+            <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(reativarUsuario, 'Reativar', 'Conta reativada com sucesso')}>Reativar</button>
           )}
           {ficha.status !== 'suspenso' && (
-            <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(suspenderUsuario, 'Suspender')}>Suspender</button>
+            <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(suspenderUsuario, 'Suspender', 'Conta suspensa com sucesso')}>Suspender</button>
           )}
           {ficha.status !== 'banido' && (
-            <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={() => acaoComJustificativa(banirUsuario, 'Banir')}>Banir</button>
+            <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={() => acaoComJustificativa(banirUsuario, 'Banir', 'Conta banida com sucesso')}>Banir</button>
           )}
-          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(resetarSenhaUsuario, 'Resetar senha (envia e-mail de recuperação)')}>
+          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(resetarSenhaUsuario, 'Resetar senha (envia e-mail de recuperação)', 'E-mail de redefinição enviado com sucesso')}>
             <IconeLock size={14} /> Resetar senha
           </button>
-          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(concederCortesiaUsuario, 'Conceder cortesia')}>Conceder cortesia</button>
+          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(concederCortesiaUsuario, 'Conceder cortesia', 'Cortesia concedida com sucesso')}>Conceder cortesia</button>
         </div>
       </section>
     </>
@@ -140,7 +140,7 @@ function VisaoGeralAba({ ficha, onErro }: { ficha: FichaUsuario; onErro: (e: str
 // ============================================================
 // Progresso
 // ============================================================
-function ProgressoAba({ ficha, cursos, onErro }: { ficha: FichaUsuario; cursos: CursoParaCertificado[]; onErro: (e: string | null) => void }) {
+function ProgressoAba({ ficha, cursos, onErro, onSucesso }: { ficha: FichaUsuario; cursos: CursoParaCertificado[]; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
   const [cursoId, setCursoId] = useState('')
@@ -150,11 +150,10 @@ function ProgressoAba({ ficha, cursos, onErro }: { ficha: FichaUsuario; cursos: 
     if (!cursoId) { onErro('Selecione um curso.'); return }
     const justificativa = (prompt('Justificativa (obrigatória) — Emitir certificado manual:') ?? '').trim()
     if (!justificativa) { onErro('Justificativa é obrigatória — ação cancelada.'); return }
-    onErro(null)
     startTransition(async () => {
       const r = await emitirCertificadoManual(ficha.id, cursoId, justificativa)
       if (!r.ok) onErro(r.erro)
-      else { setCursoId(''); router.refresh() }
+      else { onSucesso('Certificado emitido com sucesso'); setCursoId(''); router.refresh() }
     })
   }
 
@@ -242,7 +241,7 @@ function ProgressoAba({ ficha, cursos, onErro }: { ficha: FichaUsuario; cursos: 
 // ============================================================
 // Gamificação
 // ============================================================
-function GamificacaoAba({ ficha, extratoInicial, onErro }: { ficha: FichaUsuario; extratoInicial: ExtratoPaginado; onErro: (e: string | null) => void }) {
+function GamificacaoAba({ ficha, extratoInicial, onErro, onSucesso }: { ficha: FichaUsuario; extratoInicial: ExtratoPaginado; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
   const [extrato, setExtrato] = useState(extratoInicial)
@@ -257,11 +256,10 @@ function GamificacaoAba({ ficha, extratoInicial, onErro }: { ficha: FichaUsuario
     if (p === 0 && m === 0) { onErro('Informe pontos ou moedas diferentes de zero.'); return }
     const justificativa = (prompt('Justificativa (obrigatória) — Ajuste manual de gamificação:') ?? '').trim()
     if (!justificativa) { onErro('Justificativa é obrigatória — ação cancelada.'); return }
-    onErro(null)
     startTransition(async () => {
       const r = await ajustarGamificacaoUsuario(ficha.id, p, m, justificativa)
       if (!r.ok) onErro(r.erro)
-      else { setPontos(''); setMoedas(''); router.refresh() }
+      else { onSucesso('Ajuste de gamificação salvo com sucesso'); setPontos(''); setMoedas(''); router.refresh() }
     })
   }
 

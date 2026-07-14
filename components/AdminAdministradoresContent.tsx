@@ -6,6 +6,7 @@ import type { AdministradorLinha, PerfilBusca } from '@/lib/queries/admin-usuari
 import { NOME_PAPEL } from '@/lib/admin/permissoes'
 import type { PapelAdmin } from '@/lib/admin/permissoes'
 import { buscarPerfis, concederPapel, alternarPapel } from '@/app/admin/administradores/actions'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 const PAPEIS: PapelAdmin[] = ['super_admin', 'conteudo', 'financeiro', 'moderador']
 
@@ -14,15 +15,14 @@ function iniciais(nome: string) {
 }
 
 export default function AdminAdministradoresContent({ administradores }: { administradores: AdministradorLinha[] }) {
+  const toast = useAdminToast()
   const [termo, setTermo] = useState('')
   const [resultados, setResultados] = useState<PerfilBusca[]>([])
   const [buscando, startBusca] = useTransition()
   const [salvando, startSalvar] = useTransition()
-  const [erro, setErro] = useState<string | null>(null)
 
   function onBuscar(valor: string) {
     setTermo(valor)
-    setErro(null)
     if (valor.trim().length < 2) { setResultados([]); return }
     startBusca(async () => {
       const r = await buscarPerfis(valor)
@@ -31,34 +31,32 @@ export default function AdminAdministradoresContent({ administradores }: { admin
   }
 
   function onConceder(usuarioId: string, papel: PapelAdmin) {
-    setErro(null)
     const fd = new FormData()
     fd.set('usuario_id', usuarioId)
     fd.set('papel', papel)
     startSalvar(async () => {
       const r = await concederPapel(fd)
-      if (!r.ok) setErro(r.erro)
-      else { setTermo(''); setResultados([]) }
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Papel concedido com sucesso'); setTermo(''); setResultados([]) }
     })
   }
 
   function onAlternar(id: string, ativo: boolean) {
-    setErro(null)
     const fd = new FormData()
     fd.set('id', id)
     fd.set('ativo', String(ativo))
     startSalvar(async () => {
       const r = await alternarPapel(fd)
-      if (!r.ok) setErro(r.erro)
+      if (!r.ok) toast.erro(r.erro)
+      else toast.sucesso(ativo ? 'Papel reativado com sucesso' : 'Papel desativado com sucesso')
     })
   }
 
   return (
     <div className="ad-admins">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <h1>Gestão de Administradores</h1>
       <p className="ad-sub">Conceda ou revogue papéis de acesso ao painel admin.</p>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       <div className="ad-busca-card">
         <label htmlFor="busca-admin">Buscar por nome ou slug</label>

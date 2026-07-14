@@ -10,6 +10,7 @@ import {
   atualizarComportamento, atualizarTextos, atualizarSEO,
 } from '@/app/admin/configuracoes/actions'
 import { IconeCheck, IconeAlertTriangle, IconeLink } from '@/components/Icones'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 type Aba = 'identidade' | 'comportamento' | 'textos' | 'seo' | 'integracoes'
 
@@ -17,18 +18,17 @@ export default function AdminConfiguracoesContent({ config, integracoes }: {
   config: ConfigPlataforma; integracoes: IntegracaoStatus[]
 }) {
   const [aba, setAba] = useState<Aba>('identidade')
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
 
   return (
     <div className="ad-cursos">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <div className="ad-cursos-cab">
         <div>
           <h1>Configurações</h1>
           <p className="ad-sub">Identidade, comportamento e textos gerais da plataforma. Gamificação, Financeiro e Notificações têm configuração própria nos respectivos módulos.</p>
         </div>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       <div className="ad-abas">
         <button type="button" className={`ad-aba${aba === 'identidade' ? ' ativa' : ''}`} onClick={() => setAba('identidade')}>Identidade</button>
@@ -38,10 +38,10 @@ export default function AdminConfiguracoesContent({ config, integracoes }: {
         <button type="button" className={`ad-aba${aba === 'integracoes' ? ' ativa' : ''}`} onClick={() => setAba('integracoes')}>Integrações</button>
       </div>
 
-      {aba === 'identidade' && <IdentidadeAba config={config} onErro={setErro} />}
-      {aba === 'comportamento' && <ComportamentoAba config={config} onErro={setErro} />}
-      {aba === 'textos' && <TextosAba config={config} onErro={setErro} />}
-      {aba === 'seo' && <SEOAba config={config} onErro={setErro} />}
+      {aba === 'identidade' && <IdentidadeAba config={config} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'comportamento' && <ComportamentoAba config={config} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'textos' && <TextosAba config={config} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'seo' && <SEOAba config={config} onErro={toast.erro} onSucesso={toast.sucesso} />}
       {aba === 'integracoes' && <IntegracoesAba integracoes={integracoes} />}
     </div>
   )
@@ -50,7 +50,7 @@ export default function AdminConfiguracoesContent({ config, integracoes }: {
 // ============================================================
 // Identidade
 // ============================================================
-function IdentidadeAba({ config, onErro }: { config: ConfigPlataforma; onErro: (e: string | null) => void }) {
+function IdentidadeAba({ config, onErro, onSucesso }: { config: ConfigPlataforma; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
   const [logoUrl, setLogoUrl] = useState(config.logoUrl)
@@ -58,38 +58,35 @@ function IdentidadeAba({ config, onErro }: { config: ConfigPlataforma; onErro: (
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarIdentidade(fd)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Identidade salva com sucesso'); router.refresh() }
     })
   }
 
   function onUploadLogo(e: ChangeEvent<HTMLInputElement>) {
     const arquivo = e.target.files?.[0]
     if (!arquivo) return
-    onErro(null)
     const fd = new FormData()
     fd.set('arquivo', arquivo)
     startTransition(async () => {
       const r = await uploadLogo(fd)
       if (!r.ok) onErro(r.erro)
-      else { setLogoUrl(r.url ?? null); router.refresh() }
+      else { setLogoUrl(r.url ?? null); onSucesso('Logo atualizado com sucesso'); router.refresh() }
     })
   }
 
   function onUploadFavicon(e: ChangeEvent<HTMLInputElement>) {
     const arquivo = e.target.files?.[0]
     if (!arquivo) return
-    onErro(null)
     const fd = new FormData()
     fd.set('arquivo', arquivo)
     startTransition(async () => {
       const r = await uploadFavicon(fd)
       if (!r.ok) onErro(r.erro)
-      else { setFaviconUrl(r.url ?? null); router.refresh() }
+      else { setFaviconUrl(r.url ?? null); onSucesso('Favicon atualizado com sucesso'); router.refresh() }
     })
   }
 
@@ -160,7 +157,7 @@ function IdentidadeAba({ config, onErro }: { config: ConfigPlataforma; onErro: (
 // ============================================================
 // Comportamento
 // ============================================================
-function ComportamentoAba({ config, onErro }: { config: ConfigPlataforma; onErro: (e: string | null) => void }) {
+function ComportamentoAba({ config, onErro, onSucesso }: { config: ConfigPlataforma; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
   const [manutencao, setManutencao] = useState(config.modoManutencao)
@@ -181,12 +178,11 @@ function ComportamentoAba({ config, onErro }: { config: ConfigPlataforma; onErro
     if (manutencao && !config.modoManutencao) {
       if (!confirm('Confirma mesmo? Ao salvar, o modo manutenção entra em vigor imediatamente.')) return
     }
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarComportamento(fd)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Comportamento salvo com sucesso'); router.refresh() }
     })
   }
 
@@ -234,18 +230,17 @@ function ComportamentoAba({ config, onErro }: { config: ConfigPlataforma; onErro
 // ============================================================
 // Textos
 // ============================================================
-function TextosAba({ config, onErro }: { config: ConfigPlataforma; onErro: (e: string | null) => void }) {
+function TextosAba({ config, onErro, onSucesso }: { config: ConfigPlataforma; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarTextos(fd)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Textos salvos com sucesso'); router.refresh() }
     })
   }
 
@@ -272,7 +267,7 @@ function TextosAba({ config, onErro }: { config: ConfigPlataforma; onErro: (e: s
 // ============================================================
 // SEO
 // ============================================================
-function SEOAba({ config, onErro }: { config: ConfigPlataforma; onErro: (e: string | null) => void }) {
+function SEOAba({ config, onErro, onSucesso }: { config: ConfigPlataforma; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
   const [ogImageUrl, setOgImageUrl] = useState(config.ogImageUrl)
@@ -281,25 +276,23 @@ function SEOAba({ config, onErro }: { config: ConfigPlataforma; onErro: (e: stri
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarSEO(fd)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('SEO salvo com sucesso'); router.refresh() }
     })
   }
 
   function onUploadOg(e: ChangeEvent<HTMLInputElement>) {
     const arquivo = e.target.files?.[0]
     if (!arquivo) return
-    onErro(null)
     const fd = new FormData()
     fd.set('arquivo', arquivo)
     startTransition(async () => {
       const r = await uploadOgImage(fd)
       if (!r.ok) onErro(r.erro)
-      else { setOgImageUrl(r.url ?? null); router.refresh() }
+      else { setOgImageUrl(r.url ?? null); onSucesso('Imagem de compartilhamento atualizada com sucesso'); router.refresh() }
     })
   }
 

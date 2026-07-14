@@ -9,50 +9,50 @@ import {
   criarCategoria, atualizarCategoria, excluirCategoria,
 } from '@/app/admin/desafios/actions'
 import { IconePencil, IconeTrash } from '@/components/Icones'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 export default function AdminDesafiosContent({ desafios, categorias }: { desafios: DesafioListaItem[]; categorias: CategoriaAdmin[] }) {
   const router = useRouter()
   const [criando, setCriando] = useState(false)
   const [titulo, setTitulo] = useState('')
   const [categoriaId, setCategoriaId] = useState('')
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
   const [pendente, startTransition] = useTransition()
   const [mostrarCategorias, setMostrarCategorias] = useState(false)
 
   function onCriar() {
-    setErro(null)
-    if (titulo.trim().length < 3) { setErro('Título precisa ter pelo menos 3 caracteres.'); return }
+    if (titulo.trim().length < 3) { toast.erro('Título precisa ter pelo menos 3 caracteres.'); return }
     const fd = new FormData()
     fd.set('titulo', titulo)
     if (categoriaId) fd.set('categoria_id', categoriaId)
     startTransition(async () => {
       const r = await criarDesafio(fd)
-      if (!r.ok) { setErro(r.erro); return }
+      if (!r.ok) { toast.erro(r.erro); return }
+      toast.sucesso('Desafio criado com sucesso')
       router.push(`/admin/desafios/${r.id}`)
     })
   }
 
   function onAlternarPublicacao(id: string, publicado: boolean) {
-    setErro(null)
     startTransition(async () => {
       const r = await alternarPublicacaoDesafio(id, publicado)
-      if (!r.ok) setErro(r.erro)
-      else router.refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso(publicado ? 'Desafio publicado com sucesso' : 'Desafio voltou a rascunho'); router.refresh() }
     })
   }
 
   function onExcluir(id: string, titulo: string) {
     if (!confirm(`Excluir o desafio "${titulo}"? Essa ação não pode ser desfeita.`)) return
-    setErro(null)
     startTransition(async () => {
       const r = await excluirDesafio(id)
-      if (!r.ok) setErro(r.erro)
-      else router.refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Desafio excluído com sucesso'); router.refresh() }
     })
   }
 
   return (
     <div className="ad-cursos">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <div className="ad-cursos-cab">
         <div>
           <h1>Desafios</h1>
@@ -64,9 +64,7 @@ export default function AdminDesafiosContent({ desafios, categorias }: { desafio
         </div>
       </div>
 
-      {erro && <p className="ad-erro">{erro}</p>}
-
-      {mostrarCategorias && <CategoriasBloco categorias={categorias} onErro={setErro} />}
+      {mostrarCategorias && <CategoriasBloco categorias={categorias} onErro={toast.erro} onSucesso={toast.sucesso} />}
 
       {criando && (
         <div className="ad-busca-card">
@@ -113,7 +111,7 @@ export default function AdminDesafiosContent({ desafios, categorias }: { desafio
   )
 }
 
-function CategoriasBloco({ categorias, onErro }: { categorias: CategoriaAdmin[]; onErro: (e: string | null) => void }) {
+function CategoriasBloco({ categorias, onErro, onSucesso }: { categorias: CategoriaAdmin[]; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
   const [nome, setNome] = useState('')
@@ -122,35 +120,32 @@ function CategoriasBloco({ categorias, onErro }: { categorias: CategoriaAdmin[];
 
   function onCriar() {
     if (!nome.trim()) return
-    onErro(null)
     const fd = new FormData()
     fd.set('nome', nome)
     startTransition(async () => {
       const r = await criarCategoria(fd)
       if (!r.ok) onErro(r.erro)
-      else { setNome(''); router.refresh() }
+      else { onSucesso('Categoria criada com sucesso'); setNome(''); router.refresh() }
     })
   }
 
   function onSalvarEdicao(id: string) {
     if (!editNome.trim()) return
-    onErro(null)
     const fd = new FormData()
     fd.set('nome', editNome)
     startTransition(async () => {
       const r = await atualizarCategoria(id, fd)
       if (!r.ok) onErro(r.erro)
-      else { setEditandoId(null); router.refresh() }
+      else { onSucesso('Categoria salva com sucesso'); setEditandoId(null); router.refresh() }
     })
   }
 
   function onExcluir(id: string, nome: string, total: number) {
     if (total > 0 && !confirm(`"${nome}" tem ${total} desafio(s). Excluir a categoria mesmo assim? Os desafios ficam sem categoria.`)) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirCategoria(id)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Categoria excluída com sucesso'); router.refresh() }
     })
   }
 

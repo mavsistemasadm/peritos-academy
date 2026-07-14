@@ -5,47 +5,47 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { CursoListaItem } from '@/lib/queries/admin-cursos'
 import { criarCurso, alternarPublicacaoCurso, excluirCurso } from '@/app/admin/cursos/actions'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 export default function AdminCursosContent({ cursos }: { cursos: CursoListaItem[] }) {
   const router = useRouter()
   const [criando, setCriando] = useState(false)
   const [titulo, setTitulo] = useState('')
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
   const [pendente, startTransition] = useTransition()
 
   function onCriar() {
-    setErro(null)
-    if (titulo.trim().length < 3) { setErro('Título precisa ter pelo menos 3 caracteres.'); return }
+    if (titulo.trim().length < 3) { toast.erro('Título precisa ter pelo menos 3 caracteres.'); return }
     const fd = new FormData()
     fd.set('titulo', titulo)
     startTransition(async () => {
       const r = await criarCurso(fd)
-      if (!r.ok) { setErro(r.erro); return }
+      if (!r.ok) { toast.erro(r.erro); return }
+      toast.sucesso('Curso criado com sucesso')
       router.push(`/admin/cursos/${r.id}`)
     })
   }
 
   function onAlternarPublicacao(id: string, publicado: boolean) {
-    setErro(null)
     startTransition(async () => {
       const r = await alternarPublicacaoCurso(id, publicado)
-      if (!r.ok) setErro(r.erro)
-      else router.refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso(publicado ? 'Curso publicado com sucesso' : 'Curso voltou a rascunho'); router.refresh() }
     })
   }
 
   function onExcluir(id: string, titulo: string) {
     if (!confirm(`Excluir o curso "${titulo}"? Isso apaga módulos, aulas e avaliações vinculadas. Essa ação não pode ser desfeita.`)) return
-    setErro(null)
     startTransition(async () => {
       const r = await excluirCurso(id)
-      if (!r.ok) setErro(r.erro)
-      else router.refresh()
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Curso excluído com sucesso'); router.refresh() }
     })
   }
 
   return (
     <div className="ad-cursos">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <div className="ad-cursos-cab">
         <div>
           <h1>Cursos</h1>
@@ -55,8 +55,6 @@ export default function AdminCursosContent({ cursos }: { cursos: CursoListaItem[
           + Novo curso
         </button>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       {criando && (
         <div className="ad-busca-card">

@@ -10,6 +10,7 @@ import {
   criarNivel, atualizarNivel, excluirNivel, moverNivel, uploadSeloNivel,
 } from '@/app/admin/gamificacao/actions'
 import { IconeArrowUp, IconeArrowDown, IconePencil, IconeTrash } from '@/components/Icones'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 type Aba = 'definicoes' | 'gatilhos' | 'niveis'
 
@@ -21,10 +22,11 @@ export default function AdminGamificacaoContent({ config, gatilhos, niveis }: {
   config: ConfigGamificacao; gatilhos: GatilhoAdmin[]; niveis: NivelAdmin[]
 }) {
   const [aba, setAba] = useState<Aba>('definicoes')
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
 
   return (
     <div className="ad-cursos">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <div className="ad-cursos-cab">
         <div>
           <h1>Gamificação</h1>
@@ -32,33 +34,30 @@ export default function AdminGamificacaoContent({ config, gatilhos, niveis }: {
         </div>
       </div>
 
-      {erro && <p className="ad-erro">{erro}</p>}
-
       <div className="ad-abas">
         <button type="button" className={`ad-aba${aba === 'definicoes' ? ' ativa' : ''}`} onClick={() => setAba('definicoes')}>Definições</button>
         <button type="button" className={`ad-aba${aba === 'gatilhos' ? ' ativa' : ''}`} onClick={() => setAba('gatilhos')}>Gatilhos ({gatilhos.length})</button>
         <button type="button" className={`ad-aba${aba === 'niveis' ? ' ativa' : ''}`} onClick={() => setAba('niveis')}>Níveis ({niveis.length})</button>
       </div>
 
-      {aba === 'definicoes' && <DefinicoesAba config={config} onErro={setErro} />}
-      {aba === 'gatilhos' && <GatilhosAba gatilhos={gatilhos} onErro={setErro} />}
-      {aba === 'niveis' && <NiveisAba niveis={niveis} onErro={setErro} />}
+      {aba === 'definicoes' && <DefinicoesAba config={config} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'gatilhos' && <GatilhosAba gatilhos={gatilhos} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'niveis' && <NiveisAba niveis={niveis} onErro={toast.erro} onSucesso={toast.sucesso} />}
     </div>
   )
 }
 
-function DefinicoesAba({ config, onErro }: { config: ConfigGamificacao; onErro: (e: string | null) => void }) {
+function DefinicoesAba({ config, onErro, onSucesso }: { config: ConfigGamificacao; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarConfigGamificacao(fd)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Definições salvas com sucesso'); router.refresh() }
     })
   }
 
@@ -144,7 +143,7 @@ function DefinicoesAba({ config, onErro }: { config: ConfigGamificacao; onErro: 
   )
 }
 
-function GatilhosAba({ gatilhos, onErro }: { gatilhos: GatilhoAdmin[]; onErro: (e: string | null) => void }) {
+function GatilhosAba({ gatilhos, onErro, onSucesso }: { gatilhos: GatilhoAdmin[]; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const categorias: CategoriaGatilho[] = ['comum', 'marco', 'quiz', 'especial']
   return (
     <>
@@ -158,7 +157,7 @@ function GatilhosAba({ gatilhos, onErro }: { gatilhos: GatilhoAdmin[]; onErro: (
               <table className="ad-tabela">
                 <thead><tr><th>Gatilho</th><th>Pontos</th><th>Moedas</th><th>Limite/dia</th><th>Ativo</th><th></th></tr></thead>
                 <tbody>
-                  {doCat.map(g => <GatilhoLinha key={g.codigo} gatilho={g} onErro={onErro} />)}
+                  {doCat.map(g => <GatilhoLinha key={g.codigo} gatilho={g} onErro={onErro} onSucesso={onSucesso} />)}
                 </tbody>
               </table>
             </div>
@@ -169,18 +168,17 @@ function GatilhosAba({ gatilhos, onErro }: { gatilhos: GatilhoAdmin[]; onErro: (
   )
 }
 
-function GatilhoLinha({ gatilho, onErro }: { gatilho: GatilhoAdmin; onErro: (e: string | null) => void }) {
+function GatilhoLinha({ gatilho, onErro, onSucesso }: { gatilho: GatilhoAdmin; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarGatilho(gatilho.codigo, fd)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Gatilho salvo com sucesso'); router.refresh() }
     })
   }
 
@@ -206,7 +204,7 @@ function GatilhoLinha({ gatilho, onErro }: { gatilho: GatilhoAdmin; onErro: (e: 
   )
 }
 
-function NiveisAba({ niveis, onErro }: { niveis: NivelAdmin[]; onErro: (e: string | null) => void }) {
+function NiveisAba({ niveis, onErro, onSucesso }: { niveis: NivelAdmin[]; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
   const [criando, setCriando] = useState(false)
@@ -214,7 +212,6 @@ function NiveisAba({ niveis, onErro }: { niveis: NivelAdmin[]; onErro: (e: strin
   const [pontosMinimos, setPontosMinimos] = useState('')
 
   function onCriar() {
-    onErro(null)
     if (!nome.trim()) { onErro('Nome é obrigatório.'); return }
     const fd = new FormData()
     fd.set('nome', nome)
@@ -222,7 +219,7 @@ function NiveisAba({ niveis, onErro }: { niveis: NivelAdmin[]; onErro: (e: strin
     startTransition(async () => {
       const r = await criarNivel(fd)
       if (!r.ok) onErro(r.erro)
-      else { setNome(''); setPontosMinimos(''); setCriando(false); router.refresh() }
+      else { onSucesso('Nível criado com sucesso'); setNome(''); setPontosMinimos(''); setCriando(false); router.refresh() }
     })
   }
 
@@ -245,31 +242,29 @@ function NiveisAba({ niveis, onErro }: { niveis: NivelAdmin[]; onErro: (e: strin
 
       <div className="ad-modulos-lista">
         {niveis.map((n, i) => (
-          <NivelLinha key={n.id} nivel={n} indice={i} total={niveis.length} onErro={onErro} />
+          <NivelLinha key={n.id} nivel={n} indice={i} total={niveis.length} onErro={onErro} onSucesso={onSucesso} />
         ))}
       </div>
     </section>
   )
 }
 
-function NivelLinha({ nivel, indice, total, onErro }: { nivel: NivelAdmin; indice: number; total: number; onErro: (e: string | null) => void }) {
+function NivelLinha({ nivel, indice, total, onErro, onSucesso }: { nivel: NivelAdmin; indice: number; total: number; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
   const [editando, setEditando] = useState(false)
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarNivel(nivel.id, fd)
       if (!r.ok) onErro(r.erro)
-      else { setEditando(false); router.refresh() }
+      else { onSucesso('Nível salvo com sucesso'); setEditando(false); router.refresh() }
     })
   }
 
   function onMover(direcao: 'up' | 'down') {
-    onErro(null)
     startTransition(async () => {
       const r = await moverNivel(nivel.id, direcao)
       if (!r.ok) onErro(r.erro)
@@ -279,24 +274,22 @@ function NivelLinha({ nivel, indice, total, onErro }: { nivel: NivelAdmin; indic
 
   function onExcluir() {
     if (!confirm(`Excluir o nível "${nivel.nome}"?`)) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirNivel(nivel.id)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Nível excluído com sucesso'); router.refresh() }
     })
   }
 
   function onUploadSelo(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    onErro(null)
     const fd = new FormData()
     fd.set('selo', file)
     startTransition(async () => {
       const r = await uploadSeloNivel(nivel.id, fd)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Selo atualizado com sucesso'); router.refresh() }
     })
   }
 

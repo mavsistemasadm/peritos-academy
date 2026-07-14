@@ -12,6 +12,7 @@ import {
   criarPlano, atualizarPlano, excluirPlano, atualizarDiasCarencia,
 } from '@/app/admin/financeiro/actions'
 import { IconeSearch, IconePlus, IconeTrash, IconePencil } from '@/components/Icones'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 type Aba = 'painel' | 'assinaturas' | 'planos' | 'webhooks'
 
@@ -32,18 +33,17 @@ export default function AdminFinanceiroContent({ painel, assinaturas, planos, we
   painel: PainelFinanceiro; assinaturas: AssinaturaAdmin[]; planos: PlanoAdmin[]; webhooks: WebhookEventoAdmin[]
 }) {
   const [aba, setAba] = useState<Aba>('painel')
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
 
   return (
     <div className="ad-cursos">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <div className="ad-cursos-cab">
         <div>
           <h1>Financeiro</h1>
           <p className="ad-sub">Assinaturas, planos e integração com o Asaas (webhooks).</p>
         </div>
       </div>
-
-      {erro && <p className="ad-erro">{erro}</p>}
 
       <div className="ad-abas">
         <button type="button" className={`ad-aba${aba === 'painel' ? ' ativa' : ''}`} onClick={() => setAba('painel')}>Painel</button>
@@ -52,9 +52,9 @@ export default function AdminFinanceiroContent({ painel, assinaturas, planos, we
         <button type="button" className={`ad-aba${aba === 'webhooks' ? ' ativa' : ''}`} onClick={() => setAba('webhooks')}>Webhooks ({webhooks.length})</button>
       </div>
 
-      {aba === 'painel' && <PainelAba painel={painel} onErro={setErro} />}
-      {aba === 'assinaturas' && <AssinaturasAba assinaturas={assinaturas} onErro={setErro} />}
-      {aba === 'planos' && <PlanosAba planos={planos} onErro={setErro} />}
+      {aba === 'painel' && <PainelAba painel={painel} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'assinaturas' && <AssinaturasAba assinaturas={assinaturas} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'planos' && <PlanosAba planos={planos} onErro={toast.erro} onSucesso={toast.sucesso} />}
       {aba === 'webhooks' && <WebhooksAba webhooks={webhooks} />}
     </div>
   )
@@ -63,19 +63,18 @@ export default function AdminFinanceiroContent({ painel, assinaturas, planos, we
 // ============================================================
 // Painel
 // ============================================================
-function PainelAba({ painel, onErro }: { painel: PainelFinanceiro; onErro: (e: string | null) => void }) {
+function PainelAba({ painel, onErro, onSucesso }: { painel: PainelFinanceiro; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
   const maxReceita = Math.max(1, ...painel.receitaPorMes.map(r => r.valorCentavos))
 
   function onSalvarCarencia(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = await atualizarDiasCarencia(fd)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Carência salva com sucesso'); router.refresh() }
     })
   }
 
@@ -119,7 +118,7 @@ function PainelAba({ painel, onErro }: { painel: PainelFinanceiro; onErro: (e: s
 // ============================================================
 // Assinaturas
 // ============================================================
-function AssinaturasAba({ assinaturas, onErro }: { assinaturas: AssinaturaAdmin[]; onErro: (e: string | null) => void }) {
+function AssinaturasAba({ assinaturas, onErro, onSucesso }: { assinaturas: AssinaturaAdmin[]; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const [busca, setBusca] = useState('')
   const [filtroStatus, setFiltroStatus] = useState<StatusAssinatura | 'todas'>('todas')
   const [expandida, setExpandida] = useState<string | null>(null)
@@ -132,7 +131,7 @@ function AssinaturasAba({ assinaturas, onErro }: { assinaturas: AssinaturaAdmin[
 
   return (
     <>
-      <ConcederCortesiaCard onErro={onErro} />
+      <ConcederCortesiaCard onErro={onErro} onSucesso={onSucesso} />
 
       <section className="ad-card">
         <h2>Assinaturas ({filtradas.length})</h2>
@@ -173,7 +172,7 @@ function AssinaturasAba({ assinaturas, onErro }: { assinaturas: AssinaturaAdmin[
                     {expandida === a.id && (
                       <tr>
                         <td colSpan={6}>
-                          <AssinaturaDetalhe assinatura={a} onErro={onErro} />
+                          <AssinaturaDetalhe assinatura={a} onErro={onErro} onSucesso={onSucesso} />
                         </td>
                       </tr>
                     )}
@@ -188,18 +187,15 @@ function AssinaturasAba({ assinaturas, onErro }: { assinaturas: AssinaturaAdmin[
   )
 }
 
-function ConcederCortesiaCard({ onErro }: { onErro: (e: string | null) => void }) {
+function ConcederCortesiaCard({ onErro, onSucesso }: { onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
   const [email, setEmail] = useState('')
   const [observacao, setObservacao] = useState('')
   const [achado, setAchado] = useState<{ id: string; nome: string; jaTemAssinatura: boolean } | null>(null)
-  const [sucesso, setSucesso] = useState(false)
 
   function onBuscar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
-    setSucesso(false)
     setAchado(null)
     startTransition(async () => {
       const r = await buscarUsuarioPorEmail(email)
@@ -210,12 +206,11 @@ function ConcederCortesiaCard({ onErro }: { onErro: (e: string | null) => void }
 
   function onConceder() {
     if (!achado) return
-    onErro(null)
     startTransition(async () => {
       const r = await concederCortesia(achado.id, observacao)
       if (!r.ok) onErro(r.erro)
       else {
-        setSucesso(true)
+        onSucesso('Cortesia concedida com sucesso')
         setAchado(null)
         setEmail('')
         setObservacao('')
@@ -246,23 +241,21 @@ function ConcederCortesiaCard({ onErro }: { onErro: (e: string | null) => void }
           </div>
         </div>
       )}
-      {sucesso && <p className="ad-fin-nota">Cortesia concedida.</p>}
     </section>
   )
 }
 
-function AssinaturaDetalhe({ assinatura, onErro }: { assinatura: AssinaturaAdmin; onErro: (e: string | null) => void }) {
+function AssinaturaDetalhe({ assinatura, onErro, onSucesso }: { assinatura: AssinaturaAdmin; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
 
-  function acao(fn: (id: string, obs: string) => Promise<{ ok: true } | { ok: false; erro: string }>, rotulo: string, exigeConfirmacao: boolean) {
+  function acao(fn: (id: string, obs: string) => Promise<{ ok: true } | { ok: false; erro: string }>, rotulo: string, mensagemSucesso: string, exigeConfirmacao: boolean) {
     if (exigeConfirmacao && !confirm(`${rotulo} a assinatura de ${assinatura.usuarioNome}?`)) return
     const observacao = prompt(`Observação (opcional) — ${rotulo}:`) ?? ''
-    onErro(null)
     startTransition(async () => {
       const r = await fn(assinatura.id, observacao)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso(mensagemSucesso); router.refresh() }
     })
   }
 
@@ -293,13 +286,13 @@ function AssinaturaDetalhe({ assinatura, onErro }: { assinatura: AssinaturaAdmin
 
       <div className="ad-fin-detalhe-acoes">
         {assinatura.status !== 'suspensa' && (
-          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acao(suspenderAssinatura, 'Suspender', true)}>Suspender</button>
+          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acao(suspenderAssinatura, 'Suspender', 'Assinatura suspensa com sucesso', true)}>Suspender</button>
         )}
         {assinatura.status !== 'ativa' && assinatura.status !== 'cancelada' && (
-          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acao(reativarAssinatura, 'Reativar', false)}>Reativar</button>
+          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acao(reativarAssinatura, 'Reativar', 'Assinatura reativada com sucesso', false)}>Reativar</button>
         )}
         {assinatura.status !== 'cancelada' && (
-          <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={() => acao(cancelarAssinatura, 'Cancelar', true)}>Cancelar</button>
+          <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={() => acao(cancelarAssinatura, 'Cancelar', 'Assinatura cancelada com sucesso', true)}>Cancelar</button>
         )}
       </div>
     </div>
@@ -309,7 +302,7 @@ function AssinaturaDetalhe({ assinatura, onErro }: { assinatura: AssinaturaAdmin
 // ============================================================
 // Planos
 // ============================================================
-function PlanosAba({ planos, onErro }: { planos: PlanoAdmin[]; onErro: (e: string | null) => void }) {
+function PlanosAba({ planos, onErro, onSucesso }: { planos: PlanoAdmin[]; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const [criando, setCriando] = useState(false)
 
   return (
@@ -321,7 +314,7 @@ function PlanosAba({ planos, onErro }: { planos: PlanoAdmin[]; onErro: (e: strin
         </button>
       </div>
 
-      {criando && <PlanoForm onCancelar={() => setCriando(false)} onErro={onErro} />}
+      {criando && <PlanoForm onCancelar={() => setCriando(false)} onErro={onErro} onSucesso={onSucesso} />}
 
       {planos.length === 0 && <p className="ad-vazio">Nenhum plano cadastrado.</p>}
       {planos.length > 0 && (
@@ -329,7 +322,7 @@ function PlanosAba({ planos, onErro }: { planos: PlanoAdmin[]; onErro: (e: strin
           <table className="ad-tabela">
             <thead><tr><th>Nome</th><th>Valor</th><th>Periodicidade</th><th>Ativo</th><th></th></tr></thead>
             <tbody>
-              {planos.map(p => <PlanoLinha key={p.id} plano={p} onErro={onErro} />)}
+              {planos.map(p => <PlanoLinha key={p.id} plano={p} onErro={onErro} onSucesso={onSucesso} />)}
             </tbody>
           </table>
         </div>
@@ -338,18 +331,17 @@ function PlanosAba({ planos, onErro }: { planos: PlanoAdmin[]; onErro: (e: strin
   )
 }
 
-function PlanoLinha({ plano, onErro }: { plano: PlanoAdmin; onErro: (e: string | null) => void }) {
+function PlanoLinha({ plano, onErro, onSucesso }: { plano: PlanoAdmin; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [editando, setEditando] = useState(false)
   const [pendente, startTransition] = useTransition()
 
   function onExcluir() {
     if (!confirm(`Excluir o plano "${plano.nome}"?`)) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirPlano(plano.id)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Plano excluído com sucesso'); router.refresh() }
     })
   }
 
@@ -357,7 +349,7 @@ function PlanoLinha({ plano, onErro }: { plano: PlanoAdmin; onErro: (e: string |
     return (
       <tr>
         <td colSpan={5}>
-          <PlanoForm plano={plano} onCancelar={() => setEditando(false)} onErro={onErro} />
+          <PlanoForm plano={plano} onCancelar={() => setEditando(false)} onErro={onErro} onSucesso={onSucesso} />
         </td>
       </tr>
     )
@@ -377,18 +369,17 @@ function PlanoLinha({ plano, onErro }: { plano: PlanoAdmin; onErro: (e: string |
   )
 }
 
-function PlanoForm({ plano, onCancelar, onErro }: { plano?: PlanoAdmin; onCancelar: () => void; onErro: (e: string | null) => void }) {
+function PlanoForm({ plano, onCancelar, onErro, onSucesso }: { plano?: PlanoAdmin; onCancelar: () => void; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onErro(null)
     const fd = new FormData(e.currentTarget)
     startTransition(async () => {
       const r = plano ? await atualizarPlano(plano.id, fd) : await criarPlano(fd)
       if (!r.ok) onErro(r.erro)
-      else { onCancelar(); router.refresh() }
+      else { onSucesso(plano ? 'Plano salvo com sucesso' : 'Plano criado com sucesso'); onCancelar(); router.refresh() }
     })
   }
 

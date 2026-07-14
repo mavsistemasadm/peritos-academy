@@ -9,6 +9,7 @@ import {
   marcarMelhorResposta, desmarcarMelhorResposta, excluirComentario,
   excluirDuvidaAula,
 } from '@/app/admin/comunidade/actions'
+import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 type Aba = 'posts' | 'comentarios' | 'duvidas'
 
@@ -16,10 +17,11 @@ export default function AdminComunidadeContent({ posts, comentarios, duvidas }: 
   posts: PostAdmin[]; comentarios: ComentarioAdmin[]; duvidas: DuvidaAulaAdmin[]
 }) {
   const [aba, setAba] = useState<Aba>('posts')
-  const [erro, setErro] = useState<string | null>(null)
+  const toast = useAdminToast()
 
   return (
     <div className="ad-cursos">
+      <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <div className="ad-cursos-cab">
         <div>
           <h1>Comunidade</h1>
@@ -27,50 +29,45 @@ export default function AdminComunidadeContent({ posts, comentarios, duvidas }: 
         </div>
       </div>
 
-      {erro && <p className="ad-erro">{erro}</p>}
-
       <div className="ad-abas">
         <button type="button" className={`ad-aba${aba === 'posts' ? ' ativa' : ''}`} onClick={() => setAba('posts')}>Posts ({posts.length})</button>
         <button type="button" className={`ad-aba${aba === 'comentarios' ? ' ativa' : ''}`} onClick={() => setAba('comentarios')}>Comentários ({comentarios.length})</button>
         <button type="button" className={`ad-aba${aba === 'duvidas' ? ' ativa' : ''}`} onClick={() => setAba('duvidas')}>Dúvidas de aula ({duvidas.length})</button>
       </div>
 
-      {aba === 'posts' && <PostsAba posts={posts} onErro={setErro} />}
-      {aba === 'comentarios' && <ComentariosAba comentarios={comentarios} onErro={setErro} />}
-      {aba === 'duvidas' && <DuvidasAba duvidas={duvidas} onErro={setErro} />}
+      {aba === 'posts' && <PostsAba posts={posts} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'comentarios' && <ComentariosAba comentarios={comentarios} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'duvidas' && <DuvidasAba duvidas={duvidas} onErro={toast.erro} onSucesso={toast.sucesso} />}
     </div>
   )
 }
 
-function PostsAba({ posts, onErro }: { posts: PostAdmin[]; onErro: (e: string | null) => void }) {
+function PostsAba({ posts, onErro, onSucesso }: { posts: PostAdmin[]; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
 
   function onFixar(id: string, fixado: boolean) {
-    onErro(null)
     startTransition(async () => {
       const r = await alternarFixado(id, fixado)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso(fixado ? 'Post fixado com sucesso' : 'Post desafixado com sucesso'); router.refresh() }
     })
   }
 
   function onDestacar(id: string, destaque: boolean) {
-    onErro(null)
     startTransition(async () => {
       const r = await alternarDestaque(id, destaque)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso(destaque ? 'Post destacado com sucesso' : 'Destaque removido com sucesso'); router.refresh() }
     })
   }
 
   function onExcluir(id: string, titulo: string | null) {
     if (!confirm(`Remover o post "${titulo ?? 'sem título'}"? Os comentários vinculados também somem.`)) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirPost(id)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Post removido com sucesso'); router.refresh() }
     })
   }
 
@@ -102,36 +99,33 @@ function PostsAba({ posts, onErro }: { posts: PostAdmin[]; onErro: (e: string | 
   )
 }
 
-function ComentariosAba({ comentarios, onErro }: { comentarios: ComentarioAdmin[]; onErro: (e: string | null) => void }) {
+function ComentariosAba({ comentarios, onErro, onSucesso }: { comentarios: ComentarioAdmin[]; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
 
   function onMarcar(id: string, postId: string | null) {
     if (!postId) return
-    onErro(null)
     startTransition(async () => {
       const r = await marcarMelhorResposta(id, postId)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Melhor resposta marcada com sucesso'); router.refresh() }
     })
   }
 
   function onDesmarcar(id: string) {
-    onErro(null)
     startTransition(async () => {
       const r = await desmarcarMelhorResposta(id)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Melhor resposta desmarcada com sucesso'); router.refresh() }
     })
   }
 
   function onExcluir(id: string) {
     if (!confirm('Remover este comentário?')) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirComentario(id)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Comentário removido com sucesso'); router.refresh() }
     })
   }
 
@@ -158,17 +152,16 @@ function ComentariosAba({ comentarios, onErro }: { comentarios: ComentarioAdmin[
   )
 }
 
-function DuvidasAba({ duvidas, onErro }: { duvidas: DuvidaAulaAdmin[]; onErro: (e: string | null) => void }) {
+function DuvidasAba({ duvidas, onErro, onSucesso }: { duvidas: DuvidaAulaAdmin[]; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
 
   function onExcluir(id: string) {
     if (!confirm('Remover esta dúvida?')) return
-    onErro(null)
     startTransition(async () => {
       const r = await excluirDuvidaAula(id)
       if (!r.ok) onErro(r.erro)
-      else router.refresh()
+      else { onSucesso('Dúvida removida com sucesso'); router.refresh() }
     })
   }
 
