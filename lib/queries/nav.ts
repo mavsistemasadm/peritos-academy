@@ -14,6 +14,7 @@ export type DadosNav = {
   xpProximo: number
   progressoPct: number       // barra de nível
   faltaXp: number
+  proximoNivelNome: string | null   // null = já está no nível máximo
   moedas: number
   sequenciaDias: number      // o foguinho
   isAdmin: boolean
@@ -28,7 +29,7 @@ export type DadosNav = {
 const VAZIO: DadosNav = {
 logado: false, nome: 'Visitante', iniciais: 'PA', slug: null,
   nivel: 0, titulo: 'Iniciante',
-  xp: 0, xpProximo: 100, progressoPct: 0, faltaXp: 100,
+  xp: 0, xpProximo: 100, progressoPct: 0, faltaXp: 100, proximoNivelNome: null,
   moedas: 0, sequenciaDias: 0, isAdmin: false,
   nomePlataforma: 'Peritos Academy', logoUrl: null,
   comunidadeAtiva: true, desafiosAtivos: true, agendaAtiva: true, modoManutencao: false,
@@ -91,6 +92,7 @@ export async function carregarNav(): Promise<DadosNav> {
     xp, xpProximo,
     progressoPct: xpProximo > 0 ? Math.min(100, Math.round((xp / xpProximo) * 100)) : 100,
     faltaXp: Math.max(0, xpProximo - xp),
+    proximoNivelNome: proximo?.nome ?? null,
     moedas,
     sequenciaDias: typeof streak === 'number' ? streak : 0,
     isAdmin: (adminRows?.length ?? 0) > 0,

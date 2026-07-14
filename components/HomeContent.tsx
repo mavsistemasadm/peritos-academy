@@ -15,9 +15,9 @@ const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 function CardCurso({ c }: { c: CursoCard }) {
   const emAndamento = c.progressoPct > 0 && c.progressoPct < 100
   return (
-    <a className="card-curso" href={`/curso/${c.slug}`} role="listitem">
+    <a className="card-curso" href={c.href} role="listitem">
       <div className="card-capa" style={c.capa_url ? { backgroundImage: `url(${c.capa_url})` } : undefined}>
-        <span className="acao btn-quieto">{emAndamento ? 'Continuar' : 'Começar'}</span>
+        <span className="acao btn-quieto">{c.motivo}</span>
       </div>
       <div className="card-info">
         <span className="titulo">{c.titulo}</span>
@@ -80,7 +80,7 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
               : <>Sua jornada está pronta. Comece a primeira missão e construa sua autoridade.</>}
           </p>
           <div className="hero-ctas">
-            <a className="btn btn-primario" href={d.continuarCurso ? `/curso/${d.continuarCurso.slug}` : '/jornada'}>
+            <a className="btn btn-primario" href={d.continuarCurso ? d.continuarCurso.href : '/jornada'}>
 <IconePlay size={13} />
               {d.continuarCurso && d.continuarCurso.progressoPct > 0 ? 'Continuar de onde parei' : 'Começar agora'}
             </a>
@@ -151,7 +151,7 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
               ))}
               <li className="etapa marco">
                 <span className="no" aria-hidden="true"><IconeStar size={13} /></span>
-                <div><div className="nome">Perito de Elite</div><div className="estado">Certificação</div></div>
+                <div><div className="nome">{d.marcoFinalNome}</div><div className="estado">Formação completa</div></div>
               </li>
             </ol>
           </div>
@@ -220,18 +220,22 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
                 <h3>Peritos em movimento.</h3>
                 <span className="online num"><span className="ponto" aria-hidden="true"></span>{d.online} online</span>
               </div>
-              <ul className="mov">
-                {d.movimento.map((m, i) => (
-                  <li key={i}><a href={m.link}>
-                    <span className="foto" aria-hidden="true">{m.iniciais}</span>
-                    <span className="txt">
-                      <b>{m.titulo}</b>
-                      <span>{m.detalhe}</span>
-                      <time>{m.quando}</time>
-                    </span>
-                  </a></li>
-                ))}
-              </ul>
+              {d.movimento.length > 0 ? (
+                <ul className="mov">
+                  {d.movimento.map((m, i) => (
+                    <li key={i}><a href={m.link}>
+                      <span className="foto" aria-hidden="true">{m.iniciais}</span>
+                      <span className="txt">
+                        <b>{m.titulo}</b>
+                        <span>{m.detalhe}</span>
+                        <time>{m.quando}</time>
+                      </span>
+                    </a></li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="sub" style={{ padding: 'var(--s-4) 0' }}>A comunidade está começando — seja o primeiro a compartilhar.</p>
+              )}
               <a className="btn btn-fantasma" href="/comunidade">Entrar na comunidade</a>
             </aside>
           </div>

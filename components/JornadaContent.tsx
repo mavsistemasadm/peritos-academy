@@ -1,232 +1,283 @@
 // components/JornadaContent.tsx
-// Réplica fiel do template aprovado, 100% plugada no banco.
+// Redesenho seguindo docs/mockups/mockup_jornada_final.html e
+// mockup_jornada_pos_missao.html — 100% plugado em dados reais
+// (lib/queries/jornada.ts). Nenhuma trilha é travada.
 'use client'
 
 import { useEffect, useRef } from 'react'
-import type { DadosJornada, Etapa, Missao } from '@/lib/queries/jornada'
+import type { DadosJornada, Marco, PainelTrilha, Territorio } from '@/lib/queries/jornada'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
-import { IconeCheck, IconeLock, IconePlay } from '@/components/Icones'
-import { InsigniaEtapa, Certificado } from '@/components/Emblemas'
+import { IconePlay, IconeCheck, IconeShield, IconeFileText } from '@/components/Icones'
+import { SeloExcelencia } from '@/components/Emblemas'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
-const pad2 = (n: number) => String(n).padStart(2, '0')
+const fmtDataLonga = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: 'long', year: 'numeric' })
+function formatarDataSelo(iso: string | null): string | null {
+  if (!iso) return null
+  return fmtDataLonga.format(new Date(iso))
+}
 
-// ---------- missão ----------
-function LinhaMissao({ m, etapa }: { m: Missao; etapa: Etapa['estado'] }) {
-  const href = m.curso_slug ? `/curso/${m.curso_slug}` : '#'
-  const concluida = m.nota != null
-
+function Anel({ pct, size, largura, children }: { pct: number; size: number; largura: number; children: React.ReactNode }) {
+  const r = (size - largura) / 2
+  const c = 2 * Math.PI * r
+  const offset = c - (Math.max(0, Math.min(100, pct)) / 100) * c
   return (
-    <a className="missao" href={href}>
-      <span className="missao-txt">
-        <b>{m.titulo}</b>
-        {etapa === 'travada' ? (
-          <span>{m.info}</span>
-        ) : (
-          <>
-            <span className="barra"><i data-fill={`${concluida ? 100 : m.progresso_pct}%`}></i></span>
-            {concluida ? (
-              <span className="feito-tag">Concluída · nota {m.nota!.toLocaleString('pt-BR', { minimumFractionDigits: 1 })}</span>
-            ) : m.progresso_pct > 0 ? (
-              <span className="num">{m.progresso_pct}% · continuar daqui</span>
-            ) : (
-              <span className="novo-tag">Começar{m.info ? ` · ${m.info}` : ''}</span>
-            )}
-          </>
-        )}
-      </span>
-    </a>
+    <div className="anel-wrap" style={{ width: size, height: size }}>
+      <svg className="anel-svg" viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
+        <circle className="anel-bg" cx={size / 2} cy={size / 2} r={r} strokeWidth={largura} />
+        <circle className="anel-fill" cx={size / 2} cy={size / 2} r={r} strokeWidth={largura}
+          strokeDasharray={c} strokeDashoffset={offset} strokeLinecap="round" />
+      </svg>
+      <div className="anel-label">{children}</div>
+    </div>
   )
 }
 
-// ---------- etapa ----------
-function CardEtapa({ e }: { e: Etapa }) {
+function TimelineMarcos({ marcos }: { marcos: Marco[] }) {
+  const feitos = marcos.filter(m => m.estado === 'feita').length
+  const pct = marcos.length ? (feitos / marcos.length) * 100 : 0
   return (
-    <div className={`etapa ${e.estado} reveal`}>
-      <div className={`etapa-no${e.estado === 'feita' ? '' : ' num'}`} aria-hidden="true">
-        {e.estado === 'feita' ? <IconeCheck size={13} /> : pad2(e.numero)}
+    <div className="marcos-wrap">
+      <div className="marcos-linha">
+        <div className="marcos-fio"><i style={{ width: `${pct}%` }}></i></div>
+        {marcos.map(m => (
+          <div className={`marco-item ${m.estado}`} key={m.id}>
+            <div className="marco-bola">
+              {m.estado === 'feita' ? <IconeCheck size={16} strokeWidth={2.8} /> : String(m.ordem + 1).padStart(2, '0')}
+            </div>
+            {m.estado === 'atual' && <span className="marco-sub">Em andamento</span>}
+            <span className="marco-nome">{m.nome}</span>
+          </div>
+        ))}
       </div>
-      <div className="etapa-corpo">
-        <span className="fantasma num" aria-hidden="true">{pad2(e.numero)}</span>
-        <div className="etapa-cab">
-          <span className="rotulo-etapa">
-            Etapa {pad2(e.numero)}
-            {e.estado === 'feita' && e.concluida_rotulo && <> · {e.concluida_rotulo.replace(/^Concluída/i, 'Concluída')}</>}
-            {e.estado === 'atual' && <> · Você está aqui · {e.missoes_feitas} de {e.missoes_total} missões</>}
-          </span>
-          <h2>{e.nome}</h2>
-          <p className="desc">{e.descricao}</p>
+    </div>
+  )
+}
+
+function PainelCard({ painel, icone, corAneL = 'verde' }: { painel: PainelTrilha; icone: 'formacao' | 'territorio'; corAneL?: string }) {
+  return (
+    <div className="missao reveal">
+      <div className="missao-corpo">
+        <span className="missao-tag">{painel.tag}</span>
+        <div className="missao-cab">
+          <div className="missao-icone">
+            {icone === 'formacao' ? <IconeShield size={28} strokeWidth={1.5} /> : <IconeFileText size={28} strokeWidth={1.5} />}
+          </div>
+          <div>
+            <h2>{painel.nome}</h2>
+            {painel.descricao && <p className="desc">{painel.descricao}</p>}
+          </div>
         </div>
-        <div className="missoes">
-          {e.missoes.map(m => <LinhaMissao key={m.titulo} m={m} etapa={e.estado} />)}
+
+        {painel.marcos.length > 0 && <TimelineMarcos marcos={painel.marcos} />}
+
+        <div className="missao-rodape">
+          {painel.continuarHref ? (
+            <a className="btn-grad" href={painel.continuarHref}>
+              <IconePlay size={13} />
+              {icone === 'formacao' ? 'Continuar missão' : 'Continuar especialização'}
+            </a>
+          ) : (
+            <span className="btn-grad" style={{ opacity: 0.5, pointerEvents: 'none' }}>Sem conteúdo ainda</span>
+          )}
+          {painel.proximoTexto && (
+            <div className="proximo-curso">
+              <small>{painel.proximoRotulo}</small>
+              <strong>{painel.proximoTexto}</strong>
+            </div>
+          )}
+          {icone === 'territorio' && (
+            <a className="trocar-trilha" href="#territorios">Explorar outros territórios →</a>
+          )}
         </div>
-        <div className="etapa-rodape">
-          {e.estado === 'feita' && e.recompensa_nome && (
-            <span className="recompensa ganha">
-              <span className="mini-selo" aria-hidden="true">
-                <IconeCheck size={13} strokeWidth={2.6} />
-              </span>
-              Insígnia {e.recompensa_nome} · +{e.recompensa_xp} XP recebidos
-            </span>
-          )}
-          {e.estado === 'atual' && e.recompensa_nome && (
-            <span className="recompensa">
-              <span className="mini-selo" aria-hidden="true">
-                <InsigniaEtapa size={14} />
-              </span>
-              Ao concluir: Insígnia <b style={{ margin: '0 4px' }}>{e.recompensa_nome}</b> · +{e.recompensa_xp} XP
-            </span>
-          )}
-          {e.estado === 'travada' && e.trava_txt && (
-            <span className="trava">
-              <IconeLock size={14} strokeWidth={2} />
-              {e.trava_txt}
-            </span>
-          )}
+      </div>
+
+      <div className="missao-progresso">
+        <div className="prog-topo"><span>{icone === 'formacao' ? 'Seu progresso' : 'Território'}</span><span className="ativo">Em curso</span></div>
+        <Anel pct={painel.progressoPct} size={180} largura={6}>
+          <span className="grande num">{painel.marcosFeitos}<small>/{painel.marcosTotal}</small></span>
+          <span className="rotulo">{icone === 'formacao' ? 'Etapas' : 'Cursos'}</span>
+        </Anel>
+        <div className="prog-info">
+          <p><strong>{painel.progressoPct}%</strong> {icone === 'formacao' ? 'da base concluída' : 'do território dominado'}</p>
+          <div className="prog-barra"><i style={{ width: `${painel.progressoPct}%` }}></i></div>
+          <small>Ao concluir: {painel.marcoFinalRotulo}.</small>
         </div>
       </div>
     </div>
   )
 }
 
-// ============================================================
-// PÁGINA
-// ============================================================
+function CardTerritorio({ t }: { t: Territorio }) {
+  const estadoTxt = t.estado === 'em-curso' ? 'Em curso' : t.estado === 'concluida' ? 'Concluída' : 'Aberta'
+  const offset = 176 - (Math.max(0, Math.min(100, t.progressoPct)) / 100) * 176
+  return (
+    <a className="card-b reveal" href={t.slug ? `/jornada/${t.slug}` : '#'}>
+      <div className="lado-info">
+        <span className="estado">{estadoTxt}</span>
+        <h3>{t.nome}</h3>
+        {t.descricao && <p className="desc">{t.descricao}</p>}
+        <div className="stats">
+          <div className="stat"><b>{t.totalCursos}</b><span>Cursos</span></div>
+          <div className="stat"><b>{t.horas}h</b><span>Conteúdo</span></div>
+          <div className="stat"><b>{t.cursosConcluidos}</b><span>Concluído</span></div>
+        </div>
+      </div>
+      <div className="lado-anel">
+        <div className="anel">
+          <svg viewBox="0 0 64 64"><circle className="abg" cx="32" cy="32" r="28" /><circle className="afg" cx="32" cy="32" r="28" style={{ strokeDashoffset: offset }} /></svg>
+          <b>{t.progressoPct}%</b>
+        </div>
+        <span className="anel-rot">Progresso</span>
+      </div>
+    </a>
+  )
+}
+
+function CardTambemEmAndamento({ t }: { t: Territorio }) {
+  return (
+    <a className="tea-card reveal" href={t.slug ? `/jornada/${t.slug}` : '#'}>
+      <span className="tea-nome">{t.nome}</span>
+      <div className="tea-barra"><i style={{ width: `${t.progressoPct}%` }}></i></div>
+      <span className="tea-pct num">{t.progressoPct}% · {t.cursosConcluidos}/{t.totalCursos} cursos</span>
+    </a>
+  )
+}
+
 export default function JornadaContent({ dados, nav }: { dados: DadosJornada; nav: DadosNav }) {
   const d = dados
   const raiz = useRef<HTMLDivElement>(null)
 
-  // fio de leitura + espinha que se desenha + reveals + barras
   useEffect(() => {
-    const rm = matchMedia('(prefers-reduced-motion: reduce)').matches
-    const fio = raiz.current?.querySelector<HTMLElement>('.fio')
-    const etapasEl = raiz.current?.querySelector<HTMLElement>('.etapas')
-    const espinhaFio = raiz.current?.querySelector<HTMLElement>('.espinha-fio')
     const anima = (el: Element) =>
       el.querySelectorAll<HTMLElement>('i[data-fill]').forEach(i => { i.style.width = i.dataset.fill ?? '0%' })
-
-    const aoRolar = () => {
-      const h = document.documentElement
-      if (fio) fio.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%'
-      if (etapasEl && espinhaFio) {
-        const r = etapasEl.getBoundingClientRect()
-        const p = Math.min(Math.max((innerHeight * .62 - r.top) / r.height, 0), 1)
-        espinhaFio.style.height = (p * 100) + '%'
-      }
-    }
-    addEventListener('scroll', aoRolar, { passive: true })
-
-    if (rm) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
       raiz.current?.querySelectorAll('.reveal').forEach(el => el.classList.add('visivel'))
       if (raiz.current) anima(raiz.current)
-      if (espinhaFio) espinhaFio.style.height = '100%'
-    } else {
-      const io = new IntersectionObserver(es => {
-        es.forEach(e => {
-          if (e.isIntersecting) { e.target.classList.add('visivel'); anima(e.target); io.unobserve(e.target) }
-        })
-      }, { threshold: .14, rootMargin: '0px 0px -5% 0px' })
-      raiz.current?.querySelectorAll('.reveal').forEach(el => io.observe(el))
-      aoRolar()
+      return
     }
-    return () => removeEventListener('scroll', aoRolar)
+    const io = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visivel'); anima(e.target); io.unobserve(e.target) } })
+    }, { threshold: .12, rootMargin: '0px 0px -4% 0px' })
+    raiz.current?.querySelectorAll('.reveal').forEach(el => io.observe(el))
+    return () => io.disconnect()
   }, [])
+
+  const dataSelo = formatarDataSelo(d.seloConquistadoEm)
 
   return (
     <div ref={raiz} className="pagina-jornada">
       <div className="grao" aria-hidden="true"></div>
-      <div className="fio" aria-hidden="true"></div>
 
-      {/* ============ NAV ============ */}
       <NavPlataforma dados={nav} ativo="trilhas" />
 
       {/* ============ HERO ============ */}
-      <section className="hero" aria-label="Sua jornada">
+      <section className="hero">
+        <div className="aurora a1" aria-hidden="true"></div>
+        <div className="aurora a2" aria-hidden="true"></div>
         <div className="wrap">
-          <span className="eyebrow">Sua jornada · Trilha principal</span>
-          <h1>Do conhecimento à <span className="grad-txt">autoridade.</span></h1>
-          <p className="sub">Cinco etapas entre você e o título de Perito de Elite. Cada missão concluída destrava a próxima — e deixa um rastro verificável da sua evolução.</p>
-          <div className="hero-stats">
-            <div className="stat destaque">
-              <span className="grande num">{pad2(d.etapaAtual)}<small>/{pad2(d.etapaTotal)}</small></span>
-              <span className="rot">etapa atual</span>
-            </div>
-            <div className="stat">
-              <span className="grande num">{d.missoesEtapaFeitas}<small>/{d.missoesEtapaTotal}</small></span>
-              <span className="rot">missões da etapa</span>
-            </div>
-            <div className="stat">
-              <span className="grande num">{d.missoesJornadaFeitas}<small>/{d.missoesJornadaTotal}</small></span>
-              <span className="rot">missões na jornada</span>
-            </div>
-            <div className="stat">
-              <span className="grande num">{fmtNum(d.xp)}</span>
-              <span className="rot">XP acumulado</span>
-            </div>
-            <div className="stat">
-              <span className="grande num">~{d.ritmoSemanas} <small>sem</small></span>
-              <span className="rot">no seu ritmo atual</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ============ MAPA ============ */}
-      <section className="mapa">
-        <div className="aurora" aria-hidden="true" style={{ top: 900, left: -180 }}></div>
-        <div className="wrap">
-          <div className="etapas">
-            <div className="espinha" aria-hidden="true"><div className="espinha-fio"></div></div>
-
-            {d.etapas.map(e => <CardEtapa key={e.numero} e={e} />)}
-
-            {/* MARCO FINAL */}
-            <div className="marco reveal">
-              <div className="marco-no" aria-hidden="true">
-                <Certificado size={22} />
-              </div>
-              <div className="marco-cartao">
-                <span className="rotulo-etapa">Marco final · Certificação</span>
-                <h2>Perito de Elite.</h2>
-                <p>O título que resume a jornada: certificação verificável, com registro público e QR de autenticidade — pronta para o seu perfil profissional e para os autos.</p>
-                <div className="marco-itens">
-                  <span className="marco-item"><span className="ok" aria-hidden="true"><IconeCheck size={13} /></span>Certificado verificável com registro público</span>
-                  <span className="marco-item"><span className="ok" aria-hidden="true"><IconeCheck size={13} /></span>Insígnia máxima no perfil e no ranking</span>
-                  <span className="marco-item"><span className="ok" aria-hidden="true"><IconeCheck size={13} /></span>Selo Perito de Elite na comunidade</span>
-                </div>
-                <a className="btn btn-primario" href="/curso/segredos-bancarios">
-                  <IconePlay size={13} />
-                  Continuar a jornada
-                </a>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ============ OUTRAS TRILHAS ============ */}
-      <section className="outras" aria-label="Outras trilhas">
-        <div className="wrap">
-          <div className="outras-cab reveal">
+          <div className="hero-grid">
             <div>
-              <span className="eyebrow">Explorar</span>
-              <h2>Outras trilhas para o seu arsenal.</h2>
+              <span className="eyebrow">Jornada profissional</span>
+              <h1>Seu mapa para se tornar um <span className="grad-txt">perito impossível de ignorar.</span></h1>
             </div>
-            <a className="link-secao" href="/biblioteca">Ver biblioteca completa →</a>
-          </div>
-          <div className="trilhas-grid">
-            {d.trilhas.map(t => (
-              <a className="trilha-card reveal" href="#" key={t.nome}>
-                <span className="eyebrow">{t.missoes_qtd} missões · {t.horas}h</span>
-                <h3>{t.nome}</h3>
-                <p>{t.descricao}</p>
-                <span className="meta num"><b>{fmtNum(t.alunos)} peritos</b> nesta trilha</span>
-              </a>
-            ))}
+            <div className="hero-aside">
+              <p className="sub">Não é uma coleção de cursos. É uma progressão desenhada para transformar repertório em resultado, reconhecimento e autoridade.</p>
+            </div>
           </div>
         </div>
+      </section>
+
+      <div className="wrap">
+        <hr className="linha-grad" />
+
+        <div className="palco">
+          {/* ============ SELO CONQUISTADO ============ */}
+          {d.seloConquistado && (
+            <div className="selo-card reveal">
+              <div className="brilho" aria-hidden="true"></div>
+              <div className="selo-icone"><SeloExcelencia size={34} /></div>
+              <div className="selo-info">
+                <span className="selo-tag">Selo de Excelência conquistado</span>
+                <h3>{d.trilhaPrincipalNome ?? 'Formação Pericial de Alta Performance'} concluída</h3>
+                <p>Formação completa{dataSelo ? ` · Concluída em ${dataSelo}` : ''} · Insígnia permanente no seu perfil</p>
+              </div>
+              {d.trilhaPrincipalSlug && (
+                <div className="selo-acao">
+                  <a href={`/jornada/${d.trilhaPrincipalSlug}`}>Rever cursos da formação</a>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ============ PAINEL PRINCIPAL (formação em curso OU protagonista) ============ */}
+          {d.painelFormacao && <PainelCard painel={d.painelFormacao} icone="formacao" />}
+
+          {!d.painelFormacao && d.seloConquistado && d.painelProtagonista && (
+            <PainelCard painel={d.painelProtagonista} icone="territorio" />
+          )}
+
+          {!d.painelFormacao && d.seloConquistado && !d.painelProtagonista && (
+            <div className="convite reveal">
+              <h2>Seu selo está garantido. <span className="grad-txt">Onde sua autoridade vai crescer agora?</span></h2>
+              <a className="btn-grad" href="#territorios">Explorar territórios <span className="seta">↗</span></a>
+            </div>
+          )}
+
+          {!d.painelFormacao && !d.seloConquistado && (
+            <div className="vazio reveal">
+              <p>A {d.trilhaPrincipalNome ?? 'Formação Pericial de Alta Performance'} está sendo estruturada. Volte em breve para começar sua missão.</p>
+            </div>
+          )}
+
+          {/* ============ STATS RAIL ============ */}
+          <div className="stats-rail reveal">
+            <div className="stat-item"><span className="stat-num">{String(nav.nivel).padStart(2, '0')}</span><div className="stat-txt"><small>Nível atual</small><strong>{nav.titulo}</strong></div></div>
+            <div className="stat-item"><span className="stat-num accent">+{fmtNum(nav.faltaXp)}</span><div className="stat-txt"><small>XP para o próximo</small><strong>{nav.proximoNivelNome ?? 'Nível máximo'}</strong></div></div>
+            <div className="stat-item"><span className="stat-num">{nav.sequenciaDias}</span><div className="stat-txt"><small>Dias em movimento</small><strong>Sua sequência atual</strong></div></div>
+            <div className="stat-item"><span className="stat-num">{fmtNum(d.aulasConcluidas)}</span><div className="stat-txt"><small>Aulas concluídas</small><strong>Rastro verificável</strong></div></div>
+          </div>
+
+          {/* ============ TAMBÉM EM ANDAMENTO ============ */}
+          {d.tambemEmAndamento.length > 0 && (
+            <div className="tambem-em-andamento reveal">
+              <span className="eyebrow">Também em andamento</span>
+              <div className="tea-grid">
+                {d.tambemEmAndamento.map(t => <CardTambemEmAndamento t={t} key={t.id} />)}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ============ TERRITÓRIOS ============ */}
+      <section className="especializacoes" id="territorios">
+        <div className="aurora" aria-hidden="true"></div>
+        <div className="wrap">
+          <div className="esp-header reveal">
+            <div>
+              <span className="eyebrow">Territórios de especialização</span>
+              <h2>Escolha onde sua <span className="grad-txt">autoridade vai crescer.</span></h2>
+            </div>
+            <p className="sub">Cada território é uma carreira possível. Você avança no seu ritmo, mas nunca sem direção. Todos os territórios estão abertos.</p>
+          </div>
+
+          {d.territorios.length > 0 ? (
+            <div className="esp-grid">
+              {d.territorios.map(t => <CardTerritorio t={t} key={t.id} />)}
+            </div>
+          ) : (
+            <p className="vazio-txt">Os territórios de especialização estão sendo cadastrados — volte em breve.</p>
+          )}
+        </div>
+      </section>
+
+      {/* ============ FECHAMENTO ============ */}
+      <section className="fechamento">
+        <span className="eyebrow">Peritos Academy · Jornada</span>
+        <h2>Conhecimento não é o destino.<br /><span className="grad-txt">Autoridade é.</span></h2>
+        <a className="btn-grad" href="/cursos">Explorar todos os cursos <span className="seta">↗</span></a>
       </section>
     </div>
   )

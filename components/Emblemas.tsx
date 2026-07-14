@@ -219,6 +219,34 @@ export function Trofeu({ size = 18, variante = 'cor', className }: EmblemaProps)
   )
 }
 
+export function SeloExcelencia({ size = 18, variante = 'cor', className }: EmblemaProps) {
+  const uid = useId()
+  const gradId = `gam-selo-exc-${uid}`
+  const escudo = 'M12 2.5l7 2.7v6c0 5-3 8-7 9.3-4-1.3-7-4.3-7-9.3v-6z'
+  if (variante === 'mono') {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" className={className} aria-hidden="true">
+        <path d={escudo} {...MONO_ATTRS} />
+        <path d="M8.7 12.2l2.3 2.3 4.3-4.6" {...MONO_ATTRS} />
+      </svg>
+    )
+  }
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id={gradId} x1="5" y1="2.5" x2="19" y2="20.5" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#FFE082" />
+          <stop offset="0.4" stopColor="#F2C21D" />
+          <stop offset="0.7" stopColor="#E8A50F" />
+          <stop offset="1" stopColor="#B8860B" />
+        </linearGradient>
+      </defs>
+      <path d={escudo} fill={`url(#${gradId})`} stroke="#fff" strokeOpacity="0.3" strokeWidth="0.6" />
+      <path d="M8.7 12.2l2.3 2.3 4.3-4.6" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export function AoVivo({ size = 16, variante = 'cor', className }: EmblemaProps) {
   if (variante === 'mono') {
     return (
