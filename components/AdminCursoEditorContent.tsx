@@ -6,11 +6,12 @@ import type { FormEvent, ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import type { CursoAdmin, ModuloAdmin, AulaAdmin } from '@/lib/queries/admin-cursos'
 import {
-  atualizarCurso, uploadCapaCurso, alternarPublicacaoCurso, excluirCurso,
+  atualizarCurso, criarUploadCapaCurso, confirmarCapaCurso, alternarPublicacaoCurso, excluirCurso,
   criarModulo, atualizarModulo, excluirModulo, moverModulo,
-  criarAula, atualizarAula, excluirAula, moverAula, uploadCapaAula,
+  criarAula, atualizarAula, excluirAula, moverAula, criarUploadCapaAula, confirmarCapaAula,
   criarCapitulo, excluirCapitulo, uploadMateriais, renomearMaterial, moverMaterial, excluirMaterial,
 } from '@/app/admin/cursos/actions'
+import { criarClienteBrowser } from '@/lib/supabase/client'
 import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconePencil, IconeTrash, IconeUpload } from '@/components/Icones'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
@@ -18,6 +19,19 @@ function segParaLabel(seg: number) {
   const m = Math.floor(seg / 60)
   const s = seg % 60
   return `${m}min ${s}s`
+}
+
+const TAMANHO_MAX_CAPA = 5 * 1024 * 1024
+const TIPOS_CAPA = ['image/png', 'image/jpeg', 'image/webp']
+
+// Envia o arquivo direto do navegador pro Storage (bypassa a function
+// serverless da Vercel, que tem teto fixo de 4.5MB) — ver comentário em
+// criarUploadCapaCurso (app/admin/cursos/actions.ts) pra explicação completa.
+async function enviarCapaDireto(path: string, token: string, file: File): Promise<{ ok: true } | { ok: false; erro: string }> {
+  const supabase = criarClienteBrowser()
+  const { error } = await supabase.storage.from('capas').uploadToSignedUrl(path, token, file, { contentType: file.type })
+  if (error) return { ok: false, erro: error.message }
+  return { ok: true }
 }
 
 export default function AdminCursoEditorContent({ curso, modulos }: { curso: CursoAdmin; modulos: ModuloAdmin[] }) {
@@ -42,13 +56,23 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
 
   function onUploadCapa(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
-    const fd = new FormData()
-    fd.set('capa', file)
+    if (!TIPOS_CAPA.includes(file.type)) { toast.erro('Formato não aceito. Use JPG, PNG ou WebP.'); return }
+    if (file.size > TAMANHO_MAX_CAPA) { toast.erro('Imagem muito grande. Máximo 5 MB.'); return }
     startTransition(async () => {
-      const r = await uploadCapaCurso(curso.id, fd)
-      if (!r.ok) toast.erro(r.erro)
-      else { toast.sucesso('Capa atualizada com sucesso'); refresh() }
+      try {
+        const prep = await criarUploadCapaCurso(curso.id, file.name)
+        if (!prep.ok || !prep.path || !prep.token) { toast.erro(!prep.ok ? prep.erro : 'Falha ao preparar upload.'); return }
+        const envio = await enviarCapaDireto(prep.path, prep.token, file)
+        if (!envio.ok) { toast.erro(envio.erro); return }
+        const r = await confirmarCapaCurso(curso.id, prep.path)
+        if (!r.ok) { toast.erro(r.erro); return }
+        toast.sucesso('Capa atualizada com sucesso')
+        refresh()
+      } catch {
+        toast.erro('Não foi possível enviar a imagem. Tente novamente.')
+      }
     })
   }
 
@@ -356,13 +380,23 @@ function AulaBloco({
 
   function onUploadCapa(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
-    const fd = new FormData()
-    fd.set('capa', file)
+    if (!TIPOS_CAPA.includes(file.type)) { onErro('Formato não aceito. Use JPG, PNG ou WebP.'); return }
+    if (file.size > TAMANHO_MAX_CAPA) { onErro('Imagem muito grande. Máximo 5 MB.'); return }
     startTransition(async () => {
-      const r = await uploadCapaAula(aula.id, cursoId, fd)
-      if (!r.ok) onErro(r.erro)
-      else { onSucesso('Capa da aula atualizada com sucesso'); onRefresh() }
+      try {
+        const prep = await criarUploadCapaAula(aula.id, file.name)
+        if (!prep.ok || !prep.path || !prep.token) { onErro(!prep.ok ? prep.erro : 'Falha ao preparar upload.'); return }
+        const envio = await enviarCapaDireto(prep.path, prep.token, file)
+        if (!envio.ok) { onErro(envio.erro); return }
+        const r = await confirmarCapaAula(aula.id, cursoId, prep.path)
+        if (!r.ok) { onErro(r.erro); return }
+        onSucesso('Capa da aula atualizada com sucesso')
+        onRefresh()
+      } catch {
+        onErro('Não foi possível enviar a imagem. Tente novamente.')
+      }
     })
   }
 

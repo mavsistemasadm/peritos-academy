@@ -117,22 +117,33 @@ export async function excluirCurso(id: string): Promise<Resultado> {
   return { ok: true }
 }
 
-export async function uploadCapaCurso(id: string, formData: FormData): Promise<Resultado & { capaUrl?: string }> {
+// Upload de capa em duas etapas (signed upload URL) — os bytes do arquivo vão
+// direto do navegador pro Storage do Supabase, sem passar pela function
+// serverless da Vercel. Necessário porque a Vercel tem um teto FIXO de 4.5MB
+// pro corpo de qualquer requisição de function (independente do
+// bodySizeLimit do Next.js, que só controla o limite interno do Next — acima
+// de ~4.5MB a própria Vercel rejeita com 413 FUNCTION_PAYLOAD_TOO_LARGE antes
+// do Next processar, e essa resposta não vem no formato que o client de
+// Server Actions espera, o que quebra a página inteira com um erro genérico
+// em vez de mostrar um toast de erro normal.
+export async function criarUploadCapaCurso(id: string, nomeArquivo: string): Promise<Resultado & { path?: string; token?: string }> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
 
-  const arquivo = formData.get('capa') as File | null
-  if (!arquivo || arquivo.size === 0) return { ok: false, erro: 'Selecione uma imagem.' }
-  const ext = arquivo.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+  const ext = nomeArquivo.split('.').pop()?.toLowerCase() ?? 'jpg'
   if (!['jpg', 'jpeg', 'png', 'webp'].includes(ext)) return { ok: false, erro: 'Formato não aceito. Use JPG, PNG ou WebP.' }
-  if (arquivo.size > 5 * 1024 * 1024) return { ok: false, erro: 'Imagem muito grande. Máximo 5 MB.' }
 
   const supabase = await criarClienteServidor()
   const path = `cursos/${id}/capa.${ext}`
-  const buffer = Buffer.from(await arquivo.arrayBuffer())
+  const { data, error } = await supabase.storage.from('capas').createSignedUploadUrl(path, { upsert: true })
+  if (error) return { ok: false, erro: error.message }
 
-  const { error: upErr } = await supabase.storage.from('capas').upload(path, buffer, { contentType: arquivo.type, upsert: true })
-  if (upErr) return { ok: false, erro: upErr.message }
+  return { ok: true, path: data.path, token: data.token }
+}
 
+export async function confirmarCapaCurso(id: string, path: string): Promise<Resultado & { capaUrl?: string }> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+
+  const supabase = await criarClienteServidor()
   const { data: urlData } = supabase.storage.from('capas').getPublicUrl(path)
   const capaUrl = urlData.publicUrl + '?t=' + Date.now()
 
@@ -301,22 +312,26 @@ export async function moverAula(moduloId: string, cursoId: string, id: string, d
   return { ok: true }
 }
 
-export async function uploadCapaAula(id: string, cursoId: string, formData: FormData): Promise<Resultado & { capaUrl?: string }> {
+// Mesmo padrão de signed upload URL de criarUploadCapaCurso/confirmarCapaCurso
+// — ver comentário lá em cima pra explicação completa do porquê.
+export async function criarUploadCapaAula(id: string, nomeArquivo: string): Promise<Resultado & { path?: string; token?: string }> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
 
-  const arquivo = formData.get('capa') as File | null
-  if (!arquivo || arquivo.size === 0) return { ok: false, erro: 'Selecione uma imagem.' }
-  const ext = arquivo.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+  const ext = nomeArquivo.split('.').pop()?.toLowerCase() ?? 'jpg'
   if (!['jpg', 'jpeg', 'png', 'webp'].includes(ext)) return { ok: false, erro: 'Formato não aceito. Use JPG, PNG ou WebP.' }
-  if (arquivo.size > 5 * 1024 * 1024) return { ok: false, erro: 'Imagem muito grande. Máximo 5 MB.' }
 
   const supabase = await criarClienteServidor()
   const path = `aulas/${id}/capa.${ext}`
-  const buffer = Buffer.from(await arquivo.arrayBuffer())
+  const { data, error } = await supabase.storage.from('capas').createSignedUploadUrl(path, { upsert: true })
+  if (error) return { ok: false, erro: error.message }
 
-  const { error: upErr } = await supabase.storage.from('capas').upload(path, buffer, { contentType: arquivo.type, upsert: true })
-  if (upErr) return { ok: false, erro: upErr.message }
+  return { ok: true, path: data.path, token: data.token }
+}
 
+export async function confirmarCapaAula(id: string, cursoId: string, path: string): Promise<Resultado & { capaUrl?: string }> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+
+  const supabase = await criarClienteServidor()
   const { data: urlData } = supabase.storage.from('capas').getPublicUrl(path)
   const capaUrl = urlData.publicUrl + '?t=' + Date.now()
 
