@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { DadosPerfil } from '@/lib/queries/perfil'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
-import { salvarPerfil, uploadFoto } from '@/app/perfil/actions'
+import { salvarPerfil, uploadFoto, salvarPreferenciaEmail } from '@/app/perfil/actions'
 import {
   IconeCheck, IconeFileText, IconeZap, IconeLock, IconeMessageCircle, IconePencil,
   IconeArrowUp, IconeCamera, IconeEye, IconeLink, IconeDownload, IconePlay,
@@ -57,6 +57,14 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
   const [msgSalvo, setMsgSalvo] = useState<string | null>(null)
   const [fotoUrl, setFotoUrl] = useState<string | null>(dados.foto_url)
   const [uploadingFoto, setUploadingFoto] = useState(false)
+  const [receberEmails, setReceberEmails] = useState(dados.receberEmails)
+
+  async function onToggleReceberEmails(e: React.ChangeEvent<HTMLInputElement>) {
+    const novo = e.target.checked
+    setReceberEmails(novo) // otimista
+    const r = await salvarPreferenciaEmail(novo)
+    if (!r.ok) setReceberEmails(!novo) // reverte no erro
+  }
 
   useEffect(() => {
     const anima = (el: Element | Document) =>
@@ -220,6 +228,10 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
                   <label className="pe-toggle">
                     <input type="checkbox" name="sons_conquista" defaultChecked={d.sons_conquista} />
                     <span>Sons de conquista</span>
+                  </label>
+                  <label className="pe-toggle">
+                    <input type="checkbox" checked={receberEmails} onChange={onToggleReceberEmails} />
+                    <span>Receber emails</span>
                   </label>
                 </div>
                 {d.slug && d.perfil_publico && (

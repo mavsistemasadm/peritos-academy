@@ -1,0 +1,8 @@
+{
+  "crons": [
+    { "path": "/api/cron/email-carta-pessoal", "schedule": "0 10 * * *" },
+    { "path": "/api/cron/email-primeira-semana", "schedule": "0 10 * * *" },
+    { "path": "/api/cron/email-inatividade", "schedule": "0 10 * * *" },
+    { "path": "/api/cron/email-resumo-quinzenal", "schedule": "0 10 * * *" }
+  ]
+}

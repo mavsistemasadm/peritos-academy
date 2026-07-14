@@ -1,0 +1,73 @@
+// lib/email/templates/cartaPessoal.ts
+// HTML copiado literalmente de docs/email-templates/email_carta_pessoal_marlos.html
+export type DadosCartaPessoal = { primeiroNome: string };
+
+export function emailCartaPessoal(d: DadosCartaPessoal): { assunto: string; html: string } {
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uma mensagem pessoal do Marlos</title>
+</head>
+<body style="margin:0;padding:0;">
+<div style="background:#eef0f4;padding:32px 16px;font-family:Arial,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 2px 14px rgba(6,30,53,0.10);">
+
+    <div style="background:linear-gradient(150deg,#083d5a 0%,#061e35 50%,#040f1e 100%);padding:38px 40px 34px;">
+      <p style="margin:0 0 26px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);">UMA MENSAGEM PESSOAL</p>
+      <p style="margin:0 0 22px;font-size:26px;font-weight:800;line-height:36px;color:#ffffff;letter-spacing:-0.5px;">${d.primeiroNome}, preciso te<br>dizer uma coisa.</p>
+      <div style="width:52px;height:3px;background:linear-gradient(90deg,#1DC8A0,rgba(29,200,160,0));border-radius:2px;"></div>
+    </div>
+
+    <div style="padding:40px 40px 16px;">
+
+      <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Você não fez apenas uma compra. Você tomou uma decisão de futuro, daquelas que a gente olha pra trás e diz: <em>"ainda bem que eu não deixei passar"</em>.</p>
+
+      <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Eu sei porque estou te escrevendo isso. Porque eu já estive exatamente onde você está agora. No começo de uma jornada que parecia grande demais, sem saber se ia dar conta, sem saber se era o momento certo. E eu te digo com todas as letras: <strong>era o momento certo</strong>. E você vai dar conta.</p>
+
+      <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">A partir de agora, não existe mais teto pra sua evolução como perito. Você tem nas mãos o caminho que pode mudar completamente o seu destino profissional. E tudo depende de uma única pessoa: você.</p>
+
+      <div style="margin:30px 0;background:#edf9f6;border-left:4px solid #1DC8A0;border-radius:0 12px 12px 0;padding:20px 24px;">
+        <p style="margin:0;font-size:17px;line-height:30px;color:#083952;font-style:italic;font-weight:700;">Essa decisão já te coloca anos à frente da maioria dos peritos do país. Não é exagero. É matemática.</p>
+      </div>
+
+      <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Nós vamos te dar tudo o que for preciso: as aulas, os casos, as ferramentas, a comunidade, o suporte. Mas o seu crescimento vai ser construído no dia a dia, no seu comprometimento com a sua própria história.</p>
+
+      <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Você escolheu estar entre os que não aceitam o comum. Entre aqueles que querem crescer, faturar, ser referência, liderar o mercado. E isso, por si só, já diz muito sobre quem você é.</p>
+
+      <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Eu quero que você saiba de algo que eu não digo em público: eu acompanho de perto quem está na plataforma. Vejo quem estuda todo dia. Vejo quem resolve os casos. Vejo quem participa da comunidade. E essas pessoas me dão orgulho de ter construído isso.</p>
+
+      <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Agora começa uma nova fase. Uma fase de transformação real.</p>
+
+      <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">E eu, pessoalmente, vou estar contigo nessa jornada. Não só como educador. Mas como alguém que acredita profundamente no seu potencial.</p>
+
+      <div style="margin:30px 0;background:#edf9f6;border-left:4px solid #1DC8A0;border-radius:0 12px 12px 0;padding:20px 24px;">
+        <p style="margin:0;font-size:17px;line-height:30px;color:#083952;font-style:italic;font-weight:700;">Parabéns pela coragem. Parabéns pela visão. Parabéns por escolher o extraordinário.</p>
+      </div>
+
+      <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Sua próxima aula está te esperando. E cada uma delas te leva mais perto do profissional que você decidiu se tornar.</p>
+
+      <div style="margin:8px 0 36px;text-align:center;">
+        <a href="https://peritos-academy.vercel.app" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Continuar minha jornada</a>
+      </div>
+
+      <div style="margin-bottom:36px;border-left:3px solid #1DC8A0;padding-left:16px;">
+        <p style="margin:0 0 2px;font-size:15px;line-height:22px;color:#888880;">Do fundo do coração,</p>
+        <p style="margin:0;font-size:19px;font-weight:800;color:#083952;letter-spacing:-0.3px;">Marlos Henrique</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#888880;">Fundador da Peritos Academy</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="max-width:600px;margin:0 auto;text-align:center;padding:22px 16px 6px;">
+    <p style="font-size:12px;color:#9aa1b0;margin:0 0 6px;">Peritos Academy · A jornada completa da perícia judicial</p>
+    <p style="font-size:11px;color:#b4bac6;margin:0;">Você recebeu este email porque faz parte da Peritos Academy.<br/>Preferências de email · Cancelar inscrição</p>
+  </div>
+</div>
+</body>
+</html>`;
+
+  return { assunto: `${d.primeiroNome}, preciso te dizer uma coisa`, html };
+}

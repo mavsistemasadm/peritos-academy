@@ -75,6 +75,7 @@ export async function atualizarCurso(id: string, formData: FormData): Promise<Re
       citacao: (formData.get('citacao') as string)?.trim() || null,
       objetivos,
       emite_certificado: formData.get('emite_certificado') === 'on',
+      contexto_certificado: (formData.get('contexto_certificado') as string)?.trim() || null,
       carga_horas: cargaHoras,
       atualizado_em: new Date().toISOString(),
     })

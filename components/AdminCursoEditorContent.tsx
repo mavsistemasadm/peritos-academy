@@ -155,6 +155,14 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
                 <input name="carga_horas" type="number" step="0.5" min="0" defaultValue={curso.cargaHoras ?? ''} />
               </label>
             </div>
+            <label>Contexto do certificado (email de conclusão)
+              <textarea
+                name="contexto_certificado"
+                defaultValue={curso.contextoCertificado ?? ''}
+                rows={3}
+                placeholder="Deixe em branco pra usar o texto genérico padrão do email de certificado."
+              />
+            </label>
             <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar dados gerais'}</button>
           </form>
         </section>

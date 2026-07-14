@@ -28,7 +28,16 @@ export async function middleware(request: NextRequest) {
   // Renova a sessão se o token estiver perto de expirar.
   const { data: auth } = await supabase.auth.getUser();
   const pathname = request.nextUrl.pathname;
-  const rotaNeutra = pathname === "/login" || pathname === "/conta-suspensa" || pathname === "/manutencao";
+  const rotaNeutra =
+    pathname === "/login" ||
+    pathname === "/conta-suspensa" ||
+    pathname === "/manutencao" ||
+    pathname === "/email/cancelar";
+  // Rotas de API têm autenticação própria (token/secret compartilhado —
+  // cron, webhooks, ponte interna de email) e nunca devem ser redirecionadas
+  // pra uma página HTML por suspensão/manutenção; isso quebraria o contrato
+  // dessas rotas (esperam JSON/200, não um redirect 307).
+  const ehRotaApi = pathname.startsWith("/api/");
 
   // Admin ativo — computado uma vez e reusado no gate de /admin e no bypass
   // de manutenção (evita duas queries iguais).
@@ -47,7 +56,7 @@ export async function middleware(request: NextRequest) {
   // Suspenso/banido: bloqueio global (não só conteúdo pago) — checado aqui
   // em vez de tem_acesso_ativo porque esse RPC só gateia rotas de conteúdo
   // pago específicas; suspensão/banimento precisa cortar QUALQUER rota.
-  if (auth?.user && !rotaNeutra) {
+  if (auth?.user && !rotaNeutra && !ehRotaApi) {
     const { data: perfil } = await supabase
       .from("perfis")
       .select("status")
@@ -63,7 +72,7 @@ export async function middleware(request: NextRequest) {
   // pra excluir /login e /manutencao do próprio redirect sem entrar em loop,
   // e middleware já paga uma query por request nesse mesmo estilo (ver
   // suspensão acima); layout root não tem o pathname sem um hack extra.
-  if (!rotaNeutra && !ehAdmin) {
+  if (!rotaNeutra && !ehAdmin && !ehRotaApi) {
     const { data: config } = await supabase
       .from("config_plataforma")
       .select("modo_manutencao")

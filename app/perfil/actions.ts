@@ -43,6 +43,19 @@ export async function salvarPerfil(formData: FormData) {
   return { ok: true as const, slug }
 }
 
+export async function salvarPreferenciaEmail(receberEmails: boolean) {
+  const supabase = await criarClienteServidor()
+  const { data: auth } = await supabase.auth.getUser()
+  if (!auth?.user) return { ok: false as const, erro: 'Faça login.' }
+
+  const { error } = await supabase
+    .from('email_preferencias')
+    .upsert({ usuario_id: auth.user.id, receber_emails: receberEmails }, { onConflict: 'usuario_id' })
+
+  if (error) return { ok: false as const, erro: error.message }
+  return { ok: true as const }
+}
+
 export async function uploadFoto(formData: FormData) {
   const supabase = await criarClienteServidor()
   const { data: auth } = await supabase.auth.getUser()

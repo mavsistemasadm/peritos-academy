@@ -64,6 +64,7 @@ export type CursoAdmin = {
   citacao: string | null
   objetivos: string[]
   emiteCertificado: boolean
+  contextoCertificado: string | null
   cargaHoras: number | null
   atualizadoEm: string
 }
@@ -193,7 +194,8 @@ export async function carregarCursoAdmin(id: string): Promise<CursoDetalheAdmin 
       publicado: curso.publicado, instrutorNome: curso.instrutor_nome,
       instrutorTitulo: curso.instrutor_titulo, instrutorIniciais: curso.instrutor_iniciais,
       citacao: curso.citacao, objetivos: Array.isArray(curso.objetivos) ? curso.objetivos : [],
-      emiteCertificado: curso.emite_certificado, cargaHoras: curso.carga_horas,
+      emiteCertificado: curso.emite_certificado, contextoCertificado: curso.contexto_certificado,
+      cargaHoras: curso.carga_horas,
       atualizadoEm: curso.atualizado_em,
     },
     modulos,

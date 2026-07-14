@@ -44,6 +44,7 @@ export type DadosPerfil = {
   mostrar_email: boolean
   perfil_publico: boolean
   sons_conquista: boolean
+  receberEmails: boolean
   foto_url: string | null
   titulo: string
   nivel: number
@@ -98,6 +99,7 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     { data: atividadesRaw },
     { data: rankingVoce },
     { count: anotacoes },
+    { data: emailPref },
   ] = await Promise.all([
     supabase.from('perfis').select('*').eq('id', auth.user.id).single(),
     supabase.from('perfil_estudo_dias').select('dia, nivel'),
@@ -106,6 +108,7 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     supabase.from('perfil_atividades').select('*').order('quando', { ascending: false }).limit(8),
     supabase.from('comunidade_ranking').select('posicao, variacao').eq('eh_voce', true).maybeSingle(),
     supabase.from('aula_anotacoes').select('id', { count: 'exact', head: true }),
+    supabase.from('email_preferencias').select('receber_emails').eq('usuario_id', auth.user.id).maybeSingle(),
   ])
   if (!perfil) return null
 
@@ -168,6 +171,7 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     mostrar_email: perfil.mostrar_email ?? false,
     perfil_publico: perfil.perfil_publico ?? true,
     sons_conquista: perfil.sons_conquista ?? true,
+    receberEmails: emailPref?.receber_emails ?? true,
     foto_url: perfil.foto_url ?? null,
     titulo: perfil.titulo ?? 'Perito Iniciante',
     nivel: perfil.nivel ?? 1,
