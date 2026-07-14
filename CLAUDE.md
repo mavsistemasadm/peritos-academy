@@ -104,9 +104,42 @@ Sequência de build de cada página:
 - Testado de ponta a ponta via REST direto (upload como admin, signed URL + download com bytes idênticos como aluno com assinatura ativa, bloqueio confirmado tanto pra aluno sem assinatura quanto pra anon — 404 por RLS, não 403, o que é até melhor pra não vazar a existência do arquivo) — usuários descartáveis, tudo apagado ao final.
 - **Ideia futura (não implementada de propósito)**: gatilho de gamificação `baixar_material` (XP por baixar um material) — deixar pra próxima sessão de calibragem de gatilhos, junto com os outros valores placeholder já registrados na seção Gamificação.
 
+## Progressão sequencial de aulas — 2026-07-14
+Aula N+1 só libera após aula N concluída, e "concluída" passou a ter critérios (antes era um clique livre). Chokepoint único: RPC `concluir_aula(p_aula_id)`, `security definer` (EXECUTE revogado de `anon`/`PUBLIC` nomeando os papéis — mesma pegadinha do `notificar()`, revoke de `PUBLIC` sozinho não bastou).
+
+### Critérios de conclusão (todos avaliados dentro da RPC, nunca só no client)
+- **Vídeo**: ≥70% de `aulas.duracao_seg` assistido (só se `aulas.video_url` não for nulo).
+- **Materiais**: todos os `aula_materiais` com `arquivo_url` não nulo baixados (tabela nova `material_downloads`, ver abaixo). Aula sem vídeo/sem materiais não trava nesse critério (checado, não assumido).
+- Aula sem nenhum dos dois: conclusão livre (só a trava sequencial abaixo ainda se aplica).
+
+### Trava sequencial + avaliação de módulo (verificada DUAS vezes — página E RPC)
+`avaliacoes.modulo_id` é nullable: `tipo='avaliacao'` tem `modulo_id` (quiz do módulo), `tipo='prova'` tem `modulo_id null` (prova final do curso, gated por `avaliacoes_prova_sem_modulo`). Regra aplicada: aula[i] só libera se aula[i-1] (mesmo curso, ordenada por `modulos.ordem` → `aulas.ordem`) estiver com `aula_progresso.concluida=true` e, se aula[i] cruza pra um módulo novo, todas as `avaliacoes` publicadas (`tipo='avaliacao'`) do módulo anterior tiverem `avaliacao_tentativas.aprovado=true` pro usuário. Provas de curso (`modulo_id null`) **não** travam navegação entre aulas (não há aula pra ancorar) — travam só a conclusão do curso/certificado, já coberto por `gam_curso_completo` (pré-existente, inalterado).
+- **Página** (`lib/queries/aula.ts`, `getAula`/`primeiraAulaLiberada`): calcula `bloqueada` por aula e por item do trilho; `page.tsx` faz `redirect()` server-side pra última aula liberada (`?bloqueada=1`) se a aula pedida por URL estiver travada — cobre acesso direto por URL.
+- **RPC `concluir_aula`**: repete a mesma checagem de sequência/avaliação antes de aceitar a conclusão. Necessário porque a página só impede *ver* uma aula travada — sem isso, uma aula sem vídeo/materiais (critério trivial) seria concluível via `supabase.rpc('concluir_aula', ...)` direto no console do navegador, pulando aulas nunca vistas. Descoberto e corrigido durante esta mesma sessão, antes de ir pra produção.
+- **Admin**: bypass total (`is_admin_papel(uid)`, sem filtro de papel) — ignora critérios E sequência, mas a conclusão ainda passa pela RPC normalmente (ainda credita XP/gamificação, só pula a validação).
+
+### Tracking do vídeo (Panda Video)
+Sem SDK novo — só um listener `window.addEventListener('message', ...)` filtrando `event.data.message` com prefixo `panda_` (`panda_timeupdate`, `panda_pause`, `panda_ended`), que o player do Panda já emite por `postMessage` independente de usar a classe `PandaPlayer` deles. `AulaContent.tsx` soma só incrementos pequenos e positivos (`0 < delta < 2s`) entre dois `panda_timeupdate` como "assistido de verdade" — ignora saltos de seek pra frente (não dá pra arrastar a barra até 70%) sem penalizar replay. Persiste em `aula_progresso.segundos_assistidos` a cada ~10s (throttle) e imediatamente em pause/ended/saída da página (best-effort, cliente pode fechar a aba antes do flush).
+- **Limitação aceita**: o tempo assistido vem do player no client, não é à prova de fraude por usuário técnico (poderia forjar `postMessage` via devtools). A validação dos 70% pra *concluir* é sempre no servidor (RPC lê `aula_progresso.segundos_assistidos`, não confia em nada que o client mande na hora de concluir) — mitiga forjar a conclusão, não mitiga forjar o número assistido em si. Aceitável pro produto (mesmo espírito da doc original da spec).
+
+### Escrita protegida (trigger, não RLS)
+`aula_progresso.concluida` tinha `default true` (vestígio do modelo antigo "linha existe = concluída") — mudado pra `default false`, já que agora a linha também existe pra progresso PARCIAL (`segundos_assistidos`). RLS de `aula_progresso` continua `ALL` pro dono da linha (client grava `segundos_assistidos` direto, sem RPC, mesmo padrão de sempre) — quem impede o client de forjar `concluida=true` é o trigger `trg_aula_progresso_proteger_conclusao` (`BEFORE INSERT OR UPDATE OF concluida`, mesmo padrão de `trg_gam_proteger_perfis` em Gamificação): reverte pro valor antigo a menos que `set_config('app.conclusao_validada','on',true)` esteja setado — só `concluir_aula()` seta essa flag. Testado explicitamente: `UPDATE aula_progresso SET concluida=true` direto (simulando bypass) foi revertido pelo trigger.
+- Toda leitura de "aula concluída" no app **precisa** filtrar `.eq('concluida', true)` — existência de linha não significa mais concluída. Auditado em toda a base nesta sessão; único ponto que lia só a existência (`lib/queries/aula.ts`) foi corrigido.
+
+### Tabelas/RPC novas
+- `aula_progresso.segundos_assistidos` (integer, default 0).
+- `material_downloads` (`usuario_id`, `material_id`, `baixado_em`, PK composta) — RLS só o dono. Escrito em `baixarMaterialAula` (`app/curso/[slug]/aula/[aulaId]/actions.ts`), depois de mintar a signed URL, upsert idempotente.
+- `concluir_aula(p_aula_id)` → `jsonb` (`{ok:true}` ou `{ok:false, erro?, video_ok?, video_pct?, materiais_pendentes?, bloqueada_sequencia?}`), chamada via nova server action `concluirAula`.
+
+### UI (`AulaContent.tsx`)
+Checklist ao vivo acima das abas (some quando a aula não tem vídeo nem material, ou já está concluída) com item de vídeo (`X% de 70%`) e um item por material (`pendente`/`baixado ✓`). Botão "Marcar como concluída" fica `disabled` (nunca clicável-pra-ser-rejeitado) enquanto os critérios não batem, com `title` explicando o que falta em tom de mentor; ao clicar chama a RPC (não mais upsert direto). Trilho lateral mostra cadeado (`IconeLock`) nas aulas bloqueadas (`Link` com `onClick` que dá `preventDefault`, não esconde só visualmente — a página redireciona de qualquer forma se a URL for acessada direto). Botão "Próxima" vira um cadeado desabilitado até a aula atual ser marcada concluída.
+
+### Testado (SQL direto via MCP, usuário descartável, tudo revertido ao final)
+Curso real com 2 módulos (`desvendando-os-segredos-das-instituicoes-bancarias`) e uma avaliação de módulo publicada temporariamente pro teste (revertida a `publicado=false` depois): rejeição sem progresso, tentativa de bypass direto de `concluida=true` revertida pelo trigger, 70% de vídeo liberando o critério, download parcial (5 de 6 materiais) ainda bloqueando, conclusão completa creditando gamificação (`concluir_aula` + `iniciar_curso` no `gamificacao_extrato`), pulo de aula no meio do módulo bloqueado, módulo seguinte bloqueado até aprovar a avaliação e liberado depois de aprovar, bypass total de admin numa aula nunca vista. **Não testado**: fluxo real em navegador (login, clique, player do Panda de verdade) — verificação ficou no nível de banco/RPC + `npm run build`; recomendado um teste manual único em preview antes do próximo grande lançamento de conteúdo.
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários)
-- `cursos`, `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool — não existe tabela `aula_concluida`, nunca criar código que a referencie), `aula_anotacoes`
+- `cursos`, `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)
 - `trilhas`, `etapas`, `curso_trilha` (com trilha_nome, trilha_slug, etapa_nome)
 - `avaliacoes`, `avaliacao_questoes`, `avaliacao_opcoes`, `avaliacao_tentativas`, `avaliacao_respostas` (+ views `_publicas`)
 - `desafios`, `desafio_categorias`, `desafio_entregas` (nota_minima, arquivo_path)

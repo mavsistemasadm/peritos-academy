@@ -17,6 +17,8 @@ export async function verificarCertificado(cursoId: string): Promise<Certificado
 // tanto a leitura da linha em aula_materiais quanto o createSignedUrl no
 // storage já são gateados pela RLS (tem_acesso_ativo ou admin de conteúdo),
 // mesmo padrão de app/biblioteca/actions.ts com o bucket 'planilhas'.
+// Também registra o download em material_downloads — condição de conclusão
+// da aula (ver concluirAula) exige todos os materiais baixados.
 export async function baixarMaterialAula(materialId: string): Promise<
   { ok: true; url: string } | { ok: false; erro: string }
 > {
@@ -40,5 +42,24 @@ export async function baixarMaterialAula(materialId: string): Promise<
     return { ok: false, erro: 'Não foi possível gerar o link. Tente de novo.' }
   }
 
+  await supabase
+    .from('material_downloads')
+    .upsert({ usuario_id: auth.user.id, material_id: materialId }, { onConflict: 'usuario_id,material_id', ignoreDuplicates: true })
+
   return { ok: true, url: assinado.signedUrl }
+}
+
+// concluirAula: chokepoint único de conclusão — a RPC concluir_aula() valida
+// server-side os 70% de vídeo assistido e os materiais baixados (bypass total
+// pra admin) antes de gravar aula_progresso.concluida=true. Client nunca
+// escreve concluida diretamente (bloqueado por trigger de proteção no banco).
+export type ConcluirAulaResultado =
+  | { ok: true }
+  | { ok: false; erro?: string; video_ok?: boolean; video_pct?: number; materiais_pendentes?: { id: string; nome: string }[] }
+
+export async function concluirAula(aulaId: string): Promise<ConcluirAulaResultado> {
+  const supabase = await criarClienteServidor()
+  const { data, error } = await supabase.rpc('concluir_aula', { p_aula_id: aulaId })
+  if (error) return { ok: false, erro: 'Não foi possível concluir a aula. Tente de novo.' }
+  return data as ConcluirAulaResultado
 }

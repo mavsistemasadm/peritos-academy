@@ -10,10 +10,10 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import type { AulaCompleta, Anotacao, Duvida, Material } from "@/lib/queries/aula";
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
-import { verificarCertificado, baixarMaterialAula } from '@/app/curso/[slug]/aula/[aulaId]/actions'
+import { verificarCertificado, baixarMaterialAula, concluirAula } from '@/app/curso/[slug]/aula/[aulaId]/actions'
 import {
   IconeChevronLeft, IconeChevronRight, IconePlay, IconeCheck, IconeDownload, IconeSend, IconeHeadset, IconeAlertTriangle,
-  IconeFileText, IconeBarChart, IconePaperclip,
+  IconeFileText, IconeBarChart, IconePaperclip, IconeLock,
 } from '@/components/Icones'
 import { Certificado, XP } from '@/components/Emblemas'
 
@@ -49,19 +49,23 @@ const fmtQuando = (iso: string) => {
   return `há ${d} dias`;
 };
 
-export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
+export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoBloqueio }: {
   dados: AulaCompleta;
   usuarioId: string | null;
   usuarioNome: string | null;
   nav: DadosNav;
+  avisoBloqueio?: boolean;
 }) {
   const router = useRouter();
   const { curso, modulo, aula, capitulos, materiais, trilho, anterior, proxima, proximoModulo } = dados;
+  const admin = nav.isAdmin;
 
   /* ---------- estado ---------- */
   const [abaAtiva, setAbaAtiva] = useState("sobre");
   const [teatro, setTeatro] = useState(false);
   const [concluida, setConcluida] = useState(aula.concluida);
+  const [concluindo, setConcluindo] = useState(false);
+  const [pendenciaMsg, setPendenciaMsg] = useState<string | null>(null);
   const [progresso, setProgresso] = useState(dados.progressoCurso);
   const [toast, setToast] = useState(false);
   const [pulso, setPulso] = useState(false);
@@ -72,11 +76,15 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
   const [certPopup, setCertPopup] = useState<{ numero: string; curso: string; nota?: number } | null>(null)
   const [notaTxt, setNotaTxt] = useState("");
   const [duvidaTxt, setDuvidaTxt] = useState("");
+  const [segundosAssistidos, setSegundosAssistidos] = useState(dados.aula.segundosAssistidos);
+  const [materiaisBaixados, setMateriaisBaixados] = useState<Set<string>>(new Set(dados.materiaisBaixadosIds));
+  const [avisoVisivel, setAvisoVisivel] = useState(!!avisoBloqueio);
 
   /* ---------- player (Panda Video via iframe) ---------- */
   const playerRef = useRef<HTMLDivElement>(null);
   const notaTaRef = useRef<HTMLTextAreaElement>(null);
   const regressivaRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const segundosRef = useRef(dados.aula.segundosAssistidos);
 
   const seek = (_s: number) => {
     /* seek no iframe do Panda exige o SDK do player — reativar na próxima fase */
@@ -104,12 +112,110 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
 
   useEffect(() => () => { if (regressivaRef.current) clearInterval(regressivaRef.current); }, []);
 
+  /* aviso de "aula bloqueada" (veio de um redirect por acesso direto via URL) */
+  useEffect(() => {
+    if (!avisoBloqueio) return;
+    const t = setTimeout(() => setAvisoVisivel(false), 6000);
+    return () => clearTimeout(t);
+  }, [avisoBloqueio]);
+
+  /* ---------- tracking do Panda Video via postMessage ----------
+     O player do Panda envia eventos (panda_timeupdate, panda_pause, panda_ended)
+     por postMessage independente de usarmos o SDK deles — só ouvimos o
+     window "message". Só contamos incrementos pequenos e positivos entre dois
+     timeupdate (< 2s) como "assistido de verdade": isso ignora saltos de seek
+     pra frente (não dá pra arrastar a barra até 70% sem assistir) sem penalizar
+     replays. Persiste em aula_progresso.segundos_assistidos a cada ~10s, e
+     imediatamente em pause/ended/saída da página. É best-effort (cliente),
+     mas a validação dos 70% pra CONCLUIR a aula é sempre no servidor (RPC
+     concluir_aula) — ver CLAUDE.md, seção Progressão sequencial. */
+  useEffect(() => {
+    if (!aula.video_url || !usuarioId) return;
+    let ultimoTempo = 0;
+    let ultimoPersist = 0;
+
+    const persistir = (forcar = false) => {
+      const agora = Date.now();
+      if (!forcar && agora - ultimoPersist < 10000) return;
+      ultimoPersist = agora;
+      sb().from("aula_progresso")
+        .upsert({ usuario_id: usuarioId, aula_id: aula.id, segundos_assistidos: Math.floor(segundosRef.current) })
+        .then(() => {});
+    };
+
+    const onMessage = (e: MessageEvent) => {
+      const data = e.data;
+      if (!data || typeof data !== "object" || typeof data.message !== "string" || !data.message.startsWith("panda_")) return;
+
+      if (data.message === "panda_timeupdate" && typeof data.currentTime === "number") {
+        const t = data.currentTime;
+        const delta = t - ultimoTempo;
+        ultimoTempo = t;
+        if (delta > 0 && delta < 2) {
+          const novo = aula.duracaoSeg ? Math.min(aula.duracaoSeg, segundosRef.current + delta) : segundosRef.current + delta;
+          segundosRef.current = novo;
+          setSegundosAssistidos(novo);
+          persistir();
+        }
+      } else if (data.message === "panda_pause") {
+        persistir(true);
+      } else if (data.message === "panda_ended") {
+        const novo = aula.duracaoSeg || segundosRef.current;
+        segundosRef.current = novo;
+        setSegundosAssistidos(novo);
+        persistir(true);
+      }
+    };
+
+    window.addEventListener("message", onMessage);
+    return () => {
+      window.removeEventListener("message", onMessage);
+      persistir(true);
+    };
+  }, [aula.id, aula.video_url, aula.duracaoSeg, usuarioId]);
+
+  /* ---------- critérios de conclusão ---------- */
+  const pctVideo = aula.duracaoSeg > 0 ? Math.min(100, Math.round((segundosAssistidos / aula.duracaoSeg) * 100)) : 100;
+  const videoOk = !aula.video_url || aula.duracaoSeg === 0 || pctVideo >= 70;
+  const materiaisComArquivo = materiais.filter((m) => m.arquivo_url);
+  const materiaisPendentes = materiaisComArquivo.filter((m) => !materiaisBaixados.has(m.id));
+  const criteriosOk = videoOk && materiaisPendentes.length === 0;
+  const podeConcluir = admin || criteriosOk;
+  const mostrarChecklist = !concluida && (!!aula.video_url || materiaisComArquivo.length > 0);
+
+  const tituloPendencia = (() => {
+    if (concluida || podeConcluir) return undefined;
+    const itens: string[] = [];
+    if (!videoOk) itens.push("assista pelo menos 70% da aula");
+    materiaisPendentes.forEach((m) => itens.push(`baixe "${m.nome}"`));
+    return `Para concluir: ${itens.join(" · ")}`;
+  })();
+
+  const marcarMaterialBaixado = (materialId: string) => {
+    setMateriaisBaixados((prev) => {
+      if (prev.has(materialId)) return prev;
+      const novo = new Set(prev);
+      novo.add(materialId);
+      return novo;
+    });
+  };
+
   /* ---------- ações plugadas no banco ---------- */
   const marcarConcluida = async () => {
-    if (concluida) return;
+    if (concluida || concluindo) return;
     if (!usuarioId) { alert("Entre na sua conta para registrar o progresso."); return; }
-    const { error } = await sb().from("aula_progresso").upsert({ usuario_id: usuarioId, aula_id: aula.id });
-    if (error) { console.error(error); return; }
+    if (!podeConcluir) return; // botão já vem desabilitado nesse estado — defesa extra
+    setConcluindo(true);
+    const r = await concluirAula(aula.id);
+    setConcluindo(false);
+    if (!r.ok) {
+      const itens: string[] = [];
+      if (r.video_ok === false) itens.push("assista pelo menos 70% da aula");
+      (r.materiais_pendentes ?? []).forEach((m) => itens.push(`baixe "${m.nome}"`));
+      setPendenciaMsg(itens.length ? `Ainda falta: ${itens.join(" · ")}` : (r.erro ?? "Ainda não dá pra concluir esta aula."));
+      setTimeout(() => setPendenciaMsg(null), 5000);
+      return;
+    }
     setConcluida(true);
     setProgresso((p) => {
       const c = p.concluidas + 1;
@@ -186,6 +292,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
   const totalDuvidas = duvidas.reduce((s, d) => s + 1 + (d.respostas?.length ?? 0), 0);
   const faltamModulo = modulo.totalAulas - modulo.concluidasNoModulo - (concluida && !aula.concluida ? 1 : 0);
   const momento = "00:00";
+  const proximaLiberada = proxima ? (admin || concluida) : false;
 
   return (
     <div style={{ ["--arte" as string]: aula.capa_url ? `url('${aula.capa_url}')` : "none" }}>
@@ -254,6 +361,14 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
                 </div>
               </div>
 
+              {/* AVISO: acesso direto a aula bloqueada foi redirecionado pra cá */}
+              {avisoBloqueio && (
+                <div className={`aviso-bloqueio${avisoVisivel ? " visivel" : ""}`} role="status">
+                  <IconeLock size={14} strokeWidth={2.2} />
+                  <span>Conclua as aulas anteriores para desbloquear a que você tentou acessar.</span>
+                </div>
+              )}
+
               {/* TÍTULO + AÇÕES */}
               <div className="aula-cab">
                 <div className="aula-cab-txt">
@@ -266,20 +381,69 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
                       <IconeChevronLeft size={14} strokeWidth={2.4} />
                     </Link>
                   ) : null}
-                  <button className={`btn btn-fantasma btn-concluir${concluida ? " feito" : ""}`} onClick={marcarConcluida}>
+                  <button
+                    className={`btn btn-fantasma btn-concluir${concluida ? " feito" : ""}${!concluida && !podeConcluir ? " aguardando" : ""}`}
+                    onClick={marcarConcluida}
+                    disabled={!concluida && (!podeConcluir || concluindo)}
+                    title={tituloPendencia}
+                  >
                     <span className="rotulo-b">
                       <IconeCheck size={14} strokeWidth={2.6} />
-                      <span>{concluida ? "Concluída" : `Marcar como concluída · +${aula.xp} XP`}</span>
+                      <span>{concluida ? "Concluída" : concluindo ? "Concluindo…" : `Marcar como concluída · +${aula.xp} XP`}</span>
                     </span>
                   </button>
                   {proxima ? (
-                    <Link className="btn btn-primario btn-nav-aula" href={`/curso/${curso.slug}/aula/${proxima.id}`} aria-label="Próxima aula">
-                      Próxima
-                      <IconeChevronRight size={14} strokeWidth={2.4} />
-                    </Link>
+                    proximaLiberada ? (
+                      <Link className="btn btn-primario btn-nav-aula" href={`/curso/${curso.slug}/aula/${proxima.id}`} aria-label="Próxima aula">
+                        Próxima
+                        <IconeChevronRight size={14} strokeWidth={2.4} />
+                      </Link>
+                    ) : (
+                      <span className="btn btn-fantasma btn-nav-aula bloqueado" aria-disabled="true" title="Conclua esta aula para desbloquear a próxima">
+                        <IconeLock size={13} strokeWidth={2.2} />
+                      </span>
+                    )
                   ) : null}
                 </div>
               </div>
+
+              {/* PENDÊNCIA: mensagem de tom mentor quando o clique não vinga (defesa extra) */}
+              {pendenciaMsg && (
+                <div className="pendencia-msg" role="status">
+                  <IconeAlertTriangle size={14} strokeWidth={2.2} />
+                  <span>{pendenciaMsg}</span>
+                </div>
+              )}
+
+              {/* CHECKLIST: critérios pra concluir a aula, ao vivo */}
+              {mostrarChecklist && (
+                <div className="checklist-conclusao">
+                  <span className="checklist-titulo">Para concluir esta aula</span>
+                  <ul>
+                    {aula.video_url && (
+                      <li className={videoOk ? "feito" : ""}>
+                        <span className="checklist-ico" aria-hidden="true">
+                          {videoOk ? <IconeCheck size={13} strokeWidth={2.4} /> : <IconePlay size={12} strokeWidth={2.2} />}
+                        </span>
+                        <span className="checklist-txt">Assistir a aula</span>
+                        <span className="checklist-valor num">{videoOk ? "concluído ✓" : `${pctVideo}% de 70%`}</span>
+                      </li>
+                    )}
+                    {materiaisComArquivo.map((m) => {
+                      const feito = materiaisBaixados.has(m.id);
+                      return (
+                        <li key={m.id} className={feito ? "feito" : ""}>
+                          <span className="checklist-ico" aria-hidden="true">
+                            {feito ? <IconeCheck size={13} strokeWidth={2.4} /> : <IconeDownload size={12} strokeWidth={2.2} />}
+                          </span>
+                          <span className="checklist-txt">{m.nome}</span>
+                          <span className="checklist-valor num">{feito ? "baixado ✓" : "pendente"}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
 
               {/* CELEBRAÇÃO: PRÓXIMA AULA */}
               {proxima && (
@@ -337,7 +501,9 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
                     <p className="meta">Nenhum material anexado a esta aula ainda.</p>
                   ) : (
                     <ul className="arquivos">
-                      {materiais.map((m) => <MaterialItem key={m.id} material={m} />)}
+                      {materiais.map((m) => (
+                        <MaterialItem key={m.id} material={m} baixado={materiaisBaixados.has(m.id)} onBaixado={marcarMaterialBaixado} />
+                      ))}
                     </ul>
                   )}
                 </div>
@@ -444,16 +610,25 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav }: {
               <ul className="trilho-lista">
                 {trilho.map((t) => {
                   const feita = t.concluida || (t.atual && concluida);
-                  const cls = `t-aula${feita ? " feita" : ""}${t.atual ? " atual" : ""}`;
+                  const efetivamenteBloqueada = t.bloqueada && !t.atual && !feita && !admin;
+                  const cls = `t-aula${feita ? " feita" : ""}${t.atual ? " atual" : ""}${efetivamenteBloqueada ? " bloqueada" : ""}`;
                   return (
                     <li className={cls} key={t.id}>
-                      <Link href={`/curso/${curso.slug}/aula/${t.id}`} aria-current={t.atual || undefined}>
+                      <Link
+                        href={`/curso/${curso.slug}/aula/${t.id}`}
+                        aria-current={t.atual || undefined}
+                        aria-disabled={efetivamenteBloqueada || undefined}
+                        title={efetivamenteBloqueada ? "Conclua a aula anterior para desbloquear" : undefined}
+                        onClick={(e) => { if (efetivamenteBloqueada) e.preventDefault(); }}
+                      >
                         <span className={`t-estado${!feita && !t.atual ? " num" : ""}`} aria-hidden="true">
-                          {t.atual && !feita ? <span className="eq"><i></i><i></i><i></i></span> : feita ? <IconeCheck size={12} /> : t.ordem}
+                          {efetivamenteBloqueada ? <IconeLock size={11} strokeWidth={2.2} />
+                            : t.atual && !feita ? <span className="eq"><i></i><i></i><i></i></span>
+                            : feita ? <IconeCheck size={12} /> : t.ordem}
                         </span>
                         <span className="t-txt">
                           <b>{t.titulo}</b>
-                          <span>{t.atual ? "Assistindo agora" : feita ? "Assistida" : t.tipo === "quiz" ? "Quiz do módulo" : fmtDurSeg(t.duracaoSeg)}</span>
+                          <span>{t.atual ? "Assistindo agora" : feita ? "Assistida" : efetivamenteBloqueada ? "Bloqueada" : t.tipo === "quiz" ? "Quiz do módulo" : fmtDurSeg(t.duracaoSeg)}</span>
                         </span>
                         <span className="t-dur num">{fmtDurSeg(t.duracaoSeg)}</span>
                       </Link>
@@ -531,7 +706,7 @@ const ICONE_POR_TIPO: Record<string, typeof IconeFileText> = {
   outro: IconePaperclip,
 };
 
-function MaterialItem({ material }: { material: Material }) {
+function MaterialItem({ material, baixado, onBaixado }: { material: Material; baixado: boolean; onBaixado: (materialId: string) => void }) {
   const [baixando, setBaixando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const Icone = ICONE_POR_TIPO[material.tipo] ?? IconePaperclip;
@@ -543,6 +718,7 @@ function MaterialItem({ material }: { material: Material }) {
     const r = await baixarMaterialAula(material.id);
     setBaixando(false);
     if (!r.ok) { setErro(r.erro); return; }
+    onBaixado(material.id);
     window.open(r.url, "_blank");
   }
 
@@ -553,9 +729,9 @@ function MaterialItem({ material }: { material: Material }) {
           <Icone size={20} strokeWidth={1.6} />
         </span>
         <span className="arq-txt"><b>{material.nome}</b><span>{erro ?? material.descricao}</span></span>
-        <span className="arq-baixar">
-          <IconeDownload size={13} strokeWidth={2.2} />
-          {baixando ? "Gerando link..." : "Baixar"}
+        <span className={`arq-baixar${baixado ? " feito" : ""}`}>
+          {baixado ? <IconeCheck size={13} strokeWidth={2.4} /> : <IconeDownload size={13} strokeWidth={2.2} />}
+          {baixando ? "Gerando link..." : baixado ? "Baixado" : "Baixar"}
         </span>
       </a>
     </li>
