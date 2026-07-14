@@ -1,0 +1,264 @@
+{
+  "data": [
+    {
+      "id": 295,
+      "description": "<p>Na Planilha B informe qual o valor da soma da média de horas extras físicas nas férias.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "47,92",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "51,68",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "45,99",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "57,21",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 298,
+      "description": "<p>A atualização monetária do dano moral deferido deve ser a partir da data do ajuizamento da demanda judicial. Esta afirmação é:</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Verdadeira",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Falsa",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 297,
+      "description": "<p>Qual o valor total das verbas rescisórias atualizadas e com FGTS?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 5.012,23",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 3.245,55",
+          "position": 1,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "R$ 4.823,44",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 5.122,65",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 296,
+      "description": "<p>Considerando a proporção correta para cálculo do reflexo das horas extras no aviso prévio atualizado, qual o valor da soma dos 3 avisos prévios (HE c/50%, HE Art. 71 e HE Art. 384)?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 429,51",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 505,87",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 523,18",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 5,
+          "content": "R$ 431,30",
+          "position": 4,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 291,
+      "description": "<p>Qual o índice de atualização monetária do mês de Abril/2014?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "1,02797143",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "1,034589808",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "1,030155268",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "1,034373624",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 293,
+      "description": "<p>Na Planilha A, qual o valor da soma das diferenças mês a mês de horas extras c/50% atualizadas?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 4.920,51",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 5.783,84",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 5.296,98",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 4.764,19",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 294,
+      "description": "<p>Nas diferenças de horas extras, independente da rubrica, qual a proporção devida para o décimo terceiro salário de 2014.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "05/11",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "05/12",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "06/12",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "06/11",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 292,
+      "description": "<p>Qual o índice de atualização monetária do mês de Abril/2014?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "1,02797143",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "1,034589808",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "1,030155268",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "1,034373624",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

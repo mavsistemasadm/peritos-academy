@@ -1,0 +1,140 @@
+{
+  "data": [
+    {
+      "id": 45,
+      "description": "<p>Suponha que na sentença judicial que determina o pagamento do valor de R$ 5.000,00 atualizados a partir de 28/06/2013 e não explicita qual o indicador de atualização monetária a ser aplicado. Qual é o seu critério para escolher o indicador inflacionário neste caso?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Não utiliza nenhuma atualização",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": " Peticiona ao devedor para informar qual o critério de atualização monetária a adotar",
+          "position": 1,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": " Utiliza a variação do INPC por ser o indicador mais utilizado no judiciário",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Pesquisa na internet qual é o índice adotado pelo Tribunal e o utiliza para o cálculo e/ou peticiona ao juízo.",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 46,
+      "description": "<p>Qual a variação em percentual no mês de 09/2001?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "1,18%",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "0,94%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "0,38%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "0,26%",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 47,
+      "description": "<p>Qual é o valor atualizado para 12/2001 (data final) de um valor base de 126.500,00 em 09/1993</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 101,54",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 28.987,45",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 3.605,87",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 2.702,47",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 48,
+      "description": "<p>Qual o valor atualizado de um dano moral deferido em 07/2013 no valor de R$ 50.000,00 que deve ser atualizado para 12/2015?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 60.066,96",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 71.003,11",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 59.593,87",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 68.401,23",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

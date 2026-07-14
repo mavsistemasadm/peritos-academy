@@ -1,0 +1,530 @@
+{
+  "criadas": [
+    {
+      "quiz_id": 1,
+      "curso": "Leitura e interpretação de processos judiciais para cálculos",
+      "titulo": "Avaliação de conhecimento",
+      "avaliacao_id": "c724c329-603f-4d60-8efe-8653ca539958",
+      "modulo_id": "d4823385-a44b-465a-a263-7e9fb48c7db7",
+      "modulo_titulo": "Importancia E Montagem De Sinteses Processuais",
+      "posicao_ensinio": 2,
+      "questoes_ensinio": 13,
+      "questoes_inseridas": 13,
+      "alternativas_inseridas": 49
+    },
+    {
+      "quiz_id": 2,
+      "curso": "Leitura e interpretação de processos judiciais para cálculos",
+      "titulo": "Prova Final",
+      "avaliacao_id": "24903756-f4ae-48a0-80d6-debff428b976",
+      "modulo_id": "837f4ede-93c7-4334-8b33-846e5e848fdd",
+      "modulo_titulo": "Passos Finais Do Dominio Da Leitura E Interpretacao",
+      "posicao_ensinio": 0,
+      "questoes_ensinio": 8,
+      "questoes_inseridas": 8,
+      "alternativas_inseridas": 30
+    },
+    {
+      "quiz_id": 3,
+      "curso": "Aprenda a construir qualquer tabela de atualização monetária",
+      "titulo": "Avaliação de conhecimento I",
+      "avaliacao_id": "154549be-a3b3-4635-8d51-fd9a31b8ff29",
+      "modulo_id": "88bef92b-fb7d-49c1-8e3c-c168ccf6909b",
+      "modulo_titulo": "Modulo Principal",
+      "posicao_ensinio": 5,
+      "questoes_ensinio": 11,
+      "questoes_inseridas": 11,
+      "alternativas_inseridas": 41
+    },
+    {
+      "quiz_id": 4,
+      "curso": "Aprenda a construir qualquer tabela de atualização monetária",
+      "titulo": "Avaliação de conhecimento II",
+      "avaliacao_id": "6148d6a1-7379-481b-81bf-a98f0c2543f5",
+      "modulo_id": "88bef92b-fb7d-49c1-8e3c-c168ccf6909b",
+      "modulo_titulo": "Modulo Principal",
+      "posicao_ensinio": 9,
+      "questoes_ensinio": 10,
+      "questoes_inseridas": 10,
+      "alternativas_inseridas": 38
+    },
+    {
+      "quiz_id": 5,
+      "curso": "Aprenda a construir qualquer tabela de atualização monetária",
+      "titulo": "Prova final",
+      "avaliacao_id": "0fe1f343-4df6-4758-8693-4d23b517b5e1",
+      "modulo_id": "88bef92b-fb7d-49c1-8e3c-c168ccf6909b",
+      "modulo_titulo": "Modulo Principal",
+      "posicao_ensinio": 11,
+      "questoes_ensinio": 4,
+      "questoes_inseridas": 4,
+      "alternativas_inseridas": 16
+    },
+    {
+      "quiz_id": 6,
+      "curso": "VOCÊ, Perito é!",
+      "titulo": "Desafio nº 01",
+      "avaliacao_id": "e2414758-6a53-4ad6-93be-adc25061d451",
+      "modulo_id": "724c8a85-7786-4293-8ff0-6ded31c5cec9",
+      "modulo_titulo": "Desafio Pericial No 01",
+      "posicao_ensinio": 2,
+      "questoes_ensinio": 11,
+      "questoes_inseridas": 11,
+      "alternativas_inseridas": 42
+    },
+    {
+      "quiz_id": 7,
+      "curso": "VOCÊ, Perito é!",
+      "titulo": "Desafio nº 02",
+      "avaliacao_id": "d3a92b4c-7aa9-45cb-bca4-2c407a15d472",
+      "modulo_id": "a6b13e42-87cc-456f-b93a-9a7d88b2fb46",
+      "modulo_titulo": "Desafio Pericial No 02",
+      "posicao_ensinio": 1,
+      "questoes_ensinio": 9,
+      "questoes_inseridas": 9,
+      "alternativas_inseridas": 36
+    },
+    {
+      "quiz_id": 8,
+      "curso": "VOCÊ, Perito é!",
+      "titulo": "Desafio nº 03",
+      "avaliacao_id": "403ffbbb-1eee-466c-a817-65a8745be603",
+      "modulo_id": "7ea0df65-3467-43b0-ac42-827194e5faa3",
+      "modulo_titulo": "Desafio Pericial No 03",
+      "posicao_ensinio": 1,
+      "questoes_ensinio": 8,
+      "questoes_inseridas": 8,
+      "alternativas_inseridas": 32
+    },
+    {
+      "quiz_id": 9,
+      "curso": "VOCÊ, Perito é!",
+      "titulo": "Desafio nº 04",
+      "avaliacao_id": "696d3f1b-aefb-454e-9f29-3641b0e8546f",
+      "modulo_id": "f7aaa7c3-cc9e-4993-b0f2-86a6316277eb",
+      "modulo_titulo": "Desafio Pericial No 04",
+      "posicao_ensinio": 1,
+      "questoes_ensinio": 8,
+      "questoes_inseridas": 8,
+      "alternativas_inseridas": 32
+    },
+    {
+      "quiz_id": 10,
+      "curso": "VOCÊ, Perito é!",
+      "titulo": "Desafio nº 05",
+      "avaliacao_id": "9b612338-31c3-438b-9571-9fc6c44f4eef",
+      "modulo_id": "fab4986f-b49a-4332-84e5-f288491e7d69",
+      "modulo_titulo": "Desafio Pericial No 05",
+      "posicao_ensinio": 1,
+      "questoes_ensinio": 11,
+      "questoes_inseridas": 11,
+      "alternativas_inseridas": 44
+    },
+    {
+      "quiz_id": 32,
+      "curso": "Desvendando os segredos das instituições bancárias",
+      "titulo": "Avaliação I",
+      "avaliacao_id": "3d2a1771-7083-4143-a6d1-4d60e99084fe",
+      "modulo_id": "9b2ac0c3-ae89-451d-8dd4-cd2d9396f6b4",
+      "modulo_titulo": "Principais Discussoes E Itens Relevantes De Um Contrato Bancario",
+      "posicao_ensinio": 4,
+      "questoes_ensinio": 6,
+      "questoes_inseridas": 6,
+      "alternativas_inseridas": 22
+    },
+    {
+      "quiz_id": 33,
+      "curso": "Desvendando os segredos das instituições bancárias",
+      "titulo": "Avaliação II",
+      "avaliacao_id": "ee342d63-ba12-4f95-81f3-ffbe2d7b2801",
+      "modulo_id": "f31141d1-7193-45e2-b90f-3e42243edbcb",
+      "modulo_titulo": "Mundo Dos Juros Bancarios",
+      "posicao_ensinio": 1,
+      "questoes_ensinio": 4,
+      "questoes_inseridas": 4,
+      "alternativas_inseridas": 16
+    },
+    {
+      "quiz_id": 34,
+      "curso": "Desvendando os segredos das instituições bancárias",
+      "titulo": "Avaliação III",
+      "avaliacao_id": "23141a0c-b277-40d1-a7f0-480a507f9b33",
+      "modulo_id": "f31141d1-7193-45e2-b90f-3e42243edbcb",
+      "modulo_titulo": "Mundo Dos Juros Bancarios",
+      "posicao_ensinio": 3,
+      "questoes_ensinio": 8,
+      "questoes_inseridas": 8,
+      "alternativas_inseridas": 32
+    },
+    {
+      "quiz_id": 35,
+      "curso": "Desvendando os segredos das instituições bancárias",
+      "titulo": "Avaliação IV",
+      "avaliacao_id": "dee28c42-154e-4860-a0ed-185c7845358f",
+      "modulo_id": "157650e5-db4f-424b-be64-0aaa1c079a46",
+      "modulo_titulo": "Sistemas De Amortizacao",
+      "posicao_ensinio": 4,
+      "questoes_ensinio": 7,
+      "questoes_inseridas": 7,
+      "alternativas_inseridas": 23
+    },
+    {
+      "quiz_id": 36,
+      "curso": "Desvendando os segredos das instituições bancárias",
+      "titulo": "Sobre a Prova final",
+      "avaliacao_id": "bc131919-904f-4d25-833b-c322a52b0aed",
+      "modulo_id": "39e2a1cf-725d-4121-9f7f-796ee9cc6c55",
+      "modulo_titulo": "Ocorrencias Da Capitalizacao E Modalidades De Contrato",
+      "posicao_ensinio": 4,
+      "questoes_ensinio": 8,
+      "questoes_inseridas": 8,
+      "alternativas_inseridas": 29
+    },
+    {
+      "quiz_id": 18,
+      "curso": "Cálculos revisionais de Financiamento e Empréstimos",
+      "titulo": "Avaliação de conhecimento",
+      "avaliacao_id": "e1d148dd-2617-4689-bf75-02cbdf2abfd4",
+      "modulo_id": "11a4cbd8-f1dd-4a2a-ac72-cea206152c32",
+      "modulo_titulo": "Iniciando Os Calculos E Entendimento Sobre O Criterio Dos Juros Simples",
+      "posicao_ensinio": 2,
+      "questoes_ensinio": 4,
+      "questoes_inseridas": 4,
+      "alternativas_inseridas": 16
+    },
+    {
+      "quiz_id": 19,
+      "curso": "Cálculos revisionais de Financiamento e Empréstimos",
+      "titulo": "Prova Final",
+      "avaliacao_id": "db7654ab-c0e7-4fb2-84f0-2cfd8a23b479",
+      "modulo_id": "a5b902ec-57b3-4505-a729-81c18a4821e5",
+      "modulo_titulo": "Recalculo De Contratos Bancarios",
+      "posicao_ensinio": 5,
+      "questoes_ensinio": 9,
+      "questoes_inseridas": 9,
+      "alternativas_inseridas": 35
+    },
+    {
+      "quiz_id": 15,
+      "curso": "Cálculos revisionais de Cheque Especial",
+      "titulo": "Avaliaçao de conhecimento I",
+      "avaliacao_id": "62a8b063-83e1-4640-9286-19c6f0f745ba",
+      "modulo_id": "dfa14c42-372f-44bd-9d27-d378ccca52de",
+      "modulo_titulo": "Modulo De Calculos",
+      "posicao_ensinio": 3,
+      "questoes_ensinio": 6,
+      "questoes_inseridas": 6,
+      "alternativas_inseridas": 24
+    },
+    {
+      "quiz_id": 17,
+      "curso": "Cálculos revisionais de Cheque Especial",
+      "titulo": "Prova Final",
+      "avaliacao_id": "1e619735-117c-4062-b8bd-86928027f7c0",
+      "modulo_id": "dfa14c42-372f-44bd-9d27-d378ccca52de",
+      "modulo_titulo": "Modulo De Calculos",
+      "posicao_ensinio": 11,
+      "questoes_ensinio": 8,
+      "questoes_inseridas": 8,
+      "alternativas_inseridas": 29
+    },
+    {
+      "quiz_id": 16,
+      "curso": "Cálculos revisionais de Cheque Especial",
+      "titulo": "Avaliação de conhecimento II",
+      "avaliacao_id": "33eeda32-9a22-4bba-b076-32b4f42142c5",
+      "modulo_id": "dfa14c42-372f-44bd-9d27-d378ccca52de",
+      "modulo_titulo": "Modulo De Calculos",
+      "posicao_ensinio": 8,
+      "questoes_ensinio": 3,
+      "questoes_inseridas": 3,
+      "alternativas_inseridas": 12
+    },
+    {
+      "quiz_id": 14,
+      "curso": "Cálculos revisionais de Financiamento Habitacional (SFH)",
+      "titulo": "Prova final",
+      "avaliacao_id": "ca502dbe-bb15-4b5b-bcc1-259818e9798a",
+      "modulo_id": "785c67b0-82a0-4d02-af0e-57a6619f35b3",
+      "modulo_titulo": "Desafio Final",
+      "posicao_ensinio": 0,
+      "questoes_ensinio": 10,
+      "questoes_inseridas": 10,
+      "alternativas_inseridas": 40
+    },
+    {
+      "quiz_id": 20,
+      "curso": "Programa 01: Iniciando a caminhada nos cálculos trabalhistas",
+      "titulo": "Avaliação de Conhecimento I",
+      "avaliacao_id": "32215620-0061-4caa-85d1-4b0e887d8ea4",
+      "modulo_id": "0baf758b-ec9c-4319-b313-5f178c284b88",
+      "modulo_titulo": "Interpretacao Do Tempo E Prescricao",
+      "posicao_ensinio": 3,
+      "questoes_ensinio": 10,
+      "questoes_inseridas": 10,
+      "alternativas_inseridas": 34
+    },
+    {
+      "quiz_id": 21,
+      "curso": "Programa 01: Iniciando a caminhada nos cálculos trabalhistas",
+      "titulo": "Avaliação de conhecimento II",
+      "avaliacao_id": "3ef2e2bb-6813-470e-be04-732dd05360ca",
+      "modulo_id": "dcfb212a-1e72-4c19-b827-576bf0a91238",
+      "modulo_titulo": "Ferias",
+      "posicao_ensinio": 2,
+      "questoes_ensinio": 9,
+      "questoes_inseridas": 9,
+      "alternativas_inseridas": 35
+    },
+    {
+      "quiz_id": 22,
+      "curso": "Programa 01: Iniciando a caminhada nos cálculos trabalhistas",
+      "titulo": "Avaliação de conhecimento III",
+      "avaliacao_id": "44893db9-16d4-4bec-9025-02239c960f2a",
+      "modulo_id": "8d018b76-8cdf-47ab-bf0e-95113fb56107",
+      "modulo_titulo": "Outras Verbas Trabalhistas E Verbas Acessorias Do Calculo",
+      "posicao_ensinio": 5,
+      "questoes_ensinio": 7,
+      "questoes_inseridas": 7,
+      "alternativas_inseridas": 25
+    },
+    {
+      "quiz_id": 23,
+      "curso": "Programa 01: Iniciando a caminhada nos cálculos trabalhistas",
+      "titulo": "Prova Final",
+      "avaliacao_id": "85bf6ca8-464a-45d2-9b7f-7a6ae43c6587",
+      "modulo_id": "39c9724d-f7f6-4d4d-8584-6a26762772bb",
+      "modulo_titulo": "Desafio Final",
+      "posicao_ensinio": 0,
+      "questoes_ensinio": 5,
+      "questoes_inseridas": 5,
+      "alternativas_inseridas": 20
+    },
+    {
+      "quiz_id": 24,
+      "curso": "Programa 02: Afiando o machado nos cálculos trabalhistas",
+      "titulo": "Avaliação conhecimento 01",
+      "avaliacao_id": "6f183cd3-5be1-419f-8848-5a110e1f35bd",
+      "modulo_id": "5d690cf3-d0c9-47c3-85c2-86e6ecde7e39",
+      "modulo_titulo": "Adic De Periculosidade Insalubridade E Transferencia",
+      "posicao_ensinio": 4,
+      "questoes_ensinio": 1,
+      "questoes_inseridas": 1,
+      "alternativas_inseridas": 4
+    },
+    {
+      "quiz_id": 25,
+      "curso": "Programa 02: Afiando o machado nos cálculos trabalhistas",
+      "titulo": "Avaliação de conhecimento 02",
+      "avaliacao_id": "8d771e0a-818f-4c65-88a6-73f32d734afd",
+      "modulo_id": "24d50606-d541-43a6-81f1-6835f0ad05b1",
+      "modulo_titulo": "Verbas Rescisorias",
+      "posicao_ensinio": 2,
+      "questoes_ensinio": 6,
+      "questoes_inseridas": 6,
+      "alternativas_inseridas": 23
+    },
+    {
+      "quiz_id": 26,
+      "curso": "Programa 02: Afiando o machado nos cálculos trabalhistas",
+      "titulo": "Prova Final",
+      "avaliacao_id": "5dab74f4-8509-4af5-bbdf-b87cf8a04766",
+      "modulo_id": "8ac92321-20b8-452e-8854-6fe0a75d86d9",
+      "modulo_titulo": "Desafios Dos Calculos Trabalhistas",
+      "posicao_ensinio": 1,
+      "questoes_ensinio": 6,
+      "questoes_inseridas": 6,
+      "alternativas_inseridas": 24
+    },
+    {
+      "quiz_id": 27,
+      "curso": "Programa 03: Dá licença, agora sou Expert em cálculos trabalhistas!",
+      "titulo": "Avaliação I",
+      "avaliacao_id": "74afe480-2dba-44c9-a7eb-f7f5eb5a4713",
+      "modulo_id": "ce67a731-c4d9-46f2-b9bd-3f4f690a253a",
+      "modulo_titulo": "Iniciando Os Calculos Das Horas Extras",
+      "posicao_ensinio": 3,
+      "questoes_ensinio": 10,
+      "questoes_inseridas": 10,
+      "alternativas_inseridas": 40
+    },
+    {
+      "quiz_id": 28,
+      "curso": "Programa 03: Dá licença, agora sou Expert em cálculos trabalhistas!",
+      "titulo": "Avaliação de conhecimento II",
+      "avaliacao_id": "b0ea425a-99a9-4b97-aa64-fd44795a94a2",
+      "modulo_id": "7bf46de1-9879-43e7-b8f6-606cf369fc69",
+      "modulo_titulo": "Calculo Do Imposto De Renda Nos Processos Trabalhistas",
+      "posicao_ensinio": 4,
+      "questoes_ensinio": 7,
+      "questoes_inseridas": 7,
+      "alternativas_inseridas": 28
+    },
+    {
+      "quiz_id": 29,
+      "curso": "Programa 03: Dá licença, agora sou Expert em cálculos trabalhistas!",
+      "titulo": "Primeiro desafio",
+      "avaliacao_id": "c682b07f-953e-4e55-85c9-52d2a4beb6db",
+      "modulo_id": "6c842c88-df97-4250-a375-64f71ee3e6de",
+      "modulo_titulo": "A Trilha Final",
+      "posicao_ensinio": 0,
+      "questoes_ensinio": 8,
+      "questoes_inseridas": 8,
+      "alternativas_inseridas": 30
+    },
+    {
+      "quiz_id": 30,
+      "curso": "Programa 03: Dá licença, agora sou Expert em cálculos trabalhistas!",
+      "titulo": "Segundo Desafio",
+      "avaliacao_id": "cb07dccd-3fe3-4aaa-9a08-aa66817c5dbb",
+      "modulo_id": "6c842c88-df97-4250-a375-64f71ee3e6de",
+      "modulo_titulo": "A Trilha Final",
+      "posicao_ensinio": 2,
+      "questoes_ensinio": 9,
+      "questoes_inseridas": 9,
+      "alternativas_inseridas": 32
+    },
+    {
+      "quiz_id": 31,
+      "curso": "Programa 03: Dá licença, agora sou Expert em cálculos trabalhistas!",
+      "titulo": "O caminho sem volta",
+      "avaliacao_id": "a4620952-12fd-41d6-9e6b-6423fecf6062",
+      "modulo_id": "6c842c88-df97-4250-a375-64f71ee3e6de",
+      "modulo_titulo": "A Trilha Final",
+      "posicao_ensinio": 4,
+      "questoes_ensinio": 9,
+      "questoes_inseridas": 9,
+      "alternativas_inseridas": 36
+    },
+    {
+      "quiz_id": 11,
+      "curso": "Aprenda a calcular todos os tipo de aposentadorias e benefícios - Programa I",
+      "titulo": "Prova Final",
+      "avaliacao_id": "8c9be23a-82fb-4155-920b-67a510dbf08a",
+      "modulo_id": "9ba32cd2-322b-49d5-8115-6614cdb0cc7c",
+      "modulo_titulo": "Primeiros Passos Dos Calculos Judiciais",
+      "posicao_ensinio": 4,
+      "questoes_ensinio": 16,
+      "questoes_inseridas": 16,
+      "alternativas_inseridas": 56
+    },
+    {
+      "quiz_id": 12,
+      "curso": "Domine todas as revisões previdenciárias - Programa II",
+      "titulo": "Prova I",
+      "avaliacao_id": "36b25505-9bb6-4332-a4f9-5aa77a3e9486",
+      "modulo_id": "187d506c-58f5-4aac-8c8c-ebc147f5270b",
+      "modulo_titulo": "Desafios De Calculo",
+      "posicao_ensinio": 0,
+      "questoes_ensinio": 8,
+      "questoes_inseridas": 8,
+      "alternativas_inseridas": 28
+    },
+    {
+      "quiz_id": 13,
+      "curso": "Domine todas as revisões previdenciárias - Programa II",
+      "titulo": "Prova II",
+      "avaliacao_id": "a67a8a79-b30b-4212-b971-aaed518ed50c",
+      "modulo_id": "187d506c-58f5-4aac-8c8c-ebc147f5270b",
+      "modulo_titulo": "Desafios De Calculo",
+      "posicao_ensinio": 2,
+      "questoes_ensinio": 8,
+      "questoes_inseridas": 8,
+      "alternativas_inseridas": 31
+    },
+    {
+      "quiz_id": 38,
+      "curso": "PJE Calc e Liquidação de Sentença",
+      "titulo": "Avaliação de prova",
+      "avaliacao_id": "b92a66e9-19be-428b-a379-6a4bae1f8f6c",
+      "modulo_id": "465defd3-6c5d-4b3a-9e41-fd058d00c619",
+      "modulo_titulo": "Prova Final",
+      "posicao_ensinio": 1,
+      "questoes_ensinio": 12,
+      "questoes_inseridas": 12,
+      "alternativas_inseridas": 48
+    }
+  ],
+  "puladas_ja_existentes": [],
+  "puladas_sem_json": [],
+  "puladas_vazias": [],
+  "questoes_puladas": [],
+  "explanations": [],
+  "desafios_como_avaliacao": [
+    {
+      "quiz_id": 6,
+      "curso": "VOCÊ, Perito é!",
+      "titulo": "Desafio nº 01"
+    },
+    {
+      "quiz_id": 7,
+      "curso": "VOCÊ, Perito é!",
+      "titulo": "Desafio nº 02"
+    },
+    {
+      "quiz_id": 8,
+      "curso": "VOCÊ, Perito é!",
+      "titulo": "Desafio nº 03"
+    },
+    {
+      "quiz_id": 9,
+      "curso": "VOCÊ, Perito é!",
+      "titulo": "Desafio nº 04"
+    },
+    {
+      "quiz_id": 10,
+      "curso": "VOCÊ, Perito é!",
+      "titulo": "Desafio nº 05"
+    },
+    {
+      "quiz_id": 29,
+      "curso": "Programa 03: Dá licença, agora sou Expert em cálculos trabalhistas!",
+      "titulo": "Primeiro desafio"
+    },
+    {
+      "quiz_id": 30,
+      "curso": "Programa 03: Dá licença, agora sou Expert em cálculos trabalhistas!",
+      "titulo": "Segundo Desafio"
+    }
+  ],
+  "multiple_importadas_como_single": [
+    {
+      "quiz_id": 7,
+      "curso": "VOCÊ, Perito é!",
+      "titulo": "Desafio nº 02",
+      "questao_id_ensinio": 67
+    },
+    {
+      "quiz_id": 36,
+      "curso": "Desvendando os segredos das instituições bancárias",
+      "titulo": "Sobre a Prova final",
+      "questao_id_ensinio": 279
+    },
+    {
+      "quiz_id": 15,
+      "curso": "Cálculos revisionais de Cheque Especial",
+      "titulo": "Avaliaçao de conhecimento I",
+      "questao_id_ensinio": 140
+    },
+    {
+      "quiz_id": 15,
+      "curso": "Cálculos revisionais de Cheque Especial",
+      "titulo": "Avaliaçao de conhecimento I",
+      "questao_id_ensinio": 142
+    },
+    {
+      "quiz_id": 17,
+      "curso": "Cálculos revisionais de Cheque Especial",
+      "titulo": "Prova Final",
+      "questao_id_ensinio": 153
+    },
+    {
+      "quiz_id": 21,
+      "curso": "Programa 01: Iniciando a caminhada nos cálculos trabalhistas",
+      "titulo": "Avaliação de conhecimento II",
+      "questao_id_ensinio": 179
+    }
+  ],
+  "total_questoes": 297,
+  "total_alternativas": 1132
+}

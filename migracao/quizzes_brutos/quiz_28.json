@@ -1,0 +1,242 @@
+{
+  "data": [
+    {
+      "id": 216,
+      "description": "<p>Na Planilha \"K\" qual o valor da base de cálculo INSS recalculada (com adição das diferenças salariais ora reconhecidas) no mês de 02/2007?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 2.274,42",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 1.856,96",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 2.025,47",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 1.911,25",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 222,
+      "description": "<p>Na Planilha \"M\" qual o valor do INSS patronal referente as diferenças mês a mês atualizado?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 11.040,47",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 10.952,36",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 11.587,55",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 10.655,39",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 221,
+      "description": "<p>Qual o valor da base de cálculo acumulada para a 4ª faixa de IRPF?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 233.234,00",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 251.892,72",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 242.563,36",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 256.557,40",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 220,
+      "description": "<p>Se somarmos as três bases de cálculo do IRPF (salariais, 13º salário e férias) qual é o total geral?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 50.002,12",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 54.663,01",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 52.561,89",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 49.883,25",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 219,
+      "description": "<p>Para termos certeza de que está no caminho certo, quero que me informe o valor da soma de todas as \"novas bases de cálculo do INSS\" das diferenças mês a mês, que refere-se a soma da base de cálculo anterior e as verbas deferidas. Diferenças de centavos serão aceitas, não mais do que isso.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 114.875,78",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 124.313,09",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 112.288,73",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 102.101,52",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 218,
+      "description": "<p>Qual o valor da diferença a pagar (INSS recolhido e o INSS recalculado) no mês de 04/2009?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 95,18",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 119,03",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 79,41",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 154,71",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 217,
+      "description": "<p>Ainda no exercício anterior, qual o percentual de INSS devido?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "11%",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "8,5%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "9%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "8%",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

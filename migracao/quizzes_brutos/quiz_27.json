@@ -1,0 +1,344 @@
+{
+  "data": [
+    {
+      "id": 290,
+      "description": "<p>Se somarmos mês a mês o valor do salário base para cálculo das horas extras, qual total obteremos?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 22.098,00",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 23.046,00",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 21.246,00",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 24.322,00",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 281,
+      "description": "<p>Qual o valor do salário hora nos meses de 10/2006 e 09/2009?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 3,49 e R$ 5,61",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 4,37 e R$ 8,41",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 3,79 e R$ 6,60",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 3,79 e R$ 6,92",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 282,
+      "description": "<p>Ainda com base nos meses informados na questão anterior, informe qual o valor do adicional noturno (10/2006) e horas extras c/100% (09/2009)</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 1,22 e R$12,35",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 0,83 e R$ 13,21",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "R$ 0,81 e R$ 13,21",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 0,99 e R$ 14,55",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 283,
+      "description": "<p>Hipoteticamente precisamos saber qual o valor das horas diurnas com 50% do começo do cálculo 04/2006 até o final 05/2010? Some o valor das horas calculadas mês a mês.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 325,79",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 396,85",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 574,13",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 417,88",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 284,
+      "description": "<p>Na Planilha \"A\" informe o valor do FGTS calculado no mês de 05/2006.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 16,44",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 14,86",
+          "position": 1,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "R$ 13,97",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 12,74",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 285,
+      "description": "<p>Ainda na Planilha \"A\" qual o valor das diferenças mês a mês das horas extras c/50% acrescidas do FGTS, ambas atualizadas. (Considere o abatimento mês a mês).</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 8.671,52",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 9.931,12",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 6.896,99",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 7.502,41",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 286,
+      "description": "<p>Qual a proporção do 13º de 2006 e 2010?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "07/12 e 01/12",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "08/12 e 02/12",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "07/12 e 02/12",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "08/12 e 01/12",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 289,
+      "description": "<p>De acordo com a Planilha \"C\" qual o valor devido dos reflexos das horas extras com 100% nas férias? Informe o total atualizado.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 466,44",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 406,79",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 432,32",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 418,20",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 288,
+      "description": "<p>Ainda na Planilha \"B\" qual o valor do aviso prévio indenizado acrescido das projeções sem atualização?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 89,46",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 78,12",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 90,18",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 95,35",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 287,
+      "description": "<p>Na Planilha \"B\" qual o valor do reflexo das horas extras noturnas no 13º salário de 2008 corrigido?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 17,97",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 19,74",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 20,82",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 21,48",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

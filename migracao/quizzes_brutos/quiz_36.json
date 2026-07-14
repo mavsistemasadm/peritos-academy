@@ -1,0 +1,258 @@
+{
+  "data": [
+    {
+      "id": 273,
+      "description": "<p>CONTRATO 1: Qual o valor do financiamento utilizado como base para cálculo do valor da parcela?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 126.000,00",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 126.450,00",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 128.684,38",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 131.215,48",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 274,
+      "description": "<p>CONTRATO 1: Qual a taxa de juros anual efetivamente cobrada pela instituição?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "18,58%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "20,33%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "21,84%",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "19,43%",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 275,
+      "description": "<p>CONTRATO 1: Existe cláusula informando sobre a capitalização de juros e/ou sua periodicidade durante o período de pagamento das parcelas?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Sim",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Não",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 276,
+      "description": "<p>CONTRATO 1: Qual deveria ser o valor dos juros totais do período (36 meses) considerando o valor da parcela com base nos juros contratados de 1,39% apurados pela Tabela Price?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 37.895,87",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 39.052,13",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 28.718,45",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 35.744,94",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 277,
+      "description": "<p>CONTRATO 2: Qual o valor da parcela calculada considerando a taxa de juros pactuada com exclusão dos seguintes itens:</p><p>- Seguro</p><p>- Serviços concessionária</p><p>- Registro</p><p>- Acessórios do bem</p><p>- Tarifa de avaliação do bem</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 1.399,68",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 1.484,29",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "R$ 1.433,28",
+          "position": 2,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 278,
+      "description": "<p>CONTRATO 2: Qual diferença entre o total a pagar com a parcela recalculada e a parcela contratada?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 6.254,12",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 6.502,45",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 6.312,96",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 6.874,40",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 279,
+      "description": "<p>CONTRATO 3: De acordo com o contrato qual a taxa mensal de comissão de permanência?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "3,30%",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "5,90%",
+          "position": 1,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "9,20%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Média do Banco Central",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "multiple"
+    },
+    {
+      "id": 280,
+      "description": "<p>CONTRATO 3: Considere neste momento que todas as parcelas foram pagas nas respectivas data de vencimento no valor contratado de R$ 2.083,07 e que na verdade o cliente deveria ter pago o valor da parcela ora apurada anteriormente, considerando a taxa de juros do contrato. Informe a soma de todas as diferenças encontradas (parcela devida - parcela paga) atualizadas pela variação do INPC para data 25/12/2017.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 823,61",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 918,47",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 741,36",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 1.011,22",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

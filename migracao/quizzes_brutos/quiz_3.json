@@ -1,0 +1,360 @@
+{
+  "data": [
+    {
+      "id": 24,
+      "description": "<p>Qual o número índice dos percentuais 8% e 0,47%?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": " 1,0800 e 1,0470",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": " 1,8000 e 1,04700",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "1,0800 e 1,00470",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "1,0080 e 1,000470",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 25,
+      "description": "<p>Qual o percentual que equivale aos seguintes números índices: 1,725300 e 1,053892?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": " 7,2530% e 0,0053892%",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "725,300% e 53,892%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": " 72,53% e 53,892%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": " 72,53% e 5,3892%",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 27,
+      "description": "<p>Na presente ação, o dano moral serve exatamente para restabelecer ao requerente a sua condição, se não houvesse ocorrido o corte de fornecimento de energia elétrica por parte da requerida. Houve a devida comprovação das perdas sofridas pelo autor em seu patrimônio, bem como provada pela própria requerida da diferenciação entre o requerente e os demais produtores que foram indenizados.</p><p><br></p><p>DA DECISÃO</p><p><br></p><p>Isto posto, opino seja julgada procedente a ação , condenando a requerida pagar o valor de R$ 1.654,65 (um mil, seiscentos e cinquenta e quatro reais e sessenta e cinco centavos) a título de indenização pelos DANOS MATERIAIS sofridos pelo autor em 01/10/1999 e o mesmo valor de R$ 1.654,65 a fim de indenização por DANOS MORAIS pelo fato ocorrido em 25/03/2003, ambos os valores corrigidos pelo IGP-M da data do ajuizamento.</p><p><br></p><p>Pergunta: Qual o valor atualizado dos danos materiais e danos morais, sendo que a variação inflacionária para a atualização dos danos materiais durante o período foi de 233,1986% e a variação inflacionária dos danos materiais durante o período foi de 145,0099%?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": " R$ 5.513,21 e R$ 4.328,97",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": " R$ 5.728,12 e R$ 4.054,06",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": " R$ 5.592,72 e R$ 3.756,06",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 5.513,27 e R$ 4.054,06",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 26,
+      "description": "<p>A Empresa “X” foi condenada a pagar o valor de R$ 25.000,00 a título de danos morais ao empregado. A data da sentença que deferiu o dano moral foi em 15/08/2013 e a data do cálculo é 01/02/2014, cuja variação inflacionária do período entre a sentença e a data dos cálculos foi de 11,3282%. Qual o valor corrigido dos danos morais?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": " R$ 27.832,05",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": " R$ 22.054,33",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 21.987,01",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": " R$ 25.101,66",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 28,
+      "description": "<p>Para que é serve a atualização monetária de valores?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": " Para manter o mesmo padrão de compra através do tempo",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": " Para congelar um valor através do tempo",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Para pagar ao governo juros sobre o valor em função do tempo",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": " Nenhuma das alternativas",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 29,
+      "description": "<p>A empresa X foi condenada a pagar uma pensão mensal para o funcionário acidentado em local de trabalho no valor de R$ 100,00 por mês. Este valor deve ser atualizado pela variação abaixo. Qual o valor total atualizado ?</p><p><br></p><p>MES/ANO VALOR ORIGINAL ÍND. ATUALIZAÇÃO</p><p>01/2014 R$ 100,00 1,183324</p><p>02/2014 R$ 100,00 1,174198</p><p>03/2014 R$ 100,00 1,173122</p><p>04/2014 R$ 100,00 1,165169</p><p>05/2014 R$ 100,00 1,159982</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 535,74",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 566,87",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": " R$ 542,24",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 585,58",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 30,
+      "description": "<p>A atualização monetária e o entendimento do judiciário podemos extrair que:</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": " Todas as alternativas estão corretas",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": " A correção monetária é devida em apenas quando há decisão da justiça",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": " A atualização monetária é devida apenas nos casos em que se apresente a conta judicial no começo do processo",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": " A correção não é uma vantagem em favor do credor, mas sim um prejuízo que se evita",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 31,
+      "description": "<p>Para chegar no índice acumulado inflacionário eu preciso somar o índice acumulado do mês anterior com o índice do mês. Essa afirmação é:</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Verdadeira",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "Falsa",
+          "position": 1,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 32,
+      "description": "<p>Por que os indicadores inflacionários utilizados na tabela de atualização são aqueles do mês anterior e não a variação do próprio mês?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": " É uma determinação judicial, cujo entendimento é de utilizar do indicador do mês anterior",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "Utiliza-se do mês anterior porque as variações inflacionárias do mês vigente são sempre divulgadas no mês seguinte",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Faz-se necessária a adoção do indicador do mês anterior pois o índice mensal pode ser negativo",
+          "position": 2,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 33,
+      "description": "<p>Como se chega no índice acumulado?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Multiplicando o percentual do mês anterior pelo índice do mês",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "Somando o índice do mês anterior com o índice do mês",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Multiplicando o índice do mês anterior pelo índice acumulado do mês anterior",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": " Multiplica-se o índice acumulado do mês anterior pelo índice do mês",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 34,
+      "description": "<p>Os cortes da moeda são importantes para:</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Manter o mesmo padrão de compra através do tempo",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": " Transformar o padrão monetário para ajustar a moeda atual",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Não gerar valores astronômicos pela falta de corte da moeda",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Todas as alternativas estão corretas",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    }
+  ]
+}

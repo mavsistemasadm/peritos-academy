@@ -1,0 +1,196 @@
+{
+  "data": [
+    {
+      "id": 249,
+      "description": "<p>O cliente X obteve um financiamento para aquisição de seu imóvel junto a Caixa Econômica Federal, entretanto, na atual situação econômica do país, está com 3 parcelas em atraso, sendo todas com valor fixo no importe de R$ 1.235,00, cujos vencimentos são 11/08/2015, 11/09/2015 e 11/10/2015. No dia 23/12/2015 o cliente X resolveu pagar essas parcelas em atraso e pediu para que você recalcula-se o valor dos encargos moratórios devidos considerando apenas a comissão de permanência, conforme determina a justiça.</p><p><br></p><p>Taxa de comissão de permanência: 1.97%</p><p><br></p><p>Informe a soma das três parcelas em atraso acrescidas da comissão de permanência para data do pagamento ocorrido em 23/12/2015.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 3.956,40",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 3.841,28",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 3.626,30",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 3.649,55",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 250,
+      "description": "<p>Ainda no exercício anterior, o cliente X ao chegar no banco para fazer o pagamento das parcelas com base no valor calculado por você, surpreende-se ao ser informado que o valor a pagar das três parcelas em atraso equivale a R$ 4.338,17. Pergunta-se qual o percentual de encargos cobrados pela instituição considerando a soma das parcelas originais? E qual o percentual total dos encargos sobre a soma das parcelas originais com base no nosso cálculo?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "17,089% e 6,785%",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "16,559% e 5,332%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "16,988% e 6,203%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "17,128% e 5,852%",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 252,
+      "description": "<p>Qual a taxa CET para os dados do contrato abaixo:</p><p><br></p><p>VALOR FINANCIADO: R$ 500.000,00</p><p>TAXA DE JUROS: 1,86% a.m.</p><p>NÚMERO DE PARCELAS: 48</p><p>VALOR DA PARCELA: R$ 15.840,03</p><p><br></p><p>TARIFA DE CADASTRO: R$ 2.500,00</p><p>IOF: R$ 6.338,50</p><p>SEGURO EMBUTIDO: R$ 18.000,00</p><p><br></p><p>Qual a taxa CET?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "1,998%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "2,131%",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "2,228%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "2,475%",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 251,
+      "description": "<p>O cliente Y foi ao banco para para se informar sobre os encargos de mora do contrato que ele tem porque possui um saldo devedor no valor de R$ 12.732,08 na data base 22/02/2016, ao chegar lá foi informado que a taxa de encargos moratórios equivale a 318,33% ao ano calculado de forma simples, sem capitalização. Em 15/04/2016 resolver pagar a dívida. Pergunta-se: Qual o valor que ele pagou acrescido dos encargos informados pela instituição?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 18.699,00",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 16.238,92",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 16.803,56",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 15.028,11",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 253,
+      "description": "<p>A taxa pós fixada geralmente tem taxas de juros maiores pois considera a possível variação inflacionária do período. Essa afirmação está?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Verdadeira",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Falsa",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 254,
+      "description": "<p>Suponha que o banco tenha cobrado um valor de encargos de mora no importe de R$ 1.280,50 e afirma que esse valor refere-se aos juros de mora no importe de 3,9% a.m. de forma pró rata die. Considerando a data de vencimento 03/10/2016 e pagamento 18/04/2017, qual o valor base dos encargos moratórios?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 5.000,00",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 5.500,00",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 5.250,00",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 5.180,00",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

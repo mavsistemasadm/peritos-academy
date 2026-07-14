@@ -1,0 +1,276 @@
+{
+  "data": [
+    {
+      "id": 69,
+      "description": "<p>Qual é o mês que começam os cálculos?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "03/2010",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "07/2012",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "03/2016",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "03/2005",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 70,
+      "description": "<p>Qual é o indicador de atualização monetária que vamos atualizar neste cálculo?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Taxa Referencial",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Média INPC+IGP-DI",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "INPC",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": " IPCA",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 71,
+      "description": "<p>Qual é a data de início para contagem dos juros de mora?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Data do ajuizamento",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "Data da citação",
+          "position": 1,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "Data da sentença",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Data da prescrição",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 72,
+      "description": "<p>Informe qual o valor da diferença entre o ATS pago e o ATS devido conforme as decisões judiciais no primeiro e no último mês do cálculo (04/2012)? Sem atualização.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 222,08 e R$ 1.108,61",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 222,08 e R$ 1.358,40",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 177,66 e R$ 831,46",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 175,30 e R$ 954,60",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 73,
+      "description": "<p>Qual é o valor atualizado da diferença no mês de 10/2010?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 970,03",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 1.534,61",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "R$ 1.328,91",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 653,98",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 75,
+      "description": "<p>Já que sabemos os critérios de cálculo dos honorários, me informe o valor do mesmo.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 10.426,13",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 9.625,33",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 11.413,58",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 9.624,75",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 76,
+      "description": "<p>Agora que você está com o cálculo todo pronto me diga o valor total da condenação (valor atualizado + juros + honorários). Vou considerar diferenças muito pequenas, Novamente, os números são exatos e o teu valor deve ser o mesmo que o meu.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 98.114,71",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 109.405,63",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 105.872,20",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 102.223,89",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 74,
+      "description": "<p>Qual o valor total da condenação (valores das diferenças atualizadas com juros, inclusive 13º salário)? Preciso que você esteja muito atento as informações do contracheque... por exemplo no mês de 06/2010 temos um valor adicional de Salário básico e TIDE que devem ser levadas em consideração ok? Essa questão ocorre em dois momentos e o meu valor com o teu tem que ser exato!</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 84.029,85",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 93.854,13",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 88.410,25",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 96.247,45",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

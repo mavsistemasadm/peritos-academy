@@ -1,0 +1,378 @@
+{
+  "data": [
+    {
+      "id": 98,
+      "description": "<p>Qual o valor dos honorários atualizados para data do cálculo?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 12.169,75",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 11.893,47",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 13.748,32",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 11.077,09",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 97,
+      "description": "<p>Informe o valor da soma total dos valores atualizados monetariamente e dos juros.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 221.298,62 e R$ 70.002,05",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 184.516,35 e R$ 58.880,60",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 254.979,40 e R$ 83.441,56",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 231.352,97 e R$ 74.669,11",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 96,
+      "description": "<p>Qual o valor da diferença atualizada acrescida de juros moratórios no mês de 07/2012.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 6.238,91",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 6.595,30",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 6.364,45",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 6.256,84",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 95,
+      "description": "<p>Considerando que nem todos os juros moratórios serão calculados pela Lei 9494/97 e posteriormente pela Lei 11960/2009 e 12703/2012 informe qual o percentual total dos juros moratórios no mês da citação.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "38,087%",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "44,541%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "39,905%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "43,996%",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 92,
+      "description": "<p>Qual o percentual de juros no mês de 06/2012 que usaremos para apurar os juros moratórios acumulados devidos no processo. Lembrando que os juros deverão ser calculados de forma crescente a contar da data do cálculo (02/2016) até a data da citação.</p>",
+      "explanation": null,
+      "difficulty": "medium",
+      "options": [
+        {
+          "id": 1,
+          "content": "0,5230%",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "0,6178%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "0,6250%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "0,4770%",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 93,
+      "description": "<p>As diferenças devidas a título de URV serão calculadas até que mês? Lembrando que tais diferenças serão atualizadas monetariamente e juros até 02/2016.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "02/2016",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "03/2014",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "12/2013",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "01/2012",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 91,
+      "description": "<p>A partir de que mês os juros mensais serão diferentes de 0,5% a.m. como versa a lei 12703/2012, ou seja, considerando a TAXA SELIC inferior a 8,5%?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "04/2012",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "08/2012",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "05/2012",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "06/2012",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 89,
+      "description": "<p>Qual o valor do somatório da rubrica GRAT. JUDICIÁRIA durante todo o período de cálculo?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 53.102,20",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 49.908,35",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "R$ 36.874,58",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 41.665,79",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 88,
+      "description": "<p>A partir de qual data começamos a contabilizar me nosso cálculo os valores recebidos a título de PRODUTIVIDADE e até qual data o Autor recebe esse verba?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "08/2006 e 07/2011",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "09/2006 e 01/2011",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 5,
+          "content": "08/2006 e 05/2011",
+          "position": 4,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "09/2006 e 12/2010",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 87,
+      "description": "<p>Qual o valor da diferença (total da remuneração multiplicado por 11,98%) devida em 12/2006?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 7.514,71",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": " R$ 7.015,47",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 6.910,98",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 6.098,35",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 86,
+      "description": "<p>Qual o valor base (total das verbas de natureza salarial) que servirá de incidência do percentual de 11,98% em 10/2004?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 2.400,00",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 9.800,00",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "R$ 3.600,00",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 10.200,00",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

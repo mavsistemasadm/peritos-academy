@@ -1,0 +1,202 @@
+{
+  "data": [
+    {
+      "id": 201,
+      "description": "<p>Considerando o pagamento das comissões abaixo, calcule o reflexo das mesmas em RSR, 13º salário, férias e aviso prévio e me diga qual é o somatório total atualizado pela tabela do TST nos arquivos complementares? LEMBRANDO QUE HOUVE O RECLAMANTE GOZOU DE FÉRIAS NO MÊS DE 09/2013.</p><p><br></p><p>Data de admissão: 20/08/2012</p><p>Data de demissão: 30/06/2014</p><p>Férias período 2012/2013 gozadas em 05/01/2014 a 02/02/2014.</p><p><br></p><p>Mês/ano\tComissão (R$)</p><p>08/2012\t650,00</p><p>09/2012\t750,00</p><p>10/2012\t400,00</p><p>11/2012\t130,00</p><p>12/2012\t225,00</p><p>01/2013\t189,00</p><p>02/2013\t300,00</p><p>03/2013\t213,00</p><p>04/2013\t322,00</p><p>05/2013\t431,00</p><p>06/2013\t540,00</p><p>07/2013\t649,00</p><p>08/2013\t758,00</p><p>09/2013\t867,00</p><p>10/2013\t976,00</p><p>11/2013\t1.085,00</p><p>12/2013\t1.194,00</p><p>01/2014\t150,00</p><p>02/2014\t1.412,00</p><p>03/2014\t1.521,00</p><p>04/2014\t1.630,00</p><p>05/2014\t1.739,00</p><p>06/2014\t850,00</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 9.843,82",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 10.758,90",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 11.722,32",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 12.003,45",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 200,
+      "description": "<p>Em uma ação judicial foi reconhecido o direito ao pagamento do adicional de insalubridade sobre o salário mínimo vigente à época no percentual de 40% (grau máximo) durante todo o período laborado, qual seja 03/04/2011 a 12/06/2015.</p><p><br></p><p>Pergunta-se: Qual o valor total da insalubridade mês a mês sem atualização?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 13.364,75",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 13.025,63",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 13.025,63",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 13.364,75",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 196,
+      "description": "<p>Quanto ao seguro-desemprego a obrigação do empregador consubstancia-se em entregar as guias para o ex-empregado, cabendo ao órgão gestor avaliar o cabimento, ou não, do pagamento do referido benefício. Portanto, haja vista da não entrega das guias para o Autor, defere-se o requerimento autoral de indenização do montante das parcelas do seguro-desemprego, condenando-se a primeira reclamada ao pagamento das parcelas devidas a título do seguro desemprego na data do TRCT.</p><p><br></p><p>Data do Ajuizamento: 17/10/2013</p><p>Data de Admissão: 21/11/2012</p><p>Data de Demissão: 15/07/2013</p><p>Data da Prescrição: Não há</p><p>Valor do salário nos últimos 03 meses anteriores a rescisão contratual: R$ 975,00;</p><p>Valor das diferenças de horas extras reconhecidas nos últimos 3 meses anteriores a rescisão: R$ 150,32, R$ 86,54 e R$ 209,11.</p><p><br></p><p>O autor tem direito a 3 parcelas. Qual o valor total a receber a título de seguro desemprego?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 2.666,87",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 2.325,30",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 2.122,08",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 2.796,45",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 199,
+      "description": "<p>No exercício previamente respondido da SIMONE, agora preciso que você informe o valor total corrigido dos reflexos em 13º salário utilizando a tabela TST nos arquivos complementares.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 490,18",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 483,21",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 593,98",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 635,20",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 198,
+      "description": "<p>A sentença deferiu o pagamento de diferenças salariais durante toda a contratualidade, logo deve-se calcular as diferenças mês a mês, além dos reflexos também deferidos. A admissão ocorreu em 15/01/2010 e a demissão em 18/03/2012. Supondo que o padrão é que as diferenças tenha a proporção de 30/30 (mês inteiro) caso o labor realmente tenha ocorrido durante a integralidade do mês, mas neste caso é diferença, então qual a proporção do primeiro mês de cálculo da diferença salarial?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "15/30",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "30/30",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "16/30",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "14/30",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 197,
+      "description": "<p>As convenções foram descumpridas no que diz respeito ao adicional de horas extras, de forma que é devida multa de 12% sobre o maior valor vigente a título de salário normativo da categoria profissional (Cláusula 62ª CCT 2003/2004 Valor maior salário vigente R$ 465,00, Cláusula 57ª CCT 2004/2005 Valor maior salário vigente R$ 618,00, Cláusula 58ª CCT 2005/2006 Valor maior salário vigente R$ 725,00, Cláusula 59ª CCT 2006/2007 Valor maior salário vigente R$ 830,00, 2007/2008 Valor maior salário vigente R$ 950,00.</p><p><br></p><p>Defere-se uma multa por convenção descumprida, no total de 05 multas. Qual o valor total das multas (sem atualização)</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 430,56",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 418,22",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 401,02",
+          "position": 2,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

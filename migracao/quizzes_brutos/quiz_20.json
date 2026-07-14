@@ -1,0 +1,308 @@
+{
+  "data": [
+    {
+      "id": 168,
+      "description": "<p>A sentença (decisão de 1º grau) deferiu o pagamento dos reflexos de hora extra sobre o 13º salário do Reclamante, cuja data de admissão foi 12/01/2003 e a data da demissão ocorreu em 03/11/2009. O processo foi ajuizado em 22/10/2010. Considerando que a prescrição reconhecida foi a quinquenal a contar da data do ajuizamento qual ou quais anos em que o 13º salário está prescrito?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "2003 e 2004",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "2004, 2005 e 2006",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "2002, 2003, 2004, 2005 e 2006",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "2004, 2005, 2006 e 2007",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 169,
+      "description": "<p>Para verificar a existência da prescrição sobre férias em cálculos trabalhistas, devemos nos atentar quanto ao período aquisitivo.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Verdadeira",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Falsa",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 170,
+      "description": "<p>Qual é a prescrição dos valores devidos a título de FGTS?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "5  anos",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "20 anos",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "10 anos",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "30 anos",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 171,
+      "description": "<p>Conceito de salário: é a contraprestação devida diretamente pelo empregador ao empregado pela prestação do serviço decorrente do contrato de trabalho.</p><p><br></p><p>Conceito de Remuneração: é a soma do salário estipulado em contrato com vantagens adicionais, também previstas de forma contratual.</p><p><br></p><p>As afirmações são verdadeiras ou falsas?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Verdadeiras",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "Falsas",
+          "position": 1,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 172,
+      "description": "<p>A liquidação por arbitramento se dá através da:</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Insuficiência de elementos para cálculo, podendo haver a necessidade de outro perito",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "Apresentação de valores de cálculos solicitados pelo advogado do Reclamante",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Cálculo de valores quando houver algum fato novo à justiça",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Cálculo de liquidação com os documentos juntos aos autos",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 173,
+      "description": "<p>O empregado foi admitido em 14/03/2008 e foi demitido em 20/12/2010. Quais são as proporções de 13º a receber nos anos de 2008, 2009 e 2010?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "10/12, 12/12 e 12/12",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "09/12, 12/12 e 12/12",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "10/12, 12/12 e 11/12",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "09/12, 12/12 e 11/12",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 174,
+      "description": "<p>Ainda no exemplo anterior, supondo que a prescrição do processo atinja parcelas anteriores a 10/2008. Qual seria a proporção do ano 13º salário de 2008?</p><p>O empregado foi admitido em 14/03/2008 e foi demitido em 20/12/2010. Utilizar 2 casas no campo de preenchimento.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "02/12",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "12/12",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "10/12",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "08/12",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 331,
+      "description": "<p>Em determinado acórdão de 2º grau o Desembargador determinou o pagamento do FGTS, considerando as prescrições devidas as verbas destinadas ao FGTS. A admissão ocorreu em 08/02/1987 e a demissão em 23/03/2009. O ajuizamento da ação se deu em 05/02/2010 e a prescrição das verbas trabalhistas em 05/02/2005.</p><p><br></p><p>A partir de qual data será calculado o FGTS deferido em acórdão?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": " 05/02/2005",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": " 05/02/2010",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": " 08/02/1987",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": " a partir da data do cálculo",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 332,
+      "description": "<p>Na montagem da base de cálculo das horas extras temos os seguintes valores no mês de 11/2014:</p><p>– Salário base: R$ 1.500,00</p><p>– Insalubridade: R$ 300,00</p><p>– Comissão: R$ 880,00</p><p>– Horas extras pagas c/50%: R$ 135,50</p><p><br></p><p>O divisor deferido judicialmente foi de 200. Pergunto: Qual o valor da hora extras c/100%?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": " R$23,22",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": " R$25,59",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$26,80",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$28,40",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 333,
+      "description": "<p>Para formação da base de cálculo das horas extras deferidas judicialmente eu devo adicionar nesta base o valor das horas extras recebidas durante a contratualidade. Esse afirmação é:</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Verdadeira",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "Falsa",
+          "position": 1,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

@@ -1,0 +1,304 @@
+{
+  "data": [
+    {
+      "id": 173,
+      "description": "<p>O empregado foi admitido em 14/03/2008 e foi demitido em 20/12/2010. Quais são as proporções de 13º a receber nos anos de 2008, 2009 e 2010?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "10/12, 12/12 e 12/12",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "09/12, 12/12 e 12/12",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "10/12, 12/12 e 11/12",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "09/12, 12/12 e 11/12",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 174,
+      "description": "<p>Ainda no exemplo anterior, supondo que a prescrição do processo atinja parcelas anteriores a 10/2008. Qual seria a proporção do ano 13º salário de 2008?</p><p>O empregado foi admitido em 14/03/2008 e foi demitido em 20/12/2010. Utilizar 2 casas no campo de preenchimento.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "02/12",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "12/12",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "10/12",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "08/12",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 334,
+      "description": "<p>Quantos dias de aviso prévio tem direito um trabalhador que foi admitido em 02/02/2010 e demitido em 18/05/2014?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "30",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "36",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "45",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "42",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 176,
+      "description": "<p>Com base na questão 01 supondo que o Reclamante recebia R$ 1.108,00 em Dez/2008, R$ 1.223,70 em Dez/2009 e R$ 1.408,25 em Dez/2010. Qual o valor das proporções de 13º salário que ele tem direito a receber nos respectivos meses de dezembro de cada ano.</p><p><br></p><p>O empregado foi admitido em 14/03/2008 e foi demitido em 20/12/2010.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 906,45, R$ 1.325,32 e R$ 1.398,77",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 831,00, R$ 1.123,70 e R$ 1.408,25",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 923,33, R$ 1.123,70 e R$ 1.408,25",
+          "position": 1,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 177,
+      "description": "<p>Considerando ainda as proporções calculadas e valores dos salário acima nos meses de dezembro 2008/2009/2010, precisamos agora apurar o reflexo das horas extras laboradas durante o ano de 2010 e o valor das horas extras a serem pagas junto com o 13º salário. (Lembre-se de calcular a média física das horas e não do valor durante o ano)</p><p><br></p><p>Divisor: 220</p><p>Valor do salário de 01/2010 a 12/2010: R$ 1.408,25</p><p>Valor da hora extra: ? (acrescentar ao valo da hora, o percentual de 50%)</p><p><br></p><p>Mês/ano Qtde. HE</p><p>01/2010 8,42</p><p>02/2010 6,77</p><p>03/2010 3,69</p><p>04/2010 4,90</p><p>05/2010 3,25</p><p>06/2010 12,50</p><p>07/2010 11,50</p><p>08/2010 18,75</p><p>09/2010 9,25</p><p>10/2010 7,22</p><p>11/2010 3,00</p><p>12/2010 10,00</p><p><br></p><p>Qual o valor a pagar das horas extras junto com o 13º salário de 2010?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 48,36",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 60,87",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 39,92",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 79,41",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 178,
+      "description": "<p>Temos a seguinte sentença:</p><p><br></p><p>\"Desta forma, diante o quadro probatório formado nos autos, defiro o adicional de periculosidade pleiteado, à razão de 30% sobre o salário quitado à Reclamante, bem como seus respectivos reflexos em aviso prévio indenizado, férias acrescidas do terço constitucional, gratificação natalina, eventuais horas extras quitadas durante a contratualidade (as deferidas em juízo já contarão com o adicional de periculosidade em sua base de cálculo) e FGTS à razão de 11,2%. Não em dsr’s, sob pena de bis in idem.\"</p><p><br></p><p>Data do Ajuizamento: 28/09/2012</p><p>Data de Admissão: 04/10/2007</p><p>Data de Demissão: 13/06/2012</p><p>Data da Prescrição: Não há</p><p><br></p><p>Período aquisitivo</p><p><br></p><p>04/10/2007 a 03/10/2008</p><p>04/10/2008 a 03/10/2009</p><p>04/10/2009 a 03/10/2010</p><p>04/10/2010 a 03/10/2011</p><p>04/10/2011 a 13/06/2012 (proporcional)</p><p><br></p><p>Haja vista que o último período aquisitivo o Reclamante saiu da empresa antes de completar 12 meses para ter direito a 1 ano de férias, pergunto: Qual a proporção devida ao Reclamante no período aquisitivo 04/10/2011 a 13/06/2012?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "07/12",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "09/12",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "08/12",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "10/12",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 179,
+      "description": "<p>De acordo com a proporção determinada no exercício anterior, calcule o valor das férias proporcionais a pagar, acrescida do terço constitucional (1/3), sendo que a remuneração informada no TRCT (Termo de Rescisão de Contrato de Trabalho) foi de R$ 2.250,00.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$2.000,00",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$2.100,00",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$2.150,00",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$2.250,00",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "multiple"
+    },
+    {
+      "id": 180,
+      "description": "<p>\"Desta forma, diante o quadro probatório formado nos autos, defiro o adicional de periculosidade pleiteado, à razão de 30% sobre o salário quitado à Reclamante, bem como seus respectivos reflexos em aviso prévio indenizado, férias acrescidas do terço constitucional, gratificação natalina, eventuais horas extras quitadas durante a contratualidade (as deferidas em juízo já contarão com o adicional de periculosidade em sua base de cálculo) e FGTS à razão de 11,2%. Não em dsr’s, sob pena de bis in idem.\"</p><p><br></p><p>Com base na sentença, precisamos calcular o reflexo do adicional de periculosidade de 30% a ser pago nas férias.</p><p><br></p><p>Dica: Os meses base serão aqueles em que as férias foram gozadas e no caso das férias proporcionais, estas serão na data do TRCT, que é a data da demissão.</p><p><br></p><p>Temos o seguinte período de fruição:</p><p><br></p><p>Período aquisitivo Período de fruição</p><p><br></p><p>04/10/2007 a 03/10/2008 - 01/01/2009 a 30/01/2009</p><p>04/10/2008 a 03/10/2009 - 01/07/2010 a 30/07/2010</p><p>04/10/2009 a 03/10/2010 - 01/02/2011 a 02/03/2011</p><p>04/10/2010 a 03/10/2011 - 14/05/2012 a 12/06/2012</p><p>04/10/2011 a 13/06/2012 - Proporcional pago no TRCT (06/2012)</p><p><br></p><p>Valor dos salários:</p><p><br></p><p>01/2009 - R$ 1.022,00</p><p>07/2010 - R$ 1.228,00</p><p>02/2011 - R$ 1.902,15</p><p>05/2012 - R$ 2.085,30</p><p>06/2012 - R$ 2.085,30</p><p><br></p><p>Qual a soma total do adicional de periculosidade a pagar nas férias do Reclamante? (Não esqueça de incluir o terço constitucional). o.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$3.051,07",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$2.823,74",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$4.323,11",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$2.796,87",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 181,
+      "description": "<p>Foi deferido em sentença o pagamento do FGTS (8% + 40% da multa fundiária) sobre os seguinte valores de horas extras recebidos durante a contratualidade, haja vista que o FGTS não foi recolhido anteriormente. Qual o valor do total do FGTS a recolher?</p><p><br></p><p>Mês/ ano Valor pago HE</p><p>03/2013 274,33</p><p>04/2013 308,21</p><p>05/2013 346,27</p><p>06/2013 389,04</p><p>07/2013 437,08</p><p>08/2013 491,06</p><p>09/2013 551,71</p><p>10/2013 619,85</p><p>11/2013 696,40</p><p>12/2013 782,40</p><p>01/2014 879,03</p><p>02/2014 987,59</p><p>03/2014 1.109,56</p><p>04/2014 1.246,59</p><p>05/2014 1.400,54</p><p>06/2014 1.573,51</p><p>07/2014 1.767,84</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$1.366,35",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$1.376,20",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$1.640,06",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$1.552,43",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

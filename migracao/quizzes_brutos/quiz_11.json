@@ -1,0 +1,500 @@
+{
+  "data": [
+    {
+      "id": 99,
+      "description": "<p>Qual o valor da proporção de 13º salário a ser pago em 12/2015, cuja DIB foi concedida em 18/08/2015 e a RMI calculada em R$ 2.550,00?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 1.700,00",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 1.275,00",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 1.062,50",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 850,00",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 100,
+      "description": "<p>Qual o reajuste acumulado (multiplicar índices de reajuste por índices de reajuste) em um benefício com DIB em 06/2009 até 01/2016?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "1,55876590",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "1,62335843",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "1,58580551",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "1,61229797",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 101,
+      "description": "<p>A renda mensal inicial pela Lei 8812/91 é calculada através da multiplicação do salário de contribuição pelo coeficiente de aposentadoria. Essa afirmação é?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Verdadeira",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Falsa",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 102,
+      "description": "<p>Suponha que vamos precisar calcular um aposentadoria pelo critério estabelecido na Lei 9876/99 e que esse benefício ainda não foi concedido. Em quais documentos do INSS abaixo vamos ter as informações que precisamos?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Carta de Concessão",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "CNIS",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "INFBEN",
+          "position": 2,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 103,
+      "description": "<p>Ainda na pergunta anterior, quais são as informações que vamos utilizar no documento informado?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Salário de benefício e tempo de contribuição",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Tempo de contribuição e fator previdenciário",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Salários de contribuição, tempos de contribuição e idade",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "Idade, expectativa de vida e salários de contribuição",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 104,
+      "description": "<p>Considerando DIB em 15/04/1993. Informe qual o valor do salário de benefício (Lei 8131/1991) considerando que todas as 36 contribuições anteriores a DIB foram realizadas pelo TETO e os salários de contribuição devem ser corrigidos pela variação do INPC.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Cr$ 15.750.858,52",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Cr$ 15.234.715,10",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "Cr$ 18.968.475,12",
+          "position": 2,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 105,
+      "description": "<p>Considerando que a pergunta anterior seja de uma aposentadoria por tempo de contribuição, cujo tempo total contribuído pela beneficiária seja de 28 anos, qual o valor da RMI devida?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Cr$ 10.664.300,57",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Cr$ 12.492.466,38",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Cr$ 16.725.441,30",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Cr$ 13.406.549,29",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 106,
+      "description": "<p>Considerando DIB hipotética em 22/11/1991, qual o valor da aposentadoria por idade de um beneficiário que laborou nos períodos abaixo:</p><p><br></p><p>18/06/1958\t31/12/1964</p><p>06/03/1965\t30/03/1970</p><p>05/10/1971\t30/10/1974</p><p>02/12/1974\t30/03/1982</p><p>05/04/1982\t06/10/1989</p><p>07/10/1989\t31/10/1991</p><p><br></p><p>Os salários de contribuição foram realizados sobre o teto de contribuição e devem ser atualizados pelo INPC. Qual o valor da RMI?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Cr$ 298.201,42",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "Cr$ 323.725,08",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Cr$ 300.011,28",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Cr$ 225.998,67",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 107,
+      "description": "<p>João Matias foi teve sua aposentadoria concedida com a numeração 46. Qual o coeficiente de aposentadoria concedido supondo que ele, no momento da DER tinha 18 anos de atividade especial?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "88%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "100%",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "98%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "85%",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 108,
+      "description": "<p>Qual o fator previdenciário para as características abaixo:</p><p><br></p><p>DIB: 22/02/2008</p><p>Data nascimento: 15/05/1948</p><p>Tempo de contribuição: 33 anos, 09 meses e 18 dias.</p><p>Expectativa de vida: (procurar nos arquivos complementares)</p><p>Alíquota: 0,31</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "0,79548",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "0,81834",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "0,82463",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "0,77356",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 109,
+      "description": "<p>Supondo a aposentadoria por idade apurada pela Lei 9876/99 e com características abaixo. A afirmação de que a RMI é mais benéfica com a aplicação do fator previdenciário é:</p><p><br></p><p>DIB: 06/05/2016</p><p>Data nascimento: 23/03/1952</p><p>Tempo de contribuição: 37 anos, 0 meses e 0 dias.</p><p>Expectativa de vida: (procurar nos arquivos complementares)</p><p>Alíquota: 0,31</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Verdadeira",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "Falsa",
+          "position": 1,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 110,
+      "description": "<p>Qual o valor do fator previdenciário calculado com base nas informações da questão anterior:</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "1,10772",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "1,18119",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "1,06548",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "1,11829",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 111,
+      "description": "<p>2ª Pergunta: Qual o fator previdenciário na DIB que será aplicado sobre a média das 80% maiores contribuições?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "0,75334",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "0,61878",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "0,66895",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "0,73021",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 112,
+      "description": "<p>3ª Pergunta: Qual o valor da média das 80% maiores contribuições do período básico de cálculo (PBC)?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 896.905,55",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 1.106.453,78",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 797.888,15",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 802.662,34",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 113,
+      "description": "<p>ª Pergunta: Qual o coeficiente de aposentadoria correto a aplicar sobre o salário de benefício?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "85%",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "88%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "94%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "100%",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 114,
+      "description": "<p>5ª Pergunta: Qual o valor da RMI devida pelo beneficiário?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 1.997,56",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": " R$ 2.089,96",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

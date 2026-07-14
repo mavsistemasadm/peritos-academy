@@ -1,0 +1,332 @@
+{
+  "data": [
+    {
+      "id": 320,
+      "description": "<p>Lembrando que a TAXA REFERENCIAL - TR é o único indicador que é divulgado dentro do próprio mês, ou seja, não precisamos pegar a variação em percentual do mês anterior. Busque nos arquivos complementares o \"TAXA REFERENCIAL\" e crie sua tabela de atualização até mês de 10/1993. Lembrando que na coluna do índice acumulado o primeiro mês será sempre 1. A tabela começará no mês de 02/1991.</p><p>Depois de encontrado o índice acumulado no mês de 10/1993, atualize o valor de 5.000,00 em 08/1992 para 10/1993. Qual é o valor atualizado?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "185.003,68",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "18.500,68",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "165,62",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 5,
+          "content": "201,22",
+          "position": 4,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 309,
+      "description": "<p>Utilizando da tabela de correção IPCA-e com base nos índices que temos na plataforma (arquivo complementar), suponhamos que sua tabela começa em 01/2012 a termina em 12/2014 e queremos atualizar o pagamento de R$ 30.000,00 com data inicial em 03/2012 e o cálculo para atualização da dívida ocorre em 09/2014. Qual é o valor corrigido?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 34.628,88",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 33.625,44",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 35.108,70",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 31.963,21",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 310,
+      "description": "<p>Qual a fórmula/função do Excel que devo utilizar para buscar os índices de atualização no meu cálculo judicial de forma automática?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "TAXA",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Função SE",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "PROCV",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 311,
+      "description": "<p>Se o índice acumulado do mês de 01/2014 é 1,3698745 e o índice acumulado do mês de 12/2015 é 1,5712053, pergunta: Qual o percentual da inflação do período?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "14,697%",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "13,829%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "15,741%",
+          "position": 2,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 312,
+      "description": "<p>Busque nos arquivos complementares o \"HISTÓRICO IGP-M\" e crie sua tabela de atualização até o mês de 05/1990 e informe qual o índice acumulado deste mês. Lembrando que na coluna do índice acumulado o primeiro mês será sempre 1. A tabela começará no mês de 07/1989.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "52,30285946",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "51,02534874",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "50,96871355",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "55,40441903",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 35,
+      "description": "<p>Com base na tabela abaixo, supondo que nossa tabela de correção monetária começo no mês de 12/2011, cujo índice é 1,00000 (variação igual a 0%), qual o índice acumulado no mês de dezembro/2012?</p><p><br></p><p>  dez/11    -0,12%</p><p>  jan/12       0,25% </p><p>  fev/12     -0,06%</p><p>  mar/12     0,43%</p><p>  abr/12      0,85%</p><p>  mai/12     1,02%</p><p>  jun/12      0,66%</p><p>  jul/12       1,34%</p><p>  ago/12     1,43%</p><p>  set/12      0,97%</p><p>  out/12      0,02%</p><p>  nov/12    -0,03%</p><p>  dez/12     0,68%</p><p> </p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": " 1,067283",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "1,062431",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "1,078119",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "1,061824",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 36,
+      "description": "<p>Ao analisarmos o histórico da moeda nacional percebemos que houveram algumas mudanças nos padrões monetários. Quando vamos construir nossa tabela de correção monetária, devemos levar em consideração tais alterações, para que ao multiplicarmos um valor da época, ele já me dê o valor atualizado com essas alterações.</p><p><br></p><p>Nesta esteira, quero que você aplique a alteração da moeda em 08/1993 e 07/1994 nos índices acumulados a partir de 07/1993 e calcule o índice acumulado até 09/1994 da tabela abaixo e responda, qual é o valor atualizado de uma dívida de Cz$ 987.740,00 em 05/1993 para 09/1994?</p><p><br></p><p><img src=\"data:image/png;base64,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\"></p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 55,32",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 553,20",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": " R$ 5.532,02",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 5,53",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 42,
+      "description": "<p>Qual o valor o de 1.590,00 em 01/1990 para 05/1990 utilizando a tabela IGP-M? O desafio é você pesquisar na internet o histórico do IGP-M e responder esse cálculo. O link a seguir pode ser útil: <span style=\"color: rgb(241, 241, 241);\"> https://www.debit.com.br/tabelas/igpm-fgv-indice-geral-de-precos-mercado</span></p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": " 15.566,70",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": " 10.988,32",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": " 20.245,74",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "18.101,09",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 43,
+      "description": "<p>Qual é o procedimento final para achar o índice de atualização monetária que vamos corrigir determinado valor?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": " Dividir o índice acumulado da data final pelo índice do mês da data inicial",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": " Multiplicar o índice do mês da data inicial pelo índice acumulado do mês final",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": " Multiplicar o índice acumulado do mês inicial com índice acumulado do mês do cálculo",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": " Dividir o índice acumulado da data final pelo índice acumulado da data inicial",
+          "position": 1,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 45,
+      "description": "<p>Suponha que na sentença judicial que determina o pagamento do valor de R$ 5.000,00 atualizados a partir de 28/06/2013 e não explicita qual o indicador de atualização monetária a ser aplicado. Qual é o seu critério para escolher o indicador inflacionário neste caso?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Não utiliza nenhuma atualização",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": " Peticiona ao devedor para informar qual o critério de atualização monetária a adotar",
+          "position": 1,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": " Utiliza a variação do INPC por ser o indicador mais utilizado no judiciário",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Pesquisa na internet qual é o índice adotado pelo Tribunal e o utiliza para o cálculo e/ou peticiona ao juízo.",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

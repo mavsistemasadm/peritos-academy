@@ -1,0 +1,212 @@
+{
+  "data": [
+    {
+      "id": 267,
+      "description": "<p>Seguindo a mesma linha do exercício anterior informe qual o valor da parcela número 98 de acordo com as informações do financiamento abaixo (UTILIZAR MÉTODO SAC).</p><p><br></p><p>Valor do financiamento: R$ 240.000,00</p><p>Número de prestações: 180</p><p>Taxa de juros a.m.: 0,84%</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 2.262,93",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 2.422,08",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 2,033,19",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 2.454,90",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 266,
+      "description": "<p>Ao analisar um contrato de financiamento percebeu-se uma taxa de juros contratada de 1,42%. Considerando que o valor do financiamento foi R$ 39.900,00, valor da parcela R$ 1.172,06 e um prazo de 48 parcelas, pergunta: Qual a taxa de juros efetivamente utilizada pela Instituição/ Lembr-se de usar a função TAXA (excel).</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "1,50%",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "1,52%",
+          "position": 1,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 268,
+      "description": "<p>Seguindo a mesma linha do exercício anterior informe qual o valor da parcela número 25 e o valor da parcela número 36 já que esta deve se atentar pois de acordo com nossos estudos, a última parcela do método SACRE possui um detalhe bem interessante (UTILIZAR MÉTODO SACRE).</p><p><br></p><p>Valor do financiamento: R$ 28.888.32</p><p>Número de prestações: 36</p><p>Taxa de juros a.m.: 1,32%</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 826,42 e R$ 176,72",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 832,10 e R$ 178,25",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 820,87 e R$ 203,40",
+          "position": 2,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 269,
+      "description": "<p>Utilizando o método PRICE de amortização, qual o valor da taxa de juros e saldo devedor na parcela 36?</p><p><br></p><p>Valor financiamento: R$ 128.390,00</p><p>Prazo: 48</p><p>Parcela: 4.320,72</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "2,16% e R$ 45.255,19",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "2.89% e R$ 49.520,14",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "2,50% e R$ 46.123,58",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 5,
+          "content": "2,87% e R$ 41,522,96",
+          "position": 4,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 271,
+      "description": "<p>No método HAMBURGUÊS o valor base para cálculo dos juros é o saldo devedor na data do pagamento dos encargos estipulados pela instituição financeira.</p><p><br></p><p>Esta afirmação é?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Verdadeira",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Falsa",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 270,
+      "description": "<p>Utilizando o método PRICE de amortização, qual o valor da amortização na parcela 25?</p><p><br></p><p>Valor financiamento: R$ 35.500,00</p><p>Prazo: 36</p><p>Taxa: 1,89%</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 1.220,18",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 1.092,94",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "R$ 1.198,30",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 1.110,22",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 272,
+      "description": "<p>Utilizando o método SAC de amortização, qual o valor do saldo devedor na parcela 108.</p><p><br></p><p>Valor financiado R$ 48.300,00</p><p>Taxa: 3,74%</p><p>Prazo 120</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 4.080,00",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 2.725,00",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 4.830,00",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 3.960,00",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

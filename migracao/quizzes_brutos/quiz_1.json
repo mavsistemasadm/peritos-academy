@@ -1,0 +1,428 @@
+{
+  "data": [
+    {
+      "id": 3,
+      "description": "<p>PROCESSO CÍVEL: Sobre o que se trata a ação judicial (matéria principal)?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Recálculo de expurgos inflacionários na aposentadoria",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "Inclusão das horas extras (justiça do trabalho) no cálculo do benefício complementar",
+          "position": 1,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "Pagamento de juros moratórios",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Revisão da aposentadoria INSS (previdência social)",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 4,
+      "description": "<p>PROCESSO CÍVEL: Em que momento processual é feita a contestação do Réu?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Depois da sentença",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "Antes da petição inicial",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Depois da petição inicial",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "Após o acórdão do Tribunal",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 5,
+      "description": "<p>PROCESSO CÍVEL: Haja vista do processo ter sido ajuizado no Tribunal de Justiça do Paraná e o índice de correção monetária do TJPR é a média do INPC+IGP-DI, é correto neste processo adotar este índice?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Sim",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "Não",
+          "position": 1,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 6,
+      "description": "<p>PROCESSO CÍVEL: Os juros moratórios foram determinados através do seguinte critério:</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Juros no importe de 1% ao dia a contar da data da citação",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "Juros no importe de 1% ao mês a contar do vencimento de cada parcela mensal",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Juros no importe de 1% ao mês a contar da data do trânsito em julgado da decisão",
+          "position": 2,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 7,
+      "description": "<p>PROCESSO CÍVEL: O primeiro acórdão do Tribunal reforma a sentença em algum desses pontos?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Os juros devem ser calculados no importe de 0,5% por se tratar de empresa ",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "O débito deve ser corrigido monetariamente pelo IPC",
+          "position": 1,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "Indeferido o pedido inicial e baixa dos autos sem resolução de mérito",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "A data da sentença teve sua data alterada para o dia 15/04/2013",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 9,
+      "description": "<p>PROCESSO PREVIDENCIÁRIO: As diferenças dos valores de pensão mensal devem ser calculados a partir de qual data?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Data do ajuizamento pra frente",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "Data do ajuizamento até a sentença",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Data de prescrição",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "Data da citação dos Réus",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 10,
+      "description": "<p>PROCESSO PREVIDENCIÁRIO: O acórdão do STJ às folhas 316/318 versa sobre as seguintes alterações.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Os juros de mora serão calculados com base em 0,5% a.m. a contar do ajuizamento da demanda",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "As diferenças mês a mês deverão ser pagas por todos os Réus do processo",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Solicita o retorno dos autos ao Tribunal de origem para readequação da sentença",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Nega seguimento ao recurso e não há alteração de nenhum item processual",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 11,
+      "description": "<p>PROCESSO PREVIDENCIÁRIO: Sabendo que o valor da pensão devida pela Autora é de 100% do valor da aposentadoria do marido falecido e estes valores estão descritos às folhas 399/404 e o valor recebido pela autora através do INSS está informado nas folhas 377/393, pergunto: Qual o valor da diferença no mês de 05/2009 (considerando o valor da MR e o plansfer)</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 440,13",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 398,15",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 374,26",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 180,55",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 12,
+      "description": "<p>Processo BANCÁRIO: Para que serve uma ação de Embargos à Execução?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "É uma ação independente, ou seja, autônoma, em que o executado se manifesta, apresentando sua discordância referente ao valor cobrado e/ou em relação ao teor da ordem requerida na Ação de Execução.",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "É uma das peças de resposta do réu, onde ele pode se defender daquilo que lhe foi imputado.",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "É um instrumento para pedir a mudança de uma decisão da mesma instância ou em instância superior, sobre o mesmo processo.",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Peça fundamental do processo, dispositivo que dá início ao processo e permite que o autor exercite uma ação.",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 13,
+      "description": "<p>Processo BANCÁRIO: No demonstrativo de débito juntado pelo Requerido, quais são os itens de cálculo informados?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Parcelas em atraso e juros remuneratórios",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "Parcelas em atraso, parcelas vincendas, juros remuneratórios, correção monetária e multa contratual",
+          "position": 1,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "Juros remuneratórios, correção monetária, parcelas vincendas e multa contratual",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Correção monetária e multa contratual",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 14,
+      "description": "<p>Processo BANCÁRIO: Qual a peça processual que deu efeito suspensivo na ação de execução proposta pelo Banco?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Não foi considerado o efeito suspensivo em nenhum momento do processo",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "Embargos à Execução enviado pelo Réu",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Petição inicial do Autor",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Apresentação de carta de pobreza por parte do devedor",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 15,
+      "description": "<p>Processo BANCÁRIO: Quais os documentos relevantes para cálculo que foram juntados pelo embargado?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Não há nenhum documento relevante para cálculo no processo.",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "Memória de cálculo do débito.",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Contrato de Capital de Giro e memória de cálculo do débito",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "Decisão judicial e contrato de Capital de Giro",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 8,
+      "description": "<p>PROCESSO PREVIDENCIÁRIO: Quantos Réus possuem no processo?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "1",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "2",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "3",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "4",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

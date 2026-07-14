@@ -1,0 +1,140 @@
+{
+  "data": [
+    {
+      "id": 157,
+      "description": "<p>A empresa X recorreu ao Banco Itau para contratar um capital de giro e foi assinado contrato com as características abaixo:</p><p><br></p><p>Valor do financiamento: R$ 100.000,00</p><p>Número de prestações: 72</p><p>Taxa de juros: 1,45%</p><p><br></p><p>Informe qual é o índice FVA e qual o valor da amortização (capital pago) na parcela de número 68 pelo critério de juros simples.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "0,50352 e R$ 1.026,56",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "0,50199 e R$ 1.129,02",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "0,49876 e R$ 1.329,90",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "0,50156 e R$ 1.212,56",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 158,
+      "description": "<p>Qual o valor da parcela e o total de juros pagos em um contrato de financiamento habitacional de 150 parcelas, valor base do financiamento de R$ 280.000,00 e uma taxa mensal no percentual 0,975% utilizando o método de Equivalência a Juros Simples.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 3.039,11 e R$ 175.866,96",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 3.039,11 e R$ 198.403,21",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 3.213,55 e R$ 175.866,96",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 3.213,55 e R$ 198.403,21",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 160,
+      "description": "<p>Qual o valor da amortização na parcela 26 pelo critério de juros simples quando do pagamento integral do contrato de acordo com características abaixo:</p><p><br></p><p>VALOR FINANCIADO: 139.825,00</p><p>TAXA DE JUROS: 1,67%</p><p>PRAZO DO CONTRATO: 60 MESES</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 3.172,33",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 2.670,65",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 2.359,67",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 5,
+          "content": "R$ 2.535,28",
+          "position": 4,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 159,
+      "description": "<p>Qual o valor da diferença entre o valor da parcela paga de R$ 4.212,90 e a parcela recalculada a juros simples do financiamento abaixo:</p><p><br></p><p>VALOR DO FINANCIAMENTO: R$ 56.500,00</p><p>PRAZO DO CONTRATO: R$ 24</p><p>TAXA DE JUROS: 3,89% a.m.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 832,03",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 611,76",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 709,92",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 544,28",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

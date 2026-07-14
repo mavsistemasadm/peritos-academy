@@ -1,0 +1,304 @@
+{
+  "data": [
+    {
+      "id": 322,
+      "description": "<p>Qual é a taxa efetivamente cobrada pela instituição?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "1,312%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "1,294%",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "1,281%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "1,409%",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 323,
+      "description": "<p>Qual a taxa informada pelo Banco Bradesco ao Banco Central na data da assinatura do contrato para a modalidade AQUISIÇÃO DE VEÍCULOS PF?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "1,75%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "1,35%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "1,22%",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "1,65%",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 324,
+      "description": "<p>Qual o valor da parcela recalculada a juros simples (lineares)?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$1.322,58",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 1.397,17",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "R$1.322,58",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 1.405,87",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 325,
+      "description": "<p>Qual o valor do saldo devedor recalculado a juros simples na data do último pagamento realizado?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 25.885,63",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 28.037,53",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 26.881,80",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 29.997,22",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 326,
+      "description": "<p>Considerando o valor da parcela paga e o valor da parcela recalculada, informe qual o valor total pago a maior lembrando que os valores mês a mês devem ser atualizados pelo INPC e aplicado juros de mora no importe de 1% a.m. a contar da citação.</p><p>As informações de datas estão descritas na explicação da questão de prova.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 13.228,47",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 18.313,02",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 14.445,60",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 12.794,26",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    },
+    {
+      "id": 327,
+      "description": "<p>Após o último pagamento, nenhuma parcela mais foi paga, assim devem ser calculadas com a aplicação da comissão de permanência apenas limitada a taxa do recálculo informado na planilha \"B\". Aponte qual o valor total das parcelas em atraso atualizadas pela comissão de permanência para a data 06/04/2017?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 40.721,32",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 43.505,90",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 43.685,71",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 42.028,36",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 328,
+      "description": "<p>Considerando a taxa pactuada em contrato, a taxa efetivamente utilizada pelo banco e a taxa informada ao banco central, me informe qual a taxa que vamos utilizar no recálculo.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Taxa do contrato",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "Taxa do Banco Central",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "Taxa efetivamente apurada",
+          "position": 2,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 329,
+      "description": "<p>Porque este contrato seria recalculado pelo critério de juros simples (método de equivalência). Embasado em que entendimento dos Tribunais que este contrato pode ser recalculado a juros lineares?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Há cláusula de capitalização de juros, mas não sua periodicidade",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "De acordo com entendimento atual do STF, não é permitida a capitalização de juros mensal",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Usaremos o critério de juros simples pois é o mais benéfico para nosso cliente",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Não há cláusula sobre capitalização de juros e sua periodicidade",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 330,
+      "description": "<p>Com base nos cálculos realizados na íntegra por você, gostaria que informasse se o Autor (neste caso tomador do empréstimo) tem valor a receber ou a pagar e qual seria este valor?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "O Autor deve pagar R$ 27.927,05",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "O Autor deve receber R$ 18.542,87",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "O Autor deve pagar R$ 26.698,31",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "O Autor deve receber R$ 6.254,22",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 0,
+      "type": "single"
+    }
+  ]
+}

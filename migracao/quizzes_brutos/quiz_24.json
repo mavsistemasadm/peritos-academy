@@ -1,0 +1,38 @@
+{
+  "data": [
+    {
+      "id": 194,
+      "description": "<p>CÁLCULO DO ADICIONAL DE INSALUBRIDADE</p><p><br></p><p>Leia atentamente os dados do processo abaixo:</p><p><br></p><p>Data do Ajuizamento: 31/08/2011</p><p>Data de Admissão: 31/03/2008</p><p>Data de Demissão: 08/09/2010</p><p>Data da Prescrição: Não há</p><p><br></p><p>Data dos Cálculos: 31/12/2015</p><p><br></p><p>A insalubridade: Pelos motivos expostos, a base de cálculo do adicional de insalubridade da autora deve ser sua remuneração. Condeno o réu ao pagamento do adicional de insalubridade em grau médio (20%) durante todo o período contratual com reflexos em natalinas, férias com 1/3. Não foram pagos valores sob o mesmo título, assim indefiro possíveis abatimentos.</p><p><br></p><p>Dados para cálculo</p><p><br></p><p>- Remuneração no valor de R$ 1.500,00 até 31/12/2009 e a partir de 01/01/2010 remuneração no valor de R$ 1.850,00;</p><p>- Não precisa corrigir os valores pelo índice de atualização FADT, utilizar os valores da época;</p><p>- Férias 2008/2009 de 15/04/2009 a 10/05/2009;</p><p>- Férias 2009/2010 de 01/07/2010 a 20/07/2010;</p><p>- Existência de férias proporcionais na data do TRCT.</p><p><br></p><p>PEDE-SE:</p><p>- Apure o valor da diferença mês a mês, do início da contratualidade até a data da demissão (SEM FGTS);</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 8.862,00 ",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 8.457,10",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 6.580,02 ",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 8.879,69 ",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

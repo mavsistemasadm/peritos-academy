@@ -1,0 +1,412 @@
+{
+  "data": [
+    {
+      "id": 358,
+      "description": "<p>Qual o valor dos honorários periciais atualizados para data do cálculo?</p><p><br></p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 3.920,05",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 4.246,90",
+          "position": 1,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "R$ 4.112,29",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 4.504,71",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 357,
+      "description": "<p>Informe qual o % SAT a ser aplicado no cálculo do INSS Patronal devido pela reclamada.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "3%",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "2%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "1%",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Simples",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 356,
+      "description": "<p>Qual o valor da base de cálculo do FGTS no mês de 01/2019 e a soma do valor corrigido?</p>",
+      "explanation": null,
+      "difficulty": "hard",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 1.801,69 e R$ 6.050,78",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 2.210,95 e R$ 6.050,78",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 5.153,18 e R$ 6.050,78",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 2.144,66 e R$ 6.050,78",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 355,
+      "description": "<p>Informe o valor total dos juros sobre verbas, com base nos cálculos realizados.</p>",
+      "explanation": null,
+      "difficulty": "medium",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 16.404,40",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 18.254,50",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 14.668,23",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 19.020,58",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 354,
+      "description": "<p>Qual o valor da diferença apurada a título do Art. 71 Intrajornada no mês de 03/2019, sem atualização?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 177,50",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 272,89",
+          "position": 1,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "R$ 225,30",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 248,08",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 353,
+      "description": "<p>Qual o valor total atualizado dos reflexos das horas extas com 50% no RSR e férias com o terço constitucional?</p>",
+      "explanation": null,
+      "difficulty": "medium",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 1.325,05 e R$ 456,12",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 1.316,45 e R$ 461,23",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 1.154,92 e R$ 698,78",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 1.089,96 e R$ 571,25",
+          "position": 3,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 352,
+      "description": "<p>Qual o valor do reflexo das diferenças salariais no aviso prévio?</p>",
+      "explanation": null,
+      "difficulty": "medium",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 936,32",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 896,27",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 1.147,64",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 996,74",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 351,
+      "description": "<p>Informe o valor total atualizado das diferenças salariais mensais (não os reflexos).</p>",
+      "explanation": null,
+      "difficulty": "medium",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 25.995,34",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 28.041,22",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 26.338,90",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 29.554,87",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 350,
+      "description": "<p>Qual o total da soma dos reflexos de insalubridade sobre as férias acrescidas do terço constitucional?</p>",
+      "explanation": null,
+      "difficulty": "medium",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 877,37",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 1.021,26",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 415,60",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 1.062,08",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 349,
+      "description": "<p>Qual a base do adicional de insalubridade no mês da demissão (01/2020)?</p>",
+      "explanation": null,
+      "difficulty": "medium",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 554,13",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 998,00",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 954,00",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 686,20",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 348,
+      "description": "<p>Qual o total da soma dos valores devidos a título de 13º salários deferidos em verbas rescisórias, sem atualização monetária?</p>",
+      "explanation": null,
+      "difficulty": "medium",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 2.639,11",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 2.963,28",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 2.721,84",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 2.400,09",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 347,
+      "description": "<p>Qual o valor do salário que deverá ser utilizado como devido, conforme parâmetros da sentença?</p>",
+      "explanation": "<p><br></p>",
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 600,00",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "R$ 735,66",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 1.420,09",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 1.250,00",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

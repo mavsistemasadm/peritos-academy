@@ -43,7 +43,7 @@ Achado importante desta sessão: a feature de upload real de materiais (`aula_ma
 
 ### Pendências da migração (não bloqueiam nada, só não foram feitas)
 - 3 materiais grandes (54–165MB) não couberam no teto do plano Supabase (~50MB) — arquivos originais em `migracao/materiais/`, path completo no relatório.
-- 37 aulas com quiz na Ensinio precisam ser recriadas manualmente como `avaliacoes` no admin (`avaliacoes` está com 0 linhas) — lista em `migracao/avaliacoes_a_recriar.md`.
+- ~~37 aulas com quiz na Ensinio precisam ser recriadas manualmente como `avaliacoes`~~ ✅ **resolvida em 2026-07-14** — as 37 avaliações (297 questões, 1132 alternativas) foram extraídas da API da Ensinio e recriadas via script (não manualmente), 100% conferidas contra o JSON bruto. Relatório completo em `migracao/relatorio_avaliacoes.md`. Ficam pra depois: calibragem de `peso`/`briefing`/`tema`/`nota_minima` (todas com os defaults do schema) e ajuste fino de posição entre aulas do módulo (a coluna `avaliacoes.ordem` não é lida por nenhuma tela hoje — módulo+posição originais da Ensinio ficam documentados no relatório pra quem for encaixar isso manualmente). Todas as 37 estão `publicado=false` (mesmo comportamento de `criarAvaliacao()` no admin).
 - 6 aulas com vídeo fora do Panda (Vimeo/ensinio-stream) — lista em `migracao/videos_a_resolver.md`.
 
 ## Design System

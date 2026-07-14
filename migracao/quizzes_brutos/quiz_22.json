@@ -1,0 +1,224 @@
+{
+  "data": [
+    {
+      "id": 182,
+      "description": "<p>O Reclamante recebia durante a contratualidade comissões mensais, entretanto a Reclamada não pagava o Repouso Semanal Remunerado sobre essas verbas, que foram reconhecidas judicialmente, devendo ser pagas ao Reclamante. Qual o valor da soma do RSR sobre as comissões abaixo?</p><p><br></p><p>Valor da comissão</p><p><br></p><p>RSR</p><p>1.108,00 04/26</p><p>1.223,70 05/25</p><p>1.408,25 04/27</p><p>1.546,90 06/25</p><p>1.697,03 04/27</p><p>1.847,15 04/26</p><p>1.997,28 05/25</p><p>2.147,40 04/27</p><p>2.297,53 04/26</p><p>2.447,65 05/26</p><p>2.597,78 05/25</p><p>2.747,90 06/25</p><p><br></p><p>Dica: Utilize a fórmula ESQUERDA e DIREITA do Excel para facilitar o trabalho.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$4.251,50",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$4.460,13",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$4.000,09",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$4.608,99",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 183,
+      "description": "<p>Foi deferido em juízo o pagamento de horas extras conforme a planilha a seguir, entretanto para apresentar os cálculos no processo devemos atualizar os valores para data do cálculo (09/2015). Desta forma pergunto: qual é o valor total atualizado?</p><p><br></p><p>Para realizar o exercício baixe a tabela de correção monetária em nossa aula complementar cujo nome é Tabela TST.</p><p><br></p><p>Mês/ano</p><p><br></p><p>Valor HE</p><p>03/2013 274,33</p><p>04/2013 308,21</p><p>05/2013 346,27</p><p>06/2013 389,04</p><p>07/2013 437,08</p><p>08/2013 491,06</p><p>09/2013 551,71</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$3.276,00",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$3.327,01",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$3.488,55",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$3.122,47",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 184,
+      "description": "<p>Para atualização monetária nos casos de pagamento de reflexos de verbas em 13º salário, férias com o terço constitucional e aviso prévio, devemos utilizar o índice do mês. Por exemplo: Devemos pagar o reflexo de horas extras com 50% no 13º salário de 2013. Convencionalmente o 13º salário é pago no próprio mês (dezembro de cada ano), assim vamos utilizar a correção do próprio mês. O mesmo acontece com as férias e aviso prévio.</p><p><br></p><p>Assim, precisamos atualizar os reflexos de horas extras abaixo com sua proporção e não esquecer do terço constitucional para as férias. Após corrigir os valores aplique o pagamento do FGTS.</p><p>(Utilize a Tabela TST disponível no curso)</p><p><br></p><p>Qual o valor total corrigido dos reflexos e FGTS c/ 8%? ESTE CASO OS REFLEXOS SERÃO PAGOS NO TRT.</p><p><br></p><p>Descrição</p><p>13º salário 2008</p><p>Mês/ano</p><p>12/2008 Média HE</p><p>325,30 Proporção</p><p>12/12</p><p>13º salário 2009 12/2009 287,99 12/12</p><p>13º salário 2010 12/2010 412,11 10/12</p><p>Férias 2008/2009 10/2009 508,18 12/12</p><p>Férias 2009/2010 10/2010 403,56 12/12</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 3.106,21 e R$ 109,53",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 2.172,37 e R$ 243,31",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 2.206,71 e R$ 247,15",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 2.198,32 e R$ 190,20",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 185,
+      "description": "<p>Com base nas seguintes informações, calcule o percentual de juros de mora devido em ação trabalhista (12% a.a. pró rata die e ano civil com 365 dias).</p><p><br></p><p>Data do Ajuizamento: 24/10/2013</p><p>Data de Admissão: 01/02/2007</p><p>Data de Demissão: 17/02/2013</p><p>Data da Prescrição: 24/03/2008</p><p>Data dos Cálculos: 30/09/2015</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "23,211%",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "24,098%",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "22,856%",
+          "position": 2,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 187,
+      "description": "<p>Em um processo trabalhista a Prefeitura de Paranaguá/PR (Fazenda Pública) foi condenada a pagar diferenças de insalubridade, cujo valor base para cálculo dos juros de mora é de R$ 15.850,00. Com base em tudo que estudou a respeito dos juros de mora, qual é o valor dos juros devidos cuja data de ajuizamento foi em 15/08/2013 e a data dos cálculos é 31/03/2014?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 594,05",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 1.200,18",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 714,33",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 625,87",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 186,
+      "description": "<p>Em uma ação judicial foi deferido o FGTS sobre as horas extras no percentual de 8% com o acréscimo da multa de 40%.O FGTS deve ser calculado sobre as verbas salariais sem a correção monetária. Esta afirmação está?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Verdadeira",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Falsa",
+          "position": 0,
+          "isCorrect": true
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 188,
+      "description": "<p>Como se calcula o reflexo da diferença salarial no aviso prévio?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "Através da soma dos últimos 3 meses recebidos",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "Através da média corrigida para data do TRCT",
+          "position": 3,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "Utilizando da diferença salarial no mês do TRT apurada no cálculo das diferenças mês a mês",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "Através da média dos valores recebidos nos últimos 12 meses",
+          "position": 2,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}

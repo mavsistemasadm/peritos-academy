@@ -1,0 +1,286 @@
+{
+  "data": [
+    {
+      "id": 230,
+      "description": "<p>Calcular as diferenças referente ao acúmulo de função é extremamente relevante para apurar o valor da base de cálculo das horas extras deferidas no processo judicial. Essa afirmação é:</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "Verdadeira",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "Falsa",
+          "position": 1,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 232,
+      "description": "<p>Qual o índice FADT (Atualizaçao monetária) utilizado para cálculo das diferenças mês a mês em 09/2013?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "1,033973500",
+          "position": 0,
+          "isCorrect": false
+        },
+        {
+          "id": 2,
+          "content": "1,030296538",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "1,029724925",
+          "position": 2,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "1,029806277",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 233,
+      "description": "<p>Na planilha de cálculo das diferenças de acúmulo de função, qual o valor da diferença a pagar no mês de março/2010, atualizado e com FGTS.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 164,20",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 492,60",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 446,60",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 576,17",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 234,
+      "description": "<p>Ainda na planilha A, qual o valor do FGTS total devido nos reflexos em décimo terceiro salário?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 415,35",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 518,83",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 334,37",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 4,
+          "content": "R$ 397,56",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 235,
+      "description": "<p>Informe o valor total atualizado do ressarcimento com uniforme. Posicione a data em dezembro de cada ano observando a prescrição judicial. Utilizo o mês de dezembro, primeiro porque o juiz não fala qual é a data referência de cada ano e segundo, a prescrição começa em 12/2008. Se não começo em 12/2008 o ano de 2008 fica de fora, então começamos por lá e o último ano usar a data da rescisão.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 2.956,58",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 2.833,33",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 2.721,14",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 2.190,76",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 236,
+      "description": "<p>Sobre as férias deferidas judicialmente, foi solicitado o pagamento do dobro de 10 dias de férias por ano, ou seja, vamos achar a base de cálculo, aplicar a proporção de 10/30 e multiplicar por 2x (dobro). Determinado o critério, importante destacar que teríamos dois caminhos. O primeiro seria pegar o valor base das verbas rescisórias e fazer isso para todas as férias ano a ano como um valor fixo e usar a metodologia acima fixada a data na rescisão. A outra opção seria buscar em cada contracheque das férias o valor pago pela Reclamada, e considerando para atualização a data de cada férias.</p><p><br></p><p>A sentença não é clara neste ponto e qualquer um dos dois podem ser tranquilamente defendidos e mesmo que escolhemos um ou outro vamos ter embargos seja da Reclamada ou do Reclamante. Neste caso quero que faça os cálculos com a primeira sugestão e data fixa na rescisão par atualização monetária em todas as férias.</p><p><br></p><p>Qual o valor atualizado das férias deferidas judicialmente atualizadas?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 2,
+          "content": "R$ 8.973,11",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 1,
+          "content": "R$ 13.845,15",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 3,
+          "content": "R$ 11.723,45",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 15.154,97",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 237,
+      "description": "<p>Qual o número de meses a considerar para cálculo do IRPF de forma acumulada e qual a base de imposto de renda sobre as verbas salariais do acúmulo de funções (diferenças mês a mês e reflexo de férias)? Vamos montar uma base total (diferenças salarias e reflexo de férias se gozadas) e calcular o IR sobre essa base. O 13º e reflexos do 13º salário como possui um tratamento diferenciado, mantemos ele em separado. Na planilha excel vai entender. Leia isso e veja a planilha G.</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "64 e R$ 29.719,492",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "58 e R$ 31.404,58",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "58 e R$ 38.133,45",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "64 e R$ 31.707,02",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 238,
+      "description": "<p>Informe o valor total do INSS Patronal atualizado (diferenças mês a mês e décimo terceiro)</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 7.959,40",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 8.013,02",
+          "position": 1,
+          "isCorrect": false
+        },
+        {
+          "id": 3,
+          "content": "R$ 7.880.40",
+          "position": 2,
+          "isCorrect": false
+        },
+        {
+          "id": 4,
+          "content": "R$ 7.724,32",
+          "position": 3,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    },
+    {
+      "id": 239,
+      "description": "<p>O valor total do processo (condenação) é?</p>",
+      "explanation": null,
+      "difficulty": "easy",
+      "options": [
+        {
+          "id": 1,
+          "content": "R$ 94.611,27",
+          "position": 0,
+          "isCorrect": true
+        },
+        {
+          "id": 2,
+          "content": "R$ 98.928,69",
+          "position": 1,
+          "isCorrect": false
+        }
+      ],
+      "is_required": 1,
+      "type": "single"
+    }
+  ]
+}
