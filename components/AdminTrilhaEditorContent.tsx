@@ -141,7 +141,6 @@ function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggl
 }) {
   const [pendente, startTransition] = useTransition()
   const [editando, setEditando] = useState(false)
-  const [cursoSelecionado, setCursoSelecionado] = useState('')
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -173,13 +172,14 @@ function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggl
     })
   }
 
-  function onAdicionarCurso() {
-    if (!cursoSelecionado) return
+  function onVincularCursos(cursoIds: string[]) {
     onErro(null)
     startTransition(async () => {
-      const r = await adicionarCursoNaEtapa(etapa.id, trilhaId, cursoSelecionado)
-      if (!r.ok) onErro(r.erro)
-      else { setCursoSelecionado(''); onRefresh() }
+      for (const cursoId of cursoIds) {
+        const r = await adicionarCursoNaEtapa(etapa.id, trilhaId, cursoId)
+        if (!r.ok) { onErro(r.erro); return }
+      }
+      onRefresh()
     })
   }
 
@@ -200,8 +200,6 @@ function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggl
       else onRefresh()
     })
   }
-
-  const cursosDisponiveis = cursos.filter(c => !etapa.missoes.some(m => m.cursoId === c.id))
 
   return (
     <div className="ad-modulo-bloco">
@@ -253,18 +251,77 @@ function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggl
                 </li>
               ))}
             </ul>
-            <div className="ad-nova-linha">
-              <select value={cursoSelecionado} onChange={e => setCursoSelecionado(e.target.value)}>
-                <option value="">Selecione um curso...</option>
-                {cursosDisponiveis.map(c => (
-                  <option key={c.id} value={c.id}>{c.titulo}</option>
-                ))}
-              </select>
-              <button type="button" className="ad-btn-secundario" disabled={pendente || !cursoSelecionado} onClick={onAdicionarCurso}>+ Vincular curso</button>
-            </div>
+            <CursoPickerMultiplo cursos={cursos} pendente={pendente} onVincular={onVincularCursos} />
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+function normalizarBusca(texto: string): string {
+  // remove acentos (marcas diacríticas combinantes, U+0300-U+036F, depois de normalize('NFD'))
+  return Array.from(texto.toLowerCase().normalize('NFD'))
+    .filter(ch => { const c = ch.codePointAt(0)!; return c < 0x0300 || c > 0x036f })
+    .join('')
+}
+
+function CursoPickerMultiplo({ cursos, pendente, onVincular }: {
+  cursos: CursoPicker[]
+  pendente: boolean
+  onVincular: (cursoIds: string[]) => void
+}) {
+  const [busca, setBusca] = useState('')
+  const [selecionados, setSelecionados] = useState<Set<string>>(new Set())
+
+  const buscaNormalizada = normalizarBusca(busca.trim())
+  const filtrados = buscaNormalizada
+    ? cursos.filter(c => normalizarBusca(c.titulo).includes(buscaNormalizada))
+    : cursos
+
+  function alternar(id: string) {
+    setSelecionados(prev => {
+      const novo = new Set(prev)
+      if (novo.has(id)) novo.delete(id)
+      else novo.add(id)
+      return novo
+    })
+  }
+
+  function vincular() {
+    if (selecionados.size === 0) return
+    onVincular([...selecionados])
+    setSelecionados(new Set())
+  }
+
+  return (
+    <div className="ad-picker">
+      <input
+        type="text"
+        className="ad-picker-busca"
+        placeholder="Buscar curso pelo título..."
+        value={busca}
+        onChange={e => setBusca(e.target.value)}
+      />
+      <div className="ad-picker-lista">
+        {cursos.length === 0 && <p className="ad-vazio-sm">Não há cursos disponíveis pra vincular.</p>}
+        {cursos.length > 0 && filtrados.length === 0 && <p className="ad-vazio-sm">Nenhum curso encontrado pra "{busca}".</p>}
+        {filtrados.map(c => (
+          <label key={c.id} className="ad-picker-item">
+            <input type="checkbox" checked={selecionados.has(c.id)} onChange={() => alternar(c.id)} />
+            <span className="ad-picker-titulo">{c.titulo}</span>
+            {c.outraTrilhaNome && <span className="ad-picker-badge">também em: {c.outraTrilhaNome}</span>}
+          </label>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="ad-btn-secundario"
+        disabled={pendente || selecionados.size === 0}
+        onClick={vincular}
+      >
+        Vincular selecionados{selecionados.size > 0 ? ` (${selecionados.size})` : ''}
+      </button>
     </div>
   )
 }

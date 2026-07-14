@@ -16,7 +16,7 @@ export default async function PaginaAdminTrilhaEditor({ params }: { params: Prom
   const admin = await obterAdminAtual()
   if (!temPermissao(admin, 'trilhas')) redirect('/acesso-negado')
 
-  const [dados, cursos] = await Promise.all([carregarTrilhaAdmin(id), carregarCursosParaPicker()])
+  const [dados, cursos] = await Promise.all([carregarTrilhaAdmin(id), carregarCursosParaPicker(id)])
   if (!dados) notFound()
 
   return <AdminTrilhaEditorContent trilha={dados.trilha} etapas={dados.etapas} cursos={cursos} />

@@ -37,7 +37,7 @@ export type TrilhaDetalheAdmin = {
   etapas: EtapaAdmin[]
 }
 
-export type CursoPicker = { id: string; titulo: string; slug: string }
+export type CursoPicker = { id: string; titulo: string; slug: string; outraTrilhaNome: string | null }
 
 export async function carregarTrilhasAdmin(): Promise<TrilhaListaItem[]> {
   const supabase = await criarClienteServidor()
@@ -121,8 +121,43 @@ export async function carregarTrilhaAdmin(id: string): Promise<TrilhaDetalheAdmi
   }
 }
 
-export async function carregarCursosParaPicker(): Promise<CursoPicker[]> {
+// Usada tanto pelo editor de trilhas quanto pelo editor de agenda (pra
+// vincular um curso a um evento — sem noção de "trilha atual"). Só faz a
+// exclusão/badge de vínculo com trilha quando `trilhaAtualId` é passado;
+// sem ele, comportamento idêntico ao anterior (todos os cursos, sem filtro).
+//
+// Exclui cursos já vinculados a QUALQUER etapa da trilha atual (não só à
+// etapa sendo editada) — evita o mesmo curso em duas etapas da mesma trilha.
+// Pra quem sobra, marca se o curso já pertence a outra trilha (badge "também
+// em: ...") — um curso pode estar em mais de uma trilha diferente, isso é
+// permitido, só não pode duplicar dentro da mesma trilha.
+export async function carregarCursosParaPicker(trilhaAtualId?: string): Promise<CursoPicker[]> {
   const supabase = await criarClienteServidor()
-  const { data } = await supabase.from('cursos').select('id, titulo, slug').order('titulo', { ascending: true })
-  return (data ?? []).map(c => ({ id: c.id, titulo: c.titulo, slug: c.slug }))
+
+  if (!trilhaAtualId) {
+    const { data: cursos } = await supabase.from('cursos').select('id, titulo, slug').order('titulo', { ascending: true })
+    return (cursos ?? []).map(c => ({ id: c.id, titulo: c.titulo, slug: c.slug, outraTrilhaNome: null }))
+  }
+
+  const [{ data: cursos }, { data: vinculos }] = await Promise.all([
+    supabase.from('cursos').select('id, titulo, slug').order('titulo', { ascending: true }),
+    supabase.from('etapa_missoes').select('curso_id, etapas!inner(trilha_id, trilhas!inner(nome))'),
+  ])
+  if (!cursos) return []
+
+  const vinculosPorCurso = new Map<string, { trilhaId: string; trilhaNome: string }[]>()
+  for (const v of (vinculos ?? []) as any[]) {
+    const trilhaId = v.etapas.trilha_id as string
+    const trilhaNome = (v.etapas.trilhas?.nome as string) ?? ''
+    const lista = vinculosPorCurso.get(v.curso_id) ?? []
+    lista.push({ trilhaId, trilhaNome })
+    vinculosPorCurso.set(v.curso_id, lista)
+  }
+
+  return cursos
+    .filter(c => !(vinculosPorCurso.get(c.id) ?? []).some(v => v.trilhaId === trilhaAtualId))
+    .map(c => {
+      const outra = (vinculosPorCurso.get(c.id) ?? []).find(v => v.trilhaId !== trilhaAtualId)
+      return { id: c.id, titulo: c.titulo, slug: c.slug, outraTrilhaNome: outra?.trilhaNome ?? null }
+    })
 }
