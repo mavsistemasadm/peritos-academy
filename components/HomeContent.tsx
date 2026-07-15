@@ -2,7 +2,7 @@
 // O dashboard: réplica fiel do template aprovado, plugada na query da home.
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { DadosHome, CursoCard } from '@/lib/queries/home'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
@@ -42,6 +42,7 @@ function CardCurso({ c }: { c: CursoCard }) {
 export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: DadosNav }) {
   const d = dados
   const raiz = useRef<HTMLDivElement>(null)
+  const [heroCapaErro, setHeroCapaErro] = useState(false)
   const trilhoFeitas = d.trilho.filter(e => e.estado === 'feita').length
   const trilhoPct = d.trilho.length ? Math.round((trilhoFeitas / d.trilho.length) * 100) : 0
 
@@ -72,7 +73,16 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
 
       {/* ============ HERO ============ */}
       <section className="hero" aria-label="Sua próxima missão">
-        <div className="hero-bg" aria-hidden="true"></div>
+        <div className="hero-bg" aria-hidden="true">
+          {d.heroCapaUrl && !heroCapaErro && (
+            <img
+              src={d.heroCapaUrl}
+              alt=""
+              className="hero-capa-img"
+              onError={() => setHeroCapaErro(true)}
+            />
+          )}
+        </div>
         <div className="hero-conteudo wrap">
           <div className="hero-saudacao">
             <span className="ponto" aria-hidden="true"></span>
@@ -235,7 +245,7 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
                   ))}
                 </ul>
               ) : (
-                <p className="sub" style={{ padding: 'var(--s-4) 0' }}>A comunidade está começando — seja o primeiro a compartilhar.</p>
+                <p className="sub" style={{ padding: 'var(--s-4) 0' }}>A comunidade está começando. Seja o primeiro a compartilhar.</p>
               )}
               <a className="btn btn-fantasma" href="/comunidade">Entrar na comunidade</a>
             </aside>

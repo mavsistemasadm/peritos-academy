@@ -10,7 +10,7 @@ import { criarClienteServico } from "@/lib/supabase/servico";
 import { IconeCheck, IconeAlertTriangle } from "@/components/Icones";
 
 export const metadata: Metadata = {
-  title: "Cancelar inscrição — Peritos Academy",
+  title: "Cancelar inscrição · Peritos Academy",
 };
 
 export const dynamic = "force-dynamic";
@@ -51,7 +51,7 @@ export default async function PaginaCancelarEmail({
                 <IconeAlertTriangle size={28} strokeWidth={2} />
               </span>
               <h1>Link inválido</h1>
-              <p>Não foi possível confirmar esse cancelamento. O link pode estar incompleto — copie o link diretamente do email recebido, ou ajuste suas preferências no seu perfil.</p>
+              <p>Não foi possível confirmar esse cancelamento. O link pode estar incompleto. Copie o link diretamente do email recebido, ou ajuste suas preferências no seu perfil.</p>
               <a className="btn btn-fantasma" href="/perfil">Ir para meu perfil</a>
             </>
           )}

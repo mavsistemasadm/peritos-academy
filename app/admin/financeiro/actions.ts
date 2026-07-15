@@ -135,7 +135,7 @@ export async function excluirPlano(id: string): Promise<Resultado> {
   const { error } = await supabase.from('planos_assinatura').delete().eq('id', id)
   if (error) {
     const msg = error.message.includes('foreign key')
-      ? 'Esse plano já tem assinaturas vinculadas — desative em vez de excluir.'
+      ? 'Esse plano já tem assinaturas vinculadas. Desative em vez de excluir.'
       : error.message
     return { ok: false, erro: msg }
   }

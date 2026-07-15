@@ -71,7 +71,7 @@ export default function DesafiosContent({ dados, nav }: { dados: DadosDesafios; 
         <div className="wrap">
           <span className="eyebrow">Perícia sob pressão</span>
           <h1>Desafios <span className="grad-txt">periciais.</span></h1>
-          <p className="sub">Leia os autos, monte a planilha do zero, responda os quesitos e protocole seu laudo — com prazo correndo e a IA avaliando cada resposta.</p>
+          <p className="sub">Leia os autos, monte a planilha do zero, responda os quesitos e protocole seu laudo, com prazo correndo e a IA avaliando cada resposta.</p>
           <div className="des-selos num">
             <div className="selo"><b>{dados.totalDesafios}</b><span>disponíveis</span></div>
             <div className="selo"><b>{dados.totalEntregas}</b><span>suas entregas</span></div>
@@ -100,7 +100,7 @@ export default function DesafiosContent({ dados, nav }: { dados: DadosDesafios; 
 
         {/* ============ GRADE ============ */}
         {visiveis.length === 0 ? (
-          <p className="des-vazio">Nenhum desafio encontrado — tente outra categoria ou busca.</p>
+          <p className="des-vazio">Nenhum desafio encontrado. Tente outra categoria ou busca.</p>
         ) : (
           <div className="des-grade">
             {visiveis.map(d => <CardDesafio key={d.slug} d={d} />)}

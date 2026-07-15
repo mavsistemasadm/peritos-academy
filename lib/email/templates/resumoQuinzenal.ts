@@ -42,7 +42,7 @@ function montarTextosVariaveis(d: DadosResumoQuinzenal) {
       titulo: `Ritmo firme, ${d.primeiroNome}`,
       contexto: `Você concluiu ${d.aulasPeriodo} aulas nessas duas semanas. Sem pressa, sem parar.`,
       frase: "Cada aula é um tijolo. E você está construindo algo sólido.",
-      proximo: "Continue no seu ritmo — é ele que leva até o fim.",
+      proximo: "Continue no seu ritmo. É ele que leva até o fim.",
     };
   }
   return {

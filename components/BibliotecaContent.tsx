@@ -80,7 +80,7 @@ export default function BibliotecaContent({ dados, nav }: { dados: DadosBibliote
         <div className="wrap">
           <span className="eyebrow">Biblioteca do perito</span>
           <h1>Ferramentas prontas para o <span className="grad-txt">próximo caso.</span></h1>
-          <p className="sub">Planilhas de cálculo, modelos de laudo e petições — revisadas e atualizadas pela equipe.</p>
+          <p className="sub">Planilhas de cálculo, modelos de laudo e petições, revisadas e atualizadas pela equipe.</p>
           <div className="bib-selos num">
             <div className="selo"><b>{d.totalItens}</b><span>arquivos disponíveis</span></div>
             <div className="selo"><b>{fmtNum(d.totalDownloads)}</b><span>downloads realizados</span></div>
@@ -136,7 +136,7 @@ export default function BibliotecaContent({ dados, nav }: { dados: DadosBibliote
 
         {/* ============ GRADE ============ */}
         {visiveis.length === 0 ? (
-          <p className="bib-vazio">Nada por aqui — tenta outra busca ou outra aba.</p>
+          <p className="bib-vazio">Nada por aqui. Tenta outra busca ou outra aba.</p>
         ) : (
           <div className="bib-grade">
             {visiveis.map(item => {

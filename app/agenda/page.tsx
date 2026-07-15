@@ -9,7 +9,7 @@ import { verificarAcessoConteudo } from '@/lib/acesso/verificar'
 import AssinaturaNecessaria from '@/components/AssinaturaNecessaria'
 
 export const metadata: Metadata = {
-  title: 'Agenda — Peritos Academy',
+  title: 'Agenda · Peritos Academy',
   description: 'Aulas ao vivo, plantões, mentorias e gravações.',
 }
 

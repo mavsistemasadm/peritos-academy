@@ -69,7 +69,7 @@ export default function RedefinirSenhaContent() {
             </form>
           )}
 
-          {estado === 'sucesso' && <p className="sub">Senha atualizada — redirecionando pro login...</p>}
+          {estado === 'sucesso' && <p className="sub">Senha atualizada, redirecionando pro login...</p>}
         </div>
       </section>
     </main>

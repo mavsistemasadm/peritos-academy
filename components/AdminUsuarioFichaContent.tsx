@@ -45,7 +45,7 @@ export default function AdminUsuarioFichaContent({ ficha, extratoInicial, comuni
           <h1>{ficha.nome}</h1>
           <p className="ad-sub">{ficha.email ?? '—'} · <span className={`ad-status-pill ${ficha.status}`}>{NOME_STATUS_CONTA[ficha.status]}</span></p>
         </div>
-        <button type="button" className="ad-btn-secundario" disabled title="Em breve — impersonação exige um desenho de segurança dedicado (sessão separada, banner visível, log reforçado, expiração)">
+        <button type="button" className="ad-btn-secundario" disabled title="Em breve. Impersonação exige um desenho de segurança dedicado (sessão separada, banner visível, log reforçado, expiração)">
           <IconeEye size={14} /> Ver como este aluno
         </button>
       </div>
@@ -82,8 +82,8 @@ function VisaoGeralAba({ ficha, onErro, onSucesso }: { ficha: FichaUsuario; onEr
     mensagemSucesso: string,
   ) {
     if (!confirm(`${rotulo} a conta de ${ficha.nome}?`)) return
-    const justificativa = (prompt(`Justificativa (obrigatória) — ${rotulo}:`) ?? '').trim()
-    if (!justificativa) { onErro('Justificativa é obrigatória — ação cancelada.'); return }
+    const justificativa = (prompt(`Justificativa (obrigatória) · ${rotulo}:`) ?? '').trim()
+    if (!justificativa) { onErro('Justificativa é obrigatória. Ação cancelada.'); return }
     startTransition(async () => {
       const r = await fn(ficha.id, justificativa)
       if (!r.ok) onErro(r.erro)
@@ -110,7 +110,7 @@ function VisaoGeralAba({ ficha, onErro, onSucesso }: { ficha: FichaUsuario; onEr
         {ficha.assinatura && (
           <p>
             <span className={`ad-status-pill ${ficha.assinatura.status}`}>{ficha.assinatura.status}</span>
-            {' '}{ficha.assinatura.planoNome} — próxima cobrança em {fmtData(ficha.assinatura.proximaCobranca)}
+            {' '}{ficha.assinatura.planoNome}, próxima cobrança em {fmtData(ficha.assinatura.proximaCobranca)}
           </p>
         )}
       </section>
@@ -148,8 +148,8 @@ function ProgressoAba({ ficha, cursos, onErro, onSucesso }: { ficha: FichaUsuari
   function onEmitirManual(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!cursoId) { onErro('Selecione um curso.'); return }
-    const justificativa = (prompt('Justificativa (obrigatória) — Emitir certificado manual:') ?? '').trim()
-    if (!justificativa) { onErro('Justificativa é obrigatória — ação cancelada.'); return }
+    const justificativa = (prompt('Justificativa (obrigatória) · Emitir certificado manual:') ?? '').trim()
+    if (!justificativa) { onErro('Justificativa é obrigatória. Ação cancelada.'); return }
     startTransition(async () => {
       const r = await emitirCertificadoManual(ficha.id, cursoId, justificativa)
       if (!r.ok) onErro(r.erro)
@@ -254,8 +254,8 @@ function GamificacaoAba({ ficha, extratoInicial, onErro, onSucesso }: { ficha: F
     const p = Number(pontos) || 0
     const m = Number(moedas) || 0
     if (p === 0 && m === 0) { onErro('Informe pontos ou moedas diferentes de zero.'); return }
-    const justificativa = (prompt('Justificativa (obrigatória) — Ajuste manual de gamificação:') ?? '').trim()
-    if (!justificativa) { onErro('Justificativa é obrigatória — ação cancelada.'); return }
+    const justificativa = (prompt('Justificativa (obrigatória) · Ajuste manual de gamificação:') ?? '').trim()
+    if (!justificativa) { onErro('Justificativa é obrigatória. Ação cancelada.'); return }
     startTransition(async () => {
       const r = await ajustarGamificacaoUsuario(ficha.id, p, m, justificativa)
       if (!r.ok) onErro(r.erro)
@@ -287,7 +287,7 @@ function GamificacaoAba({ ficha, extratoInicial, onErro, onSucesso }: { ficha: F
 
       <section className="ad-card">
         <h2>Ajuste manual</h2>
-        <p>Correção pontual de XP/moedas — use valores negativos pra descontar. Fica registrado no extrato e na auditoria.</p>
+        <p>Correção pontual de XP/moedas, use valores negativos pra descontar. Fica registrado no extrato e na auditoria.</p>
         <form onSubmit={onAjustar} className="ad-form-linha" style={{ alignItems: 'flex-end' }}>
           <label>Pontos<input type="number" value={pontos} onChange={e => setPontos(e.target.value)} placeholder="0" /></label>
           <label>Moedas<input type="number" value={moedas} onChange={e => setMoedas(e.target.value)} placeholder="0" /></label>
@@ -332,7 +332,7 @@ function FinanceiroAba({ ficha }: { ficha: FichaUsuario }) {
   return (
     <section className="ad-card">
       <h2>Assinatura e cobranças</h2>
-      <p>Leitura apenas — ações financeiras (suspender/cancelar assinatura, editar planos) ficam no <a href="/admin/financeiro" style={{ textDecoration: 'underline' }}>módulo Financeiro</a>.</p>
+      <p>Leitura apenas. Ações financeiras (suspender/cancelar assinatura, editar planos) ficam no <a href="/admin/financeiro" style={{ textDecoration: 'underline' }}>módulo Financeiro</a>.</p>
 
       {!ficha.assinatura && <p className="ad-vazio">Sem assinatura.</p>}
       {ficha.assinatura && (
@@ -340,7 +340,7 @@ function FinanceiroAba({ ficha }: { ficha: FichaUsuario }) {
           <p style={{ marginBottom: 12 }}>
             <span className={`ad-status-pill ${ficha.assinatura.status}`}>{ficha.assinatura.status}</span>
             {' '}{ficha.assinatura.planoNome}
-            {ficha.assinatura.observacao && <span className="ad-fin-nota"> — {ficha.assinatura.observacao}</span>}
+            {ficha.assinatura.observacao && <span className="ad-fin-nota"> · {ficha.assinatura.observacao}</span>}
           </p>
 
           {ficha.assinatura.cobrancas.length === 0 && <p className="ad-vazio-sm">Nenhuma cobrança registrada.</p>}
@@ -376,7 +376,7 @@ function ComunidadeAba({ comunidade }: { comunidade: ComunidadeUsuario }) {
     <>
       <section className="ad-card">
         <h2>Posts recentes</h2>
-        <p>Leitura apenas — moderação (fixar, ocultar, excluir) fica no <a href="/admin/comunidade" style={{ textDecoration: 'underline' }}>módulo Comunidade</a>.</p>
+        <p>Leitura apenas. Moderação (fixar, ocultar, excluir) fica no <a href="/admin/comunidade" style={{ textDecoration: 'underline' }}>módulo Comunidade</a>.</p>
         {comunidade.posts.length === 0 && <p className="ad-vazio">Nenhum post ainda.</p>}
         {comunidade.posts.length > 0 && (
           <ul className="ad-usu-lista">

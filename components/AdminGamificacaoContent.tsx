@@ -298,7 +298,7 @@ function NivelLinha({ nivel, indice, total, onErro, onSucesso }: { nivel: NivelA
       <div className="ad-modulo-cab">
         <span className="ad-modulo-toggle">
           {nivel.seloUrl && <img src={nivel.seloUrl} alt="" style={{ width: 22, height: 22, borderRadius: '50%', marginRight: 8, verticalAlign: 'middle', objectFit: 'cover' }} />}
-          {nivel.nome} <span className="ad-sublista-meta">— {nivel.pontosMinimos} XP mínimo</span>
+          {nivel.nome} <span className="ad-sublista-meta">· {nivel.pontosMinimos} XP mínimo</span>
         </span>
         <div className="ad-modulo-acoes">
           <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>

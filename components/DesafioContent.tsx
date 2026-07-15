@@ -102,7 +102,7 @@ function IntimacaoAnimada({ ds, onAceitar }: { ds: DadosDesafio['desafio']; onAc
             <IconeCheck size={14} strokeWidth={2.6} />
             Aceitar a nomeação
           </button>
-          <p className="dsc-nota-prazo">Ao aceitar, o prazo de {ds.prazo_dias} dias começa a correr. Você pode sair e voltar — o relógio continua.</p>
+          <p className="dsc-nota-prazo">Ao aceitar, o prazo de {ds.prazo_dias} dias começa a correr. Você pode sair e voltar, o relógio continua.</p>
         </div>
       </div>
     </section>
@@ -294,7 +294,7 @@ const aprovado = nota !== null && nota >= ds.nota_minima
                 </div>
               )}
             </div>
-            <p className="dsc-perg-dica">{q.tipo === 'multipla' ? <>Use <kbd>A</kbd>–<kbd>D</kbd> e <kbd>Enter</kbd></> : q.tipo === 'texto' ? <>Shift+Enter pra nova linha · Enter pra avançar</> : <>Enter pra avançar · ← → pra navegar</>}</p>
+            <p className="dsc-perg-dica">{q.tipo === 'multipla' ? <>Use <kbd>A</kbd>-<kbd>D</kbd> e <kbd>Enter</kbd></> : q.tipo === 'texto' ? <>Shift+Enter pra nova linha · Enter pra avançar</> : <>Enter pra avançar · ← → pra navegar</>}</p>
           </div>
           <div className="dsc-perg-pontos">{ds.quesitos.map((qq, i) => <button key={qq.ordem} className={`dsc-ponto${i === atual ? ' aqui' : ''}${(respostas[String(qq.ordem)] ?? '').trim() ? ' resp' : ''}`} onClick={() => irPara(i)} aria-label={`Ir para pergunta ${i + 1}`} />)}</div>
           <button className="dsc-perg-salvar" onClick={salvar} disabled={salvando}>{salvando ? 'Salvando…' : <><IconeSave size={13} /> Salvar rascunho</>}</button>
@@ -359,7 +359,7 @@ const aprovado = nota !== null && nota >= ds.nota_minima
         <section className="dsc-cena dsc-galeria"><div className="wrap">
           <span className="eyebrow">Comunidade</span><h2>Entregas dos peritos.</h2>
           <p className="dsc-gal-sub">{fmtNum(entregas.length)} laudos protocolados neste desafio.</p>
-          {entregas.length === 0 ? <p className="dsc-gal-vazio">Nenhuma entrega ainda — seja o primeiro!</p> : (
+          {entregas.length === 0 ? <p className="dsc-gal-vazio">Nenhuma entrega ainda, seja o primeiro!</p> : (
             <div className="dsc-gal-grade">{entregas.map(e => (
               <div className="dsc-gal-card" key={e.id}>
                 <div className="dsc-gal-cab">

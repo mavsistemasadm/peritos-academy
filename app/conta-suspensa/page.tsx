@@ -6,7 +6,7 @@ import NavPlataforma from '@/components/NavPlataforma'
 import { IconeLock } from '@/components/Icones'
 
 export const metadata: Metadata = {
-  title: 'Conta indisponível — Peritos Academy',
+  title: 'Conta indisponível · Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

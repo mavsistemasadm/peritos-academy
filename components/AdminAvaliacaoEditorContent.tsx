@@ -67,7 +67,7 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
   function onCriarQuestao() {
     const fd = new FormData()
     fd.set('tipo', novoTipo)
-    fd.set('enunciado', 'Nova questão — edite o enunciado abaixo')
+    fd.set('enunciado', 'Nova questão. Edite o enunciado abaixo')
     if (novoTipo === 'valor') fd.set('resposta_valor', '0')
     startTransition(async () => {
       const r = await criarQuestao(avaliacao.id, avaliacao.cursoId, fd)

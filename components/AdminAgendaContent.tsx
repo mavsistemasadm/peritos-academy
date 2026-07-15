@@ -56,7 +56,7 @@ export default function AdminAgendaContent({ eventos }: { eventos: EventoAdmin[]
       <div className="ad-cursos-cab">
         <div>
           <h1>Agenda</h1>
-          <p className="ad-sub">Eventos ao vivo e gravados — salas de análise, aulas, plantões, mentorias.</p>
+          <p className="ad-sub">Eventos ao vivo e gravados: salas de análise, aulas, plantões, mentorias.</p>
         </div>
         <button type="button" className="ad-btn-primario" onClick={() => setCriando(v => !v)}>+ Novo evento</button>
       </div>
@@ -64,7 +64,7 @@ export default function AdminAgendaContent({ eventos }: { eventos: EventoAdmin[]
       {criando && (
         <div className="ad-busca-card">
           <label>Título
-            <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex.: Plantão de dúvidas — perícia bancária" autoFocus />
+            <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex.: Plantão de dúvidas: perícia bancária" autoFocus />
           </label>
           <label>Tipo
             <select value={tipo} onChange={e => setTipo(e.target.value)}>

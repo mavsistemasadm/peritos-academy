@@ -222,7 +222,7 @@ function ConcederCortesiaCard({ onErro, onSucesso }: { onErro: (e: string) => vo
   return (
     <section className="ad-card">
       <h2>Conceder cortesia</h2>
-      <p>Dá acesso completo a um aluno sem cobrança — pra parcerias, testes ou pré-lançamento.</p>
+      <p>Dá acesso completo a um aluno sem cobrança, pra parcerias, testes ou pré-lançamento.</p>
       <form onSubmit={onBuscar} className="ad-form-linha" style={{ alignItems: 'flex-end' }}>
         <label style={{ flex: 2 }}>E-mail do aluno
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="aluno@email.com" required />
@@ -232,7 +232,7 @@ function ConcederCortesiaCard({ onErro, onSucesso }: { onErro: (e: string) => vo
 
       {achado && (
         <div style={{ marginTop: 12 }}>
-          <p>Encontrado: <b>{achado.nome}</b>{achado.jaTemAssinatura && ' — já tem uma assinatura (será atualizada pra cortesia).'}</p>
+          <p>Encontrado: <b>{achado.nome}</b>{achado.jaTemAssinatura && '. Já tem uma assinatura (será atualizada pra cortesia).'}</p>
           <label>Observação (opcional)
             <input value={observacao} onChange={e => setObservacao(e.target.value)} placeholder="Motivo da cortesia..." />
           </label>
@@ -251,7 +251,7 @@ function AssinaturaDetalhe({ assinatura, onErro, onSucesso }: { assinatura: Assi
 
   function acao(fn: (id: string, obs: string) => Promise<{ ok: true } | { ok: false; erro: string }>, rotulo: string, mensagemSucesso: string, exigeConfirmacao: boolean) {
     if (exigeConfirmacao && !confirm(`${rotulo} a assinatura de ${assinatura.usuarioNome}?`)) return
-    const observacao = prompt(`Observação (opcional) — ${rotulo}:`) ?? ''
+    const observacao = prompt(`Observação (opcional) · ${rotulo}:`) ?? ''
     startTransition(async () => {
       const r = await fn(assinatura.id, observacao)
       if (!r.ok) onErro(r.erro)
@@ -357,7 +357,7 @@ function PlanoLinha({ plano, onErro, onSucesso }: { plano: PlanoAdmin; onErro: (
 
   return (
     <tr>
-      <td>{plano.nome}{plano.nome === 'Cortesia' && <span className="ad-fin-nota" style={{ marginLeft: 6 }}>(interno — não excluir)</span>}</td>
+      <td>{plano.nome}{plano.nome === 'Cortesia' && <span className="ad-fin-nota" style={{ marginLeft: 6 }}>(interno, não excluir)</span>}</td>
       <td>{fmtBRL(plano.valorCentavos)}</td>
       <td>{plano.periodicidade === 'mensal' ? 'Mensal' : 'Anual'}</td>
       <td>{plano.ativo ? 'Sim' : 'Não'}</td>
@@ -423,7 +423,7 @@ function WebhooksAba({ webhooks }: { webhooks: WebhookEventoAdmin[] }) {
   return (
     <section className="ad-card">
       <h2>Últimos eventos recebidos</h2>
-      <p>Log bruto do que chega em /api/webhooks/asaas — útil pra depurar a integração quando as chaves reais entrarem.</p>
+      <p>Log bruto do que chega em /api/webhooks/asaas, útil pra depurar a integração quando as chaves reais entrarem.</p>
       {webhooks.length === 0 && <p className="ad-vazio">Nenhum evento recebido ainda.</p>}
       {webhooks.length > 0 && (
         <div className="ad-tabela-scroll">

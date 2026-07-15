@@ -6,7 +6,7 @@ import { carregarAvaliacaoAdmin, carregarModulosDoCurso } from '@/lib/queries/ad
 import AdminAvaliacaoEditorContent from '@/components/AdminAvaliacaoEditorContent'
 
 export const metadata: Metadata = {
-  title: 'Editar avaliação — Admin Peritos Academy',
+  title: 'Editar avaliação · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

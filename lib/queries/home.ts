@@ -10,7 +10,8 @@ import { tituloHeroDoDia } from '@/lib/titulosHero'
 export type CursoCard = {
   slug: string
   titulo: string
-  capa_url: string | null
+  capa_url: string | null  // já resolvido pra capa_vertical_url (fallback capa_url), card é formato pôster (3/4)
+  capa_horizontal_url: string | null  // já resolvido (fallback capa_url), pro banner do hero, formato paisagem
   aulas: number
   progressoPct: number      // 0 = ainda não começou
   concluidasPct: number     // idem, para a barra
@@ -45,6 +46,7 @@ export type DadosHome = {
   saudacao: string             // "Bom dia" | "Boa tarde" | "Boa noite"
   dataHoje: string
   tituloHero: string           // título rotativo do dia (determinístico por usuário+dia)
+  heroCapaUrl: string | null   // capa_horizontal_url do curso em destaque no hero (null = aurora)
   continuarCurso: CursoCard | null
   missaoAtualNome: string
   missaoAtualPct: number
@@ -121,7 +123,7 @@ export async function carregarHome(): Promise<DadosHome | null> {
     agenda,
   ] = await Promise.all([
     supabase.from('perfis').select('nome, tour_visto_em').eq('id', uid).single(),
-    supabase.from('cursos').select('id, slug, titulo, capa_url, atualizado_em').eq('publicado', true).order('atualizado_em', { ascending: false }),
+    supabase.from('cursos').select('id, slug, titulo, capa_url, capa_vertical_url, capa_horizontal_url, atualizado_em').eq('publicado', true).order('atualizado_em', { ascending: false }),
     supabase.from('modulos').select('id, curso_id, ordem').order('ordem', { ascending: true }),
     supabase.from('comunidade_posts').select('*').order('criado_em', { ascending: false }).limit(3),
     supabase.from('comunidade_config').select('*').eq('id', 1).maybeSingle(),
@@ -164,7 +166,8 @@ export async function carregarHome(): Promise<DadosHome | null> {
     const emAndamento = pct > 0 && pct < 100
     const proximaAula = aulasIds.find(id => !concluidas.has(id))
     return {
-      slug: c.slug, titulo: c.titulo, capa_url: c.capa_url,
+      slug: c.slug, titulo: c.titulo, capa_url: c.capa_vertical_url ?? c.capa_url,
+      capa_horizontal_url: c.capa_horizontal_url ?? c.capa_url,
       aulas: aulasIds.length,
       progressoPct: pct, concluidasPct: pct,
       novo: pct === 0 && !!recente,
@@ -199,6 +202,18 @@ export async function carregarHome(): Promise<DadosHome | null> {
     const base = slug ? cursoPorSlug.get(slug) : null
     if (base) tenta({ ...base, motivo: 'Continue sua especialização', href: jornada.painelProtagonista.continuarHref })
   }
+  // território com progresso (trilha ativa) sempre disputa a vaga antes de
+  // descoberta, mesmo antes do Selo de Excelência, quando painelProtagonista
+  // (que só existe pós-formação) ainda é null. Sem isso, um território
+  // começado (mas não terminado) era pulado direto pra "Descubra".
+  if (regua.length < 3) {
+    const territorioAtivo = jornada.territorios.find(t => t.progressoPct > 0 && t.progressoPct < 100 && t.proximoHref)
+    if (territorioAtivo?.proximoHref) {
+      const slug = extrairSlug(territorioAtivo.proximoHref)
+      const base = slug ? cursoPorSlug.get(slug) : null
+      if (base) tenta({ ...base, motivo: 'Próximo na sua trilha', href: territorioAtivo.proximoHref })
+    }
+  }
   if (regua.length < 3) {
     const territorioAberto = jornada.territorios.find(t => t.progressoPct === 0 && t.proximoHref)
     if (territorioAberto?.proximoHref) {
@@ -212,6 +227,14 @@ export async function carregarHome(): Promise<DadosHome | null> {
     if (regua.length >= 3) break
     tenta(c)
   }
+
+  // ---------- hero: capa de fundo do curso em destaque ----------
+  // Mesmo curso do "Você está em {curso}" do subtítulo. Conta nova sem
+  // nenhum progresso (continuarCurso null) cai pro primeiro curso pendente
+  // da Formação (painelFormacao.continuarHref já aponta pra ele nesse caso).
+  const slugHeroFormacao = jornada.painelFormacao?.continuarHref ? extrairSlug(jornada.painelFormacao.continuarHref) : null
+  const cursoHero = continuarCurso ?? (slugHeroFormacao ? cursoPorSlug.get(slugHeroFormacao) : null) ?? null
+  const heroCapaUrl = cursoHero?.capa_horizontal_url ?? null
 
   // ---------- meta semanal: dias com atividade real nesta semana (seg-dom) ----------
   const diasAtividade = new Set<string>()
@@ -287,6 +310,7 @@ export async function carregarHome(): Promise<DadosHome | null> {
     saudacao: saudacaoPorHora(),
     dataHoje: fmtDataLonga.format(new Date()).replace(/^\w/, c => c.toUpperCase()),
     tituloHero: tituloHeroDoDia(uid, fmtDiaISO.format(new Date())),
+    heroCapaUrl,
     continuarCurso,
     missaoAtualNome, missaoAtualPct, proximaAulaNome,
     metaDias: `${diasNaSemana} de ${META_DIAS_SEMANA} dias`,

@@ -41,7 +41,7 @@ export default function AdminTrilhasContent({ trilhas }: { trilhas: TrilhaListaI
       <div className="ad-cursos-cab">
         <div>
           <h1>Trilhas</h1>
-          <p className="ad-sub">Organize os cursos em trilhas e etapas — alimenta o catálogo em /biblioteca.</p>
+          <p className="ad-sub">Organize os cursos em trilhas e etapas, alimenta o catálogo em /biblioteca.</p>
         </div>
         <button type="button" className="ad-btn-primario" onClick={() => setCriando(v => !v)}>
           + Nova trilha

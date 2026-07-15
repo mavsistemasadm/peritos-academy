@@ -268,7 +268,7 @@ export default function JornadaContent({ dados, nav }: { dados: DadosJornada; na
               {d.territorios.map(t => <CardTerritorio t={t} key={t.id} />)}
             </div>
           ) : (
-            <p className="vazio-txt">Os territórios de especialização estão sendo cadastrados — volte em breve.</p>
+            <p className="vazio-txt">Os territórios de especialização estão sendo cadastrados. Volte em breve.</p>
           )}
         </div>
       </section>

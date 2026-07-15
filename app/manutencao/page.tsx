@@ -4,7 +4,7 @@ import { carregarConfigPlataforma } from '@/lib/queries/config-plataforma'
 import { IconeZap } from '@/components/Icones'
 
 export const metadata: Metadata = {
-  title: 'Em manutenção — Peritos Academy',
+  title: 'Em manutenção · Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

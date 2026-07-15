@@ -155,7 +155,7 @@ useEffect(() => {
             </div>
             <ul className="sino-lista">
               {notifs.length === 0 && (
-                <li className="sino-vazio">Nada por aqui — você está em dia.</li>
+                <li className="sino-vazio">Nada por aqui. Você está em dia.</li>
               )}
               {notifs.map(n => (
                 <li key={n.id}>
@@ -186,7 +186,7 @@ useEffect(() => {
         <button
           className="sino-btn"
           data-tour="sino-notificacoes"
-          aria-label={`Notificações${contador ? ` — ${contador} não lidas` : ''}`}
+          aria-label={`Notificações${contador ? `: ${contador} não lidas` : ''}`}
           aria-expanded={sinoAberto}
           onClick={() => setSinoAberto(a => !a)}
         >

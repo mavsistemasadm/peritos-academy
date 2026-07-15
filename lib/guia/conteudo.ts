@@ -26,11 +26,11 @@ export const CAPITULOS: CapituloGuia[] = [
       {
         titulo: 'Navegação básica',
         paragrafos: [
-          'Início — sua central de comando: próxima aula, progresso e recomendações.',
-          'Conteúdos — dropdown com Trilhas (sua jornada), Biblioteca de cursos e Planilhas e modelos.',
-          'Comunidade — dúvidas, casos e vitórias compartilhados com outros peritos.',
-          'Agenda — encontros ao vivo e gravações disponíveis.',
-          'Desafios — casos periciais reais para praticar e receber feedback.',
+          'Início: sua central de comando, com a próxima aula, progresso e recomendações.',
+          'Conteúdos: dropdown com Trilhas (sua jornada), Biblioteca de cursos e Planilhas e modelos.',
+          'Comunidade: dúvidas, casos e vitórias compartilhados com outros peritos.',
+          'Agenda: encontros ao vivo e gravações disponíveis.',
+          'Desafios: casos periciais reais para praticar e receber feedback.',
         ],
       },
     ],
@@ -111,7 +111,7 @@ export const CAPITULOS: CapituloGuia[] = [
       {
         titulo: 'Como ganhar XP',
         paragrafos: [
-          'Várias ações reais dentro da plataforma creditam XP (e moedas): concluir uma aula, concluir um módulo, concluir um curso inteiro, ser aprovado em uma avaliação (quanto maior o seu aproveitamento, mais XP — e provas valem mais que quizzes de módulo), fazer login todo dia (mantém sua sequência viva), participar da comunidade postando, comentando ou reagindo, e entregar um desafio pericial.',
+          'Várias ações reais dentro da plataforma creditam XP (e moedas): concluir uma aula, concluir um módulo, concluir um curso inteiro, ser aprovado em uma avaliação (quanto maior o seu aproveitamento, mais XP, e provas valem mais que quizzes de módulo), fazer login todo dia (mantém sua sequência viva), participar da comunidade postando, comentando ou reagindo, e entregar um desafio pericial.',
           'Os valores exatos de cada ação ainda estão em calibragem e podem mudar conforme a plataforma evolui.',
         ],
       },
@@ -122,7 +122,7 @@ export const CAPITULOS: CapituloGuia[] = [
       {
         titulo: 'Insígnias de etapa e território',
         paragrafos: [
-          'Sua aba Conquistas, no perfil, reúne as insígnias da sua jornada — cada etapa da Formação e cada território indicam a insígnia que marca a conclusão daquele trecho do caminho.',
+          'Sua aba Conquistas, no perfil, reúne as insígnias da sua jornada. Cada etapa da Formação e cada território indicam a insígnia que marca a conclusão daquele trecho do caminho.',
         ],
       },
       {
@@ -147,7 +147,7 @@ export const CAPITULOS: CapituloGuia[] = [
       {
         titulo: 'Como postar',
         paragrafos: [
-          'No campo de publicação, escolha o tipo — Caso, Dúvida ou Vitória — escreva e publique. Posts de Vitória ganham um cartão de conquista especial, com direito a parabéns de quem estiver por perto.',
+          'No campo de publicação, escolha o tipo (Caso, Dúvida ou Vitória), escreva e publique. Posts de Vitória ganham um cartão de conquista especial, com direito a parabéns de quem estiver por perto.',
           'Reaja com Útil nos posts que te ajudaram, ou guarde um post para depois com Salvar.',
         ],
       },
@@ -156,7 +156,7 @@ export const CAPITULOS: CapituloGuia[] = [
         paragrafos: [
           'Trate cada colega como trataria num tribunal: com respeito, mesmo na discordância.',
           'Compartilhe o que puder sem violar sigilo processual ou dados de terceiros.',
-          'Perícia é técnica, não é disputa pessoal — o objetivo é todo mundo evoluir.',
+          'Perícia é técnica, não é disputa pessoal. O objetivo é todo mundo evoluir.',
         ],
       },
     ],
@@ -169,7 +169,7 @@ export const CAPITULOS: CapituloGuia[] = [
       {
         titulo: 'Como funcionam',
         paragrafos: [
-          'Cada desafio é um caso pericial real, com prazo para entrega. Você aceita o desafio, lê a intimação e os documentos anexados, responde aos quesitos — as respostas ficam salvas automaticamente enquanto você trabalha — e, quando estiver pronto, protocola o laudo final. Depois de protocolado, não dá mais para editar.',
+          'Cada desafio é um caso pericial real, com prazo para entrega. Você aceita o desafio, lê a intimação e os documentos anexados, responde aos quesitos (as respostas ficam salvas automaticamente enquanto você trabalha) e, quando estiver pronto, protocola o laudo final. Depois de protocolado, não dá mais para editar.',
         ],
       },
       {
@@ -213,7 +213,7 @@ export const CAPITULOS: CapituloGuia[] = [
       {
         titulo: 'Como emitir e onde encontrar',
         paragrafos: [
-          'A emissão é automática — não precisa pedir nada. Seus certificados ficam na aba Certificados do seu perfil, com número, nota final e carga horária, e um botão para copiar o link de verificação.',
+          'A emissão é automática, não precisa pedir nada. Seus certificados ficam na aba Certificados do seu perfil, com número, nota final e carga horária, e um botão para copiar o link de verificação.',
         ],
       },
     ],
@@ -238,7 +238,7 @@ export const CAPITULOS: CapituloGuia[] = [
       {
         titulo: 'Sons de conquista',
         paragrafos: [
-          'O toggle Sons de conquista, no mesmo formulário de Editar perfil, liga ou desliga os sons dos toasts de conquista — nível, avaliação aprovada, curso concluído, sequência e primeira aula.',
+          'O toggle Sons de conquista, no mesmo formulário de Editar perfil, liga ou desliga os sons dos toasts de conquista: nível, avaliação aprovada, curso concluído, sequência e primeira aula.',
         ],
       },
       {

@@ -6,7 +6,7 @@ import { carregarAdministradores } from '@/lib/queries/admin-usuarios'
 import AdminAdministradoresContent from '@/components/AdminAdministradoresContent'
 
 export const metadata: Metadata = {
-  title: 'Administradores — Peritos Academy',
+  title: 'Administradores · Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

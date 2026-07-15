@@ -6,7 +6,7 @@ import { carregarConfigGamificacao, carregarGatilhosAdmin, carregarNiveisAdmin }
 import AdminGamificacaoContent from '@/components/AdminGamificacaoContent'
 
 export const metadata: Metadata = {
-  title: 'Gamificação — Admin Peritos Academy',
+  title: 'Gamificação · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

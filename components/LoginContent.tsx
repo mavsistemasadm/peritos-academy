@@ -10,8 +10,8 @@ const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 function traduzErro(msg: string) {
   if (/invalid login credentials/i.test(msg)) return 'E-mail ou senha incorretos.'
   if (/email not confirmed/i.test(msg)) return 'Confirme seu e-mail antes de entrar.'
-  if (/too many requests/i.test(msg)) return 'Muitas tentativas — aguarde um instante e tente de novo.'
-  return msg || 'Algo falhou — tente de novo.'
+  if (/too many requests/i.test(msg)) return 'Muitas tentativas. Aguarde um instante e tente de novo.'
+  return msg || 'Algo falhou. Tente de novo.'
 }
 
 type Selos = { membros: number; missoes: number; casos: number }
@@ -55,7 +55,7 @@ export default function LoginContent({ selos, nomePlataforma, logoUrl, paginaIni
         <div className="painel-frase">
           <span className="eyebrow">Plataforma do perito</span>
           <h1>Do conhecimento à <span className="grad-txt">autoridade.</span></h1>
-          <p>Aulas, casos reais, jornada de evolução e a comunidade que assina laudos — tudo em um lugar.</p>
+          <p>Aulas, casos reais, jornada de evolução e a comunidade que assina laudos, tudo em um lugar.</p>
         </div>
         <div className="painel-selos num">
           <div className="selo"><b>{fmtNum(selos.membros)}</b><span>peritos na comunidade</span></div>

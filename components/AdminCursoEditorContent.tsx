@@ -588,7 +588,7 @@ function MateriaisBloco({ aula, cursoId, onErro, onSucesso, onRefresh }: {
         ))}
       </ul>
       <label className="ad-btn-secundario ad-upload-btn">
-        <IconeUpload size={13} /> Enviar arquivos (PDF, XLSX, DOCX, ZIP — até 20MB cada)
+        <IconeUpload size={13} /> Enviar arquivos (PDF, XLSX, DOCX, ZIP, até 20MB cada)
         <input type="file" multiple accept=".pdf,.xlsx,.xls,.docx,.doc,.zip" onChange={onUpload} hidden disabled={pendente} />
       </label>
     </div>

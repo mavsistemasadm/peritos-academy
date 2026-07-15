@@ -272,7 +272,7 @@ export default function ComunidadeContent({ dados, nav }: { dados: DadosComunida
               )}
               {postsVisiveis.length === 0 && (
                 <article className="post reveal visivel">
-                  <p>Nada por aqui ainda — seja a primeira pessoa a publicar neste espaço.</p>
+                  <p>Nada por aqui ainda. Seja a primeira pessoa a publicar neste espaço.</p>
                 </article>
               )}
             </div>

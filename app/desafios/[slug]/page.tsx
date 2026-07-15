@@ -27,9 +27,9 @@ export async function generateMetadata({ params }: {
 }) {
   const { slug } = await params
   const dados = await carregarDesafio(slug)
-  if (!dados?.desafio) return { title: 'Desafio — Peritos Academy' }
+  if (!dados?.desafio) return { title: 'Desafio · Peritos Academy' }
   return {
-    title: `Desafio #${dados.desafio.numero} · ${dados.desafio.titulo} — Peritos Academy`,
+    title: `Desafio #${dados.desafio.numero} · ${dados.desafio.titulo} · Peritos Academy`,
     description: `Perícia sob pressão: ${dados.desafio.quesitos_total} quesitos, ${dados.desafio.prazo_dias} dias de prazo.`,
   }
 }

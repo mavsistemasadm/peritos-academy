@@ -8,7 +8,7 @@ import { obterAdminAtual } from '@/lib/admin/auth'
 import DevIconesContent from '@/components/DevIconesContent'
 
 export const metadata: Metadata = {
-  title: 'Revisão de ícones — Peritos Academy',
+  title: 'Revisão de ícones · Peritos Academy',
   robots: { index: false, follow: false },
 }
 

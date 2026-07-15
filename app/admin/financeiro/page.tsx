@@ -8,7 +8,7 @@ import {
 import AdminFinanceiroContent from '@/components/AdminFinanceiroContent'
 
 export const metadata: Metadata = {
-  title: 'Financeiro — Admin Peritos Academy',
+  title: 'Financeiro · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

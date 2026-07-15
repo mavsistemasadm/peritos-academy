@@ -6,7 +6,7 @@ import { carregarNav } from '@/lib/queries/nav'
 import DesafiosContent from '@/components/DesafiosContent'
 
 export const metadata: Metadata = {
-  title: 'Desafios — Peritos Academy',
+  title: 'Desafios · Peritos Academy',
   description: 'Perícia sob pressão: leia os autos, monte a planilha e protocole seu laudo.',
 }
 

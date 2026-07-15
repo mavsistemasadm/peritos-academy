@@ -56,7 +56,7 @@ export default function AdminUsuariosContent({ usuarios, totalCount, pagina, por
       <div className="ad-cursos-cab">
         <div>
           <h1>Usuários</h1>
-          <p className="ad-sub">Visão 360° de cada aluno — suporte, progresso, gamificação e financeiro.</p>
+          <p className="ad-sub">Visão 360° de cada aluno: suporte, progresso, gamificação e financeiro.</p>
         </div>
       </div>
 

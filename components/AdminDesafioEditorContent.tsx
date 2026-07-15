@@ -74,7 +74,7 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
   function onCriarQuesito() {
     const fd = new FormData()
     fd.set('tipo', novoTipo)
-    fd.set('enunciado', 'Nova questão — edite o enunciado abaixo')
+    fd.set('enunciado', 'Nova questão. Edite o enunciado abaixo')
     startTransition(async () => {
       const r = await adicionarQuesito(desafio.id, fd)
       if (!r.ok) toast.erro(r.erro)
@@ -93,7 +93,7 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <a href="/admin/desafios" className="ad-voltar"><IconeChevronLeft size={14} /> Desafios</a>
       <div className="ad-editor-cab">
-        <h1>{desafio.numero ? `#${desafio.numero} — ` : ''}{desafio.titulo}</h1>
+        <h1>{desafio.numero ? `#${desafio.numero} · ` : ''}{desafio.titulo}</h1>
         <div className="ad-editor-cab-acoes">
           <label className={`ad-toggle-papel${desafio.publicado ? ' ativo' : ''}`}>
             <input type="checkbox" checked={desafio.publicado} disabled={pendente} onChange={e => onAlternarPublicacao(e.target.checked)} />

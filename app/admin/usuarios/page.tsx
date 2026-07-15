@@ -6,7 +6,7 @@ import { listarUsuariosAdmin, usuariosPorPagina, type StatusConta, type StatusAs
 import AdminUsuariosContent from '@/components/AdminUsuariosContent'
 
 export const metadata: Metadata = {
-  title: 'Usuários — Admin Peritos Academy',
+  title: 'Usuários · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

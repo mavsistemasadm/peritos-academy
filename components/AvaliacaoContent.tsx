@@ -215,9 +215,9 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter }: Props
     ? ""
     : aprovado
       ? perfeito
-        ? "Gabarito, hein! Esse é o rigor que faz juiz confiar em laudo. Te vejo no próximo caso — ele já está na sua mesa."
-        : `Parecer firme${primeiroNome ? `, ${primeiroNome}` : ""}. Dá uma olhada na revisão pra fechar os detalhes — é neles que mora a diferença entre um laudo bom e um irrefutável.`
-      : "Calma — diligência complementar faz parte do trabalho de todo perito. Revisa os pareceres abaixo, volta nos vídeos indicados e emite de novo. Estou contigo.";
+        ? "Gabarito, hein! Esse é o rigor que faz juiz confiar em laudo. Te vejo no próximo caso, ele já está na sua mesa."
+        : `Parecer firme${primeiroNome ? `, ${primeiroNome}` : ""}. Dá uma olhada na revisão pra fechar os detalhes. É neles que mora a diferença entre um laudo bom e um irrefutável.`
+      : "Calma. Diligência complementar faz parte do trabalho de todo perito. Revisa os pareceres abaixo, volta nos vídeos indicados e emite de novo. Estou contigo.";
 
   const cls = (nome: Cena) =>
     `cena${cena === nome ? " ativa" : ""}${cena === nome && saindo ? " saindo" : ""}`;
@@ -322,7 +322,7 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter }: Props
                   {q.sufixo && <span className="fixo num">{q.sufixo}</span>}
                 </label>
                 <p className="campo-valor-dica">
-                  Digite só o número — vírgula para decimais, como na planilha do laudo.
+                  Digite só o número. Vírgula para decimais, como na planilha do laudo.
                 </p>
               </>
             )}
@@ -353,7 +353,7 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter }: Props
               </button>
               <span className="dica">
                 {q.tipo === "multipla_escolha" ? (
-                  <>Use <kbd>1</kbd>–<kbd>4</kbd> e <kbd>Enter</kbd></>
+                  <>Use <kbd>1</kbd>-<kbd>4</kbd> e <kbd>Enter</kbd></>
                 ) : (
                   <>Confirme com <kbd>Enter</kbd></>
                 )}
@@ -386,7 +386,7 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter }: Props
             <p className="veredito-sub anim">
               {aprovado ? "Parecer sólido: " : "O caso continua: "}
               <b className="num">{resultado.acertos} de {resultado.total}</b> quesitos corretos
-              {aprovado ? "." : " — revise e conclua as diligências."}
+              {aprovado ? "." : ". Revise e conclua as diligências."}
             </p>
             <div className="ganhos num">
               <span className="ganho"><span className="gd"><XP size={15} /> +{resultado.xp} XP</span> creditados</span>

@@ -6,7 +6,7 @@ import { carregarNav } from '@/lib/queries/nav'
 import GuiaContent from '@/components/GuiaContent'
 
 export const metadata: Metadata = {
-  title: 'Guia da plataforma — Peritos Academy',
+  title: 'Guia da plataforma · Peritos Academy',
   description: 'Documentação viva da plataforma: jornada, aulas, gamificação, comunidade, desafios, agenda, certificados e conta.',
 }
 

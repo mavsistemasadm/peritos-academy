@@ -27,9 +27,9 @@ export async function generateMetadata({ params }: {
 }) {
   const { slug } = await params
   const dados = await carregarPeritoPublico(slug)
-  if (!dados) return { title: 'Perito não encontrado — Peritos Academy' }
+  if (!dados) return { title: 'Perito não encontrado · Peritos Academy' }
   return {
-    title: `${dados.perito.nome} · ${dados.nivel_label} — Peritos Academy`,
+    title: `${dados.perito.nome} · ${dados.nivel_label} · Peritos Academy`,
     description: dados.resumo,
     openGraph: {
       title: `${dados.perito.nome} · ${dados.nivel_label}`,

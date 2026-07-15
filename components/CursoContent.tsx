@@ -29,6 +29,7 @@ type Curso = {
   titulo: string;
   subtitulo: string | null;
   capa_url: string | null;
+  capa_horizontal_url: string | null;
   nivel: string | null;
   duracao_seg: number;
   trilha_nome?: string | null;
@@ -54,7 +55,7 @@ type Props = {
   curso: Curso;
   modulos: Modulo[];
   conquistas: Conquista[];
-  relacionados: { id: string; slug: string; titulo: string; capa_url: string | null }[];
+  relacionados: { id: string; slug: string; titulo: string; capa_url: string | null; capa_vertical_url: string | null }[];
   nav: DadosNav;
 };
 
@@ -119,7 +120,7 @@ export function CursoContent({ curso, modulos, conquistas, relacionados, nav }: 
       {/* ============ HERO ============ */}
       <section className="hero" aria-label="Sobre o curso">
         <div className="hero-bg" aria-hidden="true">
-          <img src={curso.capa_url || "/img/card-segredos-hero.jpg"} alt="" />
+          <img src={curso.capa_horizontal_url || curso.capa_url || "/img/card-segredos-hero.jpg"} alt="" />
         </div>
         <div className="wrap">
           <div className="hero-conteudo">
@@ -334,7 +335,7 @@ export function CursoContent({ curso, modulos, conquistas, relacionados, nav }: 
               {relacionados.map((rel) => (
                 <a className="card-curso" href={`/curso/${rel.slug}`} key={rel.id} role="listitem">
                   <div className="card-capa">
-                    <img src={rel.capa_url || "/img/card-segredos.jpg"} alt={`Capa do curso ${rel.titulo}`} loading="lazy" />
+                    <img src={rel.capa_vertical_url || rel.capa_url || "/img/card-segredos.jpg"} alt={`Capa do curso ${rel.titulo}`} loading="lazy" />
                     <span className="acao btn-quieto">Ver curso</span>
                   </div>
                   <div className="card-info">

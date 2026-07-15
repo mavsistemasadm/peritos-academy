@@ -6,7 +6,7 @@ import { carregarConfigPlataforma, verificarIntegracoes } from '@/lib/queries/ad
 import AdminConfiguracoesContent from '@/components/AdminConfiguracoesContent'
 
 export const metadata: Metadata = {
-  title: 'Configurações — Admin Peritos Academy',
+  title: 'Configurações · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

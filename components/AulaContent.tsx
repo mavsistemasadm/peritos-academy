@@ -339,7 +339,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
               {/* PLAYER */}
               <div className="palco">
                 <div className="luz" aria-hidden="true"></div>
-                <div className="player" ref={playerRef} aria-label={`Player de vídeo — ${aula.titulo}`}>
+                <div className="player" ref={playerRef} aria-label={`Player de vídeo: ${aula.titulo}`}>
                   {aula.video_url ? (
                     <iframe
                       className="player-el"

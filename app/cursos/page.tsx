@@ -16,6 +16,6 @@ export default async function PaginaCursos() {
 }
 
 export const metadata = {
-  title: 'Biblioteca de Cursos — Peritos Academy',
+  title: 'Biblioteca de Cursos · Peritos Academy',
   description: 'Todos os cursos organizados por trilha e etapa de desenvolvimento.',
 }

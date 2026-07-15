@@ -239,7 +239,7 @@ function ToastPrimeiraAula({ saindo }: { n: Notificacao; saindo: boolean }) {
       <span className="ct-toast-ico"><XP size={26} /></span>
       <div className="ct-toast-corpo">
         <b>Sua jornada começou!</b>
-        <span>Primeira aula concluída — continue assim</span>
+        <span>Primeira aula concluída, continue assim</span>
       </div>
     </div>
   )

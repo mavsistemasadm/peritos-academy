@@ -46,7 +46,7 @@ export async function buscarCurso(slug: string) {
   // 5. cursos relacionados (mesmo catálogo, exclui o atual)
   const { data: relacionados } = await supabase
     .from("cursos")
-    .select("id, slug, titulo, capa_url")
+    .select("id, slug, titulo, capa_url, capa_vertical_url")
     .eq("publicado", true)
     .neq("id", curso.id)
     .limit(4);

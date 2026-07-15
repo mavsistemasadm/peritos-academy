@@ -6,7 +6,7 @@ import { carregarNav } from '@/lib/queries/nav'
 import PerfilContent from '@/components/PerfilContent'
 
 export const metadata: Metadata = {
-  title: 'Meu perfil — Peritos Academy',
+  title: 'Meu perfil · Peritos Academy',
   description: 'Sua evolução: XP, constância, insígnias e certificados.',
 }
 

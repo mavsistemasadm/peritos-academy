@@ -40,11 +40,11 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
     <header className="nav-plat">
       {d.modoManutencao && d.isAdmin && (
         <div className="np-banner-manutencao">
-          <IconeAlertTriangle size={14} /> Modo manutenção ativo — visitantes não-admin estão vendo a página de manutenção.
+          <IconeAlertTriangle size={14} /> Modo manutenção ativo. Visitantes não-admin estão vendo a página de manutenção.
         </div>
       )}
       <div className="np-inner">
-        <a className="np-logo" href="/" aria-label={`${d.nomePlataforma} — Início`}>
+        <a className="np-logo" href="/" aria-label={`${d.nomePlataforma} · Início`}>
           {d.logoUrl ? (
             <img src={d.logoUrl} alt={d.nomePlataforma} className="np-logo-img" />
           ) : (
@@ -94,7 +94,7 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
             <>
               <div className="np-nivel-wrap" data-tour="nav-gamificacao" ref={area}>
                 <button className="np-nivel" aria-expanded={pop} onClick={() => setPop(v => !v)}
-                  aria-label={`Nível ${d.nivel} — ${fmtNum(d.xp)} de ${fmtNum(d.xpProximo)} XP`}>
+                  aria-label={`Nível ${d.nivel}: ${fmtNum(d.xp)} de ${fmtNum(d.xpProximo)} XP`}>
                   <span className="np-insignia num" aria-hidden="true">{d.nivel}</span>
                   <span className="np-nivel-info">
                     <span className="np-xp-linha num"><b>{fmtNum(d.xp)}</b><small>/{fmtNum(d.xpProximo)} XP</small></span>

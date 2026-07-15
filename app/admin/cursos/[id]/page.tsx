@@ -6,7 +6,7 @@ import { carregarCursoAdmin } from '@/lib/queries/admin-cursos'
 import AdminCursoEditorContent from '@/components/AdminCursoEditorContent'
 
 export const metadata: Metadata = {
-  title: 'Editar curso — Admin Peritos Academy',
+  title: 'Editar curso · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

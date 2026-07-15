@@ -134,9 +134,9 @@ export async function generateMetadata({ params }: {
 }) {
   const { slug, avaliacaoId } = await params;
   const dados = await getAvaliacao(slug, avaliacaoId);
-  if (!dados) return { title: "Avaliação — Peritos Academy" };
+  if (!dados) return { title: "Avaliação · Peritos Academy" };
   const rotulo = dados.avaliacao.tipo === "prova" ? "Prova" : "Avaliação";
   return {
-    title: `${dados.avaliacao.caso_numero ? `Caso Nº ${dados.avaliacao.caso_numero} — ` : ""}${dados.avaliacao.titulo} · ${rotulo} — Peritos Academy`,
+    title: `${dados.avaliacao.caso_numero ? `Caso Nº ${dados.avaliacao.caso_numero} · ` : ""}${dados.avaliacao.titulo} · ${rotulo} · Peritos Academy`,
   };
 }

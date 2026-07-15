@@ -6,7 +6,7 @@ import { carregarTrilhaAdmin, carregarCursosParaPicker } from '@/lib/queries/adm
 import AdminTrilhaEditorContent from '@/components/AdminTrilhaEditorContent'
 
 export const metadata: Metadata = {
-  title: 'Editar trilha — Admin Peritos Academy',
+  title: 'Editar trilha · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

@@ -6,7 +6,7 @@ import { carregarEventosAdmin } from '@/lib/queries/admin-agenda'
 import AdminAgendaContent from '@/components/AdminAgendaContent'
 
 export const metadata: Metadata = {
-  title: 'Agenda — Admin Peritos Academy',
+  title: 'Agenda · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

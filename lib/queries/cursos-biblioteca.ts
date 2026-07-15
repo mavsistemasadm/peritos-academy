@@ -7,7 +7,7 @@ export type CursoBiblioteca = {
   slug: string
   titulo: string
   subtitulo: string | null
-  capa_url: string | null
+  capa_url: string | null  // já resolvido pra capa_horizontal_url (fallback capa_url), card é formato paisagem (4/3)
   nivel: string | null
   duracao_seg: number
   instrutor_nome: string | null
@@ -50,7 +50,7 @@ export async function carregarBibliotecaCursos(): Promise<DadosBibliotecaCursos>
 
   const { data: cursosRaw } = await supabase
     .from('cursos')
-    .select('id, slug, titulo, subtitulo, capa_url, nivel, duracao_seg, instrutor_nome')
+    .select('id, slug, titulo, subtitulo, capa_url, capa_horizontal_url, nivel, duracao_seg, instrutor_nome')
     .eq('publicado', true)
     .in('id', cursoIds.length > 0 ? cursoIds : ['none'])
 
@@ -125,7 +125,7 @@ trilha = { nome: rel.trilha_nome, slug: rel.trilha_slug, descricao: null, etapas
       slug: curso.slug,
       titulo: curso.titulo,
       subtitulo: curso.subtitulo,
-      capa_url: curso.capa_url,
+      capa_url: curso.capa_horizontal_url ?? curso.capa_url,
       nivel: curso.nivel,
       duracao_seg: curso.duracao_seg ?? 0,
       instrutor_nome: curso.instrutor_nome,

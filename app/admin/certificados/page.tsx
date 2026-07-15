@@ -6,7 +6,7 @@ import { carregarCertificadosAdmin, carregarCursosCertificaveis } from '@/lib/qu
 import AdminCertificadosContent from '@/components/AdminCertificadosContent'
 
 export const metadata: Metadata = {
-  title: 'Certificados — Admin Peritos Academy',
+  title: 'Certificados · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

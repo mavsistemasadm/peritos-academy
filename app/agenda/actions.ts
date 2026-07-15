@@ -63,7 +63,7 @@ export async function publicarEvento(ev: NovoEvento) {
 
   if (!ev.titulo.trim()) return { ok: false, erro: 'Dê um título ao evento.' }
   const inicia_em = parseInicioBrasilia(ev.data, ev.hora)
-  if (!inicia_em) return { ok: false, erro: 'Data ou hora inválida — use 15/07/2026 e 20:00.' }
+  if (!inicia_em) return { ok: false, erro: 'Data ou hora inválida. Use 15/07/2026 e 20:00.' }
 
   const { error } = await supabase.from('eventos').insert({
     titulo: ev.titulo.trim(),

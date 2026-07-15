@@ -6,7 +6,7 @@ import { carregarPostsAdmin, carregarComentariosAdmin, carregarDuvidasAulaAdmin 
 import AdminComunidadeContent from '@/components/AdminComunidadeContent'
 
 export const metadata: Metadata = {
-  title: 'Comunidade — Admin Peritos Academy',
+  title: 'Comunidade · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

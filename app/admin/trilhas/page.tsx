@@ -6,7 +6,7 @@ import { carregarTrilhasAdmin } from '@/lib/queries/admin-trilhas'
 import AdminTrilhasContent from '@/components/AdminTrilhasContent'
 
 export const metadata: Metadata = {
-  title: 'Trilhas — Admin Peritos Academy',
+  title: 'Trilhas · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

@@ -163,14 +163,14 @@ export default function TrilhaDetalheContent({ dados, nav }: { dados: TrilhaDeta
                   <h2>{d.marcoFinalNome}.</h2>
                   <p>
                     {d.principal
-                      ? 'Ao concluir todas as etapas desta formação, você conquista o Selo de Excelência — insígnia permanente no seu perfil.'
+                      ? 'Ao concluir todas as etapas desta formação, você conquista o Selo de Excelência, insígnia permanente no seu perfil.'
                       : `Ao concluir: insígnia ${d.nome} no seu perfil.`}
                   </p>
                 </div>
               </div>
             </div>
           ) : (
-            <p className="vazio-txt">Esta trilha ainda está sendo estruturada — as etapas aparecem aqui assim que forem cadastradas.</p>
+            <p className="vazio-txt">Esta trilha ainda está sendo estruturada. As etapas aparecem aqui assim que forem cadastradas.</p>
           )}
         </div>
       </section>

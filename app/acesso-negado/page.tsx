@@ -5,7 +5,7 @@ import NavPlataforma from '@/components/NavPlataforma'
 import { IconeLock } from '@/components/Icones'
 
 export const metadata: Metadata = {
-  title: 'Acesso negado — Peritos Academy',
+  title: 'Acesso negado · Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

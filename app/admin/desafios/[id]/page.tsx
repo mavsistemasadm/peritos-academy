@@ -6,7 +6,7 @@ import { carregarDesafioAdmin, carregarCategoriasAdmin, carregarEntregasDesafio 
 import AdminDesafioEditorContent from '@/components/AdminDesafioEditorContent'
 
 export const metadata: Metadata = {
-  title: 'Editar desafio — Admin Peritos Academy',
+  title: 'Editar desafio · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

@@ -5,7 +5,7 @@ import { carregarConfigPlataforma } from '@/lib/queries/config-plataforma'
 import LoginContent from '@/components/LoginContent'
 
 export const metadata: Metadata = {
-  title: 'Entrar — Peritos Academy',
+  title: 'Entrar · Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

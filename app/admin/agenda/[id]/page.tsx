@@ -7,7 +7,7 @@ import { carregarCursosParaPicker } from '@/lib/queries/admin-trilhas'
 import AdminEventoEditorContent from '@/components/AdminEventoEditorContent'
 
 export const metadata: Metadata = {
-  title: 'Editar evento — Admin Peritos Academy',
+  title: 'Editar evento · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

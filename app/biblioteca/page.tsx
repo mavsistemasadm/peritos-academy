@@ -6,7 +6,7 @@ import { carregarNav } from '@/lib/queries/nav'
 import BibliotecaContent from '@/components/BibliotecaContent'
 
 export const metadata: Metadata = {
-  title: 'Biblioteca — Peritos Academy',
+  title: 'Biblioteca · Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

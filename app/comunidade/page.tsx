@@ -9,7 +9,7 @@ import { verificarAcessoConteudo } from '@/lib/acesso/verificar'
 import AssinaturaNecessaria from '@/components/AssinaturaNecessaria'
 
 export const metadata: Metadata = {
-  title: 'Comunidade — Peritos Academy',
+  title: 'Comunidade · Peritos Academy',
   description: 'Casos reais, dúvidas respondidas e vitórias dos peritos.',
 }
 

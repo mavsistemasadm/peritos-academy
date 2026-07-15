@@ -307,7 +307,7 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
               <div className="constancia-txt">
                 <p>
                   Você estudou em <b>{d.diasEstudados} dos últimos {d.diasJanela} dias</b>
-                  {d.ritmoSubiu && <> — e nas últimas 4 semanas o ritmo subiu</>}. {d.diasFortes}
+                  {d.ritmoSubiu && <>, e nas últimas 4 semanas o ritmo subiu</>}. {d.diasFortes}
                 </p>
                 <span className="sequencia">
                   <span className="chama" aria-hidden="true"><FogoStreak size={16} /></span>

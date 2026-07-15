@@ -426,7 +426,7 @@ export type CursoDetalhe = {
   id: string
   titulo: string
   slug: string
-  capaUrl: string | null
+  capaUrl: string | null  // já resolvido pra capa_vertical_url (fallback capa_url), thumbnail é formato pôster (3/4)
   totalAulas: number
   duracaoSeg: number
   progressoPct: number
@@ -479,7 +479,7 @@ export async function carregarTrilhaPorSlug(slug: string): Promise<TrilhaDetalhe
   const cursoIds = [...new Set(missoes.map(m => m.curso_id))]
 
   const [{ data: cursosRaw }, { data: modulosRaw }] = await Promise.all([
-    cursoIds.length ? supabase.from('cursos').select('id, titulo, slug, capa_url').in('id', cursoIds) : Promise.resolve({ data: [] as any[] }),
+    cursoIds.length ? supabase.from('cursos').select('id, titulo, slug, capa_url, capa_vertical_url').in('id', cursoIds) : Promise.resolve({ data: [] as any[] }),
     cursoIds.length ? supabase.from('modulos').select('id, curso_id, ordem').in('curso_id', cursoIds) : Promise.resolve({ data: [] as any[] }),
   ])
   const cursosRawList = cursosRaw ?? []
@@ -551,7 +551,7 @@ export async function carregarTrilhaPorSlug(slug: string): Promise<TrilhaDetalhe
     const completo = aulaIds.length > 0 && feitas === aulaIds.length && avals.every(id => aprovadas.has(id))
     const notas = avals.flatMap(id => notasPorAvaliacao.get(id) ?? [])
     return {
-      id: c.id, titulo: c.titulo, slug: c.slug, capaUrl: c.capa_url,
+      id: c.id, titulo: c.titulo, slug: c.slug, capaUrl: c.capa_vertical_url ?? c.capa_url,
       totalAulas: aulaIds.length, duracaoSeg, progressoPct, completo,
       notaMedia: notas.length ? notas.reduce((s, n) => s + n, 0) / notas.length : null,
     }

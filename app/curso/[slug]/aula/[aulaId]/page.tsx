@@ -46,5 +46,5 @@ export async function generateMetadata({ params }: {
 }) {
   const { slug, aulaId } = await params;
   const dados = await getAula(slug, aulaId);
-  return { title: dados ? `${dados.aula.titulo} — Peritos Academy` : "Aula — Peritos Academy" };
+  return { title: dados ? `${dados.aula.titulo} · Peritos Academy` : "Aula · Peritos Academy" };
 }

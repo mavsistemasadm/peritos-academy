@@ -10,9 +10,9 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const dados = await carregarTrilhaPorSlug(slug)
-  if (!dados) return { title: 'Trilha — Peritos Academy' }
+  if (!dados) return { title: 'Trilha · Peritos Academy' }
   return {
-    title: `${dados.nome} — Peritos Academy`,
+    title: `${dados.nome} · Peritos Academy`,
     description: dados.descricao ?? undefined,
   }
 }

@@ -9,7 +9,7 @@ import {
 import AdminUsuarioFichaContent from '@/components/AdminUsuarioFichaContent'
 
 export const metadata: Metadata = {
-  title: 'Ficha do aluno — Admin Peritos Academy',
+  title: 'Ficha do aluno · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

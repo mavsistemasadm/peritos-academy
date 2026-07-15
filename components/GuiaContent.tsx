@@ -90,7 +90,7 @@ export default function GuiaContent({ dados, nav }: { dados: DadosGuia; nav: Dad
             <input
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              placeholder="Buscar no guia — ex: certificado, XP, materiais..."
+              placeholder="Buscar no guia, ex.: certificado, XP, materiais..."
               aria-label="Buscar no guia"
             />
           </div>

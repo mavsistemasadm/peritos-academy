@@ -5,7 +5,7 @@ import { carregarNav } from '@/lib/queries/nav'
 import NavPlataforma from '@/components/NavPlataforma'
 
 export const metadata: Metadata = {
-  title: 'Política de privacidade — Peritos Academy',
+  title: 'Política de privacidade · Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

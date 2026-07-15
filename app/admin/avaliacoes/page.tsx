@@ -7,7 +7,7 @@ import { carregarCursosParaPicker } from '@/lib/queries/admin-trilhas'
 import AdminAvaliacoesContent from '@/components/AdminAvaliacoesContent'
 
 export const metadata: Metadata = {
-  title: 'Avaliações — Admin Peritos Academy',
+  title: 'Avaliações · Admin Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

@@ -56,7 +56,7 @@ export default function AdminDesafiosContent({ desafios, categorias }: { desafio
       <div className="ad-cursos-cab">
         <div>
           <h1>Desafios</h1>
-          <p className="ad-sub">Casos periciais gamificados — "O Caso". Categorias, quesitos, documentos e gabarito.</p>
+          <p className="ad-sub">Casos periciais gamificados: "O Caso". Categorias, quesitos, documentos e gabarito.</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button type="button" className="ad-btn-secundario" onClick={() => setMostrarCategorias(v => !v)}>Categorias</button>
@@ -92,7 +92,7 @@ export default function AdminDesafiosContent({ desafios, categorias }: { desafio
           <div key={d.id} className="ad-admin-linha">
             <div className="ad-admin-quem">
               <div>
-                <a href={`/admin/desafios/${d.id}`}><b>{d.numero ? `#${d.numero} — ` : ''}{d.titulo}</b></a>
+                <a href={`/admin/desafios/${d.id}`}><b>{d.numero ? `#${d.numero} · ` : ''}{d.titulo}</b></a>
                 <span className="ad-admin-slug">{d.categoriaNome} · {d.totalEntregas} entrega{d.totalEntregas === 1 ? '' : 's'} · {d.xp} XP · {d.moedas} moedas</span>
               </div>
             </div>

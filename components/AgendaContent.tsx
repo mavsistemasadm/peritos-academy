@@ -219,7 +219,7 @@ function ModalNovoEvento({ aberto, fechar, aoPublicar }:
 
         <div className="campo">
           <label htmlFor="evTitulo">Título</label>
-          <div className="caixa"><input id="evTitulo" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex.: Sala de análise — liquidação de sentença" /></div>
+          <div className="caixa"><input id="evTitulo" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex.: Sala de análise: liquidação de sentença" /></div>
         </div>
 
         <div className="campo">
@@ -242,7 +242,7 @@ function ModalNovoEvento({ aberto, fechar, aoPublicar }:
 
         <div className="campo">
           <label htmlFor="evLink">Link da transmissão</label>
-          <div className="caixa"><input id="evLink" value={link} onChange={e => setLink(e.target.value)} placeholder="Zoom, Meet ou YouTube — liberado 15min antes" /></div>
+          <div className="caixa"><input id="evLink" value={link} onChange={e => setLink(e.target.value)} placeholder="Zoom, Meet ou YouTube, liberado 15min antes" /></div>
         </div>
 
         <div className="campo">
@@ -284,7 +284,7 @@ function ModalNovoEvento({ aberto, fechar, aoPublicar }:
           <span className="olho" aria-hidden="true">
             <IconeEye size={16} strokeWidth={2} />
           </span>
-          <p>Este evento ficará visível para <b className="num">{op.alcance}</b>{op.vis !== 'todos' && <> — e aparecerá com o selo de exclusividade</>}.</p>
+          <p>Este evento ficará visível para <b className="num">{op.alcance}</b>{op.vis !== 'todos' && <>, e aparecerá com o selo de exclusividade</>}.</p>
         </div>
 
         <div className="toggles">
@@ -411,7 +411,7 @@ export default function AgendaContent({ dados, nav }: { dados: DadosAgenda; nav:
                 <span className="rot">Começa em</span>
                 <Contagem alvoIso={heroEv.inicia_em} />
                 <p className="quando num">
-                  {rotuloDia(heroEv.inicia_em).b} · {hora(heroEv.inicia_em)} – {hora(new Date(+new Date(heroEv.inicia_em) + heroEv.duracao_seg * 1000).toISOString())}
+                  {rotuloDia(heroEv.inicia_em).b} · {hora(heroEv.inicia_em)} - {hora(new Date(+new Date(heroEv.inicia_em) + heroEv.duracao_seg * 1000).toISOString())}
                 </p>
                 <p className="confirmados num"><b>{heroEv.confirmados}</b> colegas confirmados{heroEv.reservado && ' · você está dentro'}</p>
               </div>

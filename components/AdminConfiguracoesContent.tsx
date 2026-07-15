@@ -340,7 +340,7 @@ function IntegracoesAba({ integracoes }: { integracoes: IntegracaoStatus[] }) {
     <>
       <section className="ad-card">
         <h2>Status das integrações</h2>
-        <p>Somente leitura — chaves e tokens nunca são exibidos aqui, só se estão presentes ou não.</p>
+        <p>Somente leitura. Chaves e tokens nunca são exibidos aqui, só se estão presentes ou não.</p>
         {integracoes.map(i => (
           <div key={i.chave} className="ad-integracao-linha">
             <div>
@@ -363,7 +363,7 @@ function IntegracoesAba({ integracoes }: { integracoes: IntegracaoStatus[] }) {
         <h2>Pendência conhecida</h2>
         <p>
           <code>config_gamificacao.moeda_icone</code> é editável no{' '}
-          <a href="/admin/gamificacao" style={{ textDecoration: 'underline' }}>módulo Gamificação</a>, mas nenhum uso do emblema de Moeda no app lê esse campo hoje — os usos são todos o emblema fixo do Nível 2 (<code>components/Emblemas.tsx</code>).
+          <a href="/admin/gamificacao" style={{ textDecoration: 'underline' }}>módulo Gamificação</a>, mas nenhum uso do emblema de Moeda no app lê esse campo hoje. Os usos são todos o emblema fixo do Nível 2 (<code>components/Emblemas.tsx</code>).
         </p>
       </section>
     </>

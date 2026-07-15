@@ -4,7 +4,7 @@ import { obterAdminAtual } from '@/lib/admin/auth'
 import { NOME_PAPEL } from '@/lib/admin/permissoes'
 
 export const metadata: Metadata = {
-  title: 'Admin — Peritos Academy',
+  title: 'Admin · Peritos Academy',
 }
 
 export const dynamic = 'force-dynamic'

@@ -5,7 +5,7 @@ import { carregarNav } from '@/lib/queries/nav'
 import JornadaContent from '@/components/JornadaContent'
 
 export const metadata: Metadata = {
-  title: 'Sua jornada — Peritos Academy',
+  title: 'Sua jornada · Peritos Academy',
   description: 'Cinco etapas entre você e o título de Perito de Elite.',
 }
 

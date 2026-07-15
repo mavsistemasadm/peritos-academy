@@ -79,7 +79,7 @@ export async function carregarCursosAdmin(): Promise<CursoListaItem[]> {
 
   const { data: cursos } = await supabase
     .from('cursos')
-    .select('id, slug, titulo, subtitulo, capa_url, nivel, publicado, atualizado_em')
+    .select('id, slug, titulo, subtitulo, capa_url, capa_horizontal_url, nivel, publicado, atualizado_em')
     .order('atualizado_em', { ascending: false })
   if (!cursos || cursos.length === 0) return []
 
@@ -112,7 +112,7 @@ export async function carregarCursosAdmin(): Promise<CursoListaItem[]> {
     slug: c.slug,
     titulo: c.titulo,
     subtitulo: c.subtitulo,
-    capaUrl: c.capa_url,
+    capaUrl: c.capa_horizontal_url ?? c.capa_url,
     nivel: c.nivel,
     publicado: c.publicado,
     atualizadoEm: c.atualizado_em,
