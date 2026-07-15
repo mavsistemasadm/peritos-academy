@@ -78,7 +78,7 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
             <span className="ponto" aria-hidden="true"></span>
             <span className="eyebrow">{d.dataHoje} · {d.saudacao}, {d.primeiroNome}</span>
           </div>
-          <h1 className="display">Continue subindo.</h1>
+          <h1 className="display">{d.tituloHero}</h1>
           <p className="sub">
             {d.continuarCurso
               ? <>Você está em <strong>{d.continuarCurso.titulo}</strong>. Continue de onde parou e mantenha o ritmo.</>

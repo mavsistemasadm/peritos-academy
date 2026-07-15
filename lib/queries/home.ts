@@ -5,6 +5,7 @@
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { carregarJornada } from '@/lib/queries/jornada'
 import { carregarAgenda } from '@/lib/queries/agenda'
+import { tituloHeroDoDia } from '@/lib/titulosHero'
 
 export type CursoCard = {
   slug: string
@@ -43,6 +44,7 @@ export type DadosHome = {
   // hero
   saudacao: string             // "Bom dia" | "Boa tarde" | "Boa noite"
   dataHoje: string
+  tituloHero: string           // título rotativo do dia (determinístico por usuário+dia)
   continuarCurso: CursoCard | null
   missaoAtualNome: string
   missaoAtualPct: number
@@ -284,6 +286,7 @@ export async function carregarHome(): Promise<DadosHome | null> {
     moedas: saldo?.moedas_total ?? 0,
     saudacao: saudacaoPorHora(),
     dataHoje: fmtDataLonga.format(new Date()).replace(/^\w/, c => c.toUpperCase()),
+    tituloHero: tituloHeroDoDia(uid, fmtDiaISO.format(new Date())),
     continuarCurso,
     missaoAtualNome, missaoAtualPct, proximaAulaNome,
     metaDias: `${diasNaSemana} de ${META_DIAS_SEMANA} dias`,

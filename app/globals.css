@@ -112,7 +112,7 @@
 .pagina-home .hero-conteudo{position:relative;z-index:1;width:100%;padding-top:calc(var(--nav-h) + var(--s-8));padding-bottom:var(--s-8)}
 .pagina-home .hero-saudacao{display:flex;align-items:center;gap:12px;margin-bottom:var(--s-4)}
 .pagina-home .hero-saudacao .ponto{width:8px;height:8px;border-radius:50%;background:var(--grad-marca);flex-shrink:0}
-.pagina-home .hero h1{max-width:11ch;margin-bottom:var(--s-4)}
+.pagina-home .hero h1{max-width:20ch;margin-bottom:var(--s-4)}
 .pagina-home .hero .sub{max-width:44ch;margin-bottom:var(--s-5)}
 .pagina-home .hero .sub strong{color:var(--creme);font-weight:600}
 .pagina-home .hero-ctas{display:flex;align-items:center;gap:var(--s-3);flex-wrap:wrap;margin-bottom:var(--s-7)}
@@ -795,9 +795,9 @@ body.teatro .trilho-aulas{display:none}
 }
 
 /* ---------- linha de título + ações ---------- */
-.aula-cab{position:relative;z-index:1;display:flex;align-items:flex-start;gap:var(--s-4);margin-top:var(--s-5);flex-wrap:wrap}
+.aula-cab{position:relative;z-index:1;display:flex;align-items:flex-start;gap:var(--s-4);margin-top:var(--s-6);flex-wrap:wrap}
 .aula-cab-txt{flex:1;min-width:260px}
-.aula-cab .eyebrow{display:block;margin-bottom:8px}
+.aula-cab .eyebrow{display:block;margin-bottom:14px}
 .aula-cab .eyebrow b{background:var(--grad-marca);-webkit-background-clip:text;background-clip:text;color:transparent}
 .aula-cab h1{font-size:clamp(24px,2.6vw,34px);font-weight:700;letter-spacing:-.028em;line-height:1.1}
 .aula-acoes{display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap}
