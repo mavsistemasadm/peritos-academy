@@ -11,7 +11,7 @@ export type CursoCard = {
   slug: string
   titulo: string
   capa_url: string | null  // já resolvido pra capa_vertical_url (fallback capa_url), card é formato pôster (3/4)
-  capa_horizontal_url: string | null  // já resolvido (fallback capa_url), pro banner do hero, formato paisagem
+  capa_horizontal_url: string | null  // cru, SEM fallback pra capa_url. O hero cai pra aurora quando é null, não pra capa_url
   aulas: number
   progressoPct: number      // 0 = ainda não começou
   concluidasPct: number     // idem, para a barra
@@ -167,7 +167,7 @@ export async function carregarHome(): Promise<DadosHome | null> {
     const proximaAula = aulasIds.find(id => !concluidas.has(id))
     return {
       slug: c.slug, titulo: c.titulo, capa_url: c.capa_vertical_url ?? c.capa_url,
-      capa_horizontal_url: c.capa_horizontal_url ?? c.capa_url,
+      capa_horizontal_url: c.capa_horizontal_url,
       aulas: aulasIds.length,
       progressoPct: pct, concluidasPct: pct,
       novo: pct === 0 && !!recente,
