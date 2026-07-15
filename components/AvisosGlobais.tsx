@@ -185,6 +185,7 @@ useEffect(() => {
 
         <button
           className="sino-btn"
+          data-tour="sino-notificacoes"
           aria-label={`Notificações${contador ? ` — ${contador} não lidas` : ''}`}
           aria-expanded={sinoAberto}
           onClick={() => setSinoAberto(a => !a)}

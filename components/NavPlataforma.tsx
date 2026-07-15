@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { DadosNav } from '@/lib/queries/nav'
-import { IconeChevronDown, IconeMap, IconeBookOpen, IconeBarChart, IconeUser, IconeGlobe, IconeShield, IconeLogOut, IconeAlertTriangle } from '@/components/Icones'
+import { IconeChevronDown, IconeMap, IconeBookOpen, IconeBarChart, IconeUser, IconeGlobe, IconeShield, IconeLogOut, IconeAlertTriangle, IconeCompass } from '@/components/Icones'
 import { FogoStreak, Moeda, Certificado } from '@/components/Emblemas'
 import { sair } from '@/lib/auth/sair'
 
@@ -79,10 +79,10 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
           </div>
 
           {d.comunidadeAtiva && (
-            <a href="/comunidade" className={ativo === 'comunidade' ? 'ativo' : undefined} aria-current={ativo === 'comunidade' ? 'page' : undefined}>Comunidade</a>
+            <a href="/comunidade" data-tour="nav-comunidade" className={ativo === 'comunidade' ? 'ativo' : undefined} aria-current={ativo === 'comunidade' ? 'page' : undefined}>Comunidade</a>
           )}
           {d.agendaAtiva && (
-            <a href="/agenda" className={ativo === 'agenda' ? 'ativo' : undefined} aria-current={ativo === 'agenda' ? 'page' : undefined}>Agenda</a>
+            <a href="/agenda" data-tour="nav-agenda" className={ativo === 'agenda' ? 'ativo' : undefined} aria-current={ativo === 'agenda' ? 'page' : undefined}>Agenda</a>
           )}
           {d.desafiosAtivos && (
             <a href="/desafios" className={ativo === 'desafios' ? 'ativo' : undefined} aria-current={ativo === 'desafios' ? 'page' : undefined}>Desafios</a>
@@ -92,7 +92,7 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
         <div className="np-acoes">
           {d.logado ? (
             <>
-              <div className="np-nivel-wrap" ref={area}>
+              <div className="np-nivel-wrap" data-tour="nav-gamificacao" ref={area}>
                 <button className="np-nivel" aria-expanded={pop} onClick={() => setPop(v => !v)}
                   aria-label={`Nível ${d.nivel} — ${fmtNum(d.xp)} de ${fmtNum(d.xpProximo)} XP`}>
                   <span className="np-insignia num" aria-hidden="true">{d.nivel}</span>
@@ -155,6 +155,10 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
                     <a href={`/perito/${d.slug ?? ''}`} className="np-am-item" onClick={() => setMenuAvatar(false)}>
                       <IconeGlobe size={16} strokeWidth={1.8} />
                       Perfil público
+                    </a>
+                    <a href="/guia" className="np-am-item" onClick={() => setMenuAvatar(false)}>
+                      <IconeCompass size={16} strokeWidth={1.8} />
+                      Guia da plataforma
                     </a>
                     {d.isAdmin && (
                       <a href="/admin" className="np-am-item" onClick={() => setMenuAvatar(false)}>

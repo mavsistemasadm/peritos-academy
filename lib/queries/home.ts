@@ -65,6 +65,9 @@ export type DadosHome = {
   } | null
   online: number
   movimento: MovItem[]
+  // tour guiado de boas-vindas
+  mostrarTourInicial: boolean       // true só na primeira visita (perfis.tour_visto_em IS NULL)
+  tourPrimeiraAulaHref: string      // alvo do CTA final do tour — próxima aula pendente da Formação (ou /jornada)
 }
 
 const TZ = 'America/Sao_Paulo'
@@ -115,7 +118,7 @@ export async function carregarHome(): Promise<DadosHome | null> {
     jornada,
     agenda,
   ] = await Promise.all([
-    supabase.from('perfis').select('nome').eq('id', uid).single(),
+    supabase.from('perfis').select('nome, tour_visto_em').eq('id', uid).single(),
     supabase.from('cursos').select('id, slug, titulo, capa_url, atualizado_em').eq('publicado', true).order('atualizado_em', { ascending: false }),
     supabase.from('modulos').select('id, curso_id, ordem').order('ordem', { ascending: true }),
     supabase.from('comunidade_posts').select('*').order('criado_em', { ascending: false }).limit(3),
@@ -306,5 +309,7 @@ export async function carregarHome(): Promise<DadosHome | null> {
       : null,
     online: config?.online_agora ?? 0,
     movimento,
+    mostrarTourInicial: !perfil.tour_visto_em,
+    tourPrimeiraAulaHref: jornada.painelFormacao?.continuarHref ?? jornada.trilhaProtagonistaHome.continuarHref ?? '/jornada',
   }
 }

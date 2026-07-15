@@ -240,6 +240,14 @@ export function IconeShield(props: IconeProps) {
 export function IconeLogOut(props: IconeProps) {
   return <Svg {...props}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5M21 12H9" /></Svg>
 }
+export function IconeCompass(props: IconeProps) {
+  return (
+    <Svg {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M15.5 8.5 13 13l-4.5 2.5L11 11z" />
+    </Svg>
+  )
+}
 
 // ---------- comunidade ----------
 export function IconeHeart(props: IconeProps) {

@@ -8,6 +8,7 @@ import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
 import { IconePlay, IconeCheck } from '@/components/Icones'
 import { AoVivo } from '@/components/Emblemas'
+import TourGuiado from '@/components/TourGuiado'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -64,6 +65,8 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
     <div ref={raiz} className="pagina-home">
       <div className="grao" aria-hidden="true"></div>
 
+      <TourGuiado mostrarInicial={d.mostrarTourInicial} primeiraAulaHref={d.tourPrimeiraAulaHref} />
+
       {/* ============ NAV ============ */}
       <NavPlataforma dados={nav} ativo="inicio" />
 
@@ -82,7 +85,7 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
               : <>Sua jornada está pronta. Comece a primeira missão e construa sua autoridade.</>}
           </p>
           <div className="hero-ctas">
-            <a className="btn btn-primario" href={d.continuarCurso ? d.continuarCurso.href : '/jornada'}>
+            <a className="btn btn-primario" data-tour="hero-cta" href={d.continuarCurso ? d.continuarCurso.href : '/jornada'}>
 <IconePlay size={13} />
               {d.continuarCurso && d.continuarCurso.progressoPct > 0 ? 'Continuar de onde parei' : 'Começar agora'}
             </a>
@@ -157,7 +160,7 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
       </section>
 
       {/* ============ VITRINE ============ */}
-      <section className="vitrine" aria-label="Escolhido para o seu momento">
+      <section className="vitrine" id="vitrine" aria-label="Escolhido para o seu momento">
         <div className="wrap">
           <div className="secao-cab reveal">
             <div>
