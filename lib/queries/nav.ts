@@ -17,6 +17,8 @@ export type DadosNav = {
   proximoNivelNome: string | null   // null = já está no nível máximo
   moedas: number
   sequenciaDias: number      // o foguinho
+  streakRecorde: number
+  streakProtecoesRestantes: number
   isAdmin: boolean
   nomePlataforma: string
   logoUrl: string | null
@@ -30,7 +32,7 @@ const VAZIO: DadosNav = {
 logado: false, nome: 'Visitante', iniciais: 'PA', slug: null,
   nivel: 0, titulo: 'Iniciante',
   xp: 0, xpProximo: 100, progressoPct: 0, faltaXp: 100, proximoNivelNome: null,
-  moedas: 0, sequenciaDias: 0, isAdmin: false,
+  moedas: 0, sequenciaDias: 0, streakRecorde: 0, streakProtecoesRestantes: 2, isAdmin: false,
   nomePlataforma: 'Peritos Academy', logoUrl: null,
   comunidadeAtiva: true, desafiosAtivos: true, agendaAtiva: true, modoManutencao: false,
 }
@@ -69,9 +71,16 @@ export async function carregarNav(): Promise<DadosNav> {
     // perfis.xp em cache — evita depender de um valor que pode dessincronizar.
     supabase.from('gamificacao_saldo').select('xp_total, moedas_total').eq('usuario_id', auth.user.id).maybeSingle(),
     supabase.from('admin_usuarios').select('id').eq('usuario_id', auth.user.id).eq('ativo', true).limit(1),
-    supabase.rpc('gam_calcular_streak', { p_usuario: auth.user.id }),
+    // registra o acesso de hoje (idempotente) e já devolve o estado da streak —
+    // chokepoint único (carregarNav roda em toda página autenticada), evita um
+    // fetch extra no client só pra mostrar a pílula. Substitui gam_calcular_streak
+    // (que segue existindo pra outros usos — admin_usuario_ficha, resumo
+    // quinzenal por email — e é derivada de gamificação, não de acesso real).
+    supabase.rpc('registrar_acesso_diario'),
   ])
   if (!perfil) return { ...VAZIO, ...configNav }
+
+  const streakDados = streak as { sequencia_atual?: number; recorde?: number; protecoes_restantes?: number } | null
 
   const xp = saldo?.xp_total ?? 0
   const moedas = saldo?.moedas_total ?? 0
@@ -94,7 +103,9 @@ export async function carregarNav(): Promise<DadosNav> {
     faltaXp: Math.max(0, xpProximo - xp),
     proximoNivelNome: proximo?.nome ?? null,
     moedas,
-    sequenciaDias: typeof streak === 'number' ? streak : 0,
+    sequenciaDias: streakDados?.sequencia_atual ?? 0,
+    streakRecorde: streakDados?.recorde ?? 0,
+    streakProtecoesRestantes: streakDados?.protecoes_restantes ?? 2,
     isAdmin: (adminRows?.length ?? 0) > 0,
     ...configNav,
   }

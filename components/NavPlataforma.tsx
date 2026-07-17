@@ -6,6 +6,7 @@ import type { DadosNav } from '@/lib/queries/nav'
 import { IconeChevronDown, IconeMap, IconeBookOpen, IconeBarChart, IconeUser, IconeGlobe, IconeShield, IconeLogOut, IconeAlertTriangle, IconeCompass } from '@/components/Icones'
 import { FogoStreak, Moeda, Certificado } from '@/components/Emblemas'
 import { sair } from '@/lib/auth/sair'
+import StreakPopover from '@/components/streak/StreakPopover'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -128,10 +129,7 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
                 <b className="num">{fmtNum(d.moedas)}</b>
               </button>
 
-              <button className="np-pilula fogo" aria-label={`Sequência de ${d.sequenciaDias} dias`}>
-                <FogoStreak size={14} />
-                <b className="num">{d.sequenciaDias} {d.sequenciaDias === 1 ? 'dia' : 'dias'}</b>
-              </button>
+              <StreakPopover sequenciaDias={d.sequenciaDias} recorde={d.streakRecorde} protecoesRestantes={d.streakProtecoesRestantes} />
 
               <div className="np-avatar-wrap" ref={avatarRef}>
                 <button className="np-avatar" onClick={() => setMenuAvatar(v => !v)} aria-label={`Menu de ${d.nome}`} aria-expanded={menuAvatar}>
