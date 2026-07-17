@@ -139,7 +139,7 @@ export default function StreakPopover({
 
             <p className="streak-pop-texto">
               A consistência é o que separa quem estuda de quem se transforma. Cada dia de
-              acesso fortalece sua sequência — e sua sequência conta pontos na sua jornada.
+              acesso fortalece sua sequência e sua sequência conta pontos na sua jornada.
             </p>
 
             <div className="streak-pop-recorde">
