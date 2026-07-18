@@ -1832,302 +1832,6 @@ body.teatro .trilho-aulas{display:none}
 
 
 /* ============================================================
-   PERITOS ACADEMY — COMUNIDADE (escopado em .pagina-comunidade)
-   ============================================================ */
-.pagina-comunidade{
-  --carvao:#070908; --preto-elev:#101311; --preto-elev-2:#0B0E0C;
-  --creme:#F1F2DF; --cinza:#989E99; --cinza-claro:#B9BFB8;
-  --verde:#20D9A6; --ciano:#36DCD1; --lima:#DDF784;
-  --linha:rgba(255,255,255,.10); --linha-suave:rgba(255,255,255,.07);
-  --grad-marca:linear-gradient(120deg,#20D9A6 0%,#36DCD1 48%,#DDF784 100%);
-  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --s-1:8px; --s-2:12px; --s-3:16px; --s-4:24px; --s-5:32px;
-  --s-6:48px; --s-7:64px; --s-8:80px;
-  --r-pill:999px; --nav-h:64px; --maxw:1320px;
-  --suave:cubic-bezier(.2,.7,.3,1);
-  font-family:var(--font);background:var(--carvao);color:var(--creme);
-  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;
-  min-height:100vh;overflow-x:hidden;
-}
-.pagina-comunidade *{margin:0;padding:0;box-sizing:border-box}
-.pagina-comunidade a{color:inherit;text-decoration:none}
-.pagina-comunidade button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;text-align:left}
-.pagina-comunidade input,.pagina-comunidade textarea{font:inherit;color:inherit;background:none;border:none;outline:none;width:100%}
-.pagina-comunidade :focus-visible{outline:2px solid var(--verde);outline-offset:3px;border-radius:4px}
-.pagina-comunidade ::selection{background:rgba(32,217,166,.28)}
-.pagina-comunidade .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--s-6)}
-@media(max-width:768px){.pagina-comunidade .wrap{padding:0 var(--s-4)}}
-.pagina-comunidade .grao{
-  position:fixed;inset:0;z-index:300;pointer-events:none;opacity:.033;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-.pagina-comunidade .eyebrow{font-size:12px;font-weight:660;letter-spacing:.16em;text-transform:uppercase;color:var(--cinza)}
-.pagina-comunidade .num{font-variant-numeric:tabular-nums}
-.pagina-comunidade .grad-txt{background:var(--grad-marca);-webkit-background-clip:text;background-clip:text;color:transparent}
-.pagina-comunidade .btn{
-  display:inline-flex;align-items:center;gap:10px;border-radius:var(--r-pill);
-  font-size:14.5px;font-weight:600;letter-spacing:-.01em;
-  padding:12px 22px;min-height:46px;
-  transition:transform .25s var(--suave),background .25s;
-}
-.pagina-comunidade .btn-primario{background:var(--creme);color:var(--carvao)}
-.pagina-comunidade .btn-primario:hover{transform:scale(1.02)}
-.pagina-comunidade .btn-primario:disabled{opacity:.5;transform:none;cursor:default}
-.pagina-comunidade .btn-fantasma{border:1px solid var(--linha);background:rgba(255,255,255,.02)}
-.pagina-comunidade .btn-fantasma:hover{background:rgba(255,255,255,.06)}
-.pagina-comunidade .btn-fantasma.aplaudido{border-color:rgba(32,217,166,.4);color:var(--verde)}
-
-/* ---------- NAV ---------- */
-.pagina-comunidade .nav{
-  position:fixed;inset:0 0 auto 0;z-index:100;height:var(--nav-h);
-  background:rgba(7,9,8,.72);
-  -webkit-backdrop-filter:blur(20px) saturate(1.5);backdrop-filter:blur(20px) saturate(1.5);
-  border-bottom:1px solid var(--linha-suave);
-}
-.pagina-comunidade .nav-inner{max-width:var(--maxw);margin:0 auto;height:100%;padding:0 var(--s-6);display:flex;align-items:center;gap:var(--s-5)}
-.pagina-comunidade .nav-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.pagina-comunidade .nav-logo span{font-size:15px;font-weight:650;letter-spacing:-.02em;line-height:1.05}
-.pagina-comunidade .nav-logo small{display:block;font-size:11px;font-weight:450;color:var(--cinza)}
-.pagina-comunidade .nav-links{display:flex;gap:4px;margin:0 auto}
-.pagina-comunidade .nav-links a{font-size:14px;font-weight:520;color:var(--cinza-claro);padding:8px 14px;border-radius:var(--r-pill);transition:color .2s,background .2s}
-.pagina-comunidade .nav-links a:hover{color:var(--creme)}
-.pagina-comunidade .nav-links a.ativo{color:var(--creme);background:rgba(255,255,255,.07)}
-.pagina-comunidade .nav-acoes{display:flex;align-items:center;gap:var(--s-3);flex-shrink:0}
-.pagina-comunidade .insignia{
-  width:30px;height:30px;border-radius:9px;flex-shrink:0;display:grid;place-items:center;
-  font-size:12px;font-weight:700;color:var(--verde);
-  background:linear-gradient(135deg,rgba(32,217,166,.16),rgba(54,220,209,.07));
-  border:1px solid rgba(32,217,166,.38);
-}
-.pagina-comunidade .nav-nivel{display:flex;align-items:center;gap:10px;border-radius:14px;padding:6px 14px 6px 6px;transition:background .2s}
-.pagina-comunidade .nav-nivel:hover{background:rgba(255,255,255,.06)}
-.pagina-comunidade .nivel-txt{display:flex;flex-direction:column;align-items:flex-start;line-height:1.2}
-.pagina-comunidade .nivel-txt b{font-size:13px;font-weight:630;letter-spacing:-.01em}
-.pagina-comunidade .nivel-txt small{font-size:11px;font-weight:500;color:var(--cinza)}
-.pagina-comunidade .nav-avatar{
-  width:36px;height:36px;border-radius:50%;
-  background:linear-gradient(135deg,#173B31,#0E1F1A);border:1px solid var(--linha);
-  display:grid;place-items:center;font-size:12px;font-weight:650;
-}
-@media(max-width:960px){.pagina-comunidade .nav-links{display:none}}
-@media(max-width:600px){.pagina-comunidade .nav-nivel{display:none}.pagina-comunidade .nav-inner{padding:0 var(--s-4)}}
-
-/* ---------- TOPO ---------- */
-.pagina-comunidade .topo{
-  padding:calc(var(--nav-h) + var(--s-7)) 0 var(--s-6);
-  background:radial-gradient(55% 60% at 82% 0%,rgba(32,217,166,.08),transparent 65%),var(--carvao);
-}
-.pagina-comunidade .topo-linha{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s-4);flex-wrap:wrap}
-.pagina-comunidade .topo .eyebrow{display:block;margin-bottom:var(--s-2)}
-.pagina-comunidade .topo h1{font-size:clamp(36px,4.6vw,58px);font-weight:730;letter-spacing:-.035em;line-height:1}
-.pagina-comunidade .topo-stats{display:flex;gap:var(--s-5);flex-wrap:wrap}
-.pagina-comunidade .t-stat{display:flex;align-items:center;gap:10px}
-.pagina-comunidade .t-stat .ponto{width:8px;height:8px;border-radius:50%;background:var(--verde);animation:piscaCom 2.4s ease-in-out infinite}
-@keyframes piscaCom{0%,100%{opacity:1}50%{opacity:.35}}
-.pagina-comunidade .t-stat b{font-size:15px;font-weight:680;letter-spacing:-.01em}
-.pagina-comunidade .t-stat span{font-size:13px;color:var(--cinza)}
-
-/* ---------- GRID ---------- */
-.pagina-comunidade .corpo{padding:var(--s-5) 0 var(--s-8)}
-.pagina-comunidade .grid{display:grid;grid-template-columns:230px 1fr 300px;gap:var(--s-6);align-items:start}
-@media(max-width:1140px){.pagina-comunidade .grid{grid-template-columns:1fr 300px}.pagina-comunidade .rail-esq{display:none}}
-@media(max-width:860px){.pagina-comunidade .grid{grid-template-columns:1fr}.pagina-comunidade .rail-dir{order:-1}}
-
-/* ---------- rail esquerdo ---------- */
-.pagina-comunidade .rail-esq{position:sticky;top:calc(var(--nav-h) + var(--s-4))}
-.pagina-comunidade .rail-titulo{font-size:11.5px;font-weight:680;letter-spacing:.14em;text-transform:uppercase;color:var(--cinza);display:block;margin-bottom:var(--s-3)}
-.pagina-comunidade .espacos{list-style:none;display:flex;flex-direction:column;gap:2px;margin-bottom:var(--s-6)}
-.pagina-comunidade .espacos a{
-  display:flex;align-items:center;gap:11px;
-  font-size:14px;font-weight:560;color:var(--cinza-claro);
-  padding:10px 12px;border-radius:12px;
-  transition:background .2s,color .2s;
-}
-.pagina-comunidade .espacos a:hover{background:rgba(255,255,255,.04);color:var(--creme)}
-.pagina-comunidade .espacos a.ativo{background:linear-gradient(120deg,rgba(32,217,166,.10),rgba(221,247,132,.03));color:var(--creme);font-weight:620}
-.pagina-comunidade .espacos .cerquilha{color:var(--cinza);font-weight:500}
-.pagina-comunidade .espacos a.ativo .cerquilha{color:var(--verde)}
-.pagina-comunidade .espacos .qtd{margin-left:auto;font-size:11.5px;font-weight:650;color:var(--cinza)}
-.pagina-comunidade .espacos .novo-ponto{margin-left:auto;width:7px;height:7px;border-radius:50%;background:var(--grad-marca)}
-.pagina-comunidade .turma{
-  display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:12px;
-  border:1px dashed var(--linha);transition:border-color .25s,background .25s;
-}
-.pagina-comunidade .turma:hover{border-color:rgba(32,217,166,.35);background:rgba(32,217,166,.02)}
-.pagina-comunidade .turma b{font-size:13px;font-weight:600;display:block;line-height:1.25}
-.pagina-comunidade .turma span{font-size:11.5px;color:var(--cinza)}
-
-/* ---------- feed ---------- */
-.pagina-comunidade .compor{
-  display:flex;gap:14px;align-items:flex-start;
-  border:1px solid var(--linha);border-radius:18px;
-  background:rgba(255,255,255,.02);padding:var(--s-3) var(--s-4);
-  transition:border-color .25s;margin-bottom:var(--s-3);
-}
-.pagina-comunidade .compor:focus-within{border-color:rgba(32,217,166,.45)}
-.pagina-comunidade .foto-p{
-  width:40px;height:40px;border-radius:50%;flex-shrink:0;
-  display:grid;place-items:center;font-size:12.5px;font-weight:650;
-  background:linear-gradient(135deg,#15211C,#0C1310);border:1px solid var(--linha-suave);
-}
-.pagina-comunidade .compor-corpo{flex:1;min-width:0}
-.pagina-comunidade .compor textarea{min-height:26px;font-size:15px;line-height:1.6;padding-top:8px;resize:vertical}
-.pagina-comunidade .compor textarea::placeholder{color:var(--cinza)}
-.pagina-comunidade .compor-acoes{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
-.pagina-comunidade .tipo-chip{
-  font-size:12.5px;font-weight:640;letter-spacing:.02em;
-  border:1px solid var(--linha-suave);border-radius:var(--r-pill);
-  padding:7px 14px;color:var(--cinza-claro);
-  transition:border-color .2s,color .2s,background .2s;
-}
-.pagina-comunidade .tipo-chip:hover{color:var(--creme);border-color:var(--linha)}
-.pagina-comunidade .tipo-chip.sel{color:var(--verde);border-color:rgba(32,217,166,.4);background:rgba(32,217,166,.06)}
-.pagina-comunidade .compor-acoes .btn{margin-left:auto;min-height:40px;padding:9px 20px}
-.pagina-comunidade .filtros{display:flex;gap:4px;border-bottom:1px solid var(--linha-suave);margin-bottom:var(--s-4);overflow-x:auto;scrollbar-width:none}
-.pagina-comunidade .filtros::-webkit-scrollbar{display:none}
-.pagina-comunidade .filtro{
-  position:relative;font-size:14px;font-weight:600;color:var(--cinza);
-  padding:13px 16px;white-space:nowrap;transition:color .2s;
-}
-.pagina-comunidade .filtro:hover{color:var(--cinza-claro)}
-.pagina-comunidade .filtro.ativo{color:var(--creme)}
-.pagina-comunidade .filtro::after{
-  content:'';position:absolute;left:14px;right:14px;bottom:-1px;height:2.5px;border-radius:2px;
-  background:var(--grad-marca);transform:scaleX(0);transition:transform .3s var(--suave);
-}
-.pagina-comunidade .filtro.ativo::after{transform:scaleX(1)}
-.pagina-comunidade .post{border-bottom:1px solid var(--linha-suave);padding:var(--s-5) 0}
-.pagina-comunidade .post-cab{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.pagina-comunidade .post-quem{flex:1;min-width:0}
-.pagina-comunidade .post-quem .nome{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.pagina-comunidade .post-quem b{font-size:14.5px;font-weight:650;letter-spacing:-.01em}
-.pagina-comunidade .mini-nivel{
-  font-size:10.5px;font-weight:720;color:var(--verde);
-  border:1px solid rgba(32,217,166,.35);border-radius:6px;padding:1.5px 6px;
-}
-.pagina-comunidade .selo-esp{
-  font-size:10px;font-weight:750;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--carvao);background:var(--grad-marca);border-radius:6px;padding:2.5px 7px;
-}
-.pagina-comunidade .post-quem span{font-size:12.5px;color:var(--cinza);display:block}
-.pagina-comunidade .tag{
-  font-size:10.5px;font-weight:720;letter-spacing:.12em;text-transform:uppercase;
-  border-radius:7px;padding:4px 10px;flex-shrink:0;
-}
-.pagina-comunidade .tag.caso{color:var(--ciano);border:1px solid rgba(54,220,209,.35)}
-.pagina-comunidade .tag.duvida{color:var(--lima);border:1px solid rgba(221,247,132,.3)}
-.pagina-comunidade .tag.resolvida{color:var(--verde);border:1px solid rgba(32,217,166,.4);background:rgba(32,217,166,.06)}
-.pagina-comunidade .post h3{font-size:17.5px;font-weight:660;letter-spacing:-.018em;line-height:1.3;margin-bottom:8px}
-.pagina-comunidade .post h3 a:hover{text-decoration:underline;text-decoration-color:rgba(32,217,166,.5);text-underline-offset:4px}
-.pagina-comunidade .post p{font-size:14.5px;color:var(--cinza-claro);line-height:1.7;max-width:62ch}
-.pagina-comunidade .post-acoes{display:flex;align-items:center;gap:18px;margin-top:14px}
-.pagina-comunidade .acao{
-  display:inline-flex;align-items:center;gap:7px;
-  font-size:13px;font-weight:600;color:var(--cinza);
-  transition:color .2s,transform .2s var(--suave);
-}
-.pagina-comunidade .acao:hover{color:var(--creme)}
-.pagina-comunidade .acao.util:hover{color:var(--verde);transform:translateY(-1px)}
-.pagina-comunidade .acao.feita{color:var(--verde)}
-.pagina-comunidade .acao svg{flex-shrink:0}
-
-/* resposta de especialista embutida */
-.pagina-comunidade .melhor-resposta{
-  margin-top:var(--s-3);display:flex;gap:12px;
-  border-left:2px solid transparent;
-  border-image:linear-gradient(180deg,#20D9A6,#DDF784) 1;
-  padding-left:15px;
-}
-.pagina-comunidade .melhor-resposta .foto-p{width:34px;height:34px;font-size:11px;background:linear-gradient(135deg,#1C4438,#0E241D)}
-.pagina-comunidade .melhor-resposta .corpo-r{flex:1;min-width:0}
-.pagina-comunidade .melhor-resposta .quem-r{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
-.pagina-comunidade .melhor-resposta .quem-r b{font-size:13.5px;font-weight:650}
-.pagina-comunidade .melhor-resposta p{font-size:13.5px;max-width:58ch}
-
-/* post de vitória */
-.pagina-comunidade .post.vitoria{
-  border:1px solid rgba(32,217,166,.22);border-radius:20px;
-  background:radial-gradient(80% 120% at 90% 0%,rgba(32,217,166,.09),transparent 55%),linear-gradient(160deg,#0D1310,#090C0A 75%);
-  padding:var(--s-4) var(--s-5);margin:var(--s-4) 0;
-}
-.pagina-comunidade .vitoria-linha{display:flex;align-items:center;gap:var(--s-3);flex-wrap:wrap}
-.pagina-comunidade .vitoria-badge{
-  width:52px;height:52px;border-radius:15px;flex-shrink:0;position:relative;overflow:hidden;
-  display:grid;place-items:center;color:var(--carvao);
-  background:var(--grad-marca);
-}
-.pagina-comunidade .vitoria-badge::after{
-  content:'';position:absolute;inset:-40% auto -40% -80%;width:45%;
-  background:linear-gradient(105deg,transparent,rgba(255,255,255,.8),transparent);
-  transform:skewX(-20deg);animation:varrerCom 3.5s var(--suave) 1s infinite;
-}
-@keyframes varrerCom{0%,55%{left:-80%}100%{left:175%}}
-.pagina-comunidade .vitoria-txt{flex:1;min-width:200px}
-.pagina-comunidade .vitoria-txt .rot{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:3px;
-  background:var(--grad-marca);-webkit-background-clip:text;background-clip:text;color:transparent}
-.pagina-comunidade .vitoria-txt b{font-size:16px;font-weight:660;letter-spacing:-.015em;display:block}
-.pagina-comunidade .vitoria-txt span{font-size:13px;color:var(--cinza)}
-
-/* ---------- rail direito ---------- */
-.pagina-comunidade .rail-dir{position:sticky;top:calc(var(--nav-h) + var(--s-4));display:flex;flex-direction:column;gap:var(--s-5)}
-@media(max-width:860px){.pagina-comunidade .rail-dir{position:static}}
-.pagina-comunidade .bloco-r{border-top:1px solid var(--linha-suave);padding-top:var(--s-4)}
-.pagina-comunidade .bloco-r:first-child{border-top:none;padding-top:0}
-.pagina-comunidade .bloco-r-cab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--s-3)}
-.pagina-comunidade .bloco-r-cab .rail-titulo{margin-bottom:0}
-.pagina-comunidade .bloco-r-cab a{font-size:12.5px;font-weight:600;color:var(--cinza);transition:color .2s}
-.pagina-comunidade .bloco-r-cab a:hover{color:var(--creme)}
-.pagina-comunidade .ranking{list-style:none;display:flex;flex-direction:column}
-.pagina-comunidade .rk{display:flex;align-items:center;gap:12px;padding:9px 0}
-.pagina-comunidade .rk .pos{width:22px;font-size:13px;font-weight:700;color:var(--cinza);text-align:center;flex-shrink:0}
-.pagina-comunidade .rk:nth-child(1) .pos{background:var(--grad-marca);-webkit-background-clip:text;background-clip:text;color:transparent}
-.pagina-comunidade .rk .foto-p{width:32px;height:32px;font-size:11px}
-.pagina-comunidade .rk-txt{flex:1;min-width:0}
-.pagina-comunidade .rk-txt b{display:block;font-size:13.5px;font-weight:610;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pagina-comunidade .rk-txt span{font-size:11.5px;color:var(--cinza)}
-.pagina-comunidade .rk .var{font-size:11.5px;font-weight:700;flex-shrink:0}
-.pagina-comunidade .rk .var.sobe{color:var(--verde)}
-.pagina-comunidade .rk .var.desce{color:#E0776B}
-.pagina-comunidade .rk.voce{
-  margin-top:8px;border:1px solid rgba(32,217,166,.3);border-radius:14px;
-  padding:11px 12px;
-  background:linear-gradient(120deg,rgba(32,217,166,.08),rgba(221,247,132,.03));
-}
-.pagina-comunidade .rk.voce .pos{color:var(--creme)}
-.pagina-comunidade .ranking-nota{font-size:12px;color:var(--cinza);margin-top:10px}
-.pagina-comunidade .ranking-nota b{color:var(--cinza-claro)}
-.pagina-comunidade .especialista{display:flex;align-items:center;gap:12px;padding:8px 0}
-.pagina-comunidade .esp-status{position:relative}
-.pagina-comunidade .esp-status .online-dot{
-  position:absolute;right:0;bottom:0;width:10px;height:10px;border-radius:50%;
-  background:var(--verde);border:2px solid var(--carvao);
-}
-.pagina-comunidade .especialista b{display:block;font-size:13.5px;font-weight:620}
-.pagina-comunidade .especialista span{font-size:11.5px;color:var(--cinza)}
-.pagina-comunidade .bloco-r.evento{
-  border:1px solid rgba(32,217,166,.25);border-radius:18px;
-  background:radial-gradient(100% 120% at 90% 0%,rgba(32,217,166,.1),transparent 55%),linear-gradient(160deg,#0D1310,#090C0A);
-  padding:var(--s-4);
-}
-.pagina-comunidade .bloco-r.evento .selo-vivo{
-  display:inline-flex;align-items:center;gap:7px;
-  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--verde);margin-bottom:10px;
-}
-.pagina-comunidade .bloco-r.evento .selo-vivo .ponto{width:6px;height:6px;border-radius:50%;background:var(--verde);animation:piscaCom 2s ease-in-out infinite}
-.pagina-comunidade .bloco-r.evento b{font-size:15.5px;font-weight:660;letter-spacing:-.015em;display:block;line-height:1.3;margin-bottom:4px}
-.pagina-comunidade .bloco-r.evento span{font-size:12.5px;color:var(--cinza);display:block;margin-bottom:var(--s-3)}
-.pagina-comunidade .bloco-r.evento .btn{width:100%;justify-content:center;min-height:42px;padding:10px}
-.pagina-comunidade .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s var(--suave),transform .7s var(--suave)}
-.pagina-comunidade .reveal.visivel{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){
-  .pagina-comunidade *,.pagina-comunidade *::before,.pagina-comunidade *::after{animation:none!important;transition:none!important}
-  .pagina-comunidade .reveal{opacity:1;transform:none}
-}
-
-
-
-/* ============================================================
    PERITOS ACADEMY — PERFIL (escopado em .pagina-perfil)
    ============================================================ */
 .pagina-perfil{
@@ -4925,19 +4629,6 @@ body.teatro .trilho-aulas{display:none}
   background:var(--ouroCom);
   box-shadow:0 0 10px rgba(212,169,78,.6);
 }
-.pagina-comunidade .turma{
-  display:block; padding:13px 14px; border-radius:12px;
-  background:linear-gradient(135deg, rgba(212,169,78,.1), rgba(212,169,78,.03));
-  border:1px solid rgba(212,169,78,.22);
-  text-decoration:none; color:var(--textoCom);
-  transition:border-color .18s ease, transform .18s ease;
-}
-.pagina-comunidade .turma:hover{
-  border-color:rgba(212,169,78,.45); transform:translateY(-1px);
-}
-.pagina-comunidade .turma b{ display:block; font-size:.9rem; margin-bottom:3px; }
-.pagina-comunidade .turma .num{ font-size:.76rem; color:var(--suaveCom); }
-
 /* ---------- avatar genérico ---------- */
 .pagina-comunidade .foto-p{
   flex:none; width:40px; height:40px; border-radius:50%;
@@ -5052,10 +4743,11 @@ body.teatro .trilho-aulas{display:none}
 .pagina-comunidade .post h3{
   margin:0 0 8px; font-size:1.06rem; font-weight:700; line-height:1.35;
 }
-.pagina-comunidade .post h3 a{
-  color:var(--textoCom); text-decoration:none; transition:color .18s ease;
+.pagina-comunidade .post h3 button{
+  background:none; border:none; padding:0; font:inherit; text-align:left; cursor:pointer;
+  color:var(--textoCom); transition:color .18s ease;
 }
-.pagina-comunidade .post h3 a:hover{ color:var(--ouro2Com); }
+.pagina-comunidade .post h3 button:hover{ color:var(--ouro2Com); }
 .pagina-comunidade .post > p{
   margin:0 0 14px; font-size:.92rem; line-height:1.6; color:var(--suaveCom);
 }
@@ -5099,6 +4791,14 @@ body.teatro .trilho-aulas{display:none}
 }
 .pagina-comunidade .corpo-r p{
   margin:0; font-size:.86rem; line-height:1.55; color:var(--suaveCom);
+}
+
+/* lista de comentários (clique no título do post expande/colapsa) */
+.pagina-comunidade .comentarios-lista{
+  display:flex; flex-direction:column; gap:10px; margin-bottom:14px;
+}
+.pagina-comunidade .comentarios-vazio{
+  font-size:.84rem; color:var(--apagadoCom); margin:0 0 14px;
 }
 
 /* ações do post */
@@ -5216,9 +4916,6 @@ body.teatro .trilho-aulas{display:none}
   font-size:.84rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .pagina-comunidade .rk-txt span{ font-size:.72rem; color:var(--apagadoCom); }
-.pagina-comunidade .var{ flex:none; font-size:.72rem; font-weight:800; }
-.pagina-comunidade .var.sobe{ color:var(--verdeCom); }
-.pagina-comunidade .var.desce{ color:var(--vermCom); }
 .pagina-comunidade .ranking-nota{
   margin:12px 0 0; padding-top:12px; border-top:1px solid var(--bordaCom);
   font-size:.76rem; color:var(--apagadoCom); line-height:1.5;
@@ -5233,11 +4930,6 @@ body.teatro .trilho-aulas{display:none}
   border-top:1px solid var(--bordaCom);
 }
 .pagina-comunidade .esp-status{ position:relative; width:36px; height:36px; font-size:.7rem; }
-.pagina-comunidade .online-dot{
-  position:absolute; right:-1px; bottom:-1px;
-  width:10px; height:10px; border-radius:50%;
-  background:var(--verdeCom); border:2px solid var(--painelCom);
-}
 .pagina-comunidade .especialista > span:last-child{
   display:flex; flex-direction:column; gap:1px; min-width:0;
 }
@@ -5261,7 +4953,6 @@ body.teatro .trilho-aulas{display:none}
   .pagina-comunidade .espacos a{ white-space:nowrap; }
   .pagina-comunidade .espacos .qtd,
   .pagina-comunidade .novo-ponto{ margin-left:6px; }
-  .pagina-comunidade .turma{ display:none; }
   .pagina-comunidade .topo{ padding-top:96px; }
   .pagina-comunidade .topo-stats{ gap:16px; }
   .pagina-comunidade .compor{ padding:14px; }
