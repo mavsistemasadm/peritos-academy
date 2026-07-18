@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
 import type { CursoCard, DadosBibliotecaCursos, TrilhaSecao } from '@/lib/queries/cursos-biblioteca'
-import { IconeSearch, IconeClose, IconeChevronRight, IconeBookOpen } from '@/components/Icones'
+import { IconeSearch, IconeClose, IconeBookOpen } from '@/components/Icones'
 
 function fmtDuracao(seg: number) {
   const h = Math.floor(seg / 3600)
@@ -59,7 +59,7 @@ function CardCurso({ c }: { c: CursoCard }) {
 }
 
 export default function CursosBibliotecaContent({ dados, nav }: { dados: DadosBibliotecaCursos; nav: DadosNav }) {
-  const { hero, continuar, trilhas, totalCursos } = dados
+  const { continuar, trilhas, totalCursos } = dados
   const [buscaInput, setBuscaInput] = useState('')
   const [busca, setBusca] = useState('')
 
@@ -88,29 +88,11 @@ export default function CursosBibliotecaContent({ dados, nav }: { dados: DadosBi
       <div className="grao" aria-hidden="true"></div>
       <NavPlataforma dados={nav} ativo="trilhas" />
 
-      {hero && (
-        <section className="bc-hero-destaque">
-          <img className="bc-hero-bg" src={hero.capa_url ?? ''} alt="" />
-          <div className="bc-hero-overlay"></div>
-          <div className="wrap bc-hero-conteudo">
-            <span className="eyebrow">CURSO EM DESTAQUE</span>
-            <h1>{hero.titulo}</h1>
-            {hero.subtitulo && <p className="bc-hero-desc">{hero.subtitulo}</p>}
-            <a className="btn btn-primario" href={`/curso/${hero.slug}`}>
-              Começar agora <IconeChevronRight size={16} />
-            </a>
-          </div>
-        </section>
-      )}
-
       <div className="wrap">
-        {!hero && (
-          <div className="bc-topo-simples">
-            <span className="eyebrow">PARA VOCÊ</span>
-            <h1>Escolhido para o seu momento.</h1>
-            <p className="bc-hero-sub">{totalCursos} cursos disponíveis · Evolua do fundamento à autoridade</p>
-          </div>
-        )}
+        <div className="bc-topo-simples">
+          <h1>Biblioteca de <span className="grad-txt">cursos</span></h1>
+          <p className="bc-topo-sub">{totalCursos} cursos disponíveis · Evolua do fundamento à autoridade</p>
+        </div>
 
         {continuar.length > 0 && (
           <section className="bc-continuar">
@@ -128,15 +110,6 @@ export default function CursosBibliotecaContent({ dados, nav }: { dados: DadosBi
           </div>
         ) : (
           <>
-            <nav className="bc-anchors" aria-label="Ir para trilha">
-              {trilhas.map(t => (
-                <a key={t.slug} href={`#trilha-${t.slug}`} className="bc-anchor-chip">
-                  {t.nome}
-                  <span className="bc-anchor-count num">{t.cursos.length}</span>
-                </a>
-              ))}
-            </nav>
-
             <div className="bc-busca">
               <IconeSearch size={16} strokeWidth={2} />
               <input
