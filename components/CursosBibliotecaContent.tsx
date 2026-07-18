@@ -1,11 +1,11 @@
 // components/CursosBibliotecaContent.tsx
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
-import type { DadosBibliotecaCursos, TrilhaAgrupada } from '@/lib/queries/cursos-biblioteca'
-import { IconeSearch, IconeClock, IconeUser } from '@/components/Icones'
+import type { CursoCard, DadosBibliotecaCursos, TrilhaSecao } from '@/lib/queries/cursos-biblioteca'
+import { IconeSearch, IconeClose, IconeChevronRight, IconeBookOpen } from '@/components/Icones'
 
 function fmtDuracao(seg: number) {
   const h = Math.floor(seg / 3600)
@@ -14,118 +14,170 @@ function fmtDuracao(seg: number) {
   return `${m}min`
 }
 
+function metaTxt(c: CursoCard) {
+  if (c.aulasCount === 0) return null
+  const aulasTxt = `${c.aulasCount} ${c.aulasCount === 1 ? 'aula' : 'aulas'}`
+  return c.duracaoSeg > 0 ? `${aulasTxt} · ${fmtDuracao(c.duracaoSeg)}` : aulasTxt
+}
+
+function normalizar(s: string) {
+  return s
+    .normalize('NFD')
+    .split('')
+    .filter(ch => {
+      const code = ch.charCodeAt(0)
+      return code < 0x0300 || code > 0x036f
+    })
+    .join('')
+    .toLowerCase()
+}
+
+function CardCurso({ c }: { c: CursoCard }) {
+  const meta = metaTxt(c)
+  return (
+    <a className="bc-card" href={`/curso/${c.slug}`}>
+      <div className="bc-card-capa">
+        {c.capa_url ? (
+          <img src={c.capa_url} alt="" loading="lazy" />
+        ) : (
+          <div className="bc-card-placeholder">
+            <span>{c.titulo.slice(0, 2).toUpperCase()}</span>
+          </div>
+        )}
+        {c.nivel && <span className="bc-card-nivel" data-nivel={c.nivel.toLowerCase()}>{c.nivel}</span>}
+        {c.progresso !== null && c.progresso > 0 && (
+          <div className="bc-card-barra-wrap"><i style={{ width: `${c.progresso}%` }}></i></div>
+        )}
+      </div>
+      <div className="bc-card-body">
+        <h3>{c.titulo}</h3>
+        {c.subtitulo && <p className="bc-card-sub">{c.subtitulo}</p>}
+        {meta && <div className="bc-card-meta num"><span>{meta}</span></div>}
+      </div>
+    </a>
+  )
+}
+
 export default function CursosBibliotecaContent({ dados, nav }: { dados: DadosBibliotecaCursos; nav: DadosNav }) {
-  const { trilhas, totalCursos } = dados
-  const [trilhaAtiva, setTrilhaAtiva] = useState<string>(trilhas[0]?.slug ?? '')
+  const { hero, continuar, trilhas, totalCursos } = dados
+  const [buscaInput, setBuscaInput] = useState('')
   const [busca, setBusca] = useState('')
 
-  const trilhaSel = trilhas.find(t => t.slug === trilhaAtiva) ?? trilhas[0]
+  useEffect(() => {
+    const t = setTimeout(() => setBusca(buscaInput), 150)
+    return () => clearTimeout(t)
+  }, [buscaInput])
 
-  // filtra por busca
-  const etapasFiltradas = trilhaSel
-    ? trilhaSel.etapas.map(e => ({
-        ...e,
-        cursos: e.cursos.filter(c =>
-          !busca.trim() ||
-          c.titulo.toLowerCase().includes(busca.toLowerCase()) ||
-          (c.subtitulo ?? '').toLowerCase().includes(busca.toLowerCase())
+  const buscaNorm = normalizar(busca.trim())
+
+  const trilhasFiltradas: TrilhaSecao[] = useMemo(() => {
+    if (!buscaNorm) return trilhas
+    return trilhas
+      .map(t => ({
+        ...t,
+        cursos: t.cursos.filter(c =>
+          normalizar(c.titulo).includes(buscaNorm) ||
+          (c.subtitulo && normalizar(c.subtitulo).includes(buscaNorm))
         ),
-      })).filter(e => e.cursos.length > 0)
-    : []
+      }))
+      .filter(t => t.cursos.length > 0)
+  }, [trilhas, buscaNorm])
 
   return (
     <div className="pagina-bib-cursos">
       <div className="grao" aria-hidden="true"></div>
       <NavPlataforma dados={nav} ativo="trilhas" />
 
-      <div className="bc-hero">
-        <div className="wrap">
-          <span className="eyebrow">PARA VOCÊ</span>
-          <h1>Escolhido para o seu momento.</h1>
-          <p className="bc-hero-sub">{totalCursos} cursos disponíveis · Evolua do fundamento à autoridade</p>
-        </div>
-      </div>
+      {hero && (
+        <section className="bc-hero-destaque">
+          <img className="bc-hero-bg" src={hero.capa_url ?? ''} alt="" />
+          <div className="bc-hero-overlay"></div>
+          <div className="wrap bc-hero-conteudo">
+            <span className="eyebrow">CURSO EM DESTAQUE</span>
+            <h1>{hero.titulo}</h1>
+            {hero.subtitulo && <p className="bc-hero-desc">{hero.subtitulo}</p>}
+            <a className="btn btn-primario" href={`/curso/${hero.slug}`}>
+              Começar agora <IconeChevronRight size={16} />
+            </a>
+          </div>
+        </section>
+      )}
 
       <div className="wrap">
-        {/* abas de trilhas */}
-        <div className="bc-trilhas-nav">
-          {trilhas.map(t => (
-            <button
-              key={t.slug}
-              className={`bc-trilha-tab${t.slug === trilhaAtiva ? ' ativa' : ''}`}
-              onClick={() => setTrilhaAtiva(t.slug)}
-            >
-              {t.nome}
-              <span className="bc-trilha-count num">{t.etapas.reduce((s, e) => s + e.cursos.length, 0)}</span>
-            </button>
-          ))}
-        </div>
-
-{/* descrição da trilha */}
-        {trilhaSel?.descricao && (
-          <p className="bc-trilha-desc">{trilhaSel.descricao}</p>
+        {!hero && (
+          <div className="bc-topo-simples">
+            <span className="eyebrow">PARA VOCÊ</span>
+            <h1>Escolhido para o seu momento.</h1>
+            <p className="bc-hero-sub">{totalCursos} cursos disponíveis · Evolua do fundamento à autoridade</p>
+          </div>
         )}
 
-        {/* busca */}
-        <div className="bc-busca">
-          <IconeSearch size={16} strokeWidth={2} />
-          <input
-            type="text"
-            placeholder="Buscar curso..."
-            value={busca}
-            onChange={e => setBusca(e.target.value)}
-          />
-        </div>
+        {continuar.length > 0 && (
+          <section className="bc-continuar">
+            <h2>Continue de onde parou</h2>
+            <div className="bc-grade">
+              {continuar.map(c => <CardCurso key={c.id} c={c} />)}
+            </div>
+          </section>
+        )}
 
-        {/* etapas e cursos */}
-        {etapasFiltradas.length === 0 ? (
-          <p className="bc-vazio">Nenhum curso encontrado{busca ? ` para "${busca}"` : ''}.</p>
+        {trilhas.length === 0 ? (
+          <div className="bc-vazio-geral">
+            <IconeBookOpen size={28} />
+            <p>Ainda não há cursos publicados. Volte em breve.</p>
+          </div>
         ) : (
-          etapasFiltradas.map(etapa => (
-            <section className="bc-etapa" key={etapa.nome}>
-           <div className="bc-etapa-cab">
-                <div className="bc-etapa-marker"></div>
-                <div className="bc-etapa-textos">
-                  <div className="bc-etapa-topo">
-                    <h2>{etapa.nome}</h2>
-                    <span className="bc-etapa-count num">{etapa.cursos.length} {etapa.cursos.length === 1 ? 'curso' : 'cursos'}</span>
-                  </div>
-                  {etapa.descricao && <p className="bc-etapa-desc">{etapa.descricao}</p>}
-                </div>
-              </div>
+          <>
+            <nav className="bc-anchors" aria-label="Ir para trilha">
+              {trilhas.map(t => (
+                <a key={t.slug} href={`#trilha-${t.slug}`} className="bc-anchor-chip">
+                  {t.nome}
+                  <span className="bc-anchor-count num">{t.cursos.length}</span>
+                </a>
+              ))}
+            </nav>
 
-              <div className="bc-grade">
-                {etapa.cursos.map(c => (
-                  <a className="bc-card" key={c.id} href={`/curso/${c.slug}`}>
-                    <div className="bc-card-capa">
-                      {c.capa_url ? (
-                        <img src={c.capa_url} alt="" loading="lazy" />
-                      ) : (
-                        <div className="bc-card-placeholder">
-                          <span>{c.titulo.slice(0, 2).toUpperCase()}</span>
-                        </div>
-                      )}
-                      {c.progresso !== null && c.progresso > 0 && (
-                        <div className="bc-card-progresso">
-                          <div className="bc-card-barra"><i style={{ width: `${c.progresso}%` }}></i></div>
-                          <span className="num">{c.progresso}%</span>
-                        </div>
-                      )}
-{c.nivel && <span className="bc-card-nivel" data-nivel={c.nivel.toLowerCase()}>{c.nivel}</span>}
-                    </div>
-                    <div className="bc-card-body">
-                      <h3>{c.titulo}</h3>
-                      {c.subtitulo && <p className="bc-card-sub">{c.subtitulo}</p>}
-                      <div className="bc-card-meta num">
-                        {c.duracao_seg > 0 && <span><IconeClock size={12} /> {fmtDuracao(c.duracao_seg)}</span>}
-                        {c.instrutor_nome && <span><IconeUser size={12} /> {c.instrutor_nome}</span>}
-                      </div>
-                    </div>
-                  </a>
-                ))}
+            <div className="bc-busca">
+              <IconeSearch size={16} strokeWidth={2} />
+              <input
+                type="text"
+                placeholder="Buscar curso por título ou descrição..."
+                value={buscaInput}
+                onChange={e => setBuscaInput(e.target.value)}
+              />
+              {buscaInput && (
+                <button type="button" className="bc-busca-limpar" onClick={() => setBuscaInput('')} aria-label="Limpar busca">
+                  <IconeClose size={14} />
+                </button>
+              )}
+            </div>
+
+            {trilhasFiltradas.length === 0 ? (
+              <div className="bc-vazio">
+                <p>Nenhum curso encontrado para &quot;{busca}&quot;.</p>
+                <button type="button" className="btn btn-fantasma" onClick={() => setBuscaInput('')}>Limpar busca</button>
               </div>
-            </section>
-          ))
+            ) : (
+              trilhasFiltradas.map(t => (
+                <section className="bc-trilha-secao" id={`trilha-${t.slug}`} key={t.slug}>
+                  <div className="bc-trilha-cab">
+                    <div className="bc-trilha-marker"></div>
+                    <div className="bc-trilha-textos">
+                      <div className="bc-trilha-topo">
+                        <h2>{t.nome}</h2>
+                        <span className="bc-trilha-count num">{t.cursos.length} {t.cursos.length === 1 ? 'curso' : 'cursos'}</span>
+                      </div>
+                      {t.descricao && <p className="bc-trilha-desc">{t.descricao}</p>}
+                    </div>
+                  </div>
+
+                  <div className="bc-grade">
+                    {t.cursos.map(c => <CardCurso key={c.id} c={c} />)}
+                  </div>
+                </section>
+              ))
+            )}
+          </>
         )}
       </div>
     </div>
