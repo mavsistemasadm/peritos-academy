@@ -271,13 +271,6 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
                 <span className="r">missões da jornada</span>
                 <span className="sub">Etapa {String(d.etapa).padStart(2, '0')} em andamento</span>
               </div>
-              {d.rankingPos != null && (
-                <div className="n-item">
-                  <span className="v">#{d.rankingPos}</span>
-                  <span className="r">ranking da semana</span>
-                  <span className="sub"><b>{(d.rankingVar ?? 0) >= 0 ? <><IconeArrowUp size={11} />{d.rankingVar}</> : <><IconeArrowUp size={11} style={{ transform: 'rotate(180deg)' }} />{Math.abs(d.rankingVar ?? 0)}</>}</b> posições</span>
-                </div>
-              )}
               <div className="n-item">
                 <span className="v">{d.anotacoes}</span>
                 <span className="r">anotações feitas</span>

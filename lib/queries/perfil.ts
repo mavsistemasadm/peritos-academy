@@ -60,8 +60,6 @@ export type DadosPerfil = {
   estudoSemana: string
   missoesFeitas: number
   missoesTotal: number
-  rankingPos: number | null
-  rankingVar: number | null
   anotacoes: number
   heatmap: number[]
   diasEstudados: number
@@ -97,7 +95,6 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     { data: insigniasRaw },
     { data: certsRaw },
     { data: atividadesRaw },
-    { data: rankingVoce },
     { count: anotacoes },
     { data: emailPref },
   ] = await Promise.all([
@@ -106,7 +103,6 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     supabase.from('perfil_insignias').select('*').order('ordem'),
     supabase.from('certificados').select('*').order('ordem'),
     supabase.from('perfil_atividades').select('*').order('quando', { ascending: false }).limit(8),
-    supabase.from('comunidade_ranking').select('posicao, variacao').eq('eh_voce', true).maybeSingle(),
     supabase.from('aula_anotacoes').select('id', { count: 'exact', head: true }),
     supabase.from('email_preferencias').select('receber_emails').eq('usuario_id', auth.user.id).maybeSingle(),
   ])
@@ -187,8 +183,6 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     estudoSemana: fmtHoras(perfil.estudo_semana_seg ?? 0),
     missoesFeitas: perfil.missoes_feitas ?? 0,
     missoesTotal: perfil.missoes_total ?? 21,
-    rankingPos: rankingVoce?.posicao ?? null,
-    rankingVar: rankingVoce?.variacao ?? null,
     anotacoes: anotacoes ?? 0,
     heatmap,
     diasEstudados,
