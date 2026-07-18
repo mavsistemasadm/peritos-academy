@@ -24,6 +24,7 @@ export default async function PaginaCurso({
       modulos={dados.modulos}
       conquistas={dados.conquistas}
       relacionados={dados.relacionados}
+      progresso={dados.progresso}
       nav={nav}
     />
   );
