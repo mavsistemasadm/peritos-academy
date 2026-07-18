@@ -60,7 +60,9 @@ export default function LoginContent({ selos, nomePlataforma, logoUrl, paginaIni
         <div className="painel-selos num">
           <div className="selo"><b>{fmtNum(selos.membros)}</b><span>peritos na comunidade</span></div>
           <div className="selo"><b>{selos.missoes}</b><span>missões na jornada</span></div>
-          <div className="selo"><b>{selos.casos}</b><span>casos resolvidos esta semana</span></div>
+          {selos.casos > 0 && (
+            <div className="selo"><b>{selos.casos}</b><span>casos resolvidos esta semana</span></div>
+          )}
         </div>
       </section>
 
