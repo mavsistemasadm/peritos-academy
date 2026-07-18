@@ -454,9 +454,9 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter }: Props
                             </p>
                             {g.parecer && (
                               <div className="parecer">
-                                <span className="foto" aria-hidden="true">FM</span>
+                                <span className="foto" aria-hidden="true">PA</span>
                                 <div className="parecer-corpo">
-                                  <div className="quem"><b>Fábio Mendes</b><span className="selo-esp">Especialista</span></div>
+                                  <div className="quem"><b>Equipe Peritos Academy</b></div>
                                   <p>{g.parecer}</p>
                                   {(g.aula_ref || g.aula_id) && (
                                     <Link
