@@ -155,11 +155,19 @@ function Contagem({ alvoIso }: { alvoIso: string }) {
 
 // ---------- modal do produtor ----------
 const TIPOS: Evento['tipo'][] = ['sala_analise', 'aula_ao_vivo', 'plantao', 'mentoria', 'lancamento']
+function fmtNum(n: number) {
+  return n.toLocaleString('pt-BR')
+}
+
+// Só "todos" tem alcance real hoje (mesma fonte do header da Comunidade).
+// Os outros 3 modos ainda não têm uma contagem real por trás (não existe
+// conceito de "turma" no schema, e alcance por curso/assinatura exigiria
+// uma query nova por seleção) — ver pendência no resumo da tarefa.
 const VIS_OPS = [
-  { vis: 'todos' as const, b: 'Todos os membros', s: 'Visível para toda a base ativa', alcance: '3.128 membros', chips: null },
-  { vis: 'curso' as const, b: 'Alunos de um curso', s: 'Só quem tem o curso escolhido', alcance: '612 alunos com o curso ativo', chips: ['Segredos bancários', 'RMC e RCC', 'Precatórios', 'PETROS'] },
-  { vis: 'assinatura' as const, b: 'Tipo de assinatura', s: 'Segmentar por plano', alcance: '948 assinantes Premium', chips: ['Premium', 'Essencial', 'Kit Bancário'] },
-  { vis: 'turma' as const, b: 'Turma específica', s: 'A mentoria fechada daquela turma', alcance: '214 alunos da turma', chips: ['Kit Bancário 2026', 'Kit Bancário 2025'] },
+  { vis: 'todos' as const, b: 'Todos os membros', s: 'Visível para toda a base ativa', chips: null },
+  { vis: 'curso' as const, b: 'Alunos de um curso', s: 'Só quem tem o curso escolhido', chips: ['Segredos bancários', 'RMC e RCC', 'Precatórios', 'PETROS'] },
+  { vis: 'assinatura' as const, b: 'Tipo de assinatura', s: 'Segmentar por plano', chips: ['Premium', 'Essencial', 'Kit Bancário'] },
+  { vis: 'turma' as const, b: 'Turma específica', s: 'A mentoria fechada daquela turma', chips: ['Kit Bancário 2026', 'Kit Bancário 2025'] },
 ]
 function rotuloAlvo(vis: NovoEvento['visibilidade'], chip: string | null) {
   if (vis === 'todos' || !chip) return null
@@ -168,8 +176,8 @@ function rotuloAlvo(vis: NovoEvento['visibilidade'], chip: string | null) {
   return chip
 }
 
-function ModalNovoEvento({ aberto, fechar, aoPublicar }:
-  { aberto: boolean; fechar: () => void; aoPublicar: (alcance: string) => void }) {
+function ModalNovoEvento({ aberto, fechar, aoPublicar, totalPeritos }:
+  { aberto: boolean; fechar: () => void; aoPublicar: (alcance: string) => void; totalPeritos: number }) {
   const [titulo, setTitulo] = useState('')
   const [tipo, setTipo] = useState<Evento['tipo']>('sala_analise')
   const [data, setData] = useState('15/07/2026')
@@ -198,7 +206,7 @@ function ModalNovoEvento({ aberto, fechar, aoPublicar }:
         alvoRotulo: rotuloAlvo(op.vis, chips[visIdx] ?? null),
         gravar: togs[0], lembrete: togs[1], publicarFeed: togs[2],
       })
-      if (r.ok) { aoPublicar(op.alcance); fechar() }
+      if (r.ok) { aoPublicar(op.vis === 'todos' ? `${fmtNum(totalPeritos)} peritos` : 'público selecionado'); fechar() }
       else alert(r.erro)
     })
   }
@@ -284,7 +292,11 @@ function ModalNovoEvento({ aberto, fechar, aoPublicar }:
           <span className="olho" aria-hidden="true">
             <IconeEye size={16} strokeWidth={2} />
           </span>
-          <p>Este evento ficará visível para <b className="num">{op.alcance}</b>{op.vis !== 'todos' && <>, e aparecerá com o selo de exclusividade</>}.</p>
+          <p>
+            {op.vis === 'todos'
+              ? <>Este evento ficará visível para <b className="num">{fmtNum(totalPeritos)} peritos</b>.</>
+              : <>Este evento ficará visível só para o público selecionado, e aparecerá com o selo de exclusividade.</>}
+          </p>
         </div>
 
         <div className="toggles">
@@ -309,7 +321,7 @@ function ModalNovoEvento({ aberto, fechar, aoPublicar }:
 // PÁGINA
 // ============================================================
 export default function AgendaContent({ dados, nav }: { dados: DadosAgenda; nav: DadosNav }) {
-      const { usuarioNome, aoVivo, proximos, gravacoes } = dados
+  const { usuarioNome, aoVivo, proximos, gravacoes, totalPeritos } = dados
   const [filtro, setFiltro] = useState('Tudo')
   const [modal, setModal] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
@@ -472,7 +484,7 @@ export default function AgendaContent({ dados, nav }: { dados: DadosAgenda; nav:
         Novo evento
       </button>
 
-      <ModalNovoEvento aberto={modal} fechar={() => setModal(false)} aoPublicar={disparaToast} />
+      <ModalNovoEvento aberto={modal} fechar={() => setModal(false)} aoPublicar={disparaToast} totalPeritos={totalPeritos} />
 
       {/* toast */}
       <div className={`toast${toast ? ' visivel' : ''}`} role="status">
