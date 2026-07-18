@@ -229,7 +229,6 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
             <aside className="painel painel-com reveal">
               <div className="cab">
                 <h3>Peritos em movimento.</h3>
-                {d.online > 0 && <span className="online num"><span className="ponto" aria-hidden="true"></span>{d.online} online</span>}
               </div>
               {d.movimento.length > 0 ? (
                 <ul className="mov">

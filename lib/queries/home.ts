@@ -67,7 +67,6 @@ export type DadosHome = {
     titulo: string; descricao: string | null
     apresentador: string; apresentadorIniciais: string; horaRotulo: string
   } | null
-  online: number
   movimento: MovItem[]
   // tour guiado de boas-vindas
   mostrarTourInicial: boolean       // true só na primeira visita (perfis.tour_visto_em IS NULL)
@@ -116,7 +115,6 @@ export async function carregarHome(): Promise<DadosHome | null> {
     { data: cursosRaw },
     { data: modulosRaw },
     { data: postsRaw },
-    { data: config },
     { data: niveis },
     { data: saldo },
     jornada,
@@ -126,7 +124,6 @@ export async function carregarHome(): Promise<DadosHome | null> {
     supabase.from('cursos').select('id, slug, titulo, capa_url, capa_vertical_url, capa_horizontal_url, atualizado_em').eq('publicado', true).order('atualizado_em', { ascending: false }),
     supabase.from('modulos').select('id, curso_id, ordem').order('ordem', { ascending: true }),
     supabase.from('comunidade_posts').select('*').order('criado_em', { ascending: false }).limit(3),
-    supabase.from('comunidade_config').select('*').eq('id', 1).maybeSingle(),
     supabase.from('gamificacao_niveis').select('nome, pontos_minimos, ordem').order('ordem', { ascending: true }),
     supabase.from('gamificacao_saldo').select('xp_total, moedas_total').eq('usuario_id', uid).maybeSingle(),
     carregarJornada(),
@@ -334,7 +331,6 @@ export async function carregarHome(): Promise<DadosHome | null> {
             : `${ehHoje(eventoLiveRaw.inicia_em) ? 'Hoje' : fmtDiaCurto.format(new Date(eventoLiveRaw.inicia_em))} · ${fmtHora.format(new Date(eventoLiveRaw.inicia_em)).replace(':', 'h')}`,
         }
       : null,
-    online: config?.online_agora ?? 0,
     movimento,
     mostrarTourInicial: !perfil.tour_visto_em,
     tourPrimeiraAulaHref: jornada.painelFormacao?.continuarHref ?? jornada.trilhaProtagonistaHome.continuarHref ?? '/jornada',
