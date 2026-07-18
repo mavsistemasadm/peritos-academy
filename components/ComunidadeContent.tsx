@@ -1,5 +1,4 @@
 // components/ComunidadeContent.tsx
-// Réplica fiel do template aprovado, 100% plugada no banco.
 'use client'
 
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
@@ -49,6 +48,7 @@ const IcoSalvar = () => <IconeBookmark size={15} strokeWidth={2} />
 function CardPost({ post }: { post: Post }) {
   const [util, setUtil] = useState({ ativo: post.jaUtil, qtd: post.uteis })
   const [salvo, setSalvo] = useState(post.jaSalvo)
+  const [comentariosAbertos, setComentariosAbertos] = useState(false)
   const [, start] = useTransition()
 
   const tag = post.respondida ? TAG.respondida : TAG[post.tipo] ?? TAG.caso
@@ -66,7 +66,13 @@ function CardPost({ post }: { post: Post }) {
         </div>
         <span className={tag.classe}>{tag.rotulo}</span>
       </div>
-      {post.titulo && <h3><a href="#">{post.titulo}</a></h3>}
+      {post.titulo && (
+        <h3>
+          <button type="button" aria-expanded={comentariosAbertos} onClick={() => setComentariosAbertos(v => !v)}>
+            {post.titulo}
+          </button>
+        </h3>
+      )}
       {post.corpo && <p>{post.corpo}</p>}
 
       {post.melhorResposta && (
@@ -82,6 +88,26 @@ function CardPost({ post }: { post: Post }) {
         </div>
       )}
 
+      {comentariosAbertos && (
+        <div className="comentarios-lista">
+          {post.outrosComentarios.length === 0 && !post.melhorResposta && (
+            <p className="comentarios-vazio">Nenhum comentário ainda.</p>
+          )}
+          {post.outrosComentarios.map(c => (
+            <div className="melhor-resposta" key={c.id}>
+              <span className="foto-p" aria-hidden="true">{iniciais(c.autor_nome)}</span>
+              <div className="corpo-r">
+                <div className="quem-r">
+                  <b>{c.autor_nome}</b>
+                  {c.autor_selo && <span className="selo-esp">{c.autor_selo}</span>}
+                </div>
+                <p>{c.corpo}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="post-acoes">
         <button className={`acao util${util.ativo ? ' feita' : ''}`}
           onClick={() => start(async () => {
@@ -91,7 +117,9 @@ function CardPost({ post }: { post: Post }) {
           })}>
           <IcoUtil /> Útil · <span className="num">{util.qtd}</span>
         </button>
-        <button className="acao">
+        <button className={`acao${comentariosAbertos ? ' feita' : ''}`}
+          aria-expanded={comentariosAbertos}
+          onClick={() => setComentariosAbertos(v => !v)}>
           <IcoComent /> <span className="num">{post.comentarios}</span> comentários
         </button>
         <button className={`acao${salvo ? ' feita' : ''}`}
@@ -139,7 +167,7 @@ function CardVitoria({ post }: { post: Post }) {
 // PÁGINA
 // ============================================================
 export default function ComunidadeContent({ dados, nav }: { dados: DadosComunidade; nav: DadosNav }) {
-  const { usuarioNome, espacos, posts, ranking, especialistas, eventoProximo, config } = dados
+  const { usuarioNome, espacos, posts, ranking, eventoProximo, metricas } = dados
 
   const [espacoAtivo, setEspacoAtivo] = useState<string | null>(null)
   const [filtro, setFiltro] = useState('Em alta')
@@ -199,9 +227,10 @@ export default function ComunidadeContent({ dados, nav }: { dados: DadosComunida
               <h1>Peritos em <span className="grad-txt">movimento.</span></h1>
             </div>
             <div className="topo-stats num">
-              <div className="t-stat"><span className="ponto" aria-hidden="true"></span><div><b>{fmtNum(config.online_agora)}</b> <span>online agora</span></div></div>
-              <div className="t-stat"><div><b>{fmtNum(config.membros_total)}</b> <span>peritos na comunidade</span></div></div>
-              <div className="t-stat"><div><b>{config.casos_semana}</b> <span>casos resolvidos esta semana</span></div></div>
+              <div className="t-stat"><div><b>{fmtNum(metricas.totalPeritos)}</b> <span>peritos na comunidade</span></div></div>
+              {metricas.postsSemana > 0 && (
+                <div className="t-stat"><div><b>{metricas.postsSemana}</b> <span>publicações esta semana</span></div></div>
+              )}
             </div>
           </div>
         </div>
@@ -228,13 +257,6 @@ export default function ComunidadeContent({ dados, nav }: { dados: DadosComunida
                   </li>
                 ))}
               </ul>
-              <span className="rail-titulo">Minha turma</span>
-              <a className="turma" href="#">
-                <span>
-                  <b>Kit Bancário Profissional</b>
-                  <span className="num">Turma 2026 · 214 colegas</span>
-                </span>
-              </a>
             </aside>
 
             {/* FEED */}
@@ -291,33 +313,38 @@ export default function ComunidadeContent({ dados, nav }: { dados: DadosComunida
               <div className="bloco-r reveal">
                 <div className="bloco-r-cab">
                   <span className="rail-titulo">Ranking da semana</span>
-                  <a href="#">Ver completo</a>
                 </div>
-                <ol className="ranking num">
-                  {ranking.map(r => (
-                    <li key={r.posicao} className={`rk${r.eh_voce ? ' voce' : ''}`}>
-                      <span className="pos">{r.posicao}</span>
-                      <span className="foto-p" aria-hidden="true">{r.iniciais}</span>
-                      <span className="rk-txt"><b>{r.eh_voce ? 'Você' : r.nome}</b><span>{fmtNum(r.xp)} XP</span></span>
-                      <span className={`var ${r.variacao >= 0 ? 'sobe' : 'desce'}`}>
-                        {r.variacao >= 0 ? `▲${r.variacao}` : `▼${Math.abs(r.variacao)}`}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
-                <p className="ranking-nota num">Faltam <b>184 XP</b> para a posição 20 · o ranking renova em 2 dias</p>
+                {ranking.aberto ? (
+                  <ol className="ranking num">
+                    {ranking.linhas.map(r => (
+                      <li key={r.posicao} className={`rk${r.eh_voce ? ' voce' : ''}`}>
+                        <span className="pos">{r.posicao}</span>
+                        <span className="foto-p" aria-hidden="true">{r.iniciais}</span>
+                        <span className="rk-txt"><b>{r.eh_voce ? 'Você' : r.nome}</b><span>{fmtNum(r.xp)} XP</span></span>
+                      </li>
+                    ))}
+                  </ol>
+                ) : ranking.voce ? (
+                  <>
+                    <ol className="ranking num">
+                      <li className="rk voce">
+                        <span className="foto-p" aria-hidden="true">{ranking.voce.iniciais}</span>
+                        <span className="rk-txt"><b>Você</b><span>{fmtNum(ranking.voce.xp)} XP</span></span>
+                      </li>
+                    </ol>
+                    <p className="ranking-nota num">O ranking abre quando a comunidade aquecer. Garanta sua posição concluindo aulas e participando.</p>
+                  </>
+                ) : (
+                  <p className="ranking-nota num">O ranking abre quando a comunidade aquecer. Garanta sua posição concluindo aulas e participando.</p>
+                )}
               </div>
 
               <div className="bloco-r reveal">
-                <span className="rail-titulo">Especialistas agora</span>
-                {especialistas.map(esp => (
-                  <div className="especialista" key={esp.nome}>
-                    <span className="esp-status foto-p" aria-hidden="true">
-                      {esp.iniciais}{esp.online && <span className="online-dot"></span>}
-                    </span>
-                    <span><b>{esp.nome}</b><span>{esp.area}</span></span>
-                  </div>
-                ))}
+                <span className="rail-titulo">Fundador</span>
+                <div className="especialista">
+                  <span className="esp-status foto-p" aria-hidden="true">MH</span>
+                  <span><b>Marlos Henrique</b><span>Fundador · acompanha as dúvidas da comunidade</span></span>
+                </div>
               </div>
             </aside>
 
