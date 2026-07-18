@@ -77,6 +77,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
   const [notaTxt, setNotaTxt] = useState("");
   const [duvidaTxt, setDuvidaTxt] = useState("");
   const [segundosAssistidos, setSegundosAssistidos] = useState(dados.aula.segundosAssistidos);
+  const [videoTerminou, setVideoTerminou] = useState(dados.aula.videoTerminou);
   const [materiaisBaixados, setMateriaisBaixados] = useState<Set<string>>(new Set(dados.materiaisBaixadosIds));
   const [avisoVisivel, setAvisoVisivel] = useState(!!avisoBloqueio);
 
@@ -134,13 +135,13 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
     let ultimoTempo = 0;
     let ultimoPersist = 0;
 
-    const persistir = (forcar = false) => {
+    const persistir = (forcar = false, terminou = false) => {
       const agora = Date.now();
       if (!forcar && agora - ultimoPersist < 10000) return;
       ultimoPersist = agora;
-      sb().from("aula_progresso")
-        .upsert({ usuario_id: usuarioId, aula_id: aula.id, segundos_assistidos: Math.floor(segundosRef.current) })
-        .then(() => {});
+      const payload: Record<string, unknown> = { usuario_id: usuarioId, aula_id: aula.id, segundos_assistidos: Math.floor(segundosRef.current) };
+      if (terminou) payload.video_terminou = true;
+      sb().from("aula_progresso").upsert(payload).then(() => {});
     };
 
     const onMessage = (e: MessageEvent) => {
@@ -163,7 +164,8 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
         const novo = aula.duracaoSeg || segundosRef.current;
         segundosRef.current = novo;
         setSegundosAssistidos(novo);
-        persistir(true);
+        setVideoTerminou(true);
+        persistir(true, true);
       }
     };
 
@@ -175,8 +177,14 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
   }, [aula.id, aula.video_url, aula.duracaoSeg, usuarioId]);
 
   /* ---------- critérios de conclusão ---------- */
-  const pctVideo = aula.duracaoSeg > 0 ? Math.min(100, Math.round((segundosAssistidos / aula.duracaoSeg) * 100)) : 100;
-  const videoOk = !aula.video_url || aula.duracaoSeg === 0 || pctVideo >= 70;
+  // aulas.duracao_seg nulo/0 = Panda ainda não populou a duração (tarefa
+  // pendente à parte). Fallback: exige ter chegado no evento "ended" ao
+  // menos uma vez, em vez de liberar o requisito de vídeo inteiramente.
+  const duracaoConhecida = aula.duracaoSeg > 0;
+  const pctVideo = duracaoConhecida
+    ? Math.min(100, Math.round((segundosAssistidos / aula.duracaoSeg) * 100))
+    : (videoTerminou ? 100 : 0);
+  const videoOk = !aula.video_url || (duracaoConhecida ? pctVideo >= 70 : videoTerminou);
   const materiaisComArquivo = materiais.filter((m) => m.arquivo_url);
   const materiaisPendentes = materiaisComArquivo.filter((m) => !materiaisBaixados.has(m.id));
   const criteriosOk = videoOk && materiaisPendentes.length === 0;
@@ -245,6 +253,19 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
       }, 1000);
     }
   };
+
+  /* conclusão automática: dispara sozinha assim que o critério real é
+     cumprido (nunca pelo bypass de admin — isso continua exigindo clique
+     manual, pra visitar uma aula como admin não completar ela à toa). O
+     botão "Marcar como concluída" continua existindo como reforço/fallback,
+     mas some a necessidade de clicar no caminho normal do aluno. */
+  useEffect(() => {
+    if (!concluida && !concluindo && criteriosOk && usuarioId) {
+      marcarConcluida();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [criteriosOk, concluida, concluindo, usuarioId]);
+
   const fecharCertPopup = () => {
     sessionStorage.removeItem('cert-popup-aberto');
     setCertPopup(null);
@@ -426,7 +447,9 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
                           {videoOk ? <IconeCheck size={13} strokeWidth={2.4} /> : <IconePlay size={12} strokeWidth={2.2} />}
                         </span>
                         <span className="checklist-txt">Assistir a aula</span>
-                        <span className="checklist-valor num">{videoOk ? "concluído ✓" : `${pctVideo}% de 70%`}</span>
+                        <span className="checklist-valor num">
+                          {videoOk ? "concluído ✓" : duracaoConhecida ? `${pctVideo}% de 70%` : "assista até o fim"}
+                        </span>
                       </li>
                     )}
                     {materiaisComArquivo.map((m) => {

@@ -21,7 +21,7 @@ export type AulaCompleta = {
   aula: {
     id: string; titulo: string; ordem: number; duracaoSeg: number; xp: number;
     video_url: string | null; capa_url: string | null; sobre: string[];
-    concluida: boolean; bloqueada: boolean; segundosAssistidos: number;
+    concluida: boolean; bloqueada: boolean; segundosAssistidos: number; videoTerminou: boolean;
   };
   capitulos: Capitulo[];
   materiais: Material[];
@@ -84,8 +84,8 @@ export async function getAula(slug: string, aulaId: string): Promise<AulaComplet
       ? supabase.from("aula_progresso").select("aula_id").eq("usuario_id", userId).eq("concluida", true).in("aula_id", todas.map((a) => a.id))
       : Promise.resolve({ data: [] as { aula_id: string }[] }),
     userId
-      ? supabase.from("aula_progresso").select("segundos_assistidos").eq("usuario_id", userId).eq("aula_id", aulaId).maybeSingle()
-      : Promise.resolve({ data: null as { segundos_assistidos: number } | null }),
+      ? supabase.from("aula_progresso").select("segundos_assistidos, video_terminou").eq("usuario_id", userId).eq("aula_id", aulaId).maybeSingle()
+      : Promise.resolve({ data: null as { segundos_assistidos: number; video_terminou: boolean } | null }),
     userId
       ? supabase.from("aula_anotacoes").select("id, tempo_seg, texto, criada_em").eq("usuario_id", userId).eq("aula_id", aulaId).order("criada_em", { ascending: false })
       : Promise.resolve({ data: [] as Anotacao[] }),
@@ -100,6 +100,7 @@ export async function getAula(slug: string, aulaId: string): Promise<AulaComplet
 
   const concluidasSet = new Set(((progRes.data as any[]) ?? []).map((p) => p.aula_id));
   const segundosAssistidos = (segRes.data as any)?.segundos_assistidos ?? 0;
+  const videoTerminou = (segRes.data as any)?.video_terminou ?? false;
 
   const aprovadasSet = new Set(((tentRes.data as any[]) ?? []).map((t) => t.avaliacao_id));
   const avalsPorModulo = new Map<string, string[]>();
@@ -170,6 +171,7 @@ export async function getAula(slug: string, aulaId: string): Promise<AulaComplet
       concluida: concluidasSet.has(aulaRaw.id),
       bloqueada: bloqueadaPorAula.get(aulaRaw.id) ?? false,
       segundosAssistidos,
+      videoTerminou,
     },
     capitulos: (capRes.data as Capitulo[]) ?? [],
     materiais,
