@@ -75,7 +75,7 @@ export async function carregarDesafios(): Promise<DadosDesafios> {
       xp: d.xp,
       moedas: d.moedas,
       plano: d.plano ?? 'free',
-      participantes: (d.participantes_base ?? 0) + (partCount.get(d.id) ?? 0),
+      participantes: partCount.get(d.id) ?? 0,
       quesitos: quesitos.length,
       documentos: documentos.length,
       jaAceitou: !!entrega?.aceito_em,

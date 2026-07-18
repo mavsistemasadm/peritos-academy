@@ -41,23 +41,19 @@ export async function carregarBiblioteca(): Promise<DadosBiblioteca> {
   const { data: auth } = await supabase.auth.getUser()
   if (!auth?.user) return VAZIO
 
-  const [{ data: perfil }, { data: areasRaw }, { data: itensRaw }, { data: downloadsRaw }, { data: favoritasRaw }, { data: minhasRaw }] =
+  const [{ data: perfil }, { data: areasRaw }, { data: itensRaw }, { data: contagemRaw }, { data: favoritasRaw }, { data: minhasRaw }] =
     await Promise.all([
       supabase.from('perfis').select('acesso_biblioteca').eq('id', auth.user.id).single(),
       supabase.from('planilha_areas').select('*').order('ordem'),
       supabase.from('planilhas').select('*').eq('publicado', true).order('atualizado_em', { ascending: false }),
-      supabase.from('planilha_downloads').select('planilha_id'),
+      // planilha_downloads.SELECT é restrita ao dono da linha — contagem
+      // cross-usuário real só via RPC security definer.
+      supabase.rpc('planilha_downloads_contagem'),
       supabase.from('planilha_favoritas').select('planilha_id'),
       supabase.from('planilha_downloads').select('planilha_id').eq('usuario_id', auth.user.id),
     ])
 
-  // contagem real de downloads por item (RLS limita o select geral aos meus;
-  // por isso o total público = downloads_base + meus registros são contados
-  // no servidor via downloads_base — o número exibido é base + count visível)
-  const contagem = new Map<string, number>()
-  for (const d of downloadsRaw ?? []) {
-    contagem.set(d.planilha_id, (contagem.get(d.planilha_id) ?? 0) + 1)
-  }
+  const contagem = new Map<string, number>((contagemRaw ?? []).map((c: any) => [c.planilha_id, c.downloads]))
   const favoritas = new Set((favoritasRaw ?? []).map(f => f.planilha_id))
   const minhas = new Set((minhasRaw ?? []).map(m => m.planilha_id))
 
@@ -69,7 +65,7 @@ export async function carregarBiblioteca(): Promise<DadosBiblioteca> {
     descricao: p.descricao,
     formato: p.formato ?? 'xlsx',
     tamanhoKb: p.tamanho_kb,
-    downloads: (p.downloads_base ?? 0) + (contagem.get(p.id) ?? 0),
+    downloads: contagem.get(p.id) ?? 0,
     atualizadoEm: p.atualizado_em,
     novo: p.atualizado_em ? (Date.now() - +new Date(p.atualizado_em) < TRINTA_DIAS) : false,
     favorita: favoritas.has(p.id),
