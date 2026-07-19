@@ -39,6 +39,13 @@ export async function atualizarConfigGamificacao(formData: FormData): Promise<Re
     moeda_cor: (formData.get('moeda_cor') as string)?.trim() || null,
     moeda_icone: (formData.get('moeda_icone') as string)?.trim() || null,
     texto_como_acumular: (formData.get('texto_como_acumular') as string)?.trim() || null,
+    avaliacao_xp_base: Number((formData.get('avaliacao_xp_base') as string) || 200),
+    bonus_curso_concluido: Number((formData.get('bonus_curso_concluido') as string) || 100),
+    teto_engajamento_diario: Number((formData.get('teto_engajamento_diario') as string) || 60),
+    moeda_a_cada_xp: (() => {
+      const raw = (formData.get('moeda_a_cada_xp') as string)?.trim()
+      return raw ? Number(raw) : null
+    })(),
   }).eq('id', 1)
 
   if (error) return { ok: false, erro: error.message }
@@ -59,6 +66,7 @@ export async function atualizarGatilho(codigo: string, formData: FormData): Prom
     moedas: Number((formData.get('moedas') as string) || 0),
     limite_diario: limiteRaw ? Number(limiteRaw) : null,
     ativo: formData.get('ativo') === 'on',
+    conta_teto_engajamento: formData.get('conta_teto_engajamento') === 'on',
     atualizado_em: new Date().toISOString(),
   }).eq('codigo', codigo)
 
@@ -68,6 +76,22 @@ export async function atualizarGatilho(codigo: string, formData: FormData): Prom
 }
 
 // ---------- Níveis ----------
+
+function requisitoComposto(formData: FormData, campo: string): number | null {
+  const raw = (formData.get(campo) as string)?.trim()
+  return raw ? Number(raw) : null
+}
+
+function requisitosCompostos(formData: FormData) {
+  return {
+    aulas_concluidas: requisitoComposto(formData, 'aulas_concluidas'),
+    cursos_completos: requisitoComposto(formData, 'cursos_completos'),
+    avaliacoes_aprovadas: requisitoComposto(formData, 'avaliacoes_aprovadas'),
+    desafios_completos: requisitoComposto(formData, 'desafios_completos'),
+    streak_marco_dias: requisitoComposto(formData, 'streak_marco_dias'),
+    participacoes_comunidade: requisitoComposto(formData, 'participacoes_comunidade'),
+  }
+}
 
 export async function criarNivel(formData: FormData): Promise<Resultado> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
@@ -80,7 +104,9 @@ export async function criarNivel(formData: FormData): Promise<Resultado> {
   const { data: ultimo } = await supabase.from('gamificacao_niveis').select('ordem').order('ordem', { ascending: false }).limit(1).maybeSingle()
   const ordem = (ultimo?.ordem ?? 0) + 1
 
-  const { error } = await supabase.from('gamificacao_niveis').insert({ nome, pontos_minimos: pontosMinimos, ordem })
+  const { error } = await supabase.from('gamificacao_niveis').insert({
+    nome, pontos_minimos: pontosMinimos, ordem, ...requisitosCompostos(formData),
+  })
   if (error) return { ok: false, erro: error.message.includes('duplicate') ? 'Já existe um nível com esse XP mínimo.' : error.message }
   revalidar()
   return { ok: true }
@@ -94,10 +120,25 @@ export async function atualizarNivel(id: string, formData: FormData): Promise<Re
   if (!nome) return { ok: false, erro: 'Nome é obrigatório.' }
 
   const supabase = await criarClienteServidor()
-  const { error } = await supabase.from('gamificacao_niveis').update({ nome, pontos_minimos: pontosMinimos }).eq('id', id)
+  const { error } = await supabase.from('gamificacao_niveis').update({
+    nome, pontos_minimos: pontosMinimos, ...requisitosCompostos(formData),
+  }).eq('id', id)
   if (error) return { ok: false, erro: error.message.includes('duplicate') ? 'Já existe um nível com esse XP mínimo.' : error.message }
   revalidar()
   return { ok: true }
+}
+
+// ---------- Curva de níveis ----------
+
+export async function recalcularCurvaNiveis(): Promise<Resultado & { teto?: number; componentes?: Record<string, number> }> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+
+  const supabase = await criarClienteServidor()
+  const { data, error } = await supabase.rpc('gam_recalcular_curva_niveis')
+  if (error) return { ok: false, erro: error.message }
+
+  revalidar()
+  return { ok: true, teto: data?.teto, componentes: data?.componentes }
 }
 
 export async function excluirNivel(id: string): Promise<Resultado> {

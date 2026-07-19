@@ -18,6 +18,12 @@ export type ConfigGamificacao = {
   moedaCor: string | null
   moedaIcone: string | null
   textoComoAcumular: string | null
+  avaliacaoXpBase: number
+  bonusCursoConcluido: number
+  tetoEngajamentoDiario: number
+  moedaACadaXp: number | null
+  xpTetoCalculado: number | null
+  xpTetoCalculadoEm: string | null
 }
 
 export type CategoriaGatilho = 'comum' | 'quiz' | 'marco' | 'especial'
@@ -31,6 +37,7 @@ export type GatilhoAdmin = {
   limiteDiario: number | null
   ativo: boolean
   categoria: CategoriaGatilho
+  contaTetoEngajamento: boolean
 }
 
 export type NivelAdmin = {
@@ -39,6 +46,12 @@ export type NivelAdmin = {
   pontosMinimos: number
   seloUrl: string | null
   ordem: number
+  aulasConcluidas: number | null
+  cursosCompletos: number | null
+  avaliacoesAprovadas: number | null
+  desafiosCompletos: number | null
+  streakMarcoDias: number | null
+  participacoesComunidade: number | null
 }
 
 export async function carregarConfigGamificacao(): Promise<ConfigGamificacao> {
@@ -62,6 +75,12 @@ export async function carregarConfigGamificacao(): Promise<ConfigGamificacao> {
     moedaCor: data?.moeda_cor ?? null,
     moedaIcone: data?.moeda_icone ?? null,
     textoComoAcumular: data?.texto_como_acumular ?? null,
+    avaliacaoXpBase: data?.avaliacao_xp_base ?? 200,
+    bonusCursoConcluido: data?.bonus_curso_concluido ?? 100,
+    tetoEngajamentoDiario: data?.teto_engajamento_diario ?? 60,
+    moedaACadaXp: data?.moeda_a_cada_xp ?? null,
+    xpTetoCalculado: data?.xp_teto_calculado ?? null,
+    xpTetoCalculadoEm: data?.xp_teto_calculado_em ?? null,
   }
 }
 
@@ -76,6 +95,7 @@ export async function carregarGatilhosAdmin(): Promise<GatilhoAdmin[]> {
     .map(g => ({
       codigo: g.codigo, nome: g.nome, descricao: g.descricao, pontos: g.pontos, moedas: g.moedas,
       limiteDiario: g.limite_diario, ativo: g.ativo, categoria: g.categoria as CategoriaGatilho,
+      contaTetoEngajamento: g.conta_teto_engajamento ?? false,
     }))
     .sort((a, b) => ORDEM_CATEGORIA[a.categoria] - ORDEM_CATEGORIA[b.categoria] || a.nome.localeCompare(b.nome))
 }
@@ -85,5 +105,8 @@ export async function carregarNiveisAdmin(): Promise<NivelAdmin[]> {
   const { data } = await supabase.from('gamificacao_niveis').select('*').order('ordem')
   return (data ?? []).map(n => ({
     id: n.id, nome: n.nome, pontosMinimos: n.pontos_minimos, seloUrl: n.selo_url, ordem: n.ordem,
+    aulasConcluidas: n.aulas_concluidas, cursosCompletos: n.cursos_completos,
+    avaliacoesAprovadas: n.avaliacoes_aprovadas, desafiosCompletos: n.desafios_completos,
+    streakMarcoDias: n.streak_marco_dias, participacoesComunidade: n.participacoes_comunidade,
   }))
 }

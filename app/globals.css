@@ -4025,6 +4025,12 @@ body.teatro .trilho-aulas{display:none}
 .pagina-admin .ad-card-link{transition:border-color .2s,transform .2s}
 .pagina-admin .ad-card-link:hover{border-color:rgba(32,217,166,.4);transform:translateY(-2px)}
 .pagina-admin .ad-card-vazio{color:var(--cinza)}
+.pagina-admin .ad-card-destaque{
+  display:flex;align-items:center;justify-content:space-between;gap:var(--s-4);flex-wrap:wrap;
+  padding:var(--s-4);border:1px solid rgba(32,217,166,.25);border-radius:var(--r-card);
+  background:rgba(32,217,166,.05);
+}
+.pagina-admin .ad-card-destaque button{flex-shrink:0}
 .pagina-admin .ad-erro{
   font-size:13.5px;font-weight:600;color:#E0776B;margin-bottom:var(--s-3);
   padding:10px 14px;border-radius:12px;background:rgba(224,107,107,.08);border:1px solid rgba(224,107,107,.25);
