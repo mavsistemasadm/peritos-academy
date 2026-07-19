@@ -4,7 +4,7 @@ import "./globals.css";
 import { carregarAvisos } from "@/lib/queries/avisos";
 import AvisosGlobais from "@/components/AvisosGlobais";
 import ConquistaToast from "@/components/ConquistaToast";
-import { creditarLoginDiario } from "@/lib/gamificacao/login-diario";
+import { registrarAcessoDiario } from "@/lib/gamificacao/acesso-diario";
 import { carregarConfigPlataforma } from "@/lib/queries/config-plataforma";
 
 const inter = Inter({
@@ -33,7 +33,7 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const [avisos, config] = await Promise.all([carregarAvisos(), carregarConfigPlataforma()]);
-  void creditarLoginDiario(); // fire-and-forget, não bloqueia o render
+  void registrarAcessoDiario(); // fire-and-forget, não bloqueia o render — streak + login_diario, chokepoint único
 
   return (
     <html lang="pt-BR" className={inter.className}>
