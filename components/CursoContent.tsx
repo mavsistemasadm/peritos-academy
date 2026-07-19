@@ -539,23 +539,11 @@ export function CursoContent({ curso, modulos, conquistas, progresso, proximoPas
           sequencial de propósito). Recomendação de próximo curso deve viver
           na biblioteca e na tela de conclusão do curso, não durante o estudo. */}
 
-      {/* FOOTER */}
-      <footer className="footer">
-        <div className="wrap">
-          <div className="footer-baixo">
-            <div className="footer-logo">
-              <img src="/img/logo.png" alt="" />
-              <span>peritos academy</span>
-            </div>
-            <nav className="footer-links" aria-label="Links do rodapé">
-              <a href="#">Suporte</a>
-              <a href="#">Privacidade</a>
-              <a href="#">Certificados</a>
-            </nav>
-            <span className="footer-copy">© 2026 Peritos Academy</span>
-          </div>
-        </div>
-      </footer>
+      {/* FOOTER: removido — era um resto órfão copiado do footer real de
+          HomeContent.tsx (que só funciona lá porque está dentro do wrapper
+          .pagina-home; aqui nunca teve CSS de verdade, daí a logo gigante e
+          os links sem espaçamento). O rodapé institucional já aparece
+          estilizado em toda página via app/layout.tsx (.rodape-global). */}
 
       {/* toast de aula/módulo bloqueado */}
       <div className={`toast-bloqueio${aviso ? " visivel" : ""}`} role="status">
