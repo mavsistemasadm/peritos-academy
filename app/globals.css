@@ -2019,6 +2019,12 @@ body.teatro .trilho-aulas{display:none}
 .pagina-perfil .checklist-nivel li.cumprido{color:var(--cinza-claro)}
 .pagina-perfil .checklist-nivel li svg{color:var(--verde);flex-shrink:0}
 .pagina-perfil .checklist-vazio{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--linha);flex-shrink:0}
+.pagina-perfil .checklist-nivel li.suspenso{color:var(--cinza)}
+.pagina-perfil .checklist-selo-em-breve{
+  display:inline-block;flex-shrink:0;padding:1px 7px;border-radius:var(--r-pill);
+  font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--cinza-claro);border:1px solid var(--linha);background:rgba(255,255,255,.03);
+}
 
 /* ---------- CORPO ---------- */
 .pagina-perfil .corpo{padding:var(--s-6) 0 var(--s-8)}

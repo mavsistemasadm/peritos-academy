@@ -55,18 +55,26 @@ export type DadosGamificacaoJornada = {
   tetoEngajamentoDiario: number
   niveis: NivelJornada[]
   gatilhos: GatilhoJornada[]
+  // sem nenhum conteúdo publicado desse tipo, o requisito composto
+  // correspondente fica suspenso (ver gam_nivel_real) — mesma checagem
+  // aqui, só pra exibição ("em breve" em vez de exigência impossível).
+  cursosPublicadosExistem: boolean
+  avaliacoesPublicadasExistem: boolean
+  desafiosPublicadosExistem: boolean
+  aulasPublicadasExistem: boolean
 }
 
 export async function carregarGamificacaoJornada(): Promise<DadosGamificacaoJornada> {
   const supabase = await criarClienteServidor()
 
-  const [{ data: config }, { data: niveisRaw }, { data: gatilhosRaw }, { data: cursosPublicados }, { data: etapasXp }, { count: desafiosPublicados }] = await Promise.all([
+  const [{ data: config }, { data: niveisRaw }, { data: gatilhosRaw }, { data: cursosPublicados }, { data: etapasXp }, { count: desafiosPublicados }, { count: avaliacoesPublicadasCount }] = await Promise.all([
     supabase.from('config_gamificacao').select('*').eq('id', 1).single(),
     supabase.from('gamificacao_niveis').select('*').order('ordem', { ascending: true }),
     supabase.from('gamificacao_gatilhos').select('*').eq('ativo', true).order('categoria').order('nome'),
     supabase.from('cursos').select('id').eq('publicado', true),
     supabase.from('etapas').select('xp_conclusao').gt('xp_conclusao', 0),
     supabase.from('desafios').select('id', { count: 'exact', head: true }).eq('publicado', true),
+    supabase.from('avaliacoes').select('id', { count: 'exact', head: true }).eq('publicado', true),
   ])
 
   // valor real creditado por concluir_aula (dinâmico, aulas.xp) — busca só
@@ -79,6 +87,9 @@ export async function carregarGamificacaoJornada(): Promise<DadosGamificacaoJorn
   const { data: aulasXp } = idsModulosPublicados.length
     ? await supabase.from('aulas').select('xp').in('modulo_id', idsModulosPublicados).gt('xp', 0)
     : { data: [] as { xp: number }[] }
+  const { count: aulasPublicadasCount } = idsModulosPublicados.length
+    ? await supabase.from('aulas').select('id', { count: 'exact', head: true }).in('modulo_id', idsModulosPublicados)
+    : { count: 0 }
 
   const aulaXpValores = (aulasXp ?? []).map(a => a.xp as number)
   const aulaXpMin = aulaXpValores.length ? Math.min(...aulaXpValores) : null
@@ -114,6 +125,10 @@ export async function carregarGamificacaoJornada(): Promise<DadosGamificacaoJorn
     avaliacaoXpBase: config?.avaliacao_xp_base ?? 200,
     bonusCursoConcluido: config?.bonus_curso_concluido ?? 100,
     tetoEngajamentoDiario: config?.teto_engajamento_diario ?? 60,
+    cursosPublicadosExistem: idsCursosPublicados.length > 0,
+    avaliacoesPublicadasExistem: (avaliacoesPublicadasCount ?? 0) > 0,
+    desafiosPublicadosExistem: (desafiosPublicados ?? 0) > 0,
+    aulasPublicadasExistem: (aulasPublicadasCount ?? 0) > 0,
     niveis: (niveisRaw ?? []).map(n => ({
       ordem: n.ordem,
       nome: n.nome,

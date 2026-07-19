@@ -14,15 +14,32 @@ const NOME_CATEGORIA: Record<string, string> = {
   especial: 'Momentos especiais',
 }
 
-function formatarRequisito(nivel: NivelJornada): string[] {
+type ItemRequisito = { texto: string; suspenso: boolean }
+
+// requisito sem nenhum conteúdo publicado daquele tipo fica suspenso (não
+// trava ninguém) até o dia em que o primeiro item daquele tipo for
+// publicado, ver gam_nivel_real() — aqui só reflete isso na exibição.
+function formatarRequisito(nivel: NivelJornada, dados: DadosGamificacaoJornada): ItemRequisito[] {
   const r = nivel.requisito
-  const partes: string[] = []
-  if (r.aulasConcluidas !== null) partes.push(`${r.aulasConcluidas} aula${r.aulasConcluidas === 1 ? '' : 's'} concluída${r.aulasConcluidas === 1 ? '' : 's'}`)
-  if (r.cursosCompletos !== null) partes.push(r.cursosCompletos === -1 ? 'todos os cursos publicados concluídos' : `${r.cursosCompletos} curso${r.cursosCompletos === 1 ? '' : 's'} completo${r.cursosCompletos === 1 ? '' : 's'}`)
-  if (r.avaliacoesAprovadas !== null) partes.push(r.avaliacoesAprovadas === -1 ? 'todas as avaliações publicadas aprovadas' : `${r.avaliacoesAprovadas} avaliaç${r.avaliacoesAprovadas === 1 ? 'ão aprovada' : 'ões aprovadas'}`)
-  if (r.desafiosCompletos !== null) partes.push(r.desafiosCompletos === -1 ? 'todos os desafios existentes entregues e aprovados' : `${r.desafiosCompletos} desafio${r.desafiosCompletos === 1 ? '' : 's'} completo${r.desafiosCompletos === 1 ? '' : 's'}`)
-  if (r.streakMarcoDias !== null) partes.push(`sequência de ${r.streakMarcoDias} dias em algum momento`)
-  if (r.participacoesComunidade !== null) partes.push(`${r.participacoesComunidade} participaç${r.participacoesComunidade === 1 ? 'ão' : 'ões'} na comunidade`)
+  const partes: ItemRequisito[] = []
+  if (r.aulasConcluidas !== null) partes.push({
+    suspenso: !dados.aulasPublicadasExistem,
+    texto: `${r.aulasConcluidas} aula${r.aulasConcluidas === 1 ? '' : 's'} concluída${r.aulasConcluidas === 1 ? '' : 's'}`,
+  })
+  if (r.cursosCompletos !== null) partes.push({
+    suspenso: !dados.cursosPublicadosExistem,
+    texto: r.cursosCompletos === -1 ? 'todos os cursos publicados concluídos' : `${r.cursosCompletos} curso${r.cursosCompletos === 1 ? '' : 's'} completo${r.cursosCompletos === 1 ? '' : 's'}`,
+  })
+  if (r.avaliacoesAprovadas !== null) partes.push({
+    suspenso: !dados.avaliacoesPublicadasExistem,
+    texto: r.avaliacoesAprovadas === -1 ? 'todas as avaliações publicadas aprovadas' : `${r.avaliacoesAprovadas} avaliaç${r.avaliacoesAprovadas === 1 ? 'ão aprovada' : 'ões aprovadas'}`,
+  })
+  if (r.desafiosCompletos !== null) partes.push({
+    suspenso: !dados.desafiosPublicadosExistem,
+    texto: r.desafiosCompletos === -1 ? 'todos os desafios existentes entregues e aprovados' : `${r.desafiosCompletos} desafio${r.desafiosCompletos === 1 ? '' : 's'} completo${r.desafiosCompletos === 1 ? '' : 's'}`,
+  })
+  if (r.streakMarcoDias !== null) partes.push({ suspenso: false, texto: `sequência de ${r.streakMarcoDias} dias em algum momento` })
+  if (r.participacoesComunidade !== null) partes.push({ suspenso: false, texto: `${r.participacoesComunidade} participaç${r.participacoesComunidade === 1 ? 'ão' : 'ões'} na comunidade` })
   return partes
 }
 
@@ -59,7 +76,7 @@ export default function GamificacaoJornadaContent({ dados, nav }: { dados: Dados
         </p>
         <div className="gam-niveis-grid">
           {dados.niveis.map(nivel => {
-            const requisitos = formatarRequisito(nivel)
+            const requisitos = formatarRequisito(nivel, dados)
             return (
               <article className="gam-nivel-card" key={nivel.ordem}>
                 <img src={nivel.imgUrl} alt="" width={56} height={56} />
@@ -69,7 +86,11 @@ export default function GamificacaoJornadaContent({ dados, nav }: { dados: Dados
                   <p className="gam-nivel-xp">{nivel.pontosMinimos.toLocaleString('pt-BR')} {dados.xpAbreviacao} mínimo</p>
                   {requisitos.length > 0 ? (
                     <ul className="gam-nivel-requisitos">
-                      {requisitos.map((r, i) => <li key={i}>{r}</li>)}
+                      {requisitos.map((r, i) => (
+                        <li key={i}>
+                          {r.suspenso ? <><span className="gam-selo-em-breve">em breve</span> {r.texto}</> : r.texto}
+                        </li>
+                      ))}
                     </ul>
                   ) : (
                     <p className="gam-nivel-requisitos-vazio">Sem requisito além do XP. É o seu ponto de partida.</p>

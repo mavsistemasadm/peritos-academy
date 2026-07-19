@@ -187,8 +187,8 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
                   {fmtNum(d.proximoNivel.xpAtual)} de {fmtNum(d.proximoNivel.xpNecessario)} XP
                 </li>
                 {d.proximoNivel.requisitos.map(r => (
-                  <li key={r.rotulo} className={r.cumprido ? 'cumprido' : ''}>
-                    {r.cumprido ? <IconeCheck size={14} strokeWidth={2.4} /> : <span className="checklist-vazio" />}
+                  <li key={r.rotulo} className={r.suspenso ? 'suspenso' : r.cumprido ? 'cumprido' : ''}>
+                    {r.suspenso ? <span className="checklist-selo-em-breve">em breve</span> : r.cumprido ? <IconeCheck size={14} strokeWidth={2.4} /> : <span className="checklist-vazio" />}
                     {ROTULO_REQUISITO[r.rotulo]?.(r) ?? r.rotulo}
                   </li>
                 ))}

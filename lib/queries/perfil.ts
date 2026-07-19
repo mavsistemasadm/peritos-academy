@@ -37,6 +37,7 @@ export type RequisitoProximoNivel = {
   atual: number
   necessario: number
   cumprido: boolean
+  suspenso: boolean // sem conteúdo publicado desse tipo ainda — não trava nível, aparece como "em breve"
 }
 
 export type ProximoNivel = {
