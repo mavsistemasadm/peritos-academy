@@ -61,7 +61,10 @@ já vem pronto do banco.
       "mes_inicio": 1,
       "mes_fim": 4
     }
-    // ... até 5 trilhas, na ordem em que devem aparecer no mapa
+    // ... até 5 trilhas (âncora) — ou até 7 (config_anamnese.teto_expandido)
+    // se a rota fechar curta (< meses_minimo_antes_expandir, default 6
+    // meses) e a expansão puxar mais trilhas por ordem de votos. Sempre na
+    // ordem em que devem aparecer no mapa.
   ]
 }
 ```
