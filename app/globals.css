@@ -2011,6 +2011,15 @@ body.teatro .trilho-aulas{display:none}
 .pagina-perfil .barra{height:4px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden}
 .pagina-perfil .barra i{display:block;height:100%;width:0;border-radius:2px;background:var(--grad-marca);transition:width 1.2s var(--suave) .2s}
 
+.pagina-perfil .checklist-nivel{margin-top:var(--s-4);max-width:520px}
+.pagina-perfil .checklist-nivel-titulo{font-size:13px;color:var(--cinza-claro);margin-bottom:8px}
+.pagina-perfil .checklist-nivel-titulo b{color:var(--creme)}
+.pagina-perfil .checklist-nivel ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+.pagina-perfil .checklist-nivel li{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cinza)}
+.pagina-perfil .checklist-nivel li.cumprido{color:var(--cinza-claro)}
+.pagina-perfil .checklist-nivel li svg{color:var(--verde);flex-shrink:0}
+.pagina-perfil .checklist-vazio{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--linha);flex-shrink:0}
+
 /* ---------- CORPO ---------- */
 .pagina-perfil .corpo{padding:var(--s-6) 0 var(--s-8)}
 .pagina-perfil .secao{padding:var(--s-6) 0;border-top:1px solid var(--linha-suave)}

@@ -32,6 +32,23 @@ export type Atividade = {
   quando: string
 }
 
+export type RequisitoProximoNivel = {
+  rotulo: 'aulas_concluidas' | 'cursos_completos' | 'avaliacoes_aprovadas' | 'desafios_completos' | 'streak_marco_dias' | 'participacoes_comunidade'
+  atual: number
+  necessario: number
+  cumprido: boolean
+}
+
+export type ProximoNivel = {
+  ordem: number
+  nome: string
+  seloUrl: string | null
+  xpAtual: number
+  xpNecessario: number
+  xpCumprido: boolean
+  requisitos: RequisitoProximoNivel[]
+} | null
+
 export type DadosPerfil = {
   nome: string
   slug: string | null
@@ -71,6 +88,7 @@ export type DadosPerfil = {
   insignias: Insignia[]
   certificados: Certificado[]
   atividades: Atividade[]
+  proximoNivel: ProximoNivel
 }
 
 const DIA_SEMANA = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado']
@@ -97,6 +115,8 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     { data: atividadesRaw },
     { count: anotacoes },
     { data: emailPref },
+    { data: niveis },
+    { data: statusProximoNivel },
   ] = await Promise.all([
     supabase.from('perfis').select('*').eq('id', auth.user.id).single(),
     supabase.from('perfil_estudo_dias').select('dia, nivel'),
@@ -105,8 +125,20 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     supabase.from('perfil_atividades').select('*').order('quando', { ascending: false }).limit(8),
     supabase.from('aula_anotacoes').select('id', { count: 'exact', head: true }),
     supabase.from('email_preferencias').select('receber_emails').eq('usuario_id', auth.user.id).maybeSingle(),
+    supabase.from('gamificacao_niveis').select('ordem, nome, pontos_minimos').order('ordem'),
+    supabase.rpc('gam_status_proximo_nivel'),
   ])
   if (!perfil) return null
+
+  // nível/título/progresso reais — perfis.xp_proximo_nivel e perfis.titulo
+  // são colunas órfãs (nunca escritas pelo motor de gamificação real, ver
+  // CLAUDE.md), nunca ler delas pra exibir XP/nível.
+  const nivelAtualReal = niveis?.find(n => n.ordem === (statusProximoNivel?.nivel_atual_ordem ?? perfil.nivel ?? 1))
+  const proximoNivelRaw = statusProximoNivel?.proximo_nivel ?? null
+  const xpProximoNivelReal = proximoNivelRaw?.xp_necessario ?? nivelAtualReal?.pontos_minimos ?? 100
+  const progressoPctReal = proximoNivelRaw
+    ? Math.min(100, Math.round((proximoNivelRaw.xp_atual / Math.max(1, proximoNivelRaw.xp_necessario)) * 100))
+    : 100
 
   const JANELA = 112
   const porDia = new Map<string, number>()
@@ -151,10 +183,6 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
 
   const ritmoSubiu = estudou28 / 28 > estudouAntes / (JANELA - 28)
 
-  const progressoPct = Math.min(100, Math.round(
-    perfil.xp_proximo_nivel > 0 ? (perfil.xp / perfil.xp_proximo_nivel) * 100 : 0
-  ))
-
   return {
     nome: perfil.nome ?? 'Perito',
     slug: perfil.slug ?? null,
@@ -169,11 +197,11 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     sons_conquista: perfil.sons_conquista ?? true,
     receberEmails: emailPref?.receber_emails ?? true,
     foto_url: perfil.foto_url ?? null,
-    titulo: perfil.titulo ?? 'Perito Iniciante',
-    nivel: perfil.nivel ?? 1,
+    titulo: nivelAtualReal?.nome ?? perfil.titulo ?? 'Explorador Novato',
+    nivel: statusProximoNivel?.nivel_atual_ordem ?? perfil.nivel ?? 1,
     xp: perfil.xp ?? 0,
-    xpProximoNivel: perfil.xp_proximo_nivel ?? 100,
-    progressoPct,
+    xpProximoNivel: xpProximoNivelReal,
+    progressoPct: progressoPctReal,
     iniciouRotulo: perfil.iniciou_em ? fmtMesAno.format(new Date(perfil.iniciou_em + 'T12:00:00')) : '—',
     etapa: perfil.etapa ?? 1,
     etapaTotal: perfil.etapa_total ?? 5,
@@ -202,5 +230,14 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
       progresso_pct: c.progresso_pct, faltam_txt: c.faltam_txt,
     })),
     atividades: (atividadesRaw ?? []) as Atividade[],
+    proximoNivel: proximoNivelRaw ? {
+      ordem: proximoNivelRaw.ordem,
+      nome: proximoNivelRaw.nome,
+      seloUrl: proximoNivelRaw.selo_url ?? null,
+      xpAtual: proximoNivelRaw.xp_atual,
+      xpNecessario: proximoNivelRaw.xp_necessario,
+      xpCumprido: proximoNivelRaw.xp_cumprido,
+      requisitos: (proximoNivelRaw.requisitos ?? []) as RequisitoProximoNivel[],
+    } : null,
   }
 }

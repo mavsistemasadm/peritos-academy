@@ -14,6 +14,15 @@ import { Certificado, FogoStreak } from '@/components/Emblemas'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
+const ROTULO_REQUISITO: Record<string, (r: { atual: number; necessario: number }) => string> = {
+  aulas_concluidas: r => `${fmtNum(r.atual)} de ${fmtNum(r.necessario)} aulas concluídas`,
+  cursos_completos: r => `${fmtNum(r.atual)} de ${fmtNum(r.necessario)} cursos completos`,
+  avaliacoes_aprovadas: r => `${fmtNum(r.atual)} de ${fmtNum(r.necessario)} avaliações aprovadas`,
+  desafios_completos: r => `${fmtNum(r.atual)} de ${fmtNum(r.necessario)} desafios completos`,
+  streak_marco_dias: r => `sequência de ${fmtNum(r.atual)} de ${fmtNum(r.necessario)} dias`,
+  participacoes_comunidade: r => `${fmtNum(r.atual)} de ${fmtNum(r.necessario)} participações na comunidade`,
+}
+
 function iniciais(nome: string) {
   return nome.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 }
@@ -166,6 +175,26 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
               <i data-fill={`${d.progressoPct}%`}></i>
             </div>
           </div>
+
+          {d.proximoNivel && (
+            <div className="checklist-nivel privado">
+              <p className="checklist-nivel-titulo">
+                Falta pra <b>{d.proximoNivel.nome}</b> (Nível {d.proximoNivel.ordem}):
+              </p>
+              <ul>
+                <li className={d.proximoNivel.xpCumprido ? 'cumprido' : ''}>
+                  {d.proximoNivel.xpCumprido ? <IconeCheck size={14} strokeWidth={2.4} /> : <span className="checklist-vazio" />}
+                  {fmtNum(d.proximoNivel.xpAtual)} de {fmtNum(d.proximoNivel.xpNecessario)} XP
+                </li>
+                {d.proximoNivel.requisitos.map(r => (
+                  <li key={r.rotulo} className={r.cumprido ? 'cumprido' : ''}>
+                    {r.cumprido ? <IconeCheck size={14} strokeWidth={2.4} /> : <span className="checklist-vazio" />}
+                    {ROTULO_REQUISITO[r.rotulo]?.(r) ?? r.rotulo}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div className="perfil-acoes privado">
             <button className="btn btn-fantasma" onClick={() => setEditando(v => !v)}>
