@@ -1,0 +1,1015 @@
+{
+  "data": {
+    "id": 1,
+    "title": "Rota Personalizada para Viver de Perícia",
+    "type": "use_trails",
+    "active": true,
+    "main_image": "https://cdn.ensinio.com/peritosacademy/peritosacademy/anamnese/9dee64b843aecbd486eb4fa4cb0d1ad0.png",
+    "action_button": "Descobrir minha rota",
+    "decline_button": "Me lembre depois",
+    "description": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Antes de começar sua jornada, vamos entender seu momento e seus objetivos. Com base nas suas respostas, vamos montar uma rota personalizada para que você aproveite ao máximo a plataforma e conquiste resultados reais com a perícia.</span></p>",
+    "questions": [
+      {
+        "id": 1,
+        "description": "Em qual dessas situações você se encaixa hoje?",
+        "position": 0,
+        "options": [
+          {
+            "uuid": "c53932be-199e-4acf-95b1-9970d428934b",
+            "title": "Nunca atuei com perícia e estou começando do zero.",
+            "trails": [
+              1
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "fa0d0126-7094-4247-8cd2-fba1e7e996c2",
+            "title": "Já estudei perícia, mas ainda não atuei profissionalmente.",
+            "trails": [
+              1,
+              5
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "e9d22ecb-f150-40ef-8c14-1e8659e55d85",
+            "title": "Já atuei com cálculos e quero crescer nesse mercado.",
+            "trails": [
+              5,
+              8
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "679a3215-ddd9-4af2-b11c-210504c6867a",
+            "title": "Quero empreender com perícia, ter mais clientes e escalar meu negócio.",
+            "trails": [
+              7
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "0e1ace68-0689-4688-aecf-72a719edbcd7",
+            "title": "Quero conquistar nomeações e atuar como perito judicial.",
+            "trails": [
+              6
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "74b3bb6b-2e77-490f-9e48-3eec4574501d",
+            "title": "Quero me especializar tecnicamente em uma área específica.",
+            "trails": [
+              4,
+              2,
+              3
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T10:21:55"
+      },
+      {
+        "id": 2,
+        "description": "Qual seu principal objetivo ao entrar na Peritos Academy?",
+        "position": 1,
+        "options": [
+          {
+            "uuid": "8b103c57-1bb6-4672-b10e-0d9fc58010d6",
+            "title": "Iniciar uma nova carreira e viver de perícia.",
+            "trails": [
+              1
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "ceffbf94-5bb8-4945-bfd2-acd580f9f944",
+            "title": "Fazer meus primeiros cálculos e conseguir clientes.",
+            "trails": [
+              1,
+              5
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "1f60fb63-c69d-4ced-ad5f-347917346b08",
+            "title": "Ganhar dinheiro rápido com teses práticas e planilhas automáticas.",
+            "trails": [
+              8
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "8eac8d9c-ac55-4a9f-a101-447ea389ae2a",
+            "title": "Ja sou Perito e quero montar um negócio pericial atendendo empresas e advogados.",
+            "trails": [
+              7
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "9e483582-28b0-4135-bfb2-dd2ff272cbf9",
+            "title": "Conseguir nomeações e atuar como perito do juízo.",
+            "trails": [
+              6,
+              3
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "43a47850-ca30-4ec2-a981-620edb8cf217",
+            "title": "Me especializar tecnicamente em uma área específica.",
+            "trails": [
+              4,
+              2,
+              3
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T10:34:44"
+      },
+      {
+        "id": 3,
+        "description": "Quanto tempo por semana você pode se dedicar aos estudos na plataforma?",
+        "position": 2,
+        "options": [
+          {
+            "uuid": "1d7b5856-0066-4317-8a55-679a4f8d6059",
+            "title": "Menos de 2 horas por semana.",
+            "trails": [
+              8
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "1a69045c-e34f-49c8-b83c-96e4fa93d3ed",
+            "title": "De 2 a 4 horas por semana.",
+            "trails": [
+              5,
+              8
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "06cd2112-bdb7-4c9e-bf5f-eafb5148c10f",
+            "title": "De 5 a 7 horas por semana.",
+            "trails": [
+              7,
+              5,
+              8
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "a269ea2e-f547-4b83-a29d-a425dbfbf669",
+            "title": "De 8 a 10 horas por semana.",
+            "trails": [
+              6,
+              7,
+              5,
+              8
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "f5a37646-fcb3-457a-ab67-54f63c7e6df5",
+            "title": "Mais de 10 horas por semana.",
+            "trails": [
+              4,
+              2,
+              3,
+              1
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "a581318b-a73e-4b9f-aa8d-dfe384cda199",
+            "title": "Mais de 10 horas por semana.",
+            "trails": [
+              3,
+              4,
+              2,
+              8,
+              5,
+              6,
+              7,
+              1
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T10:34:44"
+      },
+      {
+        "id": 4,
+        "description": "Qual dessas formas de atuação mais combina com o que você busca?",
+        "position": 3,
+        "options": [
+          {
+            "uuid": "1e2e5352-809c-44f9-a01f-f5739ffd7c50",
+            "title": "Quero ser nomeado pelo juízo e atuar oficialmente nos processos.",
+            "trails": [
+              6,
+              1
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "60707043-11c3-490d-95aa-8afff5dc7010",
+            "title": "Quero atender diretamente advogados e empresas como prestador de serviços.",
+            "trails": [
+              1,
+              7
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "cf978f65-d088-4240-9024-5e847ee168c8",
+            "title": "Quero aprender as duas formas, mas começar com o que gera resultado mais rápido.",
+            "trails": [
+              1,
+              6,
+              7,
+              8
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "3859dce0-c8a6-45b5-b748-5bd4e2c65377",
+            "title": "Quero atuar de forma independente e empreender com a perícia.",
+            "trails": [
+              7,
+              5,
+              8
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "f7e80f1a-9d62-4f8b-9c3e-19add1018956",
+            "title": "Ainda não sei exatamente, quero conhecer mais as possibilidades.",
+            "trails": [
+              1
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "c79eda7b-c80c-44dd-8da6-97689d42bfa5",
+            "title": "Já atuo em uma das formas, mas quero expandir para as duas.",
+            "trails": [
+              6,
+              7,
+              5,
+              8,
+              3,
+              4,
+              2
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T10:34:44"
+      },
+      {
+        "id": 5,
+        "description": "Em qual dessas áreas você tem mais interesse ou afinidade técnica?",
+        "position": 4,
+        "options": [
+          {
+            "uuid": "1d5f2ce6-1b49-43d8-8277-1f4427850363",
+            "title": "Cálculos trabalhistas (horas extras, verbas, rescisão, etc.)",
+            "trails": [
+              4
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "a78a501d-ff49-4410-bcca-8424b84d339a",
+            "title": "Cálculos bancários (empréstimos, financiamentos, revisão de contratos)",
+            "trails": [
+              3
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "44399aed-07a5-43b0-851a-39296a01f7cb",
+            "title": "Cálculos previdenciários (INSS, RMI, atrasados, vida toda)",
+            "trails": [
+              2
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "ad9e826a-e7c4-4ea4-9399-55eb413e7600",
+            "title": "Teses de massa com alto volume e faturamento rápido",
+            "trails": [
+              8
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "177839ad-bcbb-438e-b460-26c2e5e184b8",
+            "title": "Quero aprender todas as áreas e atuar de forma ampla",
+            "trails": [
+              3,
+              2,
+              4,
+              5
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "757e6502-9bfb-446c-8f0b-93cd40ae55f2",
+            "title": "Ainda estou explorando, não tenho certeza sobre qual seguir",
+            "trails": [
+              1
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T10:34:44"
+      },
+      {
+        "id": 6,
+        "description": "Você tem interesse em usar inteligência artificial ou automações na sua atuação como perito?",
+        "position": 5,
+        "options": [
+          {
+            "uuid": "88daf3dd-3e00-41a1-9b77-aac62c9a656f",
+            "title": "Sim, quero usar tudo o que puder para ganhar produtividade.",
+            "trails": [
+              8,
+              5
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "c33a59a6-3e23-41f1-a089-ab0c073e87fa",
+            "title": "Sim, mas ainda não sei como isso pode me ajudar.",
+            "trails": [
+              5,
+              8
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "39277a48-c5df-40ed-8fb3-838153ed9c6e",
+            "title": "Tenho curiosidade, mas nunca usei.",
+            "trails": [
+              5,
+              8
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "1b3c0de3-792f-44f5-9667-c9ce5f6723a0",
+            "title": "Já uso planilhas automáticas ou ferramentas de produtividade.",
+            "trails": [
+              7,
+              5
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "eea1be5a-43d9-486b-9d07-2adc19bf2853",
+            "title": "Uso eventualmente, mas quero ir além.",
+            "trails": [
+              7,
+              4,
+              2,
+              3
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "8c704f9c-e276-47a9-9922-b59aa27e39c1",
+            "title": "Não tenho interesse no momento.",
+            "trails": [
+              1
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T10:49:52"
+      },
+      {
+        "id": 7,
+        "description": "Como está sua confiança em relação aos cálculos judiciais hoje?",
+        "position": 6,
+        "options": [
+          {
+            "uuid": "fb236421-d500-4a55-8ce7-efd2e22ea03c",
+            "title": "Não me sinto seguro(a), quero aprender do zero.",
+            "trails": [
+              1
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "b1cf7368-e43c-409d-947d-c5bf8f6ea654",
+            "title": "Sei o básico, mas não sei se estou fazendo certo.",
+            "trails": [
+              1,
+              5
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "cf332459-31c6-4b9d-bfcf-38ad40396c30",
+            "title": "Já fiz alguns cálculos, mas tenho dúvidas técnicas.",
+            "trails": [
+              1,
+              5
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "989b432a-4c2f-443c-8090-0dc2a321732a",
+            "title": "Me sinto seguro em algumas áreas, mas quero aprofundar.",
+            "trails": [
+              8,
+              4,
+              2,
+              3,
+              5
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "599eac99-aacd-4162-9409-5a01263c5185",
+            "title": "Tenho total confiança técnica, mas quero mais resultado no mercado.",
+            "trails": [
+              7,
+              5,
+              8
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "9e9c1ef1-9e49-416d-93b2-ad377c0033ee",
+            "title": "Já domino os cálculos e quero crescer com escala e autoridade.",
+            "trails": [
+              7,
+              5,
+              8
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T10:49:52"
+      },
+      {
+        "id": 8,
+        "description": "Qual dessas frases mais representa sua realidade atual?",
+        "position": 7,
+        "options": [
+          {
+            "uuid": "49c9c972-6a8b-43df-a3fd-e6a1faf8b7d8",
+            "title": "Preciso urgente de uma nova fonte de renda.",
+            "trails": [
+              1,
+              8
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "b5eb7057-e969-42ec-8589-06ef5013f78b",
+            "title": "Estou cansado do meu trabalho atual e quero mudar.",
+            "trails": [
+              1,
+              8,
+              6
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "c542b50f-e894-4cef-9a18-abea1154e317",
+            "title": "Quero aprender uma nova habilidade com potencial de crescimento.",
+            "trails": [
+              1,
+              8
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "ab8507cf-652f-4f2e-92f8-b988278a172f",
+            "title": "Quero empreender com perícia e me destacar no mercado.",
+            "trails": [
+              5,
+              8,
+              7
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "3e25a6a2-ac94-4023-b809-cfcada1c241b",
+            "title": "Já sou perito, mas ainda não consegui resultados relevantes.",
+            "trails": [
+              5,
+              8
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "f46cb613-fc98-4226-b544-ad7b85418bea",
+            "title": "Já atuo, mas quero escalar, dominar mais áreas e ser autoridade.",
+            "trails": [
+              7,
+              5,
+              8,
+              4,
+              2,
+              3
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T10:49:52"
+      },
+      {
+        "id": 9,
+        "description": "Como está seu domínio do Excel atualmente?",
+        "position": 8,
+        "options": [
+          {
+            "uuid": "c55bae8e-e720-45c1-9d40-3ed4d4bf0744",
+            "title": "Mal sei abrir uma planilha.",
+            "trails": [
+              1
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "b4ff44c2-e16d-4cd3-9a72-a286452d4c61",
+            "title": "Sei o básico, mas tenho dificuldades.",
+            "trails": [
+              1
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "557aad92-f30d-4361-b1a6-191231995250",
+            "title": "Me viro bem, mas não uso fórmulas avançadas.",
+            "trails": [
+              1,
+              5
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "cd3f5492-8da7-4d92-b2bf-8a65051d637a",
+            "title": "Tenho bom domínio, uso fórmulas e crio estruturas.",
+            "trails": [
+              5
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "da706b3c-7edf-43b9-957a-888d1adb6257",
+            "title": "Uso Excel diariamente em cálculos ou rotinas profissionais.",
+            "trails": [
+              5,
+              4,
+              2,
+              3
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "173803b6-7041-4a57-8b97-a17cf923c50c",
+            "title": "Já automatizei planilhas ou usei VBA.",
+            "trails": [
+              5,
+              4,
+              2,
+              3
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T10:49:52"
+      },
+      {
+        "id": 10,
+        "description": "Qual tipo de conteúdo mais te interessa na plataforma?",
+        "position": 9,
+        "options": [
+          {
+            "uuid": "d0d2e597-9711-4841-84a5-e771945b5ef7",
+            "title": "Passo a passo para iniciar do zero.",
+            "trails": [
+              1,
+              6
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "6267399a-8433-424b-a1c6-f24f8718230e",
+            "title": "Conteúdo técnico de cálculo e jurisprudência aplicada.",
+            "trails": [
+              4,
+              2,
+              3
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "271c6906-f5a3-4b61-b820-8f93f9d9d364",
+            "title": "Estratégias para captar clientes e crescer como perito.",
+            "trails": [
+              7
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "a3a1a567-bafd-4027-985e-e2f76a3856b8",
+            "title": "Planilhas automáticas, produtividade e atuação com volume.",
+            "trails": [
+              8,
+              5
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "891d5038-830c-4821-8cd8-1fe4475737b4",
+            "title": "Modelos prontos, laudos, petições e nomeações.",
+            "trails": [
+              6,
+              3
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "97b2b85c-812e-4232-8079-3e52234108cb",
+            "title": "Um pouco de tudo para me tornar referência completa.",
+            "trails": [
+              3,
+              2,
+              4
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T10:49:52"
+      },
+      {
+        "id": 16,
+        "description": "O que te motivou a buscar a perícia nesse momento da sua vida?",
+        "position": 10,
+        "options": [
+          {
+            "uuid": "fb41065a-f91e-44e3-b100-b4450b90db70",
+            "title": "Estou em um momento de transição e quero mudar de profissão.",
+            "trails": [
+              1
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "e833ca40-58e1-4542-81d7-b6ce5a28c8a3",
+            "title": "Quero crescer financeiramente e ter mais liberdade.",
+            "trails": [
+              1,
+              7,
+              8
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "b08b826f-1011-42da-b6d0-ab807929bc00",
+            "title": "Estou cansado de não ser valorizado no meu trabalho atual.",
+            "trails": [
+              1,
+              6,
+              7
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "c451f541-b209-44b5-abf5-5dcc870f5e7f",
+            "title": "Já tenho experiência, mas quero uma carreira com mais propósito.",
+            "trails": [
+              6,
+              4,
+              2,
+              3
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "76860f52-0df4-452a-b8af-dfb189163960",
+            "title": "Vi na perícia uma chance real de construir algo meu.",
+            "trails": [
+              1,
+              7,
+              6,
+              4,
+              2,
+              3
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "ccb1631b-da54-4197-b97c-b94310e0448d",
+            "title": "Quero fazer diferença com meu conhecimento e ganhar bem por isso.",
+            "trails": [
+              3,
+              2,
+              4,
+              5
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T11:03:39"
+      },
+      {
+        "id": 17,
+        "description": "Como seria a sua vida ideal daqui a 12 meses?",
+        "position": 11,
+        "options": [
+          {
+            "uuid": "df03d2b2-0295-4ca7-ba8b-1e0660136a86",
+            "title": "Ter minha própria carteira de clientes e viver da perícia.",
+            "trails": [
+              1,
+              7
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "e312afef-ba01-4e32-becc-e65ca4a325ef",
+            "title": "Ser nomeado judicialmente e reconhecido como perito.",
+            "trails": [
+              1,
+              6
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "920ae4c6-c070-43a9-9e60-b9babeeda0e4",
+            "title": "Ter liberdade para trabalhar de onde eu quiser e ganhar bem.",
+            "trails": [
+              1,
+              8
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "9b9fc899-fbb8-4002-9701-901d9d91026d",
+            "title": "Trabalhar com algo que me dá orgulho e estabilidade.",
+            "trails": [
+              1,
+              4,
+              2,
+              3
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "0047d05b-a387-4b07-9670-fd92cc1b1e01",
+            "title": "Ter múltiplas fontes de renda com perícia.",
+            "trails": [
+              3,
+              2,
+              4,
+              1
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "92e65008-ac74-445d-9e64-ceb831c9cbbc",
+            "title": "Ser referência em uma área técnica e respeitado no meio jurídico.",
+            "trails": [
+              4,
+              2,
+              3
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T11:03:39"
+      },
+      {
+        "id": 18,
+        "description": "Qual dessas frases mais se aproxima do que você sente hoje?",
+        "position": 12,
+        "options": [
+          {
+            "uuid": "cea96229-c7da-4688-b17d-e9b3eef52a71",
+            "title": "Sei que posso mais, mas não sei por onde começar.",
+            "trails": [
+              1
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "3c9ab54c-9125-4727-943b-ef449020f2e6",
+            "title": "Já tentei antes, mas faltou direcionamento.",
+            "trails": [
+              1,
+              6,
+              7
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "d32dc959-ca2e-4dea-9740-0eb2187e4dc6",
+            "title": "Sou Perito e estou cansado de me sentir travado ou estagnado.",
+            "trails": [
+              7,
+              8
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "2bc5c61a-3602-494e-8188-fc4b89128b84",
+            "title": "Tenho vontade, mas falta tempo e apoio.",
+            "trails": [
+              8
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "5cb23213-8551-4604-9724-6a708d744507",
+            "title": "Estou decidido a fazer dar certo dessa vez.",
+            "trails": [
+              1,
+              4,
+              2,
+              3
+            ],
+            "position": 4
+          },
+          {
+            "uuid": "d2f0b71f-fa29-4bce-b858-6e817498730c",
+            "title": "Não quero mais depender de outras pessoas para crescer.",
+            "trails": [
+              7
+            ],
+            "position": 5
+          }
+        ],
+        "created_at": "2025-05-09T11:03:39"
+      },
+      {
+        "id": 19,
+        "description": "Você sente apoio da sua família ou das pessoas próximas nessa decisão?",
+        "position": 13,
+        "options": [
+          {
+            "uuid": "eac27894-9490-41b9-838d-b63ff3bbf757",
+            "title": "Sim, todos me apoiam e acreditam em mim.",
+            "trails": [
+              1,
+              6,
+              7,
+              5,
+              8,
+              4,
+              2,
+              3
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "cae25b3f-c4a1-4860-83de-91832597da01",
+            "title": "Nem todos entendem, mas sabem que é importante pra mim.",
+            "trails": [
+              1,
+              6,
+              8
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "fd8bdc55-56e1-49a9-84a7-b0a8d6052e12",
+            "title": "Ainda não falei sobre isso com ninguém.",
+            "trails": [
+              1
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "a49c1bb1-c14f-4c6e-8ad0-d3398eeb6c52",
+            "title": "Algumas pessoas não acreditam que isso pode dar certo.",
+            "trails": [
+              1,
+              8
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "e74219e4-1a61-4d1b-a639-7f0371ec9c8f",
+            "title": "Isso é por mim, vou fazer acontecer com ou sem apoio.",
+            "trails": [
+              1,
+              8,
+              7,
+              6
+            ],
+            "position": 4
+          }
+        ],
+        "created_at": "2025-05-09T11:03:39"
+      },
+      {
+        "id": 20,
+        "description": "Por que você acredita que agora é a hora certa para entrar na perícia?",
+        "position": 14,
+        "options": [
+          {
+            "uuid": "784fcae0-348c-4996-99f6-32aad3eec5e8",
+            "title": "Porque eu decidi parar de adiar e agir.",
+            "trails": [
+              1,
+              6,
+              7,
+              5,
+              8,
+              4,
+              2,
+              3
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "30562968-78f1-4a5a-90b4-3fce461d81d4",
+            "title": "Porque preciso de resultado financeiro urgente.",
+            "trails": [
+              1,
+              8
+            ],
+            "position": 1
+          },
+          {
+            "uuid": "fd693f09-ce7c-4e71-94ee-fb958f81d482",
+            "title": "Porque quero crescer de verdade e viver com mais liberdade.",
+            "trails": [
+              1,
+              4,
+              2,
+              3,
+              7
+            ],
+            "position": 2
+          },
+          {
+            "uuid": "2b9923d4-2e75-46ae-9e70-b5d3de015e51",
+            "title": "Porque quero crescer de verdade e viver com mais liberdade.",
+            "trails": [
+              5,
+              4,
+              2,
+              3
+            ],
+            "position": 3
+          },
+          {
+            "uuid": "d05d99fb-b210-425e-a414-14ddba9b0233",
+            "title": "Porque chegou minha hora de ser reconhecido.",
+            "trails": [
+              1,
+              6,
+              7
+            ],
+            "position": 4
+          }
+        ],
+        "created_at": "2025-05-09T11:03:39"
+      },
+      {
+        "id": 21,
+        "description": "Quantas vezes você já adiou a vida que queria por medo, rotina ou cansaço e até quando vai continuar fazendo isso com você e com sua família?",
+        "position": 15,
+        "options": [
+          {
+            "uuid": "8d723dd5-cf23-4d2f-a82c-3a9e64f62fa9",
+            "title": "Não quero mais viver assim. Estou pronto para mudar.",
+            "trails": [
+              1,
+              6,
+              7,
+              5,
+              8,
+              4,
+              2,
+              3
+            ],
+            "position": 0
+          },
+          {
+            "uuid": "b91b7788-1802-4079-9590-a2804a692e25",
+            "title": "Ainda me sinto preso, mas sei que preciso fazer algo.",
+            "trails": [
+              1,
+              6
+            ],
+            "position": 1
+          }
+        ],
+        "created_at": "2025-05-09T11:13:05"
+      }
+    ]
+  }
+}

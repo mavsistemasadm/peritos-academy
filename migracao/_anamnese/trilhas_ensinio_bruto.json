@@ -1,0 +1,108 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "Missão Perito",
+      "slug": "missao-perito1",
+      "description": "Essa é a trilha obrigatória para todos os alunos, seja você niciante ou já perito. É o selo de Excelência da Peritos Academy e a formação responsável pelo teu sucesso!",
+      "short_description": "Essa é a trilha obrigatória para todos os alunos, seja você niciante ou já perito. É o selo de Excelência da Peritos Academy e a formação responsável pelo teu sucesso!",
+      "active": 0,
+      "position": 0,
+      "title_image": null,
+      "background_image": null,
+      "groups_count": 9,
+      "created_at": "2024-05-27T15:21:47"
+    },
+    {
+      "id": 6,
+      "title": "Caminho do Perito Judicial",
+      "slug": "caminho-do-perito-judicial",
+      "description": "Essa trilha é para quem deseja atuar como perito nomeado pelo juízo. Aqui você vai aprender o passo a passo para conquistar nomeações, dominar os procedimentos legais, elaborar laudos técnicos e se posicionar com autoridade no sistema judicial.",
+      "short_description": "Trilha para quem quer conquistar nomeações judiciais, aprender os procedimentos e atuar oficialmente como perito do juízo.",
+      "active": 0,
+      "position": 1,
+      "title_image": null,
+      "background_image": null,
+      "groups_count": 4,
+      "created_at": "2025-05-08T17:17:12"
+    },
+    {
+      "id": 7,
+      "title": "Construindo uma negócio pericial lucrativo",
+      "slug": "construindo-uma-negocio-pericial-lucrativo",
+      "description": "Essa trilha é para quem deseja empreender com a perícia e construir um escritório lucrativo, atuando com advogados e empresas. Aqui você vai aprender a organizar sua operação, captar clientes, posicionar sua marca e escalar seus resultados.",
+      "short_description": "Trilha ideal para quem quer empreender com a perícia, atrair clientes e crescer com um escritório lucrativo e profissional.",
+      "active": 0,
+      "position": 2,
+      "title_image": null,
+      "background_image": null,
+      "groups_count": 6,
+      "created_at": "2025-05-08T17:25:14"
+    },
+    {
+      "id": 5,
+      "title": "Plano de Aceleração Pericial",
+      "slug": "plano-de-aceleracao-pericial",
+      "description": "Essa trilha é para quem já atua ou começou na perícia, mas quer acelerar os resultados, conquistar mais clientes, automatizar processos e se tornar uma referência de verdade.",
+      "short_description": "Trilha feita para quem já começou na perícia e quer acelerar resultados, ganhar autoridade e escalar sua atuação com inteligência.",
+      "active": 0,
+      "position": 3,
+      "title_image": null,
+      "background_image": null,
+      "groups_count": 6,
+      "created_at": "2025-05-08T17:12:42"
+    },
+    {
+      "id": 8,
+      "title": "Ganhos rápidos e lucrativos na perícia",
+      "slug": "ganhos-rapidos-e-lucrativos-na-pericia",
+      "description": "Essa trilha é para quem quer faturar rápido com perícia, atuando nas teses mais lucrativas e recorrentes do mercado. Você vai aprender a aplicar cálculos de massa e colocar em prática, Ideal para quem busca resultado real rápido, sem enrolação.",
+      "short_description": "Trilha ideal para quem quer faturar rápido com teses de massa, usando planilhas automáticas e estratégias prontas para ganhar dinheiro com perícia.",
+      "active": 0,
+      "position": 4,
+      "title_image": null,
+      "background_image": null,
+      "groups_count": 10,
+      "created_at": "2025-05-08T17:38:17"
+    },
+    {
+      "id": 4,
+      "title": "Perito Trabalhista Expert",
+      "slug": "perito-trabalhista-expert",
+      "description": "Seja bem vindo ao programa que vai elevar a tua perícia na esfera trabalhista. Conteúdo de altíssimo impacto na formação, onde vamos te mostrar absolutamente tudo sobre cálculos trabalhistas, regras, orientação e muito mais.",
+      "short_description": "Programa completo para dominar os cálculos trabalhistas com técnica, segurança e alto nível de orientação prática.",
+      "active": 0,
+      "position": 5,
+      "title_image": null,
+      "background_image": null,
+      "groups_count": 4,
+      "created_at": "2024-05-27T15:31:40"
+    },
+    {
+      "id": 2,
+      "title": "Perito Previdenciário de Elite",
+      "slug": "perito-previdenciario-de-elite",
+      "description": "Prepare-se para entrar em um mundo de cálculos completamente diferente, aprendendo a recalcular benefícios INSS e dominar como poucos os cálculos contra a Fazenda Pública.",
+      "short_description": "Domine os cálculos previdenciários e aprenda a atuar com segurança em revisões de benefícios e ações contra a Fazenda Pública.",
+      "active": 0,
+      "position": 6,
+      "title_image": null,
+      "background_image": null,
+      "groups_count": 3,
+      "created_at": "2024-05-27T15:24:40"
+    },
+    {
+      "id": 3,
+      "title": "Perito Bancário Profissional",
+      "slug": "perito-bancario-profissional",
+      "description": "Esse sem dúvida é o mercado mais rentável para atuação do Perito, entretanto, exige que você entenda todas as regras e formas de cálculo das instituições. É complexo, difícil, mas com infinitas possibilidades.",
+      "short_description": "Mercado desafiador, mas extremamente lucrativo. Aprenda a dominar os cálculos bancários e explorar todo o potencial dessa área.",
+      "active": 0,
+      "position": 7,
+      "title_image": null,
+      "background_image": null,
+      "groups_count": 10,
+      "created_at": "2024-05-27T15:28:50"
+    }
+  ]
+}
