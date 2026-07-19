@@ -92,14 +92,6 @@ export async function buscarCurso(slug: string) {
     .eq("curso_id", curso.id)
     .order("ordem", { ascending: true });
 
-  // 5. cursos relacionados (mesmo catálogo, exclui o atual)
-  const { data: relacionados } = await supabase
-    .from("cursos")
-    .select("id, slug, titulo, capa_url, capa_vertical_url")
-    .eq("publicado", true)
-    .neq("id", curso.id)
-    .limit(4);
-
   // 6. progresso do aluno logado — a rota já gateia por verificarAcessoConteudo,
   // então userId normalmente existe; mesmo assim tratamos null defensivamente
   // (concluidasSet vazio = tudo trava a partir da 2ª aula, mesmo comportamento
@@ -243,7 +235,6 @@ export async function buscarCurso(slug: string) {
     },
     modulos,
     conquistas: conquistas ?? [],
-    relacionados: relacionados ?? [],
     progresso,
   };
 }

@@ -79,7 +79,6 @@ type Props = {
   curso: Curso;
   modulos: Modulo[];
   conquistas: Conquista[];
-  relacionados: { id: string; slug: string; titulo: string; capa_url: string | null; capa_vertical_url: string | null }[];
   progresso: Progresso;
   nav: DadosNav;
 };
@@ -101,7 +100,7 @@ function durOuNull(seg: number) {
   return seg > 0 ? fmtDur(seg) : null;
 }
 
-export function CursoContent({ curso, modulos, conquistas, relacionados, progresso, nav }: Props) {
+export function CursoContent({ curso, modulos, conquistas, progresso, nav }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const moduloAtualId = modulos.find((m) => m.ehAtual)?.id ?? modulos[0]?.id ?? null;
   const [abertos, setAbertos] = useState<Record<string, boolean>>(
@@ -435,32 +434,11 @@ export function CursoContent({ curso, modulos, conquistas, relacionados, progres
         </div>
       </section>
 
-      {/* RELACIONADOS */}
-      {relacionados.length > 0 && (
-        <section className="vitrine">
-          <div className="wrap">
-            <div className="secao-cab reveal">
-              <div>
-                <span className="eyebrow">Continue explorando</span>
-                <h2 className="h2">Você também vai gostar.</h2>
-              </div>
-            </div>
-            <div className="carrossel reveal" role="list">
-              {relacionados.map((rel) => (
-                <a className="card-curso" href={`/curso/${rel.slug}`} key={rel.id} role="listitem">
-                  <div className="card-capa">
-                    <img src={rel.capa_vertical_url || rel.capa_url || "/img/card-segredos.jpg"} alt={`Capa do curso ${rel.titulo}`} loading="lazy" />
-                    <span className="acao btn-quieto">Ver curso</span>
-                  </div>
-                  <div className="card-info">
-                    <span className="titulo">{rel.titulo}</span>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      {/* seção de sugestões ("Continue explorando" / "Você também vai gostar")
+          removida por decisão de produto — dentro do curso o foco é o curso,
+          sem vitrine de outros cursos competindo pela atenção (jornada
+          sequencial de propósito). Recomendação de próximo curso deve viver
+          na biblioteca e na tela de conclusão do curso, não durante o estudo. */}
 
       {/* FOOTER */}
       <footer className="footer">
