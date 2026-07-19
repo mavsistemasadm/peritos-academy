@@ -7,7 +7,7 @@ import GamificacaoJornadaContent from '@/components/GamificacaoJornadaContent'
 
 export const metadata: Metadata = {
   title: 'Como funciona sua jornada · Peritos Academy',
-  description: 'Os 10 níveis, como você ganha XP, a regra de conclusão de aula e o sistema de sequência (streak) — explicados de ponta a ponta.',
+  description: 'Os 10 níveis, como você ganha XP, a regra de conclusão de aula e o sistema de sequência (streak), explicados de ponta a ponta.',
 }
 
 export const dynamic = 'force-dynamic'

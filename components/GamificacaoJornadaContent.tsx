@@ -1,6 +1,6 @@
 // components/GamificacaoJornadaContent.tsx
-// Página /gamificacao: documentação viva da jornada de XP/níveis/streak —
-// todo número vem de dados ao vivo (lib/queries/gamificacao-jornada.ts),
+// Página /gamificacao: documentação viva da jornada de XP/níveis/streak.
+// Todo número vem de dados ao vivo (lib/queries/gamificacao-jornada.ts),
 // nunca hardcoded, pra nunca ficar defasada quando o admin recalibrar.
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
@@ -44,7 +44,7 @@ export default function GamificacaoJornadaContent({ dados, nav }: { dados: Dados
           <h1>Cada aula, cada acerto, cada dia de constância conta.</h1>
           <p className="sub">
             Aqui embaixo está o mapa completo: os 10 níveis que você pode alcançar, como cada um deles credita {dados.xpAbreviacao},
-            o que precisa ser verdade pra você subir de nível, e como sua sequência de dias funciona. Nada aqui é enfeite — são as
+            o que precisa ser verdade pra você subir de nível, e como sua sequência de dias funciona. Nada aqui é enfeite, são as
             regras reais que valem na plataforma hoje.
           </p>
         </div>
@@ -54,7 +54,7 @@ export default function GamificacaoJornadaContent({ dados, nav }: { dados: Dados
         <h2>Os 10 níveis</h2>
         <p className="gam-secao-intro">
           Subir de nível exige duas coisas ao mesmo tempo: o {dados.xpAbreviacao} mínimo <b>e</b> o requisito daquele nível. Ter XP de
-          sobra não substitui um requisito que ainda falta — é assim que garantimos que cada selo realmente representa o que você
+          sobra não substitui um requisito que ainda falta. É assim que garantimos que cada selo realmente representa o que você
           construiu, não só quanto tempo você acumulou pontos.
         </p>
         <div className="gam-niveis-grid">
@@ -72,7 +72,7 @@ export default function GamificacaoJornadaContent({ dados, nav }: { dados: Dados
                       {requisitos.map((r, i) => <li key={i}>{r}</li>)}
                     </ul>
                   ) : (
-                    <p className="gam-nivel-requisitos-vazio">Sem requisito além do XP — é o seu ponto de partida.</p>
+                    <p className="gam-nivel-requisitos-vazio">Sem requisito além do XP. É o seu ponto de partida.</p>
                   )}
                 </div>
               </article>
@@ -84,9 +84,9 @@ export default function GamificacaoJornadaContent({ dados, nav }: { dados: Dados
       <section className="gam-secao wrap">
         <h2>Como você ganha {dados.xpPlural}</h2>
         <p className="gam-secao-intro">
-          Toda ação de verdade dentro da plataforma credita {dados.xpAbreviacao} — nunca clique vazio. Ações de estudo (aulas, avaliações,
+          Toda ação de verdade dentro da plataforma credita {dados.xpAbreviacao}, nunca clique vazio. Ações de estudo (aulas, avaliações,
           cursos, desafios) não têm teto diário. Ações de engajamento (posts, comentários, reações, login) têm um teto combinado de{' '}
-          <b>{dados.tetoEngajamentoDiario} {dados.xpAbreviacao} por dia</b> — o resto do dia sua constância continua valendo, só o crédito
+          <b>{dados.tetoEngajamentoDiario} {dados.xpAbreviacao} por dia</b>; o resto do dia sua constância continua valendo, só o crédito
           extra que para ali.
         </p>
         {gatilhosPorCategoria.map(({ cat, itens }) => (
@@ -98,28 +98,29 @@ export default function GamificacaoJornadaContent({ dados, nav }: { dados: Dados
                   <tr><th>Ação</th><th>{dados.xpAbreviacao}</th><th>{dados.moedaPlural}</th><th>Limite</th></tr>
                 </thead>
                 <tbody>
-                  {itens.map(g => <LinhaGatilho key={g.codigo} gatilho={g} xpAbreviacao={dados.xpAbreviacao} />)}
+                  {itens.map(g => <LinhaGatilho key={g.codigo} gatilho={g} />)}
                 </tbody>
               </table>
             </div>
           </div>
         ))}
         <p className="gam-nota">
-          Concluir uma aula credita o XP daquela aula específica (varia por conteúdo). Concluir um curso inteiro soma um bônus de{' '}
-          {dados.bonusCursoConcluido} {dados.xpAbreviacao}. Ser aprovado numa avaliação credita {dados.avaliacaoXpBase} {dados.xpAbreviacao} ×
-          o peso da avaliação × seu percentual de acerto — só na primeira vez que você é aprovado nela.
+          Concluir uma aula credita o XP daquela aula específica (hoje uniforme entre as aulas publicadas, pode variar por conteúdo no
+          futuro). Concluir um curso inteiro soma um bônus de {dados.bonusCursoConcluido} {dados.xpAbreviacao}. Ser aprovado numa
+          avaliação credita {dados.avaliacaoXpBase} {dados.xpAbreviacao} multiplicado pelo peso da avaliação e pelo seu percentual de
+          acerto, só na primeira vez que você é aprovado nela.
         </p>
       </section>
 
       <section className="gam-secao wrap">
         <h2><IconeFileText size={18} strokeWidth={1.8} /> Quando uma aula conta como concluída</h2>
         <p className="gam-secao-intro">
-          Marcar uma aula como concluída não é um clique livre — a plataforma checa de verdade:
+          Marcar uma aula como concluída não é um clique livre, a plataforma checa de verdade:
         </p>
         <ul className="gam-lista-regras">
           <li>Se a aula tem vídeo, você precisa ter assistido pelo menos <b>70% da duração</b>.</li>
           <li>Se a aula tem materiais complementares, você precisa ter baixado <b>todos eles</b>.</li>
-          <li>Aula sem vídeo e sem material libera direto — só a ordem das aulas do módulo continua valendo.</li>
+          <li>Aula sem vídeo e sem material libera direto, só a ordem das aulas do módulo continua valendo.</li>
         </ul>
         <p className="gam-secao-intro">
           E a ordem importa: a aula seguinte só libera depois que você conclui a atual, e passar pra um módulo novo exige que qualquer
@@ -131,7 +132,7 @@ export default function GamificacaoJornadaContent({ dados, nav }: { dados: Dados
         <h2><IconeCalendar size={18} strokeWidth={1.8} /> Sua sequência (streak)</h2>
         <p className="gam-secao-intro">
           Cada dia que você acessa a plataforma pela primeira vez conta um dia de sequência. Ela não reseta no primeiro deslize:
-          você tem <b>2 proteções por mês</b> — se passar um dia inteiro sem acessar, mas voltar no dia seguinte, uma proteção cobre
+          você tem <b>2 proteções por mês</b>. Se passar um dia inteiro sem acessar, mas voltar no dia seguinte, uma proteção cobre
           a falha automaticamente e sua sequência continua contando como se não tivesse parado. Depois de usar as 2 proteções do mês,
           um dia sem acesso reinicia a contagem.
         </p>
@@ -139,13 +140,13 @@ export default function GamificacaoJornadaContent({ dados, nav }: { dados: Dados
           {streak7 && (
             <div className="gam-streak-marco">
               <IconeShield size={16} strokeWidth={1.8} />
-              <span><b>7 dias seguidos</b> credita {streak7.pontos} {dados.xpAbreviacao} de bônus.</span>
+              <span><b>7 dias seguidos</b> credita {streak7.pontosLabel} de bônus.</span>
             </div>
           )}
           {streak30 && (
             <div className="gam-streak-marco">
               <IconeShield size={16} strokeWidth={1.8} />
-              <span><b>30 dias seguidos</b> credita {streak30.pontos} {dados.xpAbreviacao} de bônus.</span>
+              <span><b>30 dias seguidos</b> credita {streak30.pontosLabel} de bônus.</span>
             </div>
           )}
         </div>
@@ -154,15 +155,16 @@ export default function GamificacaoJornadaContent({ dados, nav }: { dados: Dados
   )
 }
 
-function LinhaGatilho({ gatilho, xpAbreviacao }: { gatilho: GatilhoJornada; xpAbreviacao: string }) {
+function LinhaGatilho({ gatilho }: { gatilho: GatilhoJornada }) {
   return (
-    <tr>
+    <tr className={gatilho.pendente ? 'gam-linha-pendente' : ''}>
       <td>
         <b>{gatilho.nome}</b>
+        {gatilho.pendente && <span className="gam-selo-em-breve">em breve</span>}
         {gatilho.descricao && <><br /><span className="gam-tabela-desc">{gatilho.descricao}</span></>}
       </td>
-      <td>{gatilho.pontos > 0 ? `${gatilho.pontos} ${xpAbreviacao}` : '—'}</td>
-      <td>{gatilho.moedas > 0 ? gatilho.moedas : '—'}</td>
+      <td>{gatilho.pontosLabel}</td>
+      <td>{gatilho.moedasLabel}</td>
       <td>{gatilho.limiteDiario ? `${gatilho.limiteDiario}/dia` : 'sem limite'}</td>
     </tr>
   )

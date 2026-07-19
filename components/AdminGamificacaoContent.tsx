@@ -157,6 +157,14 @@ function DefinicoesAba({ config, onErro, onSucesso }: { config: ConfigGamificaca
           XP base de avaliação: multiplicado por peso × % de acerto, só na 1ª aprovação. Bônus de curso: creditado ao concluir todas as aulas/avaliações. Teto de engajamento: soma diária máxima de XP dos gatilhos marcados &quot;conta pro teto&quot; (aba Gatilhos). Moeda a cada X XP: conversão automática quando o gatilho não define moedas fixas.
         </p>
 
+        <h2 className="ad-form-subtitulo">Gatilhos pendentes de agendamento</h2>
+        <label>Códigos (separados por vírgula)
+          <input name="gatilhos_pendentes_agendamento" defaultValue={config.gatilhosPendentesAgendamento.join(', ')} placeholder="aniversario, aniversario_plataforma" />
+        </label>
+        <p className="ad-sublista-meta">
+          Gatilhos ativos no catálogo mas sem mecanismo de disparo (cron) ligado ainda. Aparecem pro aluno em /gamificacao com selo &quot;em breve&quot;, sem prometer um valor de XP. Tire o código daqui assim que o agendamento for ligado de verdade, o valor real volta a aparecer sozinho.
+        </p>
+
         <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar definições'}</button>
       </form>
     </section>
@@ -188,9 +196,21 @@ function GatilhosAba({ gatilhos, onErro, onSucesso }: { gatilhos: GatilhoAdmin[]
   )
 }
 
+// Esses gatilhos têm o campo "Pontos" abaixo ignorado na prática: a RPC que
+// credita (creditar_gamificacao) recebe um p_pontos_override dinâmico vindo
+// de outra fonte, então o valor salvo aqui nunca é o que o aluno recebe.
+const FONTE_REAL_DINAMICA: Record<string, string> = {
+  concluir_aula: 'valor real vem de aulas.xp (por aula)',
+  concluir_etapa: 'valor real vem de etapas.xp_conclusao (por etapa)',
+  concluir_curso: 'valor real vem de config_gamificacao.bonus_curso_concluido (aba Definições)',
+  entregar_desafio: 'valor real vem de desafios.xp (por desafio)',
+  avaliacao_aprovada: 'valor real vem de avaliacao_xp_base (aba Definições) × peso da avaliação × % de acerto',
+}
+
 function GatilhoLinha({ gatilho, onErro, onSucesso }: { gatilho: GatilhoAdmin; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
+  const fonteReal = FONTE_REAL_DINAMICA[gatilho.codigo]
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -207,6 +227,7 @@ function GatilhoLinha({ gatilho, onErro, onSucesso }: { gatilho: GatilhoAdmin; o
       <td>
         <b>{gatilho.nome}</b>
         {gatilho.descricao && <><br /><span className="ad-sublista-meta">{gatilho.descricao}</span></>}
+        {fonteReal && <><br /><span className="ad-sublista-meta" style={{ color: 'var(--ciano)' }}>Pontos abaixo é só o valor padrão, não o creditado. {fonteReal}.</span></>}
       </td>
       <td colSpan={4}>
         <form onSubmit={onSalvar} style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -254,18 +275,18 @@ function NiveisAba({ niveis, config, onErro, onSucesso }: { niveis: NivelAdmin[]
       const r = await recalcularCurvaNiveis()
       setRecalculando(false)
       if (!r.ok) onErro(r.erro)
-      else { onSucesso(`Curva recalculada — novo teto: ${r.teto?.toLocaleString('pt-BR')} XP`); router.refresh() }
+      else { onSucesso(`Curva recalculada, novo teto: ${r.teto?.toLocaleString('pt-BR')} XP`); router.refresh() }
     })
   }
 
   return (
     <section className="ad-card">
       <h2>Níveis</h2>
-      <p>Nível atual do aluno exige XP mínimo <b>e</b> o requisito composto do nível ao mesmo tempo — excedente de XP não substitui um requisito faltante.</p>
+      <p>Nível atual do aluno exige XP mínimo <b>e</b> o requisito composto do nível ao mesmo tempo. Excedente de XP não substitui um requisito faltante.</p>
 
       <div className="ad-card-destaque" style={{ marginBottom: 16 }}>
         <div>
-          <b>Teto de XP calculado:</b> {config.xpTetoCalculado?.toLocaleString('pt-BR') ?? '— nunca calculado'}
+          <b>Teto de XP calculado:</b> {config.xpTetoCalculado?.toLocaleString('pt-BR') ?? 'nunca calculado'}
           {config.xpTetoCalculadoEm && (
             <span className="ad-sublista-meta"> · em {new Date(config.xpTetoCalculadoEm).toLocaleString('pt-BR')}</span>
           )}

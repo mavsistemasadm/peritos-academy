@@ -5374,6 +5374,12 @@ body.teatro .trilho-aulas{display:none}
 .pagina-gamificacao .gam-tabela td{padding:10px 14px;border-bottom:1px solid var(--linha-suave);vertical-align:top}
 .pagina-gamificacao .gam-tabela tr:last-child td{border-bottom:none}
 .pagina-gamificacao .gam-tabela-desc{font-size:12px;color:var(--cinza)}
+.pagina-gamificacao .gam-linha-pendente{opacity:.6}
+.pagina-gamificacao .gam-selo-em-breve{
+  display:inline-block;margin-left:8px;padding:2px 8px;border-radius:var(--r-pill);
+  font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--cinza-claro);border:1px solid var(--linha);background:rgba(255,255,255,.03);
+}
 
 .pagina-gamificacao .gam-lista-regras{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:var(--s-4);max-width:78ch}
 .pagina-gamificacao .gam-lista-regras li{

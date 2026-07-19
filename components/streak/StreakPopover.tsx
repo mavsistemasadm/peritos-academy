@@ -124,7 +124,7 @@ export default function StreakPopover({
         className="np-pilula fogo"
         aria-haspopup="dialog"
         aria-expanded={aberto}
-        aria-label={`Sequência de ${sequenciaDias} ${sequenciaDias === 1 ? 'dia' : 'dias'} — abrir calendário de acessos`}
+        aria-label={`Sequência de ${sequenciaDias} ${sequenciaDias === 1 ? 'dia' : 'dias'}, abrir calendário de acessos`}
         onClick={() => setAberto(v => !v)}
       >
         <FogoStreak size={14} />
@@ -186,7 +186,7 @@ export default function StreakPopover({
                     <span
                       key={i}
                       className={`streak-dia${ehHoje ? ' hoje' : ''}${futuro ? ' futuro' : ''}`}
-                      title={`${dia} de ${MESES[nav.mes - 1].toLowerCase()}${acessado ? (protegido ? ' — dia protegido' : ' — acesso registrado') : ''}`}
+                      title={`${dia} de ${MESES[nav.mes - 1].toLowerCase()}${acessado ? (protegido ? ', dia protegido' : ', acesso registrado') : ''}`}
                     >
                       {acessado ? (
                         <span className="streak-dia-chama">

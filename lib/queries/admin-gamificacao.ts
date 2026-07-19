@@ -24,6 +24,7 @@ export type ConfigGamificacao = {
   moedaACadaXp: number | null
   xpTetoCalculado: number | null
   xpTetoCalculadoEm: string | null
+  gatilhosPendentesAgendamento: string[]
 }
 
 export type CategoriaGatilho = 'comum' | 'quiz' | 'marco' | 'especial'
@@ -81,6 +82,7 @@ export async function carregarConfigGamificacao(): Promise<ConfigGamificacao> {
     moedaACadaXp: data?.moeda_a_cada_xp ?? null,
     xpTetoCalculado: data?.xp_teto_calculado ?? null,
     xpTetoCalculadoEm: data?.xp_teto_calculado_em ?? null,
+    gatilhosPendentesAgendamento: data?.gatilhos_pendentes_agendamento ?? [],
   }
 }
 

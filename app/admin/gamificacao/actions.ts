@@ -46,6 +46,8 @@ export async function atualizarConfigGamificacao(formData: FormData): Promise<Re
       const raw = (formData.get('moeda_a_cada_xp') as string)?.trim()
       return raw ? Number(raw) : null
     })(),
+    gatilhos_pendentes_agendamento: (formData.get('gatilhos_pendentes_agendamento') as string)
+      ?.split(',').map(c => c.trim()).filter(Boolean) ?? [],
   }).eq('id', 1)
 
   if (error) return { ok: false, erro: error.message }
