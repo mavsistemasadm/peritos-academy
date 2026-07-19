@@ -15,6 +15,9 @@ export type DadosNivelUp = {
   aulasConcluidas: number;
   avaliacoesAprovadas?: number; // só usado no nível 10
   desafiosEntregues?: number; // só usado no nível 10
+  proximoNivelNome?: string; // dado real de gamificacao_niveis, ausente no nível 10 (não há próximo)
+  proximoNivelFaltamXp?: number; // gamificacao_niveis.pontos_minimos do próximo - xp_total; nunca hardcoded
+  cursoConcluidoJunto?: string; // título do curso, quando a subida de nível veio junto de uma conclusão de curso no mesmo dia
 };
 
 const ASSUNTOS: Record<number, string> = {
@@ -513,8 +516,37 @@ const GERADORES: Record<number, (d: DadosNivelUp) => string> = {
   10: nivel10,
 };
 
+// Injeta, sem tocar na prosa literal aprovada de cada nível, dois blocos
+// dinâmicos por cima do HTML já gerado — ambos usando âncoras que aparecem
+// exatamente uma vez por template:
+// 1) "faltam X XP pro próximo nível" (dado real de gamificacao_niveis via
+//    gam_status_proximo_nivel, nunca hardcoded) — ausente no nível 10.
+// 2) menção do curso concluído junto, quando a subida veio de uma conclusão
+//    de curso no mesmo evento (regra de "mencionar o outro no corpo").
+function injetarDadosDinamicos(html: string, d: DadosNivelUp): string {
+  let resultado = html;
+
+  if (d.proximoNivelNome && d.proximoNivelFaltamXp !== undefined && d.proximoNivelFaltamXp > 0) {
+    const ancoraXp = `${fmtNum(d.xpTotal)} XP conquistados</p>\n    </div>`;
+    resultado = resultado.replace(
+      ancoraXp,
+      `${fmtNum(d.xpTotal)} XP conquistados</p>\n      <p style="font-size:13px;color:#888880;margin:6px 0 0;">Faltam <strong>${fmtNum(d.proximoNivelFaltamXp)} XP</strong> para ${d.proximoNivelNome}</p>\n    </div>`
+    );
+  }
+
+  if (d.cursoConcluidoJunto) {
+    const ancoraAssinatura = `<div style="margin-bottom:36px;border-left:3px solid`;
+    resultado = resultado.replace(
+      ancoraAssinatura,
+      `<p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">E de quebra, nesse mesmo embalo você concluiu o curso <strong>${d.cursoConcluidoJunto}</strong>. Dia duplo de conquista.</p>\n\n      ${ancoraAssinatura}`
+    );
+  }
+
+  return resultado;
+}
+
 export function emailNivelUp(ordem: number, dados: DadosNivelUp): { assunto: string; html: string } | null {
   const gerar = GERADORES[ordem];
   if (!gerar) return null;
-  return { assunto: ASSUNTOS[ordem], html: gerar(dados) };
+  return { assunto: ASSUNTOS[ordem], html: injetarDadosDinamicos(gerar(dados), dados) };
 }

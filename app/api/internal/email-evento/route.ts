@@ -11,6 +11,7 @@ import { enviarEmail, type TipoEmail } from "@/lib/email/enviar";
 import { emailBoasVindas } from "@/lib/email/templates/boasVindas";
 import { emailNivelUp } from "@/lib/email/templates/nivelUp";
 import { emailCertificado } from "@/lib/email/templates/certificado";
+import { emailCursoConcluido } from "@/lib/email/templates/cursoConcluido";
 
 function primeiroNome(nome: string): string {
   return nome.trim().split(/\s+/)[0] || nome;
@@ -69,7 +70,11 @@ export async function POST(request: NextRequest) {
 
     if (tipo === "nivel_up") {
       const ordem = Number(refId);
-      if (!ordem || ordem < 2) return NextResponse.json({ ok: false, motivo: "ordem inválida" });
+      // Níveis 2-4 celebram só no toast/sino — email de nível é só a partir
+      // do 5 (regra de produto: email em todo nível viraria spam). O gate
+      // real já está na fonte (creditar_gamificacao só chama esse endpoint
+      // para ordem >= 5); esta checagem é defesa em profundidade.
+      if (!ordem || ordem < 5) return NextResponse.json({ ok: false, motivo: "nivel abaixo do minimo para email" });
 
       const { count: aulasConcluidas } = await supabase
         .from("aula_progresso")
@@ -95,6 +100,38 @@ export async function POST(request: NextRequest) {
         desafiosEntregues = desafios ?? 0;
       }
 
+      // Dado real do próximo nível (nunca hardcoded) — ausente no nível 10.
+      let proximoNivelNome: string | undefined;
+      let proximoNivelFaltamXp: number | undefined;
+      const { data: status } = await supabase.rpc("gam_status_proximo_nivel", { p_usuario: usuarioId });
+      const proximo = (status as { proximo_nivel?: { nome: string; xp_necessario: number; xp_atual: number } } | null)?.proximo_nivel;
+      if (proximo) {
+        proximoNivelNome = proximo.nome;
+        proximoNivelFaltamXp = Math.max(0, proximo.xp_necessario - proximo.xp_atual);
+      }
+
+      // Se essa subida de nível veio junto de uma conclusão de curso no
+      // mesmo evento (o mesmo creditar_gamificacao('concluir_curso', ...)
+      // que dispara isso), menciona no corpo em vez de mandar 2 emails.
+      let cursoConcluidoJunto: string | undefined;
+      const { data: concluidoRecente } = await supabase
+        .from("gamificacao_extrato")
+        .select("referencia_id, criado_em")
+        .eq("usuario_id", usuarioId)
+        .eq("gatilho_codigo", "concluir_curso")
+        .gte("criado_em", new Date(Date.now() - 2 * 60_000).toISOString())
+        .order("criado_em", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (concluidoRecente?.referencia_id) {
+        const { data: cursoRecente } = await supabase
+          .from("cursos")
+          .select("titulo")
+          .eq("id", concluidoRecente.referencia_id)
+          .maybeSingle();
+        cursoConcluidoJunto = cursoRecente?.titulo;
+      }
+
       const template = emailNivelUp(ordem, {
         primeiroNome: nomePrimeiro,
         xpTotal: perfil.xp ?? 0,
@@ -102,6 +139,9 @@ export async function POST(request: NextRequest) {
         aulasConcluidas: aulasConcluidas ?? 0,
         avaliacoesAprovadas,
         desafiosEntregues,
+        proximoNivelNome,
+        proximoNivelFaltamXp,
+        cursoConcluidoJunto,
       });
       if (!template) return NextResponse.json({ ok: false, motivo: "template de nível não encontrado" });
 
@@ -156,6 +196,33 @@ export async function POST(request: NextRequest) {
       const resultado = await enviarEmail({
         usuarioId,
         tipo: "certificado" as TipoEmail,
+        refId: cursoId,
+        assunto,
+        html,
+        remetente: "pessoal",
+      });
+      return NextResponse.json(resultado);
+    }
+
+    if (tipo === "curso_concluido") {
+      const cursoId = refId;
+      if (!cursoId) return NextResponse.json({ ok: false, motivo: "curso_id ausente" });
+
+      const { data: curso } = await supabase.from("cursos").select("titulo").eq("id", cursoId).maybeSingle();
+      if (!curso) return NextResponse.json({ ok: false, motivo: "curso não encontrado" });
+
+      const { data: proximoRaw } = await supabase.rpc("gam_proximo_curso_trilha", { p_curso_id: cursoId });
+      const proximo = proximoRaw as { titulo: string; slug: string; mesma_trilha: boolean } | null;
+
+      const { assunto, html } = emailCursoConcluido({
+        primeiroNome: nomePrimeiro,
+        cursoNome: curso.titulo,
+        proximoCurso: proximo ? { titulo: proximo.titulo, slug: proximo.slug, mesmaTrilha: proximo.mesma_trilha } : null,
+      });
+
+      const resultado = await enviarEmail({
+        usuarioId,
+        tipo: "curso_concluido" as TipoEmail,
         refId: cursoId,
         assunto,
         html,
