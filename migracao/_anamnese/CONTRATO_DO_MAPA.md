@@ -51,6 +51,7 @@ já vem pronto do banco.
       "trilha_nome": "Trilha de Formação Pericial de Alta Performance",
       "votos": 10,
       "forcada_regra_iniciante": true,
+      "forcada_ancora_especialidade": false,
       "num_cursos": 9,
       "num_avaliacoes": 10,
       "carga_horas_video": 18.3,
@@ -72,7 +73,12 @@ já vem pronto do banco.
 ## O que a camada visual precisa saber (e não recalcular)
 
 - **Estações do mapa** = `resultado.trilhas`, já na ordem certa (`ordem`
-  crescente). A primeira é sempre "Seu ponto de partida".
+  crescente). A primeira é sempre "Seu ponto de partida". Uma trilha pode
+  vir marcada `forcada_regra_iniciante` (Formação, sempre 1ª quando Q1
+  indica quem nunca atuou/só estudou) e/ou `forcada_ancora_especialidade`
+  (a área técnica que o aluno declarou na Q5, sempre em destaque logo após
+  a Formação ou em 1º lugar) — útil se a UI quiser um selo tipo "sua área"
+  na estação correspondente.
 - **Faixa de meses de cada estação** = `mes_inicio`/`mes_fim` (convenção: 1
   mês = 4 semanas, arredondado pra cima — decisão de simplicidade/honestidade,
   não é mês de calendário exato).
