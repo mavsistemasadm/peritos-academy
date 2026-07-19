@@ -24,6 +24,7 @@ export default async function PaginaCurso({
       modulos={dados.modulos}
       conquistas={dados.conquistas}
       progresso={dados.progresso}
+      proximoPasso={dados.proximoPasso}
       nav={nav}
     />
   );

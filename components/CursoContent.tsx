@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
-import { IconeChevronLeft, IconePlay, IconePlus, IconeCheck, IconeLock, IconeAlertTriangle } from '@/components/Icones'
+import { IconeChevronLeft, IconePlay, IconePlus, IconeCheck, IconeLock, IconeAlertTriangle, IconeClipboard } from '@/components/Icones'
 import { Certificado } from '@/components/Emblemas'
 
 type Aula = {
@@ -20,11 +20,22 @@ type Aula = {
   motivoBloqueio: string | null;
 };
 
+type Avaliacao = {
+  id: string;
+  numeroCaso: string | null;
+  titulo: string;
+  nQuestoes: number;
+  notaMinima: number;
+  estado: "aprovada" | "disponivel" | "bloqueada";
+  nota: number | null;
+};
+
 type Modulo = {
   id: string;
   titulo: string;
   ordem: number;
   aulas: Aula[];
+  avaliacoes: Avaliacao[];
   totalAulas: number;
   concluidasNoModulo: number;
   duracaoModuloSeg: number;
@@ -32,7 +43,13 @@ type Modulo = {
   bloqueado: boolean;
   estado: "concluido" | "bloqueado" | "andamento" | "nao_iniciado";
   ehAtual: boolean;
+  motivoBloqueio: string | null;
 };
+
+type ProximoPasso =
+  | { tipo: "aula"; aulaId: string; titulo: string }
+  | { tipo: "avaliacao"; avaliacaoId: string; numeroCaso: string | null; titulo: string }
+  | { tipo: "nenhum" };
 
 type Curso = {
   id: string;
@@ -67,6 +84,9 @@ type Progresso = {
   pct: number;
   duracaoTotalSeg: number;
   xpTotal: number;
+  xpTotalAvaliacoes: number;
+  totalAvaliacoes: number;
+  avaliacoesAprovadas: number;
   cursoCompleto: boolean;
   aulaAtualId: string | null;
   aulaAtualTitulo: string | null;
@@ -80,6 +100,7 @@ type Props = {
   modulos: Modulo[];
   conquistas: Conquista[];
   progresso: Progresso;
+  proximoPasso: ProximoPasso;
   nav: DadosNav;
 };
 
@@ -100,7 +121,7 @@ function durOuNull(seg: number) {
   return seg > 0 ? fmtDur(seg) : null;
 }
 
-export function CursoContent({ curso, modulos, conquistas, progresso, nav }: Props) {
+export function CursoContent({ curso, modulos, conquistas, progresso, proximoPasso, nav }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const moduloAtualId = modulos.find((m) => m.ehAtual)?.id ?? modulos[0]?.id ?? null;
   const [abertos, setAbertos] = useState<Record<string, boolean>>(
@@ -150,12 +171,28 @@ export function CursoContent({ curso, modulos, conquistas, progresso, nav }: Pro
   }, []);
 
   const primeiraAulaId = modulos[0]?.aulas[0]?.id ?? null;
-  const cta = progresso.cursoCompleto
-    ? { texto: "Rever curso", aulaId: primeiraAulaId, sub: null as string | null }
-    : progresso.concluidas > 0
-      ? { texto: "Continuar", aulaId: progresso.aulaAtualId, sub: progresso.aulaAtualTitulo ? `Você parou em: ${progresso.aulaAtualTitulo}` : null }
-      : { texto: "Começar agora", aulaId: primeiraAulaId, sub: null as string | null };
-  const ctaHref = cta.aulaId ? `/curso/${curso.slug}/aula/${cta.aulaId}` : "#modulos";
+  const primeiraAulaHref = primeiraAulaId ? `/curso/${curso.slug}/aula/${primeiraAulaId}` : "#modulos";
+
+  let cta: { texto: string; href: string; sub: string | null };
+  if (progresso.cursoCompleto) {
+    cta = { texto: "Rever curso", href: primeiraAulaHref, sub: null };
+  } else if (progresso.concluidas === 0 && progresso.avaliacoesAprovadas === 0) {
+    cta = { texto: "Começar agora", href: primeiraAulaHref, sub: null };
+  } else if (proximoPasso.tipo === "avaliacao") {
+    // beco invisível fechado: quando as aulas do módulo acabaram e falta a
+    // avaliação, o "Continuar" leva direto pro Caso pendente, não pra uma
+    // aula travada que só devolveria o aluno pro mesmo lugar.
+    cta = {
+      texto: "Continuar",
+      href: `/curso/${curso.slug}/avaliacao/${proximoPasso.avaliacaoId}`,
+      sub: `Você parou em: ${proximoPasso.numeroCaso ? `Caso ${proximoPasso.numeroCaso} · ` : ""}${proximoPasso.titulo}`,
+    };
+  } else if (proximoPasso.tipo === "aula") {
+    cta = { texto: "Continuar", href: `/curso/${curso.slug}/aula/${proximoPasso.aulaId}`, sub: `Você parou em: ${proximoPasso.titulo}` };
+  } else {
+    cta = { texto: "Continuar", href: "#modulos", sub: null };
+  }
+  const ctaHref = cta.href;
 
   const det = progresso.aulaAtualDetalhe;
   const pctVideoAtual = det && det.duracaoSeg > 0 ? Math.min(100, Math.round((det.segundosAssistidos / det.duracaoSeg) * 100)) : null;
@@ -207,6 +244,12 @@ export function CursoContent({ curso, modulos, conquistas, progresso, nav }: Pro
                   <span className="rot">de conteúdo</span>
                 </div>
               )}
+              {progresso.totalAvaliacoes > 0 && (
+                <div className="stat">
+                  <span className="grande num">{progresso.totalAvaliacoes}</span>
+                  <span className="rot">{progresso.totalAvaliacoes === 1 ? "avaliação" : "avaliações"}</span>
+                </div>
+              )}
               {progresso.xpTotal > 0 && (
                 <div className="stat">
                   <span className="grande num">{progresso.xpTotal}</span>
@@ -238,7 +281,7 @@ export function CursoContent({ curso, modulos, conquistas, progresso, nav }: Pro
 
               <p className="trava-aviso reveal">
                 <IconeAlertTriangle size={15} strokeWidth={2} />
-                <span>As aulas são liberadas em sequência: para concluir uma aula, assista pelo menos 70% do vídeo e baixe os materiais.</span>
+                <span>As aulas são liberadas em sequência: para concluir uma aula, assista pelo menos 70% do vídeo, baixe os materiais e seja aprovado nas avaliações do módulo.</span>
               </p>
 
               <div className="modulos">
@@ -265,7 +308,11 @@ export function CursoContent({ curso, modulos, conquistas, progresso, nav }: Pro
                         <button
                           className="mod-cab"
                           aria-expanded={aberto}
-                          onClick={() => toggle(modulo.id)}
+                          title={modulo.bloqueado ? modulo.motivoBloqueio ?? undefined : undefined}
+                          onClick={() => {
+                            if (modulo.bloqueado && modulo.motivoBloqueio) avisarBloqueio(modulo.motivoBloqueio);
+                            toggle(modulo.id);
+                          }}
                         >
                           <span className="mod-cab-txt">
                             <span className="rotulo-mod">
@@ -277,6 +324,7 @@ export function CursoContent({ curso, modulos, conquistas, progresso, nav }: Pro
                               {modulo.totalAulas} {modulo.totalAulas === 1 ? "aula" : "aulas"}
                               {durOuNull(modulo.duracaoModuloSeg) && <> · {durOuNull(modulo.duracaoModuloSeg)}</>}
                               {" · "}{modulo.concluidasNoModulo} de {modulo.totalAulas} concluídas
+                              {modulo.avaliacoes.length > 0 && <> · {modulo.avaliacoes.length} {modulo.avaliacoes.length === 1 ? "avaliação" : "avaliações"}</>}
                             </span>
                           </span>
                           <span className="mod-toggle" aria-hidden="true" style={aberto ? { transform: "rotate(45deg)" } : undefined}>
@@ -332,6 +380,53 @@ export function CursoContent({ curso, modulos, conquistas, progresso, nav }: Pro
                                 );
                               })}
                             </ol>
+
+                            {modulo.avaliacoes.length > 0 && (
+                              <ol className="avaliacoes-modulo">
+                                {modulo.avaliacoes.map((av) => {
+                                  const aulasProntas = modulo.totalAulas === 0 || modulo.concluidasNoModulo === modulo.totalAulas;
+                                  const motivoAval = !aulasProntas
+                                    ? "Conclua as aulas deste módulo para desbloquear esta avaliação."
+                                    : "Aprovação na avaliação anterior deste módulo é necessária antes desta.";
+                                  const etiqueta = av.numeroCaso ? `Caso ${av.numeroCaso}` : "Avaliação";
+                                  const conteudo = (
+                                    <>
+                                      <span className={`aval-estado${av.estado === "disponivel" ? " num" : ""}`} aria-hidden="true">
+                                        {av.estado === "aprovada" ? <IconeCheck size={12} />
+                                          : av.estado === "bloqueada" ? <IconeLock size={11} strokeWidth={2.2} />
+                                          : <IconeClipboard size={13} strokeWidth={1.8} />}
+                                      </span>
+                                      <span className="aval-txt">
+                                        <span className="aval-etiqueta num">{etiqueta.toUpperCase()}</span>
+                                        <b>{av.titulo}</b>
+                                        <span className="aval-meta num">
+                                          {av.estado === "aprovada"
+                                            ? <>Aprovado{av.nota != null && <> · {av.nota.toFixed(1).replace(".", ",")}</>}</>
+                                            : `${av.nQuestoes} ${av.nQuestoes === 1 ? "quesito" : "quesitos"}`}
+                                        </span>
+                                      </span>
+                                    </>
+                                  );
+                                  return (
+                                    <li className={`avaliacao ${av.estado}`} key={av.id}>
+                                      {av.estado === "bloqueada" ? (
+                                        <button
+                                          type="button"
+                                          aria-disabled="true"
+                                          title={motivoAval}
+                                          onClick={() => avisarBloqueio(motivoAval)}
+                                          style={{ width: "100%", background: "none", border: "none", textAlign: "left", cursor: "not-allowed" }}
+                                        >
+                                          {conteudo}
+                                        </button>
+                                      ) : (
+                                        <a href={`/curso/${curso.slug}/avaliacao/${av.id}`}>{conteudo}</a>
+                                      )}
+                                    </li>
+                                  );
+                                })}
+                              </ol>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -347,7 +442,11 @@ export function CursoContent({ curso, modulos, conquistas, progresso, nav }: Pro
               {progresso.total > 0 && (
                 <div className="bloco progresso-lateral reveal">
                   <span className="eyebrow">Seu progresso</span>
-                  <p className="txt num"><b>{progresso.concluidas} de {progresso.total}</b> aulas concluídas · <b>{progresso.pct}%</b></p>
+                  <p className="txt num">
+                    <b>{progresso.concluidas} de {progresso.total}</b> aulas
+                    {progresso.totalAvaliacoes > 0 && <> · <b>{progresso.avaliacoesAprovadas} de {progresso.totalAvaliacoes}</b> avaliações</>}
+                    {" · "}<b>{progresso.pct}%</b>
+                  </p>
                   <div className="barra"><i style={{ width: `${progresso.pct}%` }}></i></div>
                 </div>
               )}
