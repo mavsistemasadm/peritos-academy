@@ -12,6 +12,7 @@ export type TipoEmail =
   | "boas_vindas"
   | "nivel_up"
   | "certificado"
+  | "curso_concluido"
   | "carta_pessoal"
   | "primeira_semana"
   | "resumo_quinzenal"
@@ -23,12 +24,14 @@ const REMETENTES: Record<"pessoal" | "automatico", { from: string; replyTo: stri
   automatico: { from: "Peritos Academy <noreply@peritosacademy.com.br>", replyTo: "marlos@peritosacademy.com.br" },
 };
 
-// Prioridade (Parte 6) — índice menor = mais prioritário. Só esses tipos
-// entram na checagem de "1 email de celebração/jornada por dia"; os demais
-// (boas_vindas) não competem por esse limite.
+// Prioridade — índice menor = mais prioritário. Só esses tipos entram na
+// checagem de "1 email de celebração por dia"; boas_vindas e certificado
+// NÃO competem por esse limite (são transacionais diretos: boas-vindas é
+// onboarding único, certificado é a prova formal de uma conquista — nenhum
+// dos dois pode ser silenciosamente engolido por um teto de celebração).
 const PRIORIDADE: TipoEmail[] = [
   "nivel_up",
-  "certificado",
+  "curso_concluido",
   "carta_pessoal",
   "primeira_semana",
   "resumo_quinzenal",
