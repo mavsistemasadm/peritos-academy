@@ -62,11 +62,8 @@ export async function carregarNav(): Promise<DadosNav> {
 
   if (!auth?.user) return { ...VAZIO, ...configNav }
 
-  const [{ data: perfil }, { data: niveis }, { data: saldo }, { data: adminRows }, { data: streak }] = await Promise.all([
+  const [{ data: perfil }, { data: saldo }, { data: adminRows }, { data: streak }, { data: statusNivel }] = await Promise.all([
     supabase.from('perfis').select('nome, slug').eq('id', auth.user.id).single(),
-    // gamificacao_niveis é pequena (dezenas de linhas) — busca tudo e deriva
-    // atual/próximo aqui em vez de duas queries com filtro.
-    supabase.from('gamificacao_niveis').select('nome, pontos_minimos, ordem').order('ordem', { ascending: true }),
     // fonte real: soma do ledger (gamificacao_extrato) via view, não a coluna
     // perfis.xp em cache — evita depender de um valor que pode dessincronizar.
     supabase.from('gamificacao_saldo').select('xp_total, moedas_total').eq('usuario_id', auth.user.id).maybeSingle(),
@@ -77,29 +74,34 @@ export async function carregarNav(): Promise<DadosNav> {
     // (que segue existindo pra outros usos — admin_usuario_ficha, resumo
     // quinzenal por email — e é derivada de gamificação, não de acesso real).
     supabase.rpc('registrar_acesso_diario'),
+    // nível real (XP + requisito composto) — nunca derivar localmente só por
+    // XP aqui, um nível pode exigir cursos/avaliações/desafios/streak/
+    // comunidade além do limiar, ver gam_status_proximo_nivel().
+    supabase.rpc('gam_status_proximo_nivel'),
   ])
   if (!perfil) return { ...VAZIO, ...configNav }
 
   const streakDados = streak as { sequencia_atual?: number; recorde?: number; protecoes_restantes?: number } | null
+  const statusDados = statusNivel as {
+    nivel_atual_ordem?: number; nivel_atual_nome?: string
+    proximo_nivel?: { nome: string; xp_necessario: number } | null
+  } | null
 
   const xp = saldo?.xp_total ?? 0
   const moedas = saldo?.moedas_total ?? 0
 
-  const ordenados = (niveis ?? []).slice().sort((a, b) => a.ordem - b.ordem)
-  const atual = [...ordenados].reverse().find(n => n.pontos_minimos <= xp) ?? null
-  const proximo = ordenados.find(n => n.pontos_minimos > xp) ?? null
-
-  const xpProximo = proximo?.pontos_minimos ?? atual?.pontos_minimos ?? 100
+  const proximo = statusDados?.proximo_nivel ?? null
+  const xpProximo = proximo?.xp_necessario ?? xp
 
   return {
     logado: true,
     nome: perfil.nome ?? 'Perito',
     iniciais: iniciaisDe(perfil.nome ?? 'PA'),
     slug: perfil.slug ?? null,
-    nivel: atual?.ordem ?? 0,
-    titulo: atual?.nome ?? 'Iniciante',
+    nivel: statusDados?.nivel_atual_ordem ?? 0,
+    titulo: statusDados?.nivel_atual_nome ?? 'Iniciante',
     xp, xpProximo,
-    progressoPct: xpProximo > 0 ? Math.min(100, Math.round((xp / xpProximo) * 100)) : 100,
+    progressoPct: proximo ? Math.min(100, Math.round((xp / Math.max(1, xpProximo)) * 100)) : 100,
     faltaXp: Math.max(0, xpProximo - xp),
     proximoNivelNome: proximo?.nome ?? null,
     moedas,

@@ -115,8 +115,8 @@ export async function carregarHome(): Promise<DadosHome | null> {
     { data: cursosRaw },
     { data: modulosRaw },
     { data: postsRaw },
-    { data: niveis },
     { data: saldo },
+    { data: statusNivel },
     jornada,
     agenda,
   ] = await Promise.all([
@@ -124,8 +124,10 @@ export async function carregarHome(): Promise<DadosHome | null> {
     supabase.from('cursos').select('id, slug, titulo, capa_url, capa_vertical_url, capa_horizontal_url, atualizado_em').eq('publicado', true).order('atualizado_em', { ascending: false }),
     supabase.from('modulos').select('id, curso_id, ordem').order('ordem', { ascending: true }),
     supabase.from('comunidade_posts').select('*').order('criado_em', { ascending: false }).limit(3),
-    supabase.from('gamificacao_niveis').select('nome, pontos_minimos, ordem').order('ordem', { ascending: true }),
     supabase.from('gamificacao_saldo').select('xp_total, moedas_total').eq('usuario_id', uid).maybeSingle(),
+    // nível real (XP + requisito composto) — nunca derivar localmente só por
+    // XP, ver gam_status_proximo_nivel().
+    supabase.rpc('gam_status_proximo_nivel'),
     carregarJornada(),
     carregarAgenda(),
   ])
@@ -250,9 +252,9 @@ export async function carregarHome(): Promise<DadosHome | null> {
 
   // ---------- próximo nível (pra "próxima conquista") ----------
   const xp = saldo?.xp_total ?? 0
-  const ordenados = (niveis ?? []).slice().sort((a, b) => a.ordem - b.ordem)
-  const proximoNivel = ordenados.find(n => n.pontos_minimos > xp) ?? null
-  const faltaXp = proximoNivel ? Math.max(0, proximoNivel.pontos_minimos - xp) : 0
+  const statusDados = statusNivel as { proximo_nivel?: { nome: string; xp_necessario: number } | null } | null
+  const proximoNivel = statusDados?.proximo_nivel ?? null
+  const faltaXp = proximoNivel ? Math.max(0, proximoNivel.xp_necessario - xp) : 0
 
   // ---------- trilho: trilha protagonista (mais atividade recente; default = Formação) ----------
   const trilho: EtapaTrilho[] = jornada.trilhaProtagonistaHome.marcos.map((m, i) => ({

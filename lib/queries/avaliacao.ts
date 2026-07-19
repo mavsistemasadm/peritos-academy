@@ -28,7 +28,7 @@ export type AvaliacaoInfo = {
   descricao: string | null;
   caso_numero: string | null;
   capa_url: string | null;
-  xp_total: number; // teto de XP (faixa quiz_100 x peso da avaliação) — o efetivo depende do acerto
+  xp_total: number; // teto de XP (avaliacao_xp_base x peso, a 100% de acerto) — o efetivo depende do acerto
   nota_minima: number;
   tema: number;
 };
@@ -88,10 +88,13 @@ export async function getAvaliacao(
     .single();
   if (!av) return null;
 
-  const { data: faixaMax } = await supabase
-    .from("gamificacao_gatilhos")
-    .select("pontos")
-    .eq("codigo", "quiz_100")
+  // teto de XP real: avaliacao_xp_base (config) x peso, a 100% de acerto —
+  // o antigo gatilho quiz_100 foi aposentado junto com o sistema de faixas
+  // (ver submeter_avaliacao(), agora usa avaliacao_aprovada).
+  const { data: configGam } = await supabase
+    .from("config_gamificacao")
+    .select("avaliacao_xp_base")
+    .eq("id", 1)
     .maybeSingle();
 
   let modulo: AvaliacaoDados["modulo"] = null;
@@ -134,7 +137,7 @@ export async function getAvaliacao(
       descricao: av.briefing,           // coluna real: briefing
       caso_numero: av.numero_caso,      // coluna real: numero_caso
       capa_url: av.capa_url,
-      xp_total: (faixaMax?.pontos ?? 60) * Math.max(av.peso ?? 1, 1), // teto: faixa quiz_100 x peso
+      xp_total: (configGam?.avaliacao_xp_base ?? 200) * Math.max(av.peso ?? 1, 1), // teto: avaliacao_xp_base x peso, a 100% de acerto
       nota_minima: Number(av.nota_minima ?? 7),
       tema: av.tema ?? 0,
     },

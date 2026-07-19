@@ -117,14 +117,18 @@ export async function carregarComunidade(): Promise<DadosComunidade> {
   let minhasReacoes = new Map<string, Set<string>>() // post_id -> tipos
   if (usuario) {
     const [{ data: perfil }, { data: saldo }, { data: reacoes }] = await Promise.all([
-      supabase.from('perfis').select('nome, nivel, titulo').eq('id', usuario.id).single(),
+      supabase.from('perfis').select('nome, nivel').eq('id', usuario.id).single(),
       supabase.from('gamificacao_saldo').select('xp_total').eq('usuario_id', usuario.id).maybeSingle(),
       supabase.from('comunidade_reacoes').select('post_id, tipo'),
     ])
     usuarioNome = perfil?.nome ?? null
     usuarioNivel = perfil?.nivel ?? 1
-    usuarioTitulo = perfil?.titulo ?? 'Perito Iniciante'
     usuarioXp = saldo?.xp_total ?? 0
+    // perfis.titulo é coluna órfã (nunca escrita pelo motor real, ver
+    // CLAUDE.md) — título vem do nome do nível atual (perfis.nivel já é
+    // a cache correta, sincronizada por creditar_gamificacao).
+    const { data: nivelAtual } = await supabase.from('gamificacao_niveis').select('nome').eq('ordem', usuarioNivel).maybeSingle()
+    usuarioTitulo = nivelAtual?.nome ?? 'Explorador Novato'
     for (const r of reacoes ?? []) {
       if (!minhasReacoes.has(r.post_id)) minhasReacoes.set(r.post_id, new Set())
       minhasReacoes.get(r.post_id)!.add(r.tipo)
@@ -186,25 +190,39 @@ export async function carregarComunidade(): Promise<DadosComunidade> {
     }
   }))
 
-  // ranking real: só "abre" com massa crítica (5+ perfis com xp>0). até lá,
-  // mostra só a linha do próprio usuário — nunca gente fictícia.
-  const { count: usuariosComXp } = await supabase
-    .from('perfis').select('id', { count: 'exact', head: true }).gt('xp', 0)
+  // ranking real da SEMANA (não XP vitalício — senão os primeiros usuários
+  // dominariam o topo pra sempre): soma gamificacao_extrato.pontos dos
+  // últimos 7 dias por usuário. Só "abre" com massa crítica (5+ pessoas
+  // com XP > 0 na semana). Até lá, mostra só a linha do próprio usuário
+  // (XP vitalício, como stat pessoal) — nunca gente fictícia.
+  const seteDiasAtras = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString()
+  const { data: extratoSemana } = await supabase
+    .from('gamificacao_extrato').select('usuario_id, pontos').gte('criado_em', seteDiasAtras)
+
+  const xpSemanaPorUsuario = new Map<string, number>()
+  for (const e of extratoSemana ?? []) {
+    xpSemanaPorUsuario.set(e.usuario_id, (xpSemanaPorUsuario.get(e.usuario_id) ?? 0) + e.pontos)
+  }
+  const rankingSemana = [...xpSemanaPorUsuario.entries()]
+    .filter(([, xp]) => xp > 0)
+    .sort((a, b) => b[1] - a[1])
 
   let ranking: RankingComunidade
-  if ((usuariosComXp ?? 0) >= 5) {
-    const { data: topPerfis } = await supabase
-      .from('perfis').select('id, nome, xp')
-      .gt('xp', 0).order('xp', { ascending: false }).limit(10)
+  if (rankingSemana.length >= 5) {
+    const top10 = rankingSemana.slice(0, 10)
+    const { data: perfisRanking } = await supabase
+      .from('perfis').select('id, nome').in('id', top10.map(([id]) => id))
+    const nomePorId = new Map((perfisRanking ?? []).map(p => [p.id, p.nome as string]))
     ranking = {
       aberto: true,
-      linhas: (topPerfis ?? []).map((p, i) => {
-        const ehVoce = !!usuario && p.id === usuario.id
+      linhas: top10.map(([id, xp], i) => {
+        const ehVoce = !!usuario && id === usuario.id
+        const nome = nomePorId.get(id) ?? null
         return {
           posicao: i + 1,
-          nome: ehVoce ? 'Você' : (p.nome ?? 'Perito'),
-          iniciais: iniciaisDe(p.nome) ?? 'PA',
-          xp: ehVoce ? usuarioXp : (p.xp ?? 0),
+          nome: ehVoce ? 'Você' : (nome ?? 'Perito'),
+          iniciais: iniciaisDe(nome) ?? 'PA',
+          xp,
           eh_voce: ehVoce,
         }
       }),
