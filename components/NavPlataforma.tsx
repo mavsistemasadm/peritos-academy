@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { DadosNav } from '@/lib/queries/nav'
-import { IconeChevronDown, IconeMap, IconeBookOpen, IconeBarChart, IconeUser, IconeGlobe, IconeShield, IconeLogOut, IconeAlertTriangle, IconeCompass } from '@/components/Icones'
+import { IconeChevronDown, IconeMap, IconeBookOpen, IconeBarChart, IconeUser, IconeGlobe, IconeShield, IconeLogOut, IconeAlertTriangle, IconeCompass, IconeZap } from '@/components/Icones'
 import { FogoStreak, Moeda, Certificado } from '@/components/Emblemas'
 import { sair } from '@/lib/auth/sair'
 import StreakPopover from '@/components/streak/StreakPopover'
@@ -153,6 +153,10 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
                     <a href={`/perito/${d.slug ?? ''}`} className="np-am-item" onClick={() => setMenuAvatar(false)}>
                       <IconeGlobe size={16} strokeWidth={1.8} />
                       Perfil público
+                    </a>
+                    <a href="/gamificacao" className="np-am-item" onClick={() => setMenuAvatar(false)}>
+                      <IconeZap size={16} strokeWidth={1.8} />
+                      Como funciona sua jornada
                     </a>
                     <a href="/guia" className="np-am-item" onClick={() => setMenuAvatar(false)}>
                       <IconeCompass size={16} strokeWidth={1.8} />

@@ -5316,3 +5316,71 @@ body.teatro .trilho-aulas{display:none}
   .pagina-guia .guia-sidebar a.ativo{border-left:none;border-bottom-color:var(--verde)}
   .pagina-guia .guia-cap-corpo{padding-left:0}
 }
+
+/* ============================================================
+   PÁGINA /gamificacao — "Como funciona sua jornada"
+   ============================================================ */
+.pagina-gamificacao{background:var(--carvao);color:var(--creme);min-height:100vh}
+
+.pagina-gamificacao .gam-hero{
+  padding:calc(var(--nav-h) + var(--s-7)) 0 var(--s-6);
+  background:radial-gradient(60% 50% at 50% 0%,rgba(32,217,166,.09),transparent 70%);
+  text-align:center;
+}
+.pagina-gamificacao .gam-hero h1{font-size:clamp(26px,3.2vw,40px);font-weight:730;letter-spacing:-.03em;margin:10px 0 12px}
+.pagina-gamificacao .gam-hero .sub{max-width:62ch;margin:0 auto;color:var(--cinza-claro);line-height:1.65}
+
+.pagina-gamificacao .gam-secao{padding:var(--s-6) 0}
+.pagina-gamificacao .gam-secao h2{
+  display:flex;align-items:center;gap:8px;
+  font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:10px;
+}
+.pagina-gamificacao .gam-secao-intro{color:var(--cinza-claro);line-height:1.65;margin-bottom:var(--s-4);max-width:78ch}
+.pagina-gamificacao .gam-nota{color:var(--cinza);font-size:13.5px;line-height:1.6;margin-top:var(--s-3);max-width:78ch}
+
+.pagina-gamificacao .gam-niveis-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;
+}
+.pagina-gamificacao .gam-nivel-card{
+  display:flex;gap:14px;padding:16px;border:1px solid var(--linha);border-radius:var(--r-card);
+  background:rgba(255,255,255,.02);
+}
+.pagina-gamificacao .gam-nivel-card img{border-radius:12px;flex-shrink:0;object-fit:contain}
+.pagina-gamificacao .gam-nivel-num{font-size:11px;color:var(--cinza);text-transform:uppercase;letter-spacing:.04em}
+.pagina-gamificacao .gam-nivel-info h3{font-size:16px;font-weight:660;margin:2px 0 4px}
+.pagina-gamificacao .gam-nivel-xp{font-size:13px;color:var(--verde);font-weight:600;margin-bottom:8px}
+.pagina-gamificacao .gam-nivel-requisitos{list-style:none;display:flex;flex-direction:column;gap:3px}
+.pagina-gamificacao .gam-nivel-requisitos li{font-size:12.5px;color:var(--cinza-claro);line-height:1.5;padding-left:12px;position:relative}
+.pagina-gamificacao .gam-nivel-requisitos li::before{content:'';position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:50%;background:var(--ciano)}
+.pagina-gamificacao .gam-nivel-requisitos-vazio{font-size:12.5px;color:var(--cinza)}
+
+.pagina-gamificacao .gam-tabela-bloco{margin-bottom:var(--s-5)}
+.pagina-gamificacao .gam-tabela-bloco h3{font-size:13px;font-weight:680;letter-spacing:.02em;color:var(--cinza-claro);margin-bottom:8px;text-transform:uppercase}
+.pagina-gamificacao .gam-tabela-scroll{overflow-x:auto;border:1px solid var(--linha);border-radius:var(--r-card)}
+.pagina-gamificacao .gam-tabela{width:100%;border-collapse:collapse;font-size:13.5px}
+.pagina-gamificacao .gam-tabela th{
+  text-align:left;padding:10px 14px;color:var(--cinza);font-weight:600;font-size:12px;
+  border-bottom:1px solid var(--linha);background:rgba(255,255,255,.02);
+}
+.pagina-gamificacao .gam-tabela td{padding:10px 14px;border-bottom:1px solid var(--linha-suave);vertical-align:top}
+.pagina-gamificacao .gam-tabela tr:last-child td{border-bottom:none}
+.pagina-gamificacao .gam-tabela-desc{font-size:12px;color:var(--cinza)}
+
+.pagina-gamificacao .gam-lista-regras{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:var(--s-4);max-width:78ch}
+.pagina-gamificacao .gam-lista-regras li{
+  font-size:14.5px;color:var(--cinza-claro);line-height:1.6;padding-left:16px;position:relative;
+}
+.pagina-gamificacao .gam-lista-regras li::before{content:'';position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:50%;background:var(--verde)}
+
+.pagina-gamificacao .gam-streak-marcos{display:flex;flex-direction:column;gap:8px;max-width:78ch}
+.pagina-gamificacao .gam-streak-marco{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;
+  border:1px solid rgba(221,247,132,.25);background:rgba(221,247,132,.05);color:var(--lima);
+  font-size:14px;
+}
+.pagina-gamificacao .gam-streak-marco span{color:var(--cinza-claro)}
+.pagina-gamificacao .gam-streak-marco b{color:var(--lima)}
+
+@media(max-width:640px){
+  .pagina-gamificacao .gam-niveis-grid{grid-template-columns:1fr}
+}

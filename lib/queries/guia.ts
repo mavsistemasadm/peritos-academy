@@ -14,7 +14,7 @@ export type DadosGuia = {
 }
 
 // mesmo mapa usado em ConquistaToast.tsx pro toast de subida de nível
-const NIVEL_IMG: Record<number, string> = {
+export const NIVEL_IMG: Record<number, string> = {
   1: '/niveis/nivel-01-explorador-novato.png',
   2: '/niveis/nivel-02-conhecedor-de-logicas.png',
   3: '/niveis/nivel-03-aspirante-a-perito.png',
