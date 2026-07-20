@@ -9,8 +9,9 @@ import { tocarAcordeAvaliacao } from './avaliacao'
 import { tocarAplausoCurso } from './curso'
 import { tocarWhooshStreak } from './streak'
 import { tocarNotaPrimeiraAula } from './primeiraAula'
+import { tocarBaqueCarimbo } from './carimbo'
 
-export type TipoSom = 'nivel_up' | 'avaliacao_aprovada' | 'curso_concluido' | 'streak' | 'primeira_aula'
+export type TipoSom = 'nivel_up' | 'avaliacao_aprovada' | 'curso_concluido' | 'streak' | 'primeira_aula' | 'carimbo'
 
 const VOLUME_MESTRE = 0.4
 
@@ -54,6 +55,7 @@ export function tocarSom(tipo: TipoSom) {
       case 'curso_concluido': tocarAplausoCurso(audio.ctx, audio.master); break
       case 'streak': tocarWhooshStreak(audio.ctx, audio.master); break
       case 'primeira_aula': tocarNotaPrimeiraAula(audio.ctx, audio.master); break
+      case 'carimbo': tocarBaqueCarimbo(audio.ctx, audio.master); break
     }
   } catch {
     // autoplay bloqueado ou qualquer outra falha de áudio — o toast nunca depende do som
