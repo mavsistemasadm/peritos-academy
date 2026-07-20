@@ -317,7 +317,6 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
   const [segAtivo, setSegAtivo] = useState(0);
   const [linhaDesenhada, setLinhaDesenhada] = useState(false);
   const [estacaoChegou, setEstacaoChegou] = useState(false);
-  const [zoomAtivo, setZoomAtivo] = useState(false);
   const [cartaoVisivel, setCartaoVisivel] = useState(false);
   const [sheetColapsado, setSheetColapsado] = useState(false);
   const [dragY, setDragY] = useState(0);
@@ -325,18 +324,17 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
 
   useEffect(() => {
     if (cena !== "rota") return;
-    setLinhaDesenhada(false); setEstacaoChegou(false); setZoomAtivo(false); setCartaoVisivel(false);
+    setLinhaDesenhada(false); setEstacaoChegou(false); setCartaoVisivel(false);
     setSheetColapsado(false); setDragY(0);
     if (reduzido) {
-      setLinhaDesenhada(true); setEstacaoChegou(true); setZoomAtivo(true); setCartaoVisivel(true);
+      setLinhaDesenhada(true); setEstacaoChegou(true); setCartaoVisivel(true);
       cerimoniaMusica.pingEstacao();
       return;
     }
     const t1 = setTimeout(() => setLinhaDesenhada(true), 50);
     const t2 = setTimeout(() => { setEstacaoChegou(true); cerimoniaMusica.pingEstacao(); }, 50 + 1400);
-    const t3 = setTimeout(() => setZoomAtivo(true), 50 + 1400 + 300);
-    const t4 = setTimeout(() => setCartaoVisivel(true), 50 + 1400 + 300 + 900);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+    const t3 = setTimeout(() => setCartaoVisivel(true), 50 + 1400 + 300 + 900);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [cena, segAtivo, reduzido]);
 
   function avancarEstacao() {
@@ -349,8 +347,21 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
 
   const estacaoAtual: Estacao | null = estacoes[segAtivo] ?? null;
   const pontoAtual = estacaoAtual ? { x: estacaoAtual.xPct, y: estacaoAtual.yPct } : { x: ENTRADA_X, y: ENTRADA_Y };
-  const dx = estacaoAtual ? (50 - estacaoAtual.xPct) * 0.14 : 0;
-  const dy = estacaoAtual ? (50 - estacaoAtual.yPct) * 0.14 : 0;
+
+  // Cartão adjacente ao envelope ativo (mapa nunca mais encolhe): envelope
+  // na metade direita do mapa -> cartão nasce à esquerda dele, e vice-versa.
+  // clamp() garante que nunca estoura a viewport nem cobre o envelope.
+  const CARTAO_LARGURA = 380;
+  const CARTAO_GAP = 32;
+  const cartaoEstiloDesktop: React.CSSProperties | undefined = estacaoAtual
+    ? {
+        left: estacaoAtual.xPct > 50
+          ? `clamp(16px, calc(${estacaoAtual.xPct}% - ${CARTAO_LARGURA + CARTAO_GAP}px), calc(100% - ${CARTAO_LARGURA + 16}px))`
+          : `clamp(16px, calc(${estacaoAtual.xPct}% + ${CARTAO_GAP}px), calc(100% - ${CARTAO_LARGURA + 16}px))`,
+        top: `clamp(40px, ${estacaoAtual.yPct}%, calc(100% - 40px))`,
+        transform: "translateY(-50%)",
+      }
+    : undefined;
 
   /* ---------- câmera mobile (pan sobre o mapa grande) ---------- */
   const mapaMobileRef = useRef<HTMLDivElement>(null);
@@ -386,18 +397,14 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
     setDragY(0);
   }
 
-  function renderMapa(opts: { estacoesAcesas: Set<string>; segmentosAte: number; zoom: boolean }) {
-    const { estacoesAcesas, segmentosAte, zoom } = opts;
+  function renderMapa(opts: { estacoesAcesas: Set<string>; segmentosAte: number }) {
+    const { estacoesAcesas, segmentosAte } = opts;
     return (
       <div
         ref={mobile ? mapaMobileRef : undefined}
         className="an-mapa-viva"
         style={{
-          transform: mobile
-            ? `translate(${camMobile.tx}px, ${camMobile.ty}px)`
-            : zoom
-            ? `scale(1.14) translate(${dx}%, ${dy}%)`
-            : "none",
+          transform: mobile ? `translate(${camMobile.tx}px, ${camMobile.ty}px)` : "none",
         }}
       >
         <img src="/rota/mesa-perito.png" alt="Mapa da Rota do Perito" className="an-mapa-img" />
@@ -676,32 +683,36 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
       {cena === "rota" && estacaoAtual && (
         <div className="an-cena ativa an-rota-cena">
           <div className="an-mapa-wrap">
-            {renderMapa({ estacoesAcesas: acesasAteAgora, segmentosAte: segAtivo, zoom: zoomAtivo })}
-          </div>
+            {renderMapa({ estacoesAcesas: acesasAteAgora, segmentosAte: segAtivo })}
 
-          {cartaoVisivel && (
-            <div
-              className={`an-cartao-capitulo${mobile ? " sheet" : ""}${sheetColapsado ? " colapsado" : ""}`}
-              style={mobile ? { transform: `translateY(${sheetColapsado ? "calc(100% - 54px)" : `${dragY}px`})` } : undefined}
-            >
-              {mobile && (
-                <div
-                  className="an-sheet-alca"
-                  onPointerDown={onSheetPointerDown}
-                  onPointerMove={onSheetPointerMove}
-                  onPointerUp={onSheetPointerUp}
-                  onClick={() => sheetColapsado && setSheetColapsado(false)}
-                />
-              )}
-              <span className="an-cartao-eyebrow">TERRITÓRIO {segAtivo + 1}</span>
-              <h3>{estacaoAtual.trilhaNome}</h3>
-              <p>{estacaoAtual.justificativa}</p>
-              <p className="an-cartao-dados">{estacaoAtual.numCursos} cursos · {estacaoAtual.cargaHoras}h de conteúdo</p>
-              <button className="an-btn-primario" onClick={avancarEstacao}>
-                {segAtivo + 1 < estacoes.length ? "Seguir no mapa" : "Chegar ao tesouro"} <IconeChevronRight size={16} />
-              </button>
-            </div>
-          )}
+            {cartaoVisivel && (
+              <div
+                className={`an-cartao-capitulo${mobile ? " sheet" : ""}${sheetColapsado ? " colapsado" : ""}`}
+                style={
+                  mobile
+                    ? { transform: `translateY(${sheetColapsado ? "calc(100% - 54px)" : `${dragY}px`})` }
+                    : cartaoEstiloDesktop
+                }
+              >
+                {mobile && (
+                  <div
+                    className="an-sheet-alca"
+                    onPointerDown={onSheetPointerDown}
+                    onPointerMove={onSheetPointerMove}
+                    onPointerUp={onSheetPointerUp}
+                    onClick={() => sheetColapsado && setSheetColapsado(false)}
+                  />
+                )}
+                <span className="an-cartao-eyebrow">TERRITÓRIO {segAtivo + 1}</span>
+                <h3>{estacaoAtual.trilhaNome}</h3>
+                <p>{estacaoAtual.justificativa}</p>
+                <p className="an-cartao-dados">{estacaoAtual.numCursos} cursos · {estacaoAtual.cargaHoras}h de conteúdo</p>
+                <button className="an-btn-primario" onClick={avancarEstacao}>
+                  {segAtivo + 1 < estacoes.length ? "Seguir no mapa" : "Chegar ao tesouro"} <IconeChevronRight size={16} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -729,7 +740,7 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
       {cena === "mapa-final" && (
         <div className="an-cena ativa an-rota-cena an-mapa-final">
           <div className="an-mapa-wrap">
-            {renderMapa({ estacoesAcesas: todasAcesasIds, segmentosAte: estacoes.length - 1, zoom: false })}
+            {renderMapa({ estacoesAcesas: todasAcesasIds, segmentosAte: estacoes.length - 1 })}
           </div>
           <div className="an-mapa-final-acoes">
             <button className="an-btn-primario" onClick={handleComecarMinhaRota} disabled={comecando}>

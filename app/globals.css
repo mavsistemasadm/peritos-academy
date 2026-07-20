@@ -5697,7 +5697,7 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
   align-items:center;justify-content:flex-start;overflow-y:auto;
 }
 .pagina-anamnese .an-mapa-wrap{position:relative;width:100%;max-width:1300px;margin:0 auto}
-.pagina-anamnese .an-mapa-viva{position:relative;width:100%;aspect-ratio:1456/816;transition:transform .9s var(--suave);overflow:hidden;border-radius:14px}
+.pagina-anamnese .an-mapa-viva{position:relative;width:100%;aspect-ratio:1456/816;overflow:hidden;border-radius:14px}
 .pagina-anamnese .an-mapa-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .pagina-anamnese .an-mapa-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .pagina-anamnese .an-linha-rota{stroke-dasharray:100;stroke-dashoffset:100;filter:drop-shadow(0 0 8px rgba(32,217,166,.8)) drop-shadow(0 0 22px rgba(54,220,209,.5))}
@@ -5733,13 +5733,14 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 .pagina-anamnese .an-tag-explorar{color:var(--cinza);border:1px solid var(--linha);background:rgba(255,255,255,.02)}
 
 .pagina-anamnese .an-cartao-capitulo{
-  position:relative;width:100%;max-width:520px;margin:0 auto;
+  position:absolute;width:380px;max-width:calc(100vw - 32px);
   border:1px solid var(--linha);border-radius:var(--r-card);
   background:linear-gradient(165deg,#0E1210,#090C0A 80%);
   padding:var(--s-5) var(--s-5) var(--s-4);
+  box-shadow:0 30px 70px -20px rgba(0,0,0,.7);
   opacity:0;animation:an-cartao-subir .5s cubic-bezier(.2,1.2,.3,1) both;
 }
-@keyframes an-cartao-subir{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes an-cartao-subir{from{opacity:0;transform:translateY(-50%) translateY(20px)}to{opacity:1;transform:translateY(-50%)}}
 .pagina-anamnese .an-cartao-eyebrow{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--verde);margin-bottom:8px}
 .pagina-anamnese .an-cartao-capitulo h3{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:var(--s-3)}
 .pagina-anamnese .an-cartao-capitulo p{font-size:14.5px;color:var(--cinza-claro);line-height:1.6;margin-bottom:var(--s-3)}
