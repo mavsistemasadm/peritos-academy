@@ -2198,6 +2198,7 @@ body.teatro .trilho-aulas{display:none}
 .pagina-perfil .cert.proximo .cert-selo{background:none;border:1px dashed var(--linha);color:var(--cinza)}
 
 /* ---------- atividade ---------- */
+.pagina-perfil .atv-vazio{font-size:14px;color:var(--cinza-claro);padding:var(--s-3) 0}
 .pagina-perfil .atv-lista{list-style:none;position:relative}
 .pagina-perfil .atv-lista::before{content:'';position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:rgba(255,255,255,.07);border-radius:2px}
 .pagina-perfil .atv{position:relative;display:flex;gap:var(--s-3);padding:13px 0 13px 0}

@@ -7,8 +7,8 @@ import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
 import { salvarPerfil, uploadFoto, salvarPreferenciaEmail } from '@/app/perfil/actions'
 import {
-  IconeCheck, IconeFileText, IconeZap, IconeLock, IconeMessageCircle, IconePencil,
-  IconeArrowUp, IconeCamera, IconeEye, IconeLink, IconeDownload, IconePlay,
+  IconeCheck, IconeFileText, IconeZap, IconeLock, IconePencil,
+  IconeCamera, IconeEye, IconeLink, IconeDownload, IconePlay,
 } from '@/components/Icones'
 import { Certificado, FogoStreak } from '@/components/Emblemas'
 
@@ -50,11 +50,6 @@ const ICONE_INS: Record<string, React.ReactNode> = {
   raio: <IconeZap size={26} />,
   cadeado: <IconeLock size={22} />,
 }
-const ICONE_ATV: Record<string, React.ReactNode> = {
-  comunidade: <IconeMessageCircle size={13} />,
-  anotacao: <IconePencil size={13} />,
-  ranking: <IconeArrowUp size={13} />,
-}
 const IcoCert = () => <Certificado size={22} />
 
 export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav: DadosNav }) {
@@ -65,6 +60,7 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
   const [salvandoPerfil, setSalvandoPerfil] = useState(false)
   const [msgSalvo, setMsgSalvo] = useState<string | null>(null)
   const [fotoUrl, setFotoUrl] = useState<string | null>(dados.foto_url)
+  const [fotoErro, setFotoErro] = useState(false)
   const [uploadingFoto, setUploadingFoto] = useState(false)
   const [receberEmails, setReceberEmails] = useState(dados.receberEmails)
 
@@ -123,7 +119,7 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
     fd.append('foto', file)
     const r = await uploadFoto(fd)
     setUploadingFoto(false)
-    if (r.ok) setFotoUrl(r.foto_url)
+    if (r.ok) { setFotoUrl(r.foto_url); setFotoErro(false) }
   }
 
   const d = dados
@@ -146,8 +142,8 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
         <div className="wrap">
           <div className="perfil-linha">
             <label className={`avatar-grande${uploadingFoto ? ' uploading' : ''}`} aria-label="Trocar foto de perfil">
-              {fotoUrl ? (
-                <img src={fotoUrl} alt="" className="avatar-foto" />
+              {fotoUrl && !fotoErro ? (
+                <img src={fotoUrl} alt="" className="avatar-foto" onError={() => setFotoErro(true)} />
               ) : (
                 iniciais(d.nome)
               )}
@@ -403,22 +399,26 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
             <div className="secao-cab">
               <h2>Atividade recente.</h2>
             </div>
+            {d.atividades.length === 0 ? (
+              <p className="atv-vazio sub">Sua jornada começa na primeira aula.</p>
+            ) : (
             <ul className="atv-lista">
               {d.atividades.map((a, i) => (
-                <li key={i} className={`atv${a.xp != null ? ' xp' : ''}`}>
+                <li key={i} className="atv xp">
                   <span className="atv-ponto" aria-hidden="true">
-                    {a.xp != null ? <IconeCheck size={13} /> : (ICONE_ATV[a.tipo] ?? '·')}
+                    <IconeCheck size={13} />
                   </span>
                   <div className="atv-txt">
                     <p>
                       {a.prefixo}<b>{a.destaque}</b>{a.sufixo}
-                      {a.xp != null && <> · <span className="gd num">+{a.xp} XP</span></>}
+                      {a.xp > 0 && <> · <span className="gd num">+{a.xp} XP</span></>}
                     </p>
                     <time>{quandoAtividade(a.quando)}</time>
                   </div>
                 </li>
               ))}
             </ul>
+            )}
           </div>
         </div>
       </section>

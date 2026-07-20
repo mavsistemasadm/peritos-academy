@@ -36,7 +36,6 @@ export type DadosPeritoPublico = {
     xp: number
     nivel: number
     moedas: number
-    streak_dias: number
     membro_desde: string
   }
   stats: {
@@ -70,6 +69,12 @@ export async function carregarPeritoPublico(slug: string): Promise<DadosPeritoPu
   const uid = perfil.id
   const nome = perfil.nome ?? 'Perito'
   const iniciais = nome.split(' ').map((p: string) => p[0]).join('').slice(0, 2).toUpperCase()
+
+  // nível real (mesmo motor de lib/queries/perfil.ts e nav.ts) — nunca a
+  // fórmula ad-hoc xp/100, que diverge do sistema de níveis de verdade
+  // (gamificacao_niveis, requisitos compostos).
+  const { data: statusNivel } = await supabase.rpc('gam_status_proximo_nivel', { p_usuario: uid })
+  const nivelReal = (statusNivel as { nivel_atual_ordem?: number } | null)?.nivel_atual_ordem ?? 0
 
   const { data: certsRaw } = await supabase
     .from('certificados')
@@ -204,9 +209,8 @@ export async function carregarPeritoPublico(slug: string): Promise<DadosPeritoPu
       mostrar_email: perfil.mostrar_email,
       mostrar_tel: perfil.mostrar_tel,
       xp,
-      nivel: Math.floor(xp / 100) + 1,
+      nivel: nivelReal,
       moedas: perfil.moedas ?? 0,
-      streak_dias: perfil.streak_dias ?? 0,
       membro_desde,
     },
     stats: {

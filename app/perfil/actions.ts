@@ -69,15 +69,15 @@ export async function uploadFoto(formData: FormData) {
   if (arquivo.size > 5 * 1024 * 1024) return { ok: false as const, erro: 'Foto muito grande. Máximo 5 MB.' }
 
   const userId = auth.user.id
-  const path = `perfis/${userId}/foto.${ext}`
+  const path = `${userId}/foto.${ext}`
   const buffer = Buffer.from(await arquivo.arrayBuffer())
 
   const { error: upErr } = await supabase.storage
-    .from('planilhas')
+    .from('fotos-perfil')
     .upload(path, buffer, { contentType: arquivo.type, upsert: true })
   if (upErr) return { ok: false as const, erro: upErr.message }
 
-  const { data: urlData } = supabase.storage.from('planilhas').getPublicUrl(path)
+  const { data: urlData } = supabase.storage.from('fotos-perfil').getPublicUrl(path)
   const foto_url = urlData.publicUrl + '?t=' + Date.now()
 
   const { error } = await supabase.from('perfis').update({ foto_url }).eq('id', userId)
