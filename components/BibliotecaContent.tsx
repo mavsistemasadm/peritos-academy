@@ -35,34 +35,47 @@ export default function BibliotecaContent({ dados, nav }: { dados: DadosBibliote
 
   const todos = useMemo(() => d.areas.flatMap(a => a.itens.map(i => ({ ...i, areaNome: d.areas.find(x => x.itens.includes(i))!.nome }))), [d.areas])
 
-  const visiveis = useMemo(() => {
-    let lista: (ItemBiblioteca & { areaNome: string })[] = todos
-    if (abaArea === 'favoritas') lista = lista.filter(i => favs.has(i.id))
-    else if (abaArea === 'top') lista = [...lista].sort((a, b) => b.downloads - a.downloads)
-    else if (abaArea !== 'todas') {
-      const area = d.areas.find(a => a.slug === abaArea)
-      lista = lista.filter(i => area?.itens.some(x => x.id === i.id))
-    }
-    if (filtroTipo !== 'todos') lista = lista.filter(i => i.tipo === filtroTipo)
+  function filtrarLista<T extends ItemBiblioteca>(lista: T[]): T[] {
+    let out = lista
+    if (filtroTipo !== 'todos') out = out.filter(i => i.tipo === filtroTipo)
     if (busca.trim()) {
       const q = busca.trim().toLowerCase()
-      lista = lista.filter(i => i.nome.toLowerCase().includes(q) || (i.descricao ?? '').toLowerCase().includes(q))
+      out = out.filter(i => i.nome.toLowerCase().includes(q) || (i.descricao ?? '').toLowerCase().includes(q))
     }
-    return lista
-  }, [todos, abaArea, filtroTipo, busca, favs, d.areas])
+    return out
+  }
+
+  // "todas" e um slug de área exibem por seção; favoritas/top continuam lista única.
+  const secoesVisiveis = useMemo(() => {
+    if (abaArea === 'favoritas' || abaArea === 'top') return null
+    const areasFiltradas = abaArea === 'todas' ? d.areas : d.areas.filter(a => a.slug === abaArea)
+    return areasFiltradas
+      .map(a => ({ slug: a.slug, nome: a.nome, itens: filtrarLista(a.itens) }))
+      .filter(a => a.itens.length > 0)
+  }, [d.areas, abaArea, filtroTipo, busca])
+
+  const listaFlat = useMemo(() => {
+    if (abaArea === 'favoritas') return filtrarLista(todos.filter(i => favs.has(i.id)))
+    if (abaArea === 'top') return filtrarLista([...todos].sort((a, b) => b.downloads - a.downloads))
+    return []
+  }, [abaArea, todos, favs, filtroTipo, busca])
 
   const tiposPresentes = useMemo(() => [...new Set(todos.map(i => i.tipo))], [todos])
 
-  async function baixar(item: ItemBiblioteca) {
+  async function baixarPorId(id: string) {
     if (!d.temAcesso) return
-    setErro(null); setBaixando(item.id)
-    const r = await baixarItem(item.id)
+    setErro(null); setBaixando(id)
+    const r = await baixarItem(id)
     setBaixando(null)
     if (!r.ok) { setErro(r.erro); return }
     // dispara o download pelo link assinado
     const a = document.createElement('a')
     a.href = r.url; a.download = ''
     document.body.appendChild(a); a.click(); a.remove()
+  }
+
+  async function baixar(item: ItemBiblioteca) {
+    await baixarPorId(item.id)
   }
 
   function favoritar(id: string) {
@@ -134,57 +147,79 @@ export default function BibliotecaContent({ dados, nav }: { dados: DadosBibliote
 
         {erro && <p className="bib-erro" role="alert">{erro}</p>}
 
-        {/* ============ GRADE ============ */}
-        {visiveis.length === 0 ? (
+        {/* ============ GRADE (por seção de área, ou lista única em favoritas/top) ============ */}
+        {abaArea === 'favoritas' || abaArea === 'top' ? (
+          listaFlat.length === 0 ? (
+            <p className="bib-vazio">Nada por aqui. Tenta outra busca ou outra aba.</p>
+          ) : (
+            <div className="bib-grade">{listaFlat.map(item => renderCard(item))}</div>
+          )
+        ) : secoesVisiveis!.length === 0 ? (
           <p className="bib-vazio">Nada por aqui. Tenta outra busca ou outra aba.</p>
         ) : (
-          <div className="bib-grade">
-            {visiveis.map(item => {
-              const IconeT = ICONE_TIPO[item.tipo]
-              return (
-              <article key={item.id} className={`bib-card${!d.temAcesso ? ' bloqueado' : ''}`}>
-                <div className="card-topo">
-                  <span className="tipo-selo"><IconeT size={13} /> {ROTULO_TIPO[item.tipo]}</span>
-                  {item.novo && <span className="selo-novo">Novo</span>}
-                  <button
-                    className={`fav${favs.has(item.id) ? ' ativa' : ''}`}
-                    aria-label={favs.has(item.id) ? 'Remover das favoritas' : 'Adicionar às favoritas'}
-                    onClick={() => favoritar(item.id)}
-                    disabled={!d.temAcesso}
-                  ><IconeStar size={14} /></button>
-                </div>
-                <h3>{item.nome}</h3>
-                {item.descricao && <p className="desc">{item.descricao}</p>}
-                <div className="card-meta num">
-                  <span className="formato">.{item.formato}</span>
-                  {item.tamanhoKb ? <span>{tamanhoBonito(item.tamanhoKb)}</span> : null}
-                  <span>Atualizada {fmtData.format(new Date(item.atualizadoEm)).replace(/\./g, '').replace(' de ', '/')}</span>
-                </div>
-                <div className="card-rodape">
-                  <span className="downloads num" title="Downloads">
-                    <IconeDownload size={13} strokeWidth={2.2} />
-                    {fmtNum(item.downloads)}
-                  </span>
-                  {d.temAcesso ? (
-                    <button className="btn-baixar" onClick={() => baixar(item)} disabled={baixando === item.id}>
-                      {baixando === item.id ? 'Gerando link…' : item.baixada ? 'Baixar de novo' : 'Baixar'}
-                    </button>
-                  ) : (
-                    <span className="btn-baixar travado"><IconeLock size={12} /> Restrito</span>
-                  )}
-                </div>
-              </article>
-              )
-            })}
-          </div>
+          secoesVisiveis!.map(area => (
+            <section key={area.slug} className="bib-area-secao">
+              <h2 className="bib-area-titulo">{area.nome} <small className="num">{area.itens.length}</small></h2>
+              <div className="bib-grade">{area.itens.map(item => renderCard(item))}</div>
+            </section>
+          ))
         )}
       </main>
 
       <footer className="bib-footer">
         <div className="wrap">
           <span>© 2026 Peritos Academy · Biblioteca do perito</span>
+          {d.termosUso && (
+            <button
+              className="bib-termos-link"
+              onClick={() => baixarPorId(d.termosUso!.id)}
+              disabled={!d.temAcesso || baixando === d.termosUso.id}
+              title={!d.temAcesso ? 'Requer acesso à Biblioteca' : undefined}
+            >
+              {!d.temAcesso ? <IconeLock size={12} /> : null}
+              {baixando === d.termosUso.id ? 'Gerando link…' : 'Termos de uso da Biblioteca'}
+            </button>
+          )}
         </div>
       </footer>
     </div>
   )
+
+  function renderCard(item: ItemBiblioteca) {
+    const IconeT = ICONE_TIPO[item.tipo]
+    return (
+      <article key={item.id} className={`bib-card${!d.temAcesso ? ' bloqueado' : ''}`}>
+        <div className="card-topo">
+          <span className="tipo-selo"><IconeT size={13} /> {ROTULO_TIPO[item.tipo]}</span>
+          {item.novo && <span className="selo-novo">Novo</span>}
+          <button
+            className={`fav${favs.has(item.id) ? ' ativa' : ''}`}
+            aria-label={favs.has(item.id) ? 'Remover das favoritas' : 'Adicionar às favoritas'}
+            onClick={() => favoritar(item.id)}
+            disabled={!d.temAcesso}
+          ><IconeStar size={14} /></button>
+        </div>
+        <h3>{item.nome}</h3>
+        {item.descricao && <p className="desc">{item.descricao}</p>}
+        <div className="card-meta num">
+          <span className="formato">.{item.formato}</span>
+          {item.tamanhoKb ? <span>{tamanhoBonito(item.tamanhoKb)}</span> : null}
+          <span>Atualizada {fmtData.format(new Date(item.atualizadoEm)).replace(/\./g, '').replace(' de ', '/')}</span>
+        </div>
+        <div className="card-rodape">
+          <span className="downloads num" title="Downloads">
+            <IconeDownload size={13} strokeWidth={2.2} />
+            {fmtNum(item.downloads)}
+          </span>
+          {d.temAcesso ? (
+            <button className="btn-baixar" onClick={() => baixar(item)} disabled={baixando === item.id}>
+              {baixando === item.id ? 'Gerando link…' : item.baixada ? 'Baixar de novo' : 'Baixar'}
+            </button>
+          ) : (
+            <span className="btn-baixar travado"><IconeLock size={12} /> Restrito</span>
+          )}
+        </div>
+      </article>
+    )
+  }
 }

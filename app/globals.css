@@ -3189,6 +3189,20 @@ body.teatro .trilho-aulas{display:none}
 }
 .pagina-biblioteca .bib-vazio{color:var(--cinza);font-size:14.5px;padding:var(--s-7) 0;text-align:center}
 
+/* ---------- seções por área ---------- */
+.pagina-biblioteca .bib-area-secao{margin-bottom:var(--s-7)}
+.pagina-biblioteca .bib-area-secao:last-child{margin-bottom:0}
+.pagina-biblioteca .bib-area-titulo{
+  font-size:15px;font-weight:660;letter-spacing:-.01em;
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:var(--s-4);padding-bottom:var(--s-3);
+  border-bottom:1px solid var(--linha-suave);
+}
+.pagina-biblioteca .bib-area-titulo .num{
+  font-size:12px;font-weight:600;color:var(--cinza);
+  border:1px solid var(--linha-suave);border-radius:var(--r-pill);padding:2px 9px;
+}
+
 /* ---------- grade de cards ---------- */
 .pagina-biblioteca .bib-grade{
   display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s-4);
@@ -3253,6 +3267,16 @@ body.teatro .trilho-aulas{display:none}
   padding:var(--s-5) 0;margin-top:var(--s-8);
   font-size:12.5px;color:var(--cinza);
 }
+.pagina-biblioteca .bib-footer .wrap{
+  display:flex;align-items:center;justify-content:space-between;gap:var(--s-4);flex-wrap:wrap;
+}
+.pagina-biblioteca .bib-termos-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12.5px;color:var(--cinza);text-decoration:underline;text-underline-offset:3px;
+  transition:color .2s;
+}
+.pagina-biblioteca .bib-termos-link:hover{color:var(--creme)}
+.pagina-biblioteca .bib-termos-link:disabled{cursor:default;opacity:.6;text-decoration:none}
 @media (prefers-reduced-motion:reduce){
   .pagina-biblioteca *,.pagina-biblioteca *::before,.pagina-biblioteca *::after{animation:none!important;transition:none!important}
 }

@@ -22,6 +22,11 @@ export type AreaBiblioteca = {
   itens: ItemBiblioteca[]
 }
 
+export type TermosUso = {
+  id: string
+  nome: string
+}
+
 export type DadosBiblioteca = {
   logado: boolean
   temAcesso: boolean       // o grupo restrito
@@ -29,11 +34,12 @@ export type DadosBiblioteca = {
   totalItens: number
   totalDownloads: number
   maisBaixadas: ItemBiblioteca[]   // top 4 geral
+  termosUso: TermosUso | null      // link discreto, fora da grade de áreas
 }
 
 const VAZIO: DadosBiblioteca = {
   logado: false, temAcesso: false, areas: [],
-  totalItens: 0, totalDownloads: 0, maisBaixadas: [],
+  totalItens: 0, totalDownloads: 0, maisBaixadas: [], termosUso: null,
 }
 
 export async function carregarBiblioteca(): Promise<DadosBiblioteca> {
@@ -41,16 +47,20 @@ export async function carregarBiblioteca(): Promise<DadosBiblioteca> {
   const { data: auth } = await supabase.auth.getUser()
   if (!auth?.user) return VAZIO
 
-  const [{ data: perfil }, { data: areasRaw }, { data: itensRaw }, { data: contagemRaw }, { data: favoritasRaw }, { data: minhasRaw }] =
+  const [{ data: perfil }, { data: areasRaw }, { data: itensRaw }, { data: contagemRaw }, { data: favoritasRaw }, { data: minhasRaw }, { data: termosRaw }] =
     await Promise.all([
       supabase.from('perfis').select('acesso_biblioteca').eq('id', auth.user.id).single(),
       supabase.from('planilha_areas').select('*').order('ordem'),
-      supabase.from('planilhas').select('*').eq('publicado', true).order('atualizado_em', { ascending: false }),
+      // area_id null = "Termos de Uso" (fora da grade, ver termosRaw abaixo).
+      // ordem (não atualizado_em) preserva a sequência original dos módulos
+      // do Ensinio dentro de cada área.
+      supabase.from('planilhas').select('*').eq('publicado', true).not('area_id', 'is', null).order('ordem'),
       // planilha_downloads.SELECT é restrita ao dono da linha — contagem
       // cross-usuário real só via RPC security definer.
       supabase.rpc('planilha_downloads_contagem'),
       supabase.from('planilha_favoritas').select('planilha_id'),
       supabase.from('planilha_downloads').select('planilha_id').eq('usuario_id', auth.user.id),
+      supabase.from('planilhas').select('id, nome').is('area_id', null).eq('publicado', true).maybeSingle(),
     ])
 
   const contagem = new Map<string, number>((contagemRaw ?? []).map((c: any) => [c.planilha_id, c.downloads]))
@@ -91,5 +101,6 @@ export async function carregarBiblioteca(): Promise<DadosBiblioteca> {
     totalItens: itens.length,
     totalDownloads: itens.reduce((s, i) => s + i.downloads, 0),
     maisBaixadas: [...itens].sort((a, b) => b.downloads - a.downloads).slice(0, 4),
+    termosUso: termosRaw ? { id: termosRaw.id, nome: termosRaw.nome } : null,
   }
 }
