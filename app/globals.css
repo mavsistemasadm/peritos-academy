@@ -210,13 +210,14 @@
   min-height:300px;display:flex;align-items:center;justify-content:center;text-align:center;
 }
 .pagina-home .rota-convite-bg{position:absolute;inset:0;background:url('/rota/porta.png') center 30%/cover no-repeat}
-.pagina-home .rota-convite-vinheta{position:absolute;inset:0;background:radial-gradient(65% 60% at 50% 65%,rgba(7,9,8,.45),var(--preto-elev-2) 94%)}
+.pagina-home .rota-convite-vinheta{position:absolute;inset:0;background:radial-gradient(60% 55% at 50% 60%,rgba(7,9,8,.35),var(--preto-elev-2) 92%)}
 .pagina-home .rota-convite-conteudo{position:relative;z-index:1;padding:var(--s-6) var(--s-5);max-width:420px;display:flex;flex-direction:column;align-items:center;gap:var(--s-3)}
 .pagina-home .rota-convite-conteudo h3{
   font-size:clamp(22px,3vw,28px);font-weight:720;letter-spacing:-.02em;margin-bottom:2px;
   background:var(--grad-marca);-webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .pagina-home .rota-convite-conteudo p{font-size:14.5px;color:var(--cinza-claro);line-height:1.6;margin-bottom:var(--s-2)}
+.pagina-home .rota-convite-conteudo .btn-primario{background:var(--grad-marca);color:var(--carvao)}
 
 .pagina-home .rota-retomar{
   max-width:520px;margin:0 auto;text-align:center;padding:var(--s-6) var(--s-5);
