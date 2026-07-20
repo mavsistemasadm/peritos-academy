@@ -407,6 +407,7 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
               key={t.trilhaId}
               className={`an-territorio${naRota ? " na-rota" : " fora-rota"}${acesa ? " acesa" : ""}`}
               style={{ left: `${t.xPct}%`, top: `${t.yPct}%` }}
+              title={t.descricaoCurta}
             >
               <span className="an-territorio-ponto" />
               {acesa && cena === "rota" && posicaoNaRota === segAtivo && <span className="an-anel-pulsante" />}

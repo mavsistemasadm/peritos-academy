@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import NavPlataforma from "@/components/NavPlataforma";
 import type { DadosNav } from "@/lib/queries/nav";
 import type { PlanoVivo } from "@/lib/queries/meuPlano";
-import type { Territorio } from "@/lib/queries/anamnese";
+import type { Territorio, AnamneseProgresso } from "@/lib/queries/anamnese";
 import { refazerAnamnese } from "@/app/anamnese/actions";
 import { IconeCheck, IconeChevronRight } from "@/components/Icones";
 
@@ -18,9 +18,10 @@ type Props = {
   plano: PlanoVivo;
   territorios: Territorio[];
   textos: Record<string, string>;
+  progresso: AnamneseProgresso;
 };
 
-export default function MeuPlanoContent({ nav, plano, territorios, textos }: Props) {
+export default function MeuPlanoContent({ nav, plano, territorios, textos, progresso }: Props) {
   const router = useRouter();
   const [refazendo, setRefazendo] = useState(false);
   const [mobile, setMobile] = useState(false);
@@ -34,6 +35,10 @@ export default function MeuPlanoContent({ nav, plano, territorios, textos }: Pro
   }, []);
 
   const atualIdx = plano.estacoes.findIndex((e) => e.estado === "atual");
+  const rotaCompleta = plano.temPlano && plano.estacoes.length > 0 && plano.estacoes.every((e) => e.estado === "concluida");
+  const estacaoAtual = atualIdx >= 0 ? plano.estacoes[atualIdx] : null;
+  const marcadorXPct = estacaoAtual ? estacaoAtual.xPct : plano.entradaXPct;
+  const marcadorYPct = estacaoAtual ? estacaoAtual.yPct : plano.entradaYPct;
   const mapaRef = useRef<HTMLDivElement>(null);
   const [cam, setCam] = useState({ tx: 0, ty: 0 });
 
@@ -42,7 +47,7 @@ export default function MeuPlanoContent({ nav, plano, territorios, textos }: Pro
     const el = mapaRef.current;
     const wrap = el?.parentElement;
     if (!el || !wrap) return;
-    const alvo = plano.estacoes[atualIdx] ?? plano.estacoes[0];
+    const alvo = plano.estacoes[atualIdx] ?? plano.estacoes[plano.estacoes.length - 1];
     if (!alvo) return;
     const w = el.offsetWidth, h = el.offsetHeight;
     const wrapW = wrap.clientWidth, wrapH = wrap.clientHeight;
@@ -74,10 +79,32 @@ export default function MeuPlanoContent({ nav, plano, territorios, textos }: Pro
         </header>
 
         {!plano.temPlano ? (
-          <div className="mp-vazio">
-            <p>Você ainda não tem uma rota traçada.</p>
-            <Link href="/anamnese" className="mp-btn-primario">Descobrir minha rota <IconeChevronRight size={16} /></Link>
-          </div>
+          progresso.questoesRespondidas > 0 ? (
+            <div className="mp-retomar-card">
+              <h2>{textos.meu_plano_retomar_titulo}</h2>
+              <p className="mp-retomar-sub">
+                Pergunta {Math.min(progresso.questoesRespondidas + 1, progresso.totalQuestoes)} de {progresso.totalQuestoes}
+              </p>
+              <div className="mp-retomar-barra">
+                <i style={{ width: `${Math.round((progresso.questoesRespondidas / progresso.totalQuestoes) * 100)}%` }} />
+              </div>
+              <Link href="/anamnese" className="mp-btn-primario">
+                {textos.meu_plano_retomar_cta} <IconeChevronRight size={16} />
+              </Link>
+            </div>
+          ) : (
+            <div className="mp-convite-card">
+              <div className="mp-convite-bg" />
+              <div className="mp-convite-vinheta" />
+              <div className="mp-convite-conteudo">
+                <h2>{textos.convite_titulo}</h2>
+                <p>{textos.meu_plano_convite_linha}</p>
+                <Link href="/anamnese" className="mp-btn-primario">
+                  {textos.convite_botao_acao} <IconeChevronRight size={16} />
+                </Link>
+              </div>
+            </div>
+          )
         ) : (
           <>
             <div className="mp-mapa-wrap">
@@ -112,9 +139,11 @@ export default function MeuPlanoContent({ nav, plano, territorios, textos }: Pro
                   </defs>
                 </svg>
 
-                <div className="mp-marcador-voce" style={{ left: `${plano.entradaXPct}%`, top: `${plano.entradaYPct}%` }}>
-                  <span>{textos.microcopy_marcador_inicial}</span>
-                </div>
+                {!rotaCompleta && (
+                  <div className="mp-marcador-voce" style={{ left: `${marcadorXPct}%`, top: `${marcadorYPct}%` }}>
+                    <span>{textos.microcopy_marcador_inicial}</span>
+                  </div>
+                )}
 
                 {territorios.map((t) => {
                   const estacao = plano.estacoes.find((e) => e.trilhaId === t.trilhaId);
@@ -124,9 +153,12 @@ export default function MeuPlanoContent({ nav, plano, territorios, textos }: Pro
                       key={t.trilhaId}
                       className={`mp-territorio${naRota ? ` na-rota ${estacao!.estado}` : " fora-rota"}`}
                       style={{ left: `${t.xPct}%`, top: `${t.yPct}%` }}
+                      title={t.descricaoCurta}
                     >
                       <span className="mp-territorio-ponto">
-                        {estacao?.estado === "concluida" && <IconeCheck size={11} />}
+                        {estacao?.estado === "concluida" && (
+                          <span className="mp-selo-envelope"><IconeCheck size={9} /></span>
+                        )}
                       </span>
                       {estacao?.estado === "atual" && <span className="mp-anel-pulsante" />}
                       <div className="mp-territorio-rotulo">
@@ -144,6 +176,16 @@ export default function MeuPlanoContent({ nav, plano, territorios, textos }: Pro
                 })}
               </div>
             </div>
+
+            {rotaCompleta && (
+              <div className="mp-tesouro-banner">
+                <img src="/rota/tesouro.png" alt="Tesouro conquistado" />
+                <div>
+                  <h3>{textos.meu_plano_tesouro_titulo}</h3>
+                  <p>{textos.meu_plano_tesouro_mensagem}</p>
+                </div>
+              </div>
+            )}
 
             <footer className="mp-rodape">
               <button className="mp-btn-refazer" onClick={handleRefazer} disabled={refazendo}>

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { carregarNav } from "@/lib/queries/nav";
 import { getPlanoVivo } from "@/lib/queries/meuPlano";
-import { getAnamneseTerritorios, getAnamneseTextosGerais } from "@/lib/queries/anamnese";
+import { getAnamneseTerritorios, getAnamneseTextosGerais, getAnamneseProgresso } from "@/lib/queries/anamnese";
 import MeuPlanoContent from "@/components/MeuPlanoContent";
 
 export const metadata: Metadata = {
@@ -17,11 +17,12 @@ export default async function PaginaMeuPlano() {
   const nav = await carregarNav();
   if (!nav.logado) redirect("/login");
 
-  const [plano, territorios, textos] = await Promise.all([
+  const [plano, territorios, textos, progresso] = await Promise.all([
     getPlanoVivo(),
     getAnamneseTerritorios(),
     getAnamneseTextosGerais(),
+    getAnamneseProgresso(),
   ]);
 
-  return <MeuPlanoContent nav={nav} plano={plano} territorios={territorios} textos={textos} />;
+  return <MeuPlanoContent nav={nav} plano={plano} territorios={territorios} textos={textos} progresso={progresso} />;
 }
