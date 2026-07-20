@@ -7,10 +7,11 @@ import type { DadosHome, CursoCard } from '@/lib/queries/home'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
 import type { PlanoVivo } from '@/lib/queries/meuPlano'
-import type { AnamneseProgresso } from '@/lib/queries/anamnese'
+import type { AnamneseProgresso, Territorio } from '@/lib/queries/anamnese'
 import { IconePlay, IconeCheck } from '@/components/Icones'
 import { AoVivo } from '@/components/Emblemas'
 import TourGuiado from '@/components/TourGuiado'
+import { caminhoCurvo } from '@/lib/rota/caminhoCurvo'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -47,9 +48,10 @@ type Props = {
   plano: PlanoVivo
   progressoRota: AnamneseProgresso
   textosRota: Record<string, string>
+  territoriosRota: Territorio[]
 }
 
-export default function HomeContent({ dados, nav, plano, progressoRota, textosRota }: Props) {
+export default function HomeContent({ dados, nav, plano, progressoRota, textosRota, territoriosRota }: Props) {
   const d = dados
   const raiz = useRef<HTMLDivElement>(null)
   const [heroCapaErro, setHeroCapaErro] = useState(false)
@@ -238,11 +240,56 @@ export default function HomeContent({ dados, nav, plano, progressoRota, textosRo
             <div className="rota-compacto reveal">
               <a href="/meu-plano" className="rota-mapa-fundo" aria-label="Ver mapa completo da minha Rota do Perito">
                 <img src="/rota/mesa-perito.png" alt="Mapa da minha Rota do Perito" className="rota-mapa-img" />
+
+                <svg className="rota-mapa-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  {plano.estacoes.map((e, i) => {
+                    const de = i === 0 ? { x: plano.entradaXPct, y: plano.entradaYPct } : { x: plano.estacoes[i - 1].xPct, y: plano.estacoes[i - 1].yPct }
+                    const percorrido = e.estado === 'concluida' || e.estado === 'atual'
+                    return (
+                      <path
+                        key={e.trilhaId}
+                        d={caminhoCurvo(de.x, de.y, e.xPct, e.yPct, i)}
+                        fill="none"
+                        stroke={percorrido ? 'url(#rota-grad-linha-home)' : 'rgba(255,255,255,.18)'}
+                        strokeWidth="0.6"
+                        strokeLinecap="round"
+                        strokeDasharray={percorrido ? undefined : '2,2'}
+                      />
+                    )
+                  })}
+                  <defs>
+                    <linearGradient id="rota-grad-linha-home" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#20D9A6" />
+                      <stop offset="100%" stopColor="#36DCD1" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+
                 {estacaoAtualRota && (
                   <span className="rota-marcador" style={{ left: `${estacaoAtualRota.xPct}%`, top: `${estacaoAtualRota.yPct}%` }}>
                     <b>{textosRota.microcopy_marcador_inicial}</b>
                   </span>
                 )}
+
+                {territoriosRota.map(t => {
+                  const estacao = plano.estacoes.find(e => e.trilhaId === t.trilhaId)
+                  const naRota = !!estacao
+                  return (
+                    <div
+                      key={t.trilhaId}
+                      className={`rota-territorio${naRota ? ` na-rota ${estacao!.estado}` : ' fora-rota'}`}
+                      style={{ left: `${t.xPct}%`, top: `${t.yPct}%` }}
+                      title={t.descricaoCurta}
+                    >
+                      <span className="rota-territorio-ponto" />
+                      {estacao?.estado === 'atual' && <span className="rota-anel-pulsante" />}
+                      <div className="rota-territorio-rotulo">
+                        <b>{t.trilhaNome}</b>
+                        {!naRota && <em className="rota-tag-explorar">{textosRota.microcopy_territorio_explorar}</em>}
+                      </div>
+                    </div>
+                  )
+                })}
               </a>
               <div className="rota-compacto-info">
                 {estacaoAtualRota ? (
