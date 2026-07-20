@@ -1,0 +1,1399 @@
+{
+  "extraido_em": "2026-07-20T15:59:26.622Z",
+  "fonte": "console Ensinio (membros.peritosacademy.com.br/console/groups/biblioteca-de-planilhas), API peritosacademy.ensinio.cloud/api/v1/console",
+  "grupo": {
+    "id": 132,
+    "slug": "biblioteca-de-planilhas",
+    "titulo": "Biblioteca de Planilhas",
+    "total_aulas": 110
+  },
+  "cdn_prefixo": "https://cdn.ensinio.com/peritosacademy/peritosacademy/group-material/file/",
+  "topicos": [
+    {
+      "id": 226,
+      "titulo": "Instruções Gerais",
+      "slug": "instrucoes-gerais",
+      "posicao": 0,
+      "total_aulas": 1,
+      "aulas": [
+        {
+          "id": 979,
+          "titulo": "O que é e como usar a Biblioteca de Planilhas",
+          "materiais": [
+            {
+              "titulo": "Termos de Uso Biblioteca de Planilhas.pdf",
+              "arquivo": "85fa3184d3a036f0f66168771a258b3c.pdf",
+              "tamanho": "247.22 kB"
+            }
+          ],
+          "descricao": null
+        }
+      ]
+    },
+    {
+      "id": 227,
+      "titulo": "Cálculos Trabalhistas",
+      "slug": "calculos-trabalhistas1",
+      "posicao": 1,
+      "total_aulas": 23,
+      "aulas": [
+        {
+          "id": 818,
+          "titulo": "HORAS EXTRAS I Escalonamento das horas",
+          "materiais": [
+            {
+              "titulo": "HORAS EXTRAS I Escalonamento das horas.zip",
+              "arquivo": "c4c0d96a20ecec868f5bc7562ec64f69.zip",
+              "tamanho": "275.10 kB"
+            }
+          ],
+          "descricao": "Planilha com estrutura de escalonamento de horas extras."
+        },
+        {
+          "id": 832,
+          "titulo": "HORAS EXTRAS I Diversas",
+          "materiais": [
+            {
+              "titulo": "HORAS EXTRAS I Diversas.zip",
+              "arquivo": "50a140dddf187487c930a44c4e729432.zip",
+              "tamanho": "331.56 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de diferenças de inúmeras modalidades de horas extras"
+        },
+        {
+          "id": 819,
+          "titulo": "HORAS EXTRAS I Com verbas rescisorias",
+          "materiais": [
+            {
+              "titulo": "HORAS EXTRAS I Com verbas rescisorias.zip",
+              "arquivo": "db1169fa4b97ffe39b9f4b4830f89b1d.zip",
+              "tamanho": "217.63 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das horas extras com verbas rescisórias."
+        },
+        {
+          "id": 835,
+          "titulo": "HORAS EXTRAS NOTURNAS I Com verbas rescisórias",
+          "materiais": [
+            {
+              "titulo": "HORAS EXTRAS NOTURNAS I Com verbas rescisórias.zip",
+              "arquivo": "9d069a17e573df2da0978a1694264422.zip",
+              "tamanho": "210.65 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de horas extras com integração de verbas salariais"
+        },
+        {
+          "id": 851,
+          "titulo": "HORAS EXTRAS I Integração Auxílo Alimentação",
+          "materiais": [
+            {
+              "titulo": "INTEGRAÇÃO AUX. ALIM E CESTA BASICA.zip",
+              "arquivo": "9cc4d2f573191797b4531db4556e2d26.zip",
+              "tamanho": "112.75 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de horas extas com integração de verbas salariais deferidas."
+        },
+        {
+          "id": 820,
+          "titulo": "PERICULOSIDADE I Com outras verbas",
+          "materiais": [
+            {
+              "titulo": "PERICULOSIDADE I Com outras verbas.zip",
+              "arquivo": "65b58fdb7a7e6d19e150bae363b63382.zip",
+              "tamanho": "170.47 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de periculosidade com outras verbas"
+        },
+        {
+          "id": 823,
+          "titulo": "INSALUBRIDADE I Com outras verbas",
+          "materiais": [
+            {
+              "titulo": "INSALUBRIDADE I Com outras verbas.zip",
+              "arquivo": "af4b75c101927b6ec7cc2251b394ef35.zip",
+              "tamanho": "134.82 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças de insalubridade e outras verbas"
+        },
+        {
+          "id": 821,
+          "titulo": "PROGRESSÕES SALARIAIS I Reflexos em HE e Anuênio",
+          "materiais": [
+            {
+              "titulo": "PROGRESSÕES SALARIAIS I Reflexos em HE e Anuênio.zip",
+              "arquivo": "8a4d9d527abcb23a30deca29aba1b11c.zip",
+              "tamanho": "347.96 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de diferenças salariais com reflexos em outras verbas"
+        },
+        {
+          "id": 824,
+          "titulo": "EQUIPARAÇÃO SALARIAL I Com aux. refeição e outras verbas",
+          "materiais": [
+            {
+              "titulo": "EQUIPARAÇÃO SALARIAL I Com aux. refeicao.zip",
+              "arquivo": "6b8f96481556d51d4d049519a98e10ad.zip",
+              "tamanho": "203.66 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de diferenças de equiparação e outras verbas"
+        },
+        {
+          "id": 828,
+          "titulo": "SALÁRIO PAGO POR FORA I Com danos morais",
+          "materiais": [
+            {
+              "titulo": "SALÁRIO PAGO POR FORA I Com danos morais.zip",
+              "arquivo": "f9d110c86c48642d2faddf896fadc89a.zip",
+              "tamanho": "86.99 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de reflexos de valores não pagos em folha"
+        },
+        {
+          "id": 836,
+          "titulo": "ADICIONAL DE TRANSFERÊNCIA",
+          "materiais": [
+            {
+              "titulo": "ADICIONAL DE TRANSFERÊNCIA.zip",
+              "arquivo": "1bce80cae302bfb3beb9a4025db1cc7c.zip",
+              "tamanho": "197.31 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças do adicional de transferência"
+        },
+        {
+          "id": 837,
+          "titulo": "ADICIONAL DE ASSIDUIDADE",
+          "materiais": [
+            {
+              "titulo": "ADC. ASSIDUIDADE I Com outras verbas.zip",
+              "arquivo": "7a7162323d1b6520032a27ec4dbc08a5.zip",
+              "tamanho": "71.84 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças do adicional de assiduidade"
+        },
+        {
+          "id": 834,
+          "titulo": "REINTEGRAÇÃO DE TRABALHO",
+          "materiais": [
+            {
+              "titulo": "REINTEGRAÇÃO.zip",
+              "arquivo": "489aa628cd1b9fe4fff83515bdab1043.zip",
+              "tamanho": "95.76 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo com as diferenças salariais da reintegração ao trabalho"
+        },
+        {
+          "id": 838,
+          "titulo": "GRATIFICAÇÃO POR TEMPO DE SERVÇO",
+          "materiais": [
+            {
+              "titulo": "GRATIFICAÇÃO POR TEMPO DE SERVIÇO.zip",
+              "arquivo": "96398c03e87b09a22eefe90576c8ff0c.zip",
+              "tamanho": "124.26 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das gratificações por tempo de servico e descontos previdenciários"
+        },
+        {
+          "id": 840,
+          "titulo": "INTEGRAÇÃO DO RSR EM PRÊMIOS",
+          "materiais": [
+            {
+              "titulo": "INTEGRAÇÃO RSR EM PRÊMIOS.zip",
+              "arquivo": "0ed0ee7cbab1e13a48c860f64c70d219.zip",
+              "tamanho": "244.56 kB"
+            }
+          ],
+          "descricao": "Planillha de cálculo de integração do RSR em prêmios e outras verbas trabalhistas"
+        },
+        {
+          "id": 831,
+          "titulo": "AUSÊNCIA DE DEPÓSITO FGTS",
+          "materiais": [
+            {
+              "titulo": "AUSÊNCIA DE DEPÓSITO FGTS.zip",
+              "arquivo": "634e66e6c9e87b513b45b015ae612f6c.zip",
+              "tamanho": "33.40 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de diferenças de FGTS não depositados na contratualidade"
+        },
+        {
+          "id": 827,
+          "titulo": "PENSIONAMENTO I IPCA-e + Juros de mora",
+          "materiais": [
+            {
+              "titulo": "PENSIONAMENTO I IPCA-e + Juros de mora.zip",
+              "arquivo": "cbe3d382ac209da5a10d5f7f1cab1152.zip",
+              "tamanho": "75.62 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de valores mensais a pagar de pensão"
+        },
+        {
+          "id": 829,
+          "titulo": "LUCROS CESSANTES I Com outras verbas",
+          "materiais": [
+            {
+              "titulo": "LUCROS CESSANTES I Com outras verbas.zip",
+              "arquivo": "25ea17a12c775c1ea71228ee3ec5c4bc.zip",
+              "tamanho": "37.41 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de lucros cessantes trabalhista com atualização IPCA-E + SELIC"
+        },
+        {
+          "id": 830,
+          "titulo": "TRABALHISTA BANCÁRIO I CEF I CTVA",
+          "materiais": [],
+          "descricao": "Planilha de cálculo de verbas trabalhistas bancárias"
+        },
+        {
+          "id": 826,
+          "titulo": "TRABALHISTA BANCÁRIO I HSBC",
+          "materiais": [
+            {
+              "titulo": "TRABALHISTA BANCÁRIO I HSBC.zip",
+              "arquivo": "c06e9aa349e840aacdbee6574818d22f.zip",
+              "tamanho": "348.27 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de verbas salariais bancárias"
+        },
+        {
+          "id": 839,
+          "titulo": "TRABALHISTA BANCÁRIO I BRADESCO",
+          "materiais": [
+            {
+              "titulo": "TRABALHISTA BANCÁRIO I BRADESCO.zip",
+              "arquivo": "b2a615fe3ffbd17dfa3e9fe91d28e2fa.zip",
+              "tamanho": "290.51 kB"
+            }
+          ],
+          "descricao": "Planillha de cálculo de verbas bancárias diversas"
+        },
+        {
+          "id": 841,
+          "titulo": "TRABALHISTA BANCÁRIO I BANCO DO BRASIL",
+          "materiais": [
+            {
+              "titulo": "TRABALHISTA BANCÁRIO I BANCO DO BRASIL.zip",
+              "arquivo": "2a6f689e3053e276173c0dd2a0127266.zip",
+              "tamanho": "214.64 kB"
+            }
+          ],
+          "descricao": "Planillha de cálculo de diferenças de comissões e outras verbas trabalhistas"
+        },
+        {
+          "id": 842,
+          "titulo": "TRABALHISTA BANCÁRIO I ITAU",
+          "materiais": [
+            {
+              "titulo": "TRABALHISTA BANCÁRIO I ITAU.zip",
+              "arquivo": "ec2b2ff1a22c9219cddb6a0346333a9c.zip",
+              "tamanho": "258.24 kB"
+            }
+          ],
+          "descricao": "Planillha de cálculo de diferenças de comissões e outras verbas trabalhistas do Itaú"
+        }
+      ]
+    },
+    {
+      "id": 229,
+      "titulo": "Cálculos Previdenciários",
+      "slug": "calculos-previdenciarios1",
+      "posicao": 2,
+      "total_aulas": 33,
+      "aulas": [
+        {
+          "id": 852,
+          "titulo": "Adicional de 25% I Lei 9876",
+          "materiais": [
+            {
+              "titulo": "ADICIONAL DE 25% - LEI 9876.zip",
+              "arquivo": "21272bf01fd7189afa1fdf1c36f63c93.zip",
+              "tamanho": "367.82 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculos com integração dos 25% conforme Lei 9876/1999"
+        },
+        {
+          "id": 843,
+          "titulo": "Teto EC´s 20/98 e 41/03",
+          "materiais": [
+            {
+              "titulo": "TETO EC´S 20-98 E 41-03.zip",
+              "arquivo": "8b2c952819dc0cf81ee8254c6416ced2.zip",
+              "tamanho": "154.23 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças entre os benefícios."
+        },
+        {
+          "id": 844,
+          "titulo": "Teto de 20 Salários Mínimos (1989)",
+          "materiais": [
+            {
+              "titulo": "TETO DE 20 SALÁRIOS.zip",
+              "arquivo": "93de09b6531610726d97f14bfcb0e256.zip",
+              "tamanho": "59.53 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças entre os benefícios da tese da lmitação dos 20 SM."
+        },
+        {
+          "id": 845,
+          "titulo": "IRSM",
+          "materiais": [
+            {
+              "titulo": "IRSM.zip",
+              "arquivo": "64b58f1dd3d2198c656b625daf699db7.zip",
+              "tamanho": "241.62 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças entre os benefícios da tese IRSM"
+        },
+        {
+          "id": 853,
+          "titulo": "Adicional Assistencial I Lei 8213",
+          "materiais": [
+            {
+              "titulo": "ADICIONAL DE ASSISTÊNCIA - LEI 8213.zip",
+              "arquivo": "31365db852ed24cd0d5b0ebd76f656cd.zip",
+              "tamanho": "225.53 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças do adicional assistencial."
+        },
+        {
+          "id": 854,
+          "titulo": "Aposentadoria Especial I Lei 9876",
+          "materiais": [
+            {
+              "titulo": "APOSENTADORIA ESPECIAL - LEI 9876.zip",
+              "arquivo": "e494ccd5c7f801760ebc2c3878e28861.zip",
+              "tamanho": "322.36 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da RMI e diferenças da aposentadoria especial pela Lei 9876/1999"
+        },
+        {
+          "id": 855,
+          "titulo": "Aposentadoria por Invalidez I Lei 9876",
+          "materiais": [
+            {
+              "titulo": "APOSENTADORIA INVALIDEZ - LEI 9876.zip",
+              "arquivo": "b227982d4580328dc8b404826a96e2f6.zip",
+              "tamanho": "421.85 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das RMI da aposentadoria por invalidez e diferenças."
+        },
+        {
+          "id": 856,
+          "titulo": "Aposentadoria por Idade I EC 103/2019",
+          "materiais": [
+            {
+              "titulo": "APOSENTADORIA POR IDADE - EC 103-19.zip",
+              "arquivo": "812cf8c69ae63e4bd2474d1e16ea8399.zip",
+              "tamanho": "226.69 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo com contagem de tempo de serviço e RMI pela EC 103/2019."
+        },
+        {
+          "id": 857,
+          "titulo": "Aposentadoria por Idade I Lei 9876",
+          "materiais": [
+            {
+              "titulo": "APOSENTADORIA POR IDADE - LEI 9876.zip",
+              "arquivo": "d748ab840881c0d480a5c25812157faf.zip",
+              "tamanho": "140.93 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da RMI da aposentadoria por idade pela Lei 9876/1999 e diferenças."
+        },
+        {
+          "id": 858,
+          "titulo": "Auxílio Acidente I Lei 8213",
+          "materiais": [
+            {
+              "titulo": "AUXILIO ACIDENTE - LEI 8213.zip",
+              "arquivo": "ed54475aecf657909d8b111bed56c957.zip",
+              "tamanho": "294.12 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo do auxílio acidente pela Lei 8213/1991 e diferenças."
+        },
+        {
+          "id": 859,
+          "titulo": "Buraco Negro",
+          "materiais": [
+            {
+              "titulo": "BURACO NEGRO.zip",
+              "arquivo": "f972345167f89cc4d5d369ff8dd92588.zip",
+              "tamanho": "259.99 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da revisão do Buraco Negro."
+        },
+        {
+          "id": 860,
+          "titulo": "Computo de Tempo Rural I Lei 9876",
+          "materiais": [
+            {
+              "titulo": "COMPUTO DE TEMPO RURAL - LEI 9876.zip",
+              "arquivo": "53f7e355023f5c6d5d7a13312632589d.zip",
+              "tamanho": "314.24 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculos com contagem de tempo e aposentadoria por tempo de serviço na Lei 9876/1999."
+        },
+        {
+          "id": 861,
+          "titulo": "Concessão de benefícios com RMI - Lei 9876",
+          "materiais": [
+            {
+              "titulo": "CONCESSÃO DE BENEFÍCIO - LEI 9876.zip",
+              "arquivo": "f999e8c04b4ffc016aa99a62efd7ae61.zip",
+              "tamanho": "288.13 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo com as diferenças de benefício não pago, com a RMI já calculada pela Lei 9876/1999."
+        },
+        {
+          "id": 862,
+          "titulo": "Planilha para contagem de tempo de serviço",
+          "materiais": [
+            {
+              "titulo": "CONTAGEM TEMPO DE SERVIÇO.zip",
+              "arquivo": "04645f5d9690b054be01f7301f350e99.zip",
+              "tamanho": "22.76 kB"
+            }
+          ],
+          "descricao": "Planilha para cálculo de tempo de serviço normal e especial."
+        },
+        {
+          "id": 863,
+          "titulo": "Contribuição Excedente ao Teto",
+          "materiais": [
+            {
+              "titulo": "CONTRIBUIÇÃO EXCEDENTE AO TETO.zip",
+              "arquivo": "860deb48897189a700b488725f448a22.zip",
+              "tamanho": "161.43 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo dos valores a restituir por contribuição excedente ao Teto."
+        },
+        {
+          "id": 864,
+          "titulo": "Atualização de Contribuições Previdenciárias em atraso",
+          "materiais": [
+            {
+              "titulo": "CONTRIBUIÇÃO PREV. EM ATRASO.zip",
+              "arquivo": "4d5979b4594e541ec4fb88c085a5ca9a.zip",
+              "tamanho": "261.97 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de atualização das contribuições INSS não pagas."
+        },
+        {
+          "id": 865,
+          "titulo": "Evolução de RMI a partir de 1989",
+          "materiais": [
+            {
+              "titulo": "EVOLUÇÃO DE RMI.zip",
+              "arquivo": "51ab7a77634182f2cdfce48d5c094ce5.zip",
+              "tamanho": "281.51 kB"
+            }
+          ],
+          "descricao": "Planilha com evolução de benefício com RMI já definida a partir de 1989"
+        },
+        {
+          "id": 866,
+          "titulo": "Inclusão de Atividades Concomitantes",
+          "materiais": [
+            {
+              "titulo": "INCLUSÃO ATIVIDADES CONCOMITANTES.zip",
+              "arquivo": "dec8a8f6acf41b6f84ac5ecd0d03e839.zip",
+              "tamanho": "352.15 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da RMI com inclusão de salários em atividades concomitantes e diferenças."
+        },
+        {
+          "id": 867,
+          "titulo": "Inclusão de Verbas Trabalhistas I Lei 9876",
+          "materiais": [
+            {
+              "titulo": "INCLUSÃO DE VERBAS TRABALHISTAS.zip",
+              "arquivo": "d6adf5ce4a256f1395f92162d8f8ca0c.zip",
+              "tamanho": "457.06 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da RMI com inclusão de verbas trabalhistas e diferença atualizada pela EC 113/21."
+        },
+        {
+          "id": 868,
+          "titulo": "Pensão por Morte I EC 103/2019",
+          "materiais": [
+            {
+              "titulo": "PENSÃO - EC 103-19.zip",
+              "arquivo": "bd8fe726a9800060701a0888acb6a70f.zip",
+              "tamanho": "170.93 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da RMI de pensão por morte pela EC 103/2019 e diferenças."
+        },
+        {
+          "id": 869,
+          "titulo": "Pensão Rede Ferroviára Federal",
+          "materiais": [
+            {
+              "titulo": "PENSÃO RFFSA.zip",
+              "arquivo": "d2b3d5fb10c7d6864f0849ab38a5da01.zip",
+              "tamanho": "111.53 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças de pensão 100% da RFFSA."
+        },
+        {
+          "id": 870,
+          "titulo": "Renda Mensal Inicial I Lei 8213",
+          "materiais": [
+            {
+              "titulo": "RMI - LEI 8213.zip",
+              "arquivo": "aab2abde5aac0a4adbfff27e797851c5.zip",
+              "tamanho": "70.49 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da RMI pela Lei 8213/1991."
+        },
+        {
+          "id": 871,
+          "titulo": "Auxílio Doença I Lei 9876",
+          "materiais": [
+            {
+              "titulo": "RMI AUX. DOENÇA - LEI 9876.zip",
+              "arquivo": "88470daa09990ce9e80c1078faa71dfe.zip",
+              "tamanho": "148.20 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da RMI do auxílio doença pela Lei 9876/1999 e diferenças."
+        },
+        {
+          "id": 872,
+          "titulo": "Simulação de Aposentadoria e cenários I Lei 9876",
+          "materiais": [
+            {
+              "titulo": "SIMULAÇÃO APOSENTADORIA.zip",
+              "arquivo": "550d5534b49ad242e745ddc871881f6b.zip",
+              "tamanho": "213.06 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de simulação de aposentadoria pela Lei 9876/1999."
+        },
+        {
+          "id": 873,
+          "titulo": "Súmula 260",
+          "materiais": [
+            {
+              "titulo": "SÚMULA 260.zip",
+              "arquivo": "acf8032ba87cfa9bf216f62ee0856dd3.zip",
+              "tamanho": "184.95 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da Revisão da Súmula 260."
+        },
+        {
+          "id": 874,
+          "titulo": "Tempo de Contribuição I Lei 8213",
+          "materiais": [
+            {
+              "titulo": "TEMPO DE CONTRIBUIÇÃO - LEI 8213.zip",
+              "arquivo": "52436b88f53764a2bbd9b8d0318bc584.zip",
+              "tamanho": "224.74 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da RMI por tempo de contribuição da Lei 8213/1991 e diferenças."
+        },
+        {
+          "id": 875,
+          "titulo": "Tempo Especial I Lei 8213",
+          "materiais": [
+            {
+              "titulo": "TEMPO ESPECIAL - LEI 8213.zip",
+              "arquivo": "fe3d581e42eb1a826bfa04c8f367e56a.zip",
+              "tamanho": "304.35 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da RMI por tempo especial na Lei 8213/1991 e diferenças."
+        },
+        {
+          "id": 876,
+          "titulo": "Tempo Especial I Lei 9876",
+          "materiais": [
+            {
+              "titulo": "TEMPO ESPECIAL - LEI 9876.zip",
+              "arquivo": "eaed92a9f27807eb7dd7f778e47314eb.zip",
+              "tamanho": "180.27 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da RMI por tempo especial na Lei 9876/1999 e diferenças."
+        },
+        {
+          "id": 877,
+          "titulo": "Tempo de Contribuição I Lei 9876",
+          "materiais": [
+            {
+              "titulo": "TEMPO SERVICO - LEI 9876.zip",
+              "arquivo": "fc1eaa9e93a5ebb43014ab112c1f9c33.zip",
+              "tamanho": "329.54 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo da RMI por tempo de contribuição na Lei 9876/1999 e diferenças."
+        },
+        {
+          "id": 878,
+          "titulo": "Teto Legal",
+          "materiais": [
+            {
+              "titulo": "TETO LEGAL.zip",
+              "arquivo": "77e94fb4d84a350fadd5ff53e0fade05.zip",
+              "tamanho": "142.94 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças da Revisão do Teto Legal."
+        },
+        {
+          "id": 879,
+          "titulo": "Teto I Lei 8880/1994",
+          "materiais": [
+            {
+              "titulo": "TETO LEI 8880-94.zip",
+              "arquivo": "641686dafa992dbdaba0b90c41f0fffc.zip",
+              "tamanho": "84.70 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças da Revisão do Teto pela Lei 8880/1994."
+        },
+        {
+          "id": 880,
+          "titulo": "Revisão da Vida Toda",
+          "materiais": [
+            {
+              "titulo": "VIDA TODA.zip",
+              "arquivo": "ce5a178113568affe837999570a42bb6.zip",
+              "tamanho": "674.15 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças da Revisão da Vida Toda atualizada pela EC 113/21"
+        },
+        {
+          "id": 881,
+          "titulo": "Metodologia de Atualização I EC 113/21",
+          "materiais": [
+            {
+              "titulo": "EC 113-21.zip",
+              "arquivo": "d250fce9da155c2ccff009053877410b.zip",
+              "tamanho": "67.16 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo com aplicação das regras de atualização pela EC 113/21."
+        }
+      ]
+    },
+    {
+      "id": 228,
+      "titulo": "Cálculos Bancários",
+      "slug": "calculos-bancarios1",
+      "posicao": 3,
+      "total_aulas": 25,
+      "aulas": [
+        {
+          "id": 882,
+          "titulo": "SFH I GAUSS",
+          "materiais": [
+            {
+              "titulo": "Sistema  Financeiro de Habitação I GAUSS.zip",
+              "arquivo": "330a254b332b39917d7efc29f06d8b94.zip",
+              "tamanho": "75.73 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato SFH aplicando o critérios de juros simples GAUSS, com cortes de moeda."
+        },
+        {
+          "id": 883,
+          "titulo": "Capital de Giro I BRADESCO",
+          "materiais": [
+            {
+              "titulo": "CAPITAL DE GIRO I BRADESCO.zip",
+              "arquivo": "fbbc5b8f6a043bfc9842813a7c2ffb29.zip",
+              "tamanho": "176.90 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato Capital de Giro do Banco Bradesco."
+        },
+        {
+          "id": 884,
+          "titulo": "Renegociação de Contratos I Banco do Brasil",
+          "materiais": [
+            {
+              "titulo": "RENEGOCIAÇÃO I BANCO DO BRASIL.zip",
+              "arquivo": "8a14970cfa1fdff3a6a4fa3b0bf464a6.zip",
+              "tamanho": "584.57 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato renegociados do Banco Bradesco."
+        },
+        {
+          "id": 885,
+          "titulo": "SFH com renegociação I CEF",
+          "materiais": [
+            {
+              "titulo": "SFH COM RENEGOCIAÇÃO I CEF.zip",
+              "arquivo": "c7769aa8a739cb2ef278aecf5f038a46.zip",
+              "tamanho": "220.17 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato SFH aplicando o critérios de amortização SAC."
+        },
+        {
+          "id": 886,
+          "titulo": "Empréstimo Pessoal I CREFISA",
+          "materiais": [
+            {
+              "titulo": "EMPRESTIMO PESSOAL I CREFISA.zip",
+              "arquivo": "29cf6dd801bcd360d046d24cc1db7ccc.zip",
+              "tamanho": "163.55 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato crédito pessoal do Banco Crefisa."
+        },
+        {
+          "id": 887,
+          "titulo": "Financiamento de Veículos I SANTANDER",
+          "materiais": [
+            {
+              "titulo": "FINAN. VEÍCULO I SANTANDER.zip",
+              "arquivo": "b17d57801c3fa0b4bbcdea713e9fe31a.zip",
+              "tamanho": "175.74 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato financiamento de veículo do Banco Santander."
+        },
+        {
+          "id": 888,
+          "titulo": "Capital de Giro com Renegociação I CEF",
+          "materiais": [
+            {
+              "titulo": "CAPITAL DE GIRO I CEF.zip",
+              "arquivo": "2ece659302c08eb172227a931a399ab6.zip",
+              "tamanho": "260.59 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato Capital de Giro com renegociação da Caixa Econômica Federal."
+        },
+        {
+          "id": 889,
+          "titulo": "Crédito Rural Pignorática I BANCO DO BRASIL",
+          "materiais": [
+            {
+              "titulo": "CRÉDITO RURAL I BB.zip",
+              "arquivo": "f0b692d04aba772a528544a35dc92438.zip",
+              "tamanho": "100.37 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato de Crédito Rural do Banco do Brasil."
+        },
+        {
+          "id": 890,
+          "titulo": "Crédito Rotativo I BANCO DO BRASIL",
+          "materiais": [
+            {
+              "titulo": "CRÉDITO ROTATITO I BB.zip",
+              "arquivo": "457b00f1db88d9819214a277829d2818.zip",
+              "tamanho": "101.89 kB"
+            }
+          ],
+          "descricao": null
+        },
+        {
+          "id": 891,
+          "titulo": "Empréstimo Pessoa Jurídica I UNICRED",
+          "materiais": [
+            {
+              "titulo": "EMP. PESSOA JURÍDICA I UNICRED.zip",
+              "arquivo": "2cdb86729d9c5964cc92fe20be863559.zip",
+              "tamanho": "254.43 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato Empréstimo PJ (Crédito Rotativo) Banco Unicred."
+        },
+        {
+          "id": 892,
+          "titulo": "Empréstimo Consignado com Renegociação I ITAU",
+          "materiais": [
+            {
+              "titulo": "EMP. CONSIGNADO I ITAU.zip",
+              "arquivo": "21092aa751344ad45bee9e65ad93cbed.zip",
+              "tamanho": "225.43 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato de empréstimo consignado com renegociação do Banco Itaú."
+        },
+        {
+          "id": 893,
+          "titulo": "Cartão de Crédito I BRB Card",
+          "materiais": [
+            {
+              "titulo": "CARTÃO DE CRÉDITO I BRBCARD.zip",
+              "arquivo": "a97651cf5dbb1f70b7a43a90efba0b6c.zip",
+              "tamanho": "64.03 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo dos encargos e saldo devedor de cartão de crédito."
+        },
+        {
+          "id": 894,
+          "titulo": "SFI com Amortizações Extraordinárias I CREDITAS",
+          "materiais": [
+            {
+              "titulo": "SFI I CREDITAS.zip",
+              "arquivo": "ff114fd240ecabd7bc30698eff545389.zip",
+              "tamanho": "1.04 MB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato SFI do Banco Creditas."
+        },
+        {
+          "id": 895,
+          "titulo": "Execução de Contrato I BANCO DO BRASIL",
+          "materiais": [
+            {
+              "titulo": "RENEGOCIAÇÃO DE DÍVIDA I BB.zip",
+              "arquivo": "797815e271aa45e1615d60030394aeed.zip",
+              "tamanho": "61.05 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo e evolução do saldo devedor de execução impetrada pelo Banco do Brasil."
+        },
+        {
+          "id": 896,
+          "titulo": "Financiamento de Veículo I BV FINANCEIRA",
+          "materiais": [
+            {
+              "titulo": "FINAN. VEÍCULO I BV.zip",
+              "arquivo": "a5736341180dd547da159dc86da7b093.zip",
+              "tamanho": "147.85 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato financiamento de veículo da BV."
+        },
+        {
+          "id": 897,
+          "titulo": "Capital de Giro I BANCO ALPHA",
+          "materiais": [
+            {
+              "titulo": "CAPITAL DE GIRO I BANCO ALPHA.zip",
+              "arquivo": "9dc59ae4fac6a04c573658c6041d1db5.zip",
+              "tamanho": "741.27 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato Capital de Giro do Banco Alpha."
+        },
+        {
+          "id": 898,
+          "titulo": "RMC I Devolução de descontos",
+          "materiais": [
+            {
+              "titulo": "RMC I Devolução de descontos.zip",
+              "arquivo": "8949849114948a72a0521ae2eab2fd0e.zip",
+              "tamanho": "179.55 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de restituição de descontos indevidos"
+        },
+        {
+          "id": 899,
+          "titulo": "Capital de Giro com CDI I SICOOB",
+          "materiais": [
+            {
+              "titulo": "CAPITAL DE GIRO COM CDI I SICOOB.zip",
+              "arquivo": "e1c167b679f9916f127d346504972003.zip",
+              "tamanho": "121.94 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo dos encargos CDI e INPC."
+        },
+        {
+          "id": 900,
+          "titulo": "Contrato BNDES",
+          "materiais": [
+            {
+              "titulo": "BNDES COM TJLP.zip",
+              "arquivo": "23a1651ac89364a0e7eedf8f140be6f1.zip",
+              "tamanho": "551.43 kB"
+            }
+          ],
+          "descricao": "Planilhas de recálculo de contratos de emprésimo com BNDES."
+        },
+        {
+          "id": 901,
+          "titulo": "Empréstimo Pessoal I BMG",
+          "materiais": [
+            {
+              "titulo": "EMPRESTIMO PESSOAL I BMG.zip",
+              "arquivo": "fbf2e509485084978644c9440f5bf66f.zip",
+              "tamanho": "137.73 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo de contrato empréstimo pessoal do Banco BMG."
+        },
+        {
+          "id": 902,
+          "titulo": "Capital de Giro I BANCO DO BRASIL",
+          "materiais": [
+            {
+              "titulo": "CAPITAL DE GIRO I BB.zip",
+              "arquivo": "82bc2f1435dd78fe5e60329c06e8cbc5.zip",
+              "tamanho": "119.68 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo dos encargos e saldo devedor de capital de giro."
+        },
+        {
+          "id": 903,
+          "titulo": "Cartão de Crédito com Parcelamento I BRADESCO",
+          "materiais": [
+            {
+              "titulo": "CARTAO DE CREDITO COM PARCEL. I BRADESCO.zip",
+              "arquivo": "27f8d095bb3e5594dc7d8ec253eb6de2.zip",
+              "tamanho": "96.76 kB"
+            }
+          ],
+          "descricao": "Planilha de recálculo dos encargos, parcelamento e saldo devedor de cartão de crédito."
+        },
+        {
+          "id": 904,
+          "titulo": "RMC I Conversão em Empréstimo Pessoal",
+          "materiais": [
+            {
+              "titulo": "RMC I CONVERSAO.zip",
+              "arquivo": "f6787f56bf5337da0be0838355a733cf.zip",
+              "tamanho": "76.33 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de conversão dos descontos de RMC em empréstimo pessoal"
+        },
+        {
+          "id": 905,
+          "titulo": "Cheque Especial",
+          "materiais": [
+            {
+              "titulo": "CHEQUE ESPECIAL.zip",
+              "arquivo": "a8588b4dc2c2fe51b25c704a12b05f87.zip",
+              "tamanho": "4.96 MB"
+            }
+          ],
+          "descricao": "Planilhas de recálculo de cheque especial pelo critério de juros lineares."
+        },
+        {
+          "id": 906,
+          "titulo": "FIES - Financiamento Estudantil",
+          "materiais": [
+            {
+              "titulo": "FIES.zip",
+              "arquivo": "069a39888e5620deb8e65ec8aa6b74c7.zip",
+              "tamanho": "177.52 kB"
+            }
+          ],
+          "descricao": "Planilhas de recálculo do financiamento estudantil."
+        }
+      ]
+    },
+    {
+      "id": 230,
+      "titulo": "Cálculos Diversos",
+      "slug": "calculos-diversos1",
+      "posicao": 4,
+      "total_aulas": 17,
+      "aulas": [
+        {
+          "id": 907,
+          "titulo": "Cálculo URV 11,98%",
+          "materiais": [
+            {
+              "titulo": "CÁLCULO URV.zip",
+              "arquivo": "351477fe0c32e0912aaf08f6f1b62ee7.zip",
+              "tamanho": "66.13 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo  com aplicação de 11,98% referente a defasagem da URV não paga"
+        },
+        {
+          "id": 908,
+          "titulo": "Consórcio I HSBC",
+          "materiais": [
+            {
+              "titulo": "CONSORCIO I HSBC.zip",
+              "arquivo": "bccae766997308fa964700c75b23e5fc.zip",
+              "tamanho": "126.18 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo revisional de consórcio."
+        },
+        {
+          "id": 909,
+          "titulo": "Enquadramento Funcional (Níveis)",
+          "materiais": [
+            {
+              "titulo": "ENQUADRAMENTO FUNCIONAL.zip",
+              "arquivo": "126a3c1a5e054e41e4e7f7a4c1e7e697.zip",
+              "tamanho": "23.75 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças salariais por enquadramento funcional"
+        },
+        {
+          "id": 910,
+          "titulo": "Expurgos em Cédulas de Crédito Rural",
+          "materiais": [
+            {
+              "titulo": "EXPURGOS CRÉDITO RURAL.zip",
+              "arquivo": "dfa7ae2ad2773839d9b309131d7e4446.zip",
+              "tamanho": "252.54 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças dos expurgos em cédulas de crédito rural."
+        },
+        {
+          "id": 911,
+          "titulo": "Expurgos Inflacionários no Saldo FGTS",
+          "materiais": [
+            {
+              "titulo": "EXPURGOS FGTS.zip",
+              "arquivo": "876e56aec56720ab8ffaa4236b08ce0c.zip",
+              "tamanho": "126.25 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças dos expurgos em FGTS."
+        },
+        {
+          "id": 912,
+          "titulo": "Expurgos Inflacionários na Poupança",
+          "materiais": [
+            {
+              "titulo": "EXPURGOS POUPANÇA.zip",
+              "arquivo": "0a464d518712f6690f85368559e4b2e9.zip",
+              "tamanho": "88.07 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças dos expurgos em saldo da poupança."
+        },
+        {
+          "id": 913,
+          "titulo": "Pensão Estatutária - União Federal",
+          "materiais": [
+            {
+              "titulo": "PENSÃO ESTATUTÁRIA - UNIÃO FEDERAL.zip",
+              "arquivo": "6771fcac159bbd4a5bf054b22b2d659c.zip",
+              "tamanho": "106.71 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças do valor devido a título de pensão."
+        },
+        {
+          "id": 914,
+          "titulo": "Restituição de Contribuição Previdenciária - Paraná Previdência",
+          "materiais": [
+            {
+              "titulo": "RESTITUIÇÃO DESCONTO PREV. - PARANÁ PREVIDENCIA.zip",
+              "arquivo": "adf11a61b6446b0de1f3a3c89e91a9c8.zip",
+              "tamanho": "21.49 kB"
+            }
+          ],
+          "descricao": "Planilha de atualização da restituição das contribuições cobradas indevidamente"
+        },
+        {
+          "id": 915,
+          "titulo": "Gratificação GDASS",
+          "materiais": [
+            {
+              "titulo": "GRATIFICAÇÃO - GDASS.zip",
+              "arquivo": "c426819d28962afcc55968adc49d61d8.zip",
+              "tamanho": "30.00 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças da GDASS"
+        },
+        {
+          "id": 916,
+          "titulo": "Revisão FGTS (TR x INPC)",
+          "materiais": [
+            {
+              "titulo": "FGTS (TR x INPC).zip",
+              "arquivo": "1a317f897a148299f681bea5979bf816.zip",
+              "tamanho": "331.78 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de revisão do saldo FGTS com alteração da TR para INPC no rendimento JAM"
+        },
+        {
+          "id": 917,
+          "titulo": "Atualzação de valores e juros de mora",
+          "materiais": [
+            {
+              "titulo": "ATUALIZAÇÃO SIMPLES E JUROS MORATÓRIOS.zip",
+              "arquivo": "ef1899230622e0f61d4417fefbb09832.zip",
+              "tamanho": "96.82 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de atualização de valores e juros moratórios."
+        },
+        {
+          "id": 918,
+          "titulo": "Danos Morais",
+          "materiais": [
+            {
+              "titulo": "DANOS MORAIS.zip",
+              "arquivo": "5c423f427fdb2807decef03a80f3172f.zip",
+              "tamanho": "43.35 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de atualização de danos morais."
+        },
+        {
+          "id": 919,
+          "titulo": "Reintegração Polícia Miltar",
+          "materiais": [
+            {
+              "titulo": "REINTEGRAÇÃO POLÍCIA MILITAR.zip",
+              "arquivo": "e97ef652c6d74168d43d490e5cfd8e32.zip",
+              "tamanho": "184.62 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo das diferenças da reintegração de policial militar."
+        },
+        {
+          "id": 920,
+          "titulo": "Taxas de Condomínio em atraso",
+          "materiais": [
+            {
+              "titulo": "TAXAS DE CONDOMINIO EM ATRASO.zip",
+              "arquivo": "b6f3686fa89288dbd2228e7e9123c4a6.zip",
+              "tamanho": "47.03 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de atualização de taxas condominiais com abatimento de depósitos judiciais."
+        },
+        {
+          "id": 921,
+          "titulo": "Revisão de Contratos de Compra de Imóveis direto com a Construtora",
+          "materiais": [
+            {
+              "titulo": "REV. CONTRATO COMPRA IMOVEIS CONSTRUTORA.zip",
+              "arquivo": "583e52313c93f7b7053b090ac60a2ed1.zip",
+              "tamanho": "104.48 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de revisão de contrato de aquisição de imóveis diretamente com a construtora."
+        },
+        {
+          "id": 922,
+          "titulo": "Atualização de Precatórios Judiciais",
+          "materiais": [
+            {
+              "titulo": "ATUALIZAÇÃO DE PRECATÓRIO.zip",
+              "arquivo": "1794f634c303c1fef6f9645940ccbfd4.zip",
+              "tamanho": "27.63 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de atualização de precatórios."
+        },
+        {
+          "id": 923,
+          "titulo": "Rescisão de Contrato de compra com a Construtora",
+          "materiais": [
+            {
+              "titulo": "RESCISAO DE CONTRATO COM CONSTRUTORA.zip",
+              "arquivo": "e64a976f42a4216a217e080d5ad7a0d6.zip",
+              "tamanho": "33.20 kB"
+            }
+          ],
+          "descricao": "Planilha de cálculo de rescisão de contrato de compra e venda de imóvel com a construtora."
+        }
+      ]
+    },
+    {
+      "id": 235,
+      "titulo": "Petições e Manifestações de cálculo",
+      "slug": "peticoes-e-manifestacoes-de-calculo",
+      "posicao": 5,
+      "total_aulas": 1,
+      "aulas": [
+        {
+          "id": 945,
+          "titulo": "Impugnação - Cálculo de Precatório TJSP",
+          "materiais": [
+            {
+              "titulo": "Precatório TJSP - Petição de esclarecimento de atualização de cálculo EC 113-21.pdf",
+              "arquivo": "479dff43cb6c9e335f1ff63894d9e94d.pdf",
+              "tamanho": "127.21 kB"
+            }
+          ],
+          "descricao": "Petição de esclarecimento de atualização de cálculo EC 113-21"
+        }
+      ]
+    },
+    {
+      "id": 236,
+      "titulo": "Cálculos Tributários",
+      "slug": "calculos-tributarios",
+      "posicao": 6,
+      "total_aulas": 8,
+      "aulas": [
+        {
+          "id": 946,
+          "titulo": "Exclusão de Verbas Indenizatórias no INSS Patronal",
+          "materiais": [
+            {
+              "titulo": "Verbas Indenizatórias - INSS Patronal.zip",
+              "arquivo": "4a060fd2656646f0cc73f2f941ba90b6.zip",
+              "tamanho": "76.77 kB"
+            }
+          ],
+          "descricao": null
+        },
+        {
+          "id": 947,
+          "titulo": "Isenção IRPF 89/95 - Contribuições Prev. Privada",
+          "materiais": [
+            {
+              "titulo": "Isenção IRPF - Contribuição 89-95.zip",
+              "arquivo": "f2e34062a1c27a98f041949912cac961.zip",
+              "tamanho": "75.44 kB"
+            }
+          ],
+          "descricao": null
+        },
+        {
+          "id": 948,
+          "titulo": "Cálculo do IRPF mensal",
+          "materiais": [
+            {
+              "titulo": "Cálculo IRPF mês a mês.zip",
+              "arquivo": "8fefbc6a8fcac57ab2f4df77214a93cf.zip",
+              "tamanho": "44.73 kB"
+            }
+          ],
+          "descricao": "Cálculo de apuração dos valores de IRPF sobre salários"
+        },
+        {
+          "id": 950,
+          "titulo": "Recálculo do IRPF sobre valores recebidos em ação contra INSS",
+          "materiais": [
+            {
+              "titulo": "Recálculo IRPF sobre ação INSS.zip",
+              "arquivo": "28b06ecce3ffe76ad49342f018254cb6.zip",
+              "tamanho": "93.73 kB"
+            }
+          ],
+          "descricao": null
+        },
+        {
+          "id": 951,
+          "titulo": "Recálculo de encargos moratórios - Limitação SELIC",
+          "materiais": [
+            {
+              "titulo": "Recálculo de encargos de mora ICMS.zip",
+              "arquivo": "fa9987f4902889e7ed1cb476392d35dd.zip",
+              "tamanho": "114.92 kB"
+            }
+          ],
+          "descricao": null
+        },
+        {
+          "id": 952,
+          "titulo": "Isenção do IRPF sobre juros cobrados em ação trabalhista",
+          "materiais": [
+            {
+              "titulo": "Isenção de IRPF sobre juros moratórios.zip",
+              "arquivo": "8cb45ad0cecfc4d48a7031ea44c97d33.zip",
+              "tamanho": "100.47 kB"
+            }
+          ],
+          "descricao": null
+        },
+        {
+          "id": 953,
+          "titulo": "Majoração indevida da Taxa SISCOMEX",
+          "materiais": [
+            {
+              "titulo": "Majoração de Taxa SISCOMEX.zip",
+              "arquivo": "3b0ae3f860bc93a00cc1d274f4d6e549.zip",
+              "tamanho": "317.93 kB"
+            }
+          ],
+          "descricao": null
+        },
+        {
+          "id": 954,
+          "titulo": "Exclusão ICMS na Demanda Contratada (Energia)",
+          "materiais": [
+            {
+              "titulo": "Exclusão ICMS Demanda Contratada.zip",
+              "arquivo": "db2692f7c96523ab46a545c07acb877e.zip",
+              "tamanho": "79.03 kB"
+            }
+          ],
+          "descricao": null
+        }
+      ]
+    },
+    {
+      "id": 237,
+      "titulo": "Laudos Periciais",
+      "slug": "laudos-periciais1",
+      "posicao": 7,
+      "total_aulas": 2,
+      "aulas": [
+        {
+          "id": 949,
+          "titulo": "Cálculo de Verbas Indenizatórias na base de cálculo INSS Patronal",
+          "materiais": [
+            {
+              "titulo": "Laudo - Verbas indenizatórias.pdf",
+              "arquivo": "9ec11cd66a71c25f51f929b645df64d7.pdf",
+              "tamanho": "117.74 kB"
+            }
+          ],
+          "descricao": null
+        },
+        {
+          "id": 955,
+          "titulo": "Laudo - Exclusão ICMS TUSD Energia Elétrica",
+          "materiais": [
+            {
+              "titulo": "Laudo - Exclusão ICMS TUSD Energia Elétrica.pdf",
+              "arquivo": "fb0e693d914d795c2ce0e3f3305d84d4.pdf",
+              "tamanho": "145.12 kB"
+            }
+          ],
+          "descricao": null
+        }
+      ]
+    }
+  ]
+}
