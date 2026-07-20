@@ -78,19 +78,23 @@ function interpolar(tpl: string, valores: Record<string, string | number>) {
 function renderFrasePalavraAPalavra(frase: string, chave: string) {
   const palavraChave = PALAVRA_CHAVE[chave];
   const palavras = frase.split(" ");
-  return palavras.map((p, i) => {
+  // O espaço precisa ser um nó de texto IRMÃO fora do <span> (que é
+  // inline-block, necessário pro slide-up da animação) — um espaço
+  // colado dentro do próprio span inline-block é engolido pelo
+  // colapso de whitespace do CSS, colando as palavras visualmente.
+  return palavras.flatMap((p, i) => {
     const limpa = p.replace(/[.,]/g, "");
     const ehChave = palavraChave && limpa.toLowerCase() === palavraChave.toLowerCase();
-    return (
+    const span = (
       <span
-        key={i}
+        key={`p-${i}`}
         className={`an-palavra${ehChave ? " an-palavra-chave" : ""}`}
         style={{ animationDelay: `${1600 + i * 110}ms` }}
       >
         {p}
-        {i < palavras.length - 1 ? " " : ""}
       </span>
     );
+    return i < palavras.length - 1 ? [span, " "] : [span];
   });
 }
 
