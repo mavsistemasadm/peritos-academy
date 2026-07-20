@@ -24,6 +24,7 @@ export type EstacaoViva = {
 export type PlanoVivo = {
   temPlano: boolean;
   planoId: string | null;
+  numeroCaso: string | null;
   horasSemanaDeclarada: number;
   mesesTotais: number;
   estacoes: EstacaoViva[];
@@ -103,19 +104,23 @@ export async function getPlanoVivo(): Promise<PlanoVivo> {
   const supabase = await criarClienteServidor();
   const { data: auth } = await supabase.auth.getUser();
   const uid = auth?.user?.id;
-  if (!uid) return { temPlano: false, planoId: null, horasSemanaDeclarada: 0, mesesTotais: 0, estacoes: [], entradaXPct: ENTRADA_X, entradaYPct: ENTRADA_Y };
+  if (!uid) return { temPlano: false, planoId: null, numeroCaso: null, horasSemanaDeclarada: 0, mesesTotais: 0, estacoes: [], entradaXPct: ENTRADA_X, entradaYPct: ENTRADA_Y };
 
-  const { data: plano } = await supabase
-    .from("planos")
-    .select("id, horas_semana_declarada, meses_totais")
-    .eq("usuario_id", uid)
-    .eq("origem", "anamnese")
-    .eq("ativo", true)
-    .order("criado_em", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const [{ data: plano }, { data: perfil }] = await Promise.all([
+    supabase
+      .from("planos")
+      .select("id, horas_semana_declarada, meses_totais")
+      .eq("usuario_id", uid)
+      .eq("origem", "anamnese")
+      .eq("ativo", true)
+      .order("criado_em", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase.from("perfis").select("numero_caso").eq("id", uid).maybeSingle(),
+  ]);
+  const numeroCaso = perfil?.numero_caso != null ? String(perfil.numero_caso).padStart(4, "0") : null;
 
-  if (!plano) return { temPlano: false, planoId: null, horasSemanaDeclarada: 0, mesesTotais: 0, estacoes: [], entradaXPct: ENTRADA_X, entradaYPct: ENTRADA_Y };
+  if (!plano) return { temPlano: false, planoId: null, numeroCaso, horasSemanaDeclarada: 0, mesesTotais: 0, estacoes: [], entradaXPct: ENTRADA_X, entradaYPct: ENTRADA_Y };
 
   const { data: trilhasPlano } = await supabase
     .from("plano_trilhas")
@@ -170,6 +175,7 @@ export async function getPlanoVivo(): Promise<PlanoVivo> {
   return {
     temPlano: true,
     planoId: plano.id,
+    numeroCaso,
     horasSemanaDeclarada: Number(plano.horas_semana_declarada ?? 0),
     mesesTotais: plano.meses_totais ?? 0,
     estacoes,

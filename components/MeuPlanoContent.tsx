@@ -74,6 +74,7 @@ export default function MeuPlanoContent({ nav, plano, territorios, textos, progr
 
       <main className="mp-conteudo">
         <header className="mp-cabecalho">
+          {plano.numeroCaso && <span className="mp-numero-caso num">CASO {plano.numeroCaso}</span>}
           <h1>{textos.microcopy_meu_plano_titulo}</h1>
           {plano.temPlano && <p>Seu ritmo declarado: {plano.horasSemanaDeclarada}h por semana.</p>}
         </header>

@@ -227,7 +227,7 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
     const avatarLabel = resultado.avatar === "iniciante_transicao" ? "TRANSICAO DE CARREIRA" : "PERITO EM EVOLUCAO";
     return [
       "PERITOS ACADEMY . DEPTO DE FORMACAO",
-      "ABERTURA DE CASO ................ 0000",
+      `ABERTURA DE CASO ................ ${resultado.numeroCaso}`,
       "OBJETO ........... ROTA PROFISSIONAL",
       "RESPOSTAS ANALISADAS ........ 16 DE 16",
       `PERFIL ........ ${avatarLabel}`,
@@ -648,7 +648,7 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
               ))}
             </pre>
             <div className="an-selo-carimbo">
-              <span>{textos.microcopy_selo_dossie}</span>
+              <span>{interpolar(textos.microcopy_selo_dossie ?? "", { numero: resultado?.ok ? resultado.numeroCaso : "" })}</span>
             </div>
           </div>
           <div className="an-flash-radial" />

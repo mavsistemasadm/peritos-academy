@@ -78,6 +78,7 @@ export type ResultadoConclusao =
       avatar: "iniciante_transicao" | "perito_em_evolucao";
       fraseEspelho: string;
       objetivo: "nomeacoes" | "negocio" | null;
+      numeroCaso: string;
       resumo: {
         mesesTotais: number;
         excedeMetaMeses: boolean;
@@ -92,10 +93,11 @@ export async function concluirAnamnese(): Promise<ResultadoConclusao> {
 
   const { data: prescricao, error: erroPrescricao } = await supabase.rpc("anamnese_gerar_prescricao");
   if (erroPrescricao) return { ok: false, motivo: erroPrescricao.message };
-  const p = prescricao as { ok: boolean; motivo?: string; avatar?: string; plano_id?: string };
+  const p = prescricao as { ok: boolean; motivo?: string; avatar?: string; plano_id?: string; numero_caso?: number };
   if (!p.ok) return { ok: false, motivo: p.motivo ?? "erro_desconhecido" };
 
   const avatar = p.avatar as "iniciante_transicao" | "perito_em_evolucao";
+  const numeroCaso = String(p.numero_caso ?? 0).padStart(4, "0");
 
   const [{ data: trilhasPlano }, { data: plano }, { data: territorios }, { data: respostas }] = await Promise.all([
     supabase
@@ -146,6 +148,7 @@ export async function concluirAnamnese(): Promise<ResultadoConclusao> {
     avatar,
     fraseEspelho: escolherFraseEspelho(mapaRespostas),
     objetivo: escolherObjetivo(mapaRespostas[0]),
+    numeroCaso,
     resumo: {
       mesesTotais: plano?.meses_totais ?? 0,
       excedeMetaMeses: !!plano?.excede_meta_meses,
