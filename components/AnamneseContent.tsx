@@ -26,6 +26,7 @@ import type { AnamneseQuestao, AnamneseProgresso, Territorio } from "@/lib/queri
 import { IconeChevronLeft, IconeChevronRight, IconeVolume, IconeVolumeMudo } from "@/components/Icones";
 import { tocarSom } from "@/lib/sons";
 import { cerimoniaMusica } from "@/lib/sons/cerimoniaMusica";
+import { caminhoCurvo } from "@/lib/rota/caminhoCurvo";
 
 const CHAVE_MUDO_SESSAO = "an-audio-mudo";
 
@@ -427,7 +428,7 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
             return (
               <path
                 key={e.trilhaId}
-                d={`M ${de.x} ${de.y} L ${e.xPct} ${e.yPct}`}
+                d={caminhoCurvo(de.x, de.y, e.xPct, e.yPct, i)}
                 fill="none"
                 stroke="url(#an-grad-linha)"
                 strokeWidth="0.6"

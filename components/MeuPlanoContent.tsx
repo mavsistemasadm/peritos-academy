@@ -12,6 +12,7 @@ import type { PlanoVivo } from "@/lib/queries/meuPlano";
 import type { Territorio, AnamneseProgresso } from "@/lib/queries/anamnese";
 import { refazerAnamnese } from "@/app/anamnese/actions";
 import { IconeCheck, IconeChevronRight } from "@/components/Icones";
+import { caminhoCurvo } from "@/lib/rota/caminhoCurvo";
 
 type Props = {
   nav: DadosNav;
@@ -123,7 +124,7 @@ export default function MeuPlanoContent({ nav, plano, territorios, textos, progr
                     return (
                       <path
                         key={e.trilhaId}
-                        d={`M ${de.x} ${de.y} L ${e.xPct} ${e.yPct}`}
+                        d={caminhoCurvo(de.x, de.y, e.xPct, e.yPct, i)}
                         fill="none"
                         stroke={percorrido ? "url(#mp-grad-linha)" : "rgba(255,255,255,.18)"}
                         strokeWidth="0.6"
