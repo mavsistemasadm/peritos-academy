@@ -90,6 +90,7 @@ const angulo = (i: number) => (Math.PI * 2 * i) / n - Math.PI / 2
 export default function PeritoPublicoContent({ dados, url }: { dados: DadosPeritoPublico; url: string }) {
   const { perito: p, stats, score, nivel_label, competencias, certificados, desafios, resumo } = dados
   const [copiado, setCopiado] = useState(false)
+  const [fotoErro, setFotoErro] = useState(false)
 
   function copiarResumo() {
     navigator.clipboard.writeText(resumo + `\n\nVerifique: ${url}`)
@@ -119,7 +120,13 @@ export default function PeritoPublicoContent({ dados, url }: { dados: DadosPerit
         <div className="pp-wrap">
           <div className="pp-hero-card">
             <div className="pp-hero-info">
-              <div className="pp-avatar" aria-hidden="true">{p.iniciais}</div>
+              <div className="pp-avatar" aria-hidden="true">
+                {p.fotoUrl && !fotoErro ? (
+                  <img src={p.fotoUrl} alt="" className="pp-avatar-foto" onError={() => setFotoErro(true)} />
+                ) : (
+                  p.iniciais
+                )}
+              </div>
               <div className="pp-hero-dados">
                 <h1>{p.nome}</h1>
                 <p className="pp-bio">{p.bio}</p>

@@ -15,6 +15,7 @@ type Aba = 'inicio' | 'trilhas' | 'biblioteca' | 'comunidade' | 'agenda' | 'desa
 export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo?: Aba }) {
   const d = dados
   const [pop, setPop] = useState(false)
+  const [fotoErro, setFotoErro] = useState(false)
   const [menuAvatar, setMenuAvatar] = useState(false)
   const [menuConteudos, setMenuConteudos] = useState(false)
   const area = useRef<HTMLDivElement>(null)
@@ -133,7 +134,11 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
 
               <div className="np-avatar-wrap" ref={avatarRef}>
                 <button className="np-avatar" onClick={() => setMenuAvatar(v => !v)} aria-label={`Menu de ${d.nome}`} aria-expanded={menuAvatar}>
-                  {d.iniciais}
+                  {d.fotoUrl && !fotoErro ? (
+                    <img src={d.fotoUrl} alt="" className="np-avatar-foto" onError={() => setFotoErro(true)} />
+                  ) : (
+                    d.iniciais
+                  )}
                 </button>
                 {menuAvatar && (
                   <div className="np-avatar-menu">

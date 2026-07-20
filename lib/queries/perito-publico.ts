@@ -25,6 +25,7 @@ export type DadosPeritoPublico = {
   perito: {
     nome: string
     iniciais: string
+    fotoUrl: string | null
     slug: string
     cidade: string | null
     estado: string | null
@@ -200,6 +201,7 @@ export async function carregarPeritoPublico(slug: string): Promise<DadosPeritoPu
     perito: {
       nome,
       iniciais,
+      fotoUrl: perfil.foto_url ?? null,
       slug: perfil.slug,
       cidade: perfil.cidade,
       estado: perfil.estado,

@@ -2068,7 +2068,9 @@ body.teatro .trilho-aulas{display:none}
   position:relative;width:112px;height:112px;border-radius:50%;flex-shrink:0;
   background:linear-gradient(135deg,#1C4438,#0E241D);
   display:grid;place-items:center;font-size:32px;font-weight:680;letter-spacing:-.02em;
+  overflow:hidden;
 }
+.pagina-perfil .avatar-foto{width:100%;height:100%;aspect-ratio:1;border-radius:50%;object-fit:cover}
 .pagina-perfil .avatar-grande::before{
   content:'';position:absolute;inset:-5px;border-radius:50%;z-index:-1;
   background:conic-gradient(from 210deg,#20D9A6,#36DCD1,#DDF784,#20D9A6);
@@ -3047,6 +3049,7 @@ body.teatro .trilho-aulas{display:none}
   transition:transform .2s;
 }
 .nav-plat .np-avatar:hover{transform:scale(1.06)}
+.nav-plat .np-avatar-foto{width:100%;height:100%;aspect-ratio:1;border-radius:50%;object-fit:cover}
 .nav-plat .np-entrar{
   font-size:14px;font-weight:600;color:var(--carvao);
   background:var(--creme);border-radius:var(--r-pill);padding:10px 22px;
@@ -3695,7 +3698,8 @@ body.teatro .trilho-aulas{display:none}
 .pagina-perito-pub .pp-hero-card::before{content:'';position:absolute;top:-100px;right:-100px;width:300px;height:300px;background:radial-gradient(circle,rgba(221,247,132,.08),transparent 65%);pointer-events:none}
 .pagina-perito-pub .pp-hero-card::after{content:'';position:absolute;bottom:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(32,217,166,.06),transparent 60%);pointer-events:none}
 .pagina-perito-pub .pp-hero-info{display:flex;gap:var(--s-4);flex:1;min-width:0;position:relative;z-index:1}
-.pagina-perito-pub .pp-avatar{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,rgba(32,217,166,.15),rgba(11,14,12,.8));border:2px solid rgba(32,217,166,.4);display:grid;place-items:center;font-size:24px;font-weight:700;color:var(--verde);flex-shrink:0;box-shadow:0 8px 24px -8px rgba(32,217,166,.2)}
+.pagina-perito-pub .pp-avatar{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,rgba(32,217,166,.15),rgba(11,14,12,.8));border:2px solid rgba(32,217,166,.4);display:grid;place-items:center;font-size:24px;font-weight:700;color:var(--verde);flex-shrink:0;box-shadow:0 8px 24px -8px rgba(32,217,166,.2);overflow:hidden}
+.pagina-perito-pub .pp-avatar-foto{width:100%;height:100%;aspect-ratio:1;border-radius:50%;object-fit:cover}
 .pagina-perito-pub .pp-hero-dados{flex:1;min-width:0}
 .pagina-perito-pub .pp-hero-dados h1{font-size:clamp(22px,3vw,32px);font-weight:720;letter-spacing:-.03em;line-height:1.15;margin-bottom:6px}
 .pagina-perito-pub .pp-bio{font-size:14px;color:var(--cinza-claro);line-height:1.55;margin-bottom:var(--s-3);max-width:48ch}
@@ -4807,7 +4811,9 @@ body.teatro .trilho-aulas{display:none}
   color:var(--ouro2Com);
   background:linear-gradient(145deg, #232a3a, #171d2a);
   border:1px solid var(--borda2Com);
+  overflow:hidden;
 }
+.pagina-comunidade .foto-p-foto{width:100%;height:100%;aspect-ratio:1;border-radius:50%;object-fit:cover}
 
 /* ---------- compor ---------- */
 .pagina-comunidade .compor{

@@ -44,11 +44,24 @@ function quandoAtividade(iso: string) {
   return 'semana passada'
 }
 
+// selo do carimbo da cerimônia da Rota do Perito (ver .an-selo-carimbo em
+// AnamneseContent.tsx: círculo + borda pontilhada interna), simplificado e
+// monocromático (currentColor) pra caber no badge de insígnia.
+function IconeSeloCarimbo({ size = 26 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5.4" strokeDasharray="2.1 2.1" />
+    </svg>
+  )
+}
+
 const ICONE_INS: Record<string, React.ReactNode> = {
   check: <IconeCheck size={26} />,
   doc: <IconeFileText size={26} />,
   raio: <IconeZap size={26} />,
   cadeado: <IconeLock size={22} />,
+  mapa: <IconeSeloCarimbo size={26} />,
 }
 const IcoCert = () => <Certificado size={22} />
 
@@ -324,7 +337,7 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
               </div>
               <div className="constancia-txt">
                 <p>
-                  Você estudou em <b>{d.diasEstudados} dos últimos {d.diasJanela} dias</b>
+                  Você estudou em <b>{d.diasEstudados} dias</b> neste período
                   {d.ritmoSubiu && <>, e nas últimas 4 semanas o ritmo subiu</>}. {d.diasFortes}
                 </p>
                 <span className="sequencia">

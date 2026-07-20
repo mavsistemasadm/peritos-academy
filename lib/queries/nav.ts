@@ -7,6 +7,7 @@ export type DadosNav = {
   logado: boolean
   nome: string
   iniciais: string
+  fotoUrl: string | null
   slug: string | null
   nivel: number
   titulo: string
@@ -29,7 +30,7 @@ export type DadosNav = {
 }
 
 const VAZIO: DadosNav = {
-logado: false, nome: 'Visitante', iniciais: 'PA', slug: null,
+logado: false, nome: 'Visitante', iniciais: 'PA', fotoUrl: null, slug: null,
   nivel: 0, titulo: 'Iniciante',
   xp: 0, xpProximo: 100, progressoPct: 0, faltaXp: 100, proximoNivelNome: null,
   moedas: 0, sequenciaDias: 0, streakRecorde: 0, streakProtecoesRestantes: 2, isAdmin: false,
@@ -63,7 +64,7 @@ export async function carregarNav(): Promise<DadosNav> {
   if (!auth?.user) return { ...VAZIO, ...configNav }
 
   const [{ data: perfil }, { data: saldo }, { data: adminRows }, { data: streak }, { data: statusNivel }] = await Promise.all([
-    supabase.from('perfis').select('nome, slug').eq('id', auth.user.id).single(),
+    supabase.from('perfis').select('nome, slug, foto_url').eq('id', auth.user.id).single(),
     // fonte real: soma do ledger (gamificacao_extrato) via view, não a coluna
     // perfis.xp em cache — evita depender de um valor que pode dessincronizar.
     supabase.from('gamificacao_saldo').select('xp_total, moedas_total').eq('usuario_id', auth.user.id).maybeSingle(),
@@ -97,6 +98,7 @@ export async function carregarNav(): Promise<DadosNav> {
     logado: true,
     nome: perfil.nome ?? 'Perito',
     iniciais: iniciaisDe(perfil.nome ?? 'PA'),
+    fotoUrl: perfil.foto_url ?? null,
     slug: perfil.slug ?? null,
     nivel: statusDados?.nivel_atual_ordem ?? 0,
     titulo: statusDados?.nivel_atual_nome ?? 'Iniciante',

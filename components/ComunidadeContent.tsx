@@ -170,11 +170,16 @@ export default function ComunidadeContent({ dados, nav }: { dados: DadosComunida
   const { usuarioNome, espacos, posts, ranking, eventoProximo, metricas } = dados
 
   const [espacoAtivo, setEspacoAtivo] = useState<string | null>(null)
+  const [fotoErro, setFotoErro] = useState(false)
   const [filtro, setFiltro] = useState('Em alta')
   const [tipoNovo, setTipoNovo] = useState<'caso' | 'duvida' | 'vitoria'>('caso')
   const [texto, setTexto] = useState('')
   const [publicando, start] = useTransition()
   const raiz = useRef<HTMLDivElement>(null)
+
+  const avatarProprio = nav.fotoUrl && !fotoErro
+    ? <img src={nav.fotoUrl} alt="" className="foto-p-foto" onError={() => setFotoErro(true)} />
+    : null
 
   // reveals
   useEffect(() => {
@@ -262,7 +267,7 @@ export default function ComunidadeContent({ dados, nav }: { dados: DadosComunida
             {/* FEED */}
             <div>
               <div className="compor reveal">
-                <span className="foto-p" aria-hidden="true">{iniciais(usuarioNome)}</span>
+                <span className="foto-p" aria-hidden="true">{avatarProprio ?? iniciais(usuarioNome)}</span>
                 <div className="compor-corpo">
                   <textarea placeholder="Compartilhe um caso, uma dúvida ou uma vitória…"
                     aria-label="Nova publicação" value={texto} onChange={e => setTexto(e.target.value)} />
@@ -319,7 +324,7 @@ export default function ComunidadeContent({ dados, nav }: { dados: DadosComunida
                     {ranking.linhas.map(r => (
                       <li key={r.posicao} className={`rk${r.eh_voce ? ' voce' : ''}`}>
                         <span className="pos">{r.posicao}</span>
-                        <span className="foto-p" aria-hidden="true">{r.iniciais}</span>
+                        <span className="foto-p" aria-hidden="true">{r.eh_voce ? (avatarProprio ?? r.iniciais) : r.iniciais}</span>
                         <span className="rk-txt"><b>{r.eh_voce ? 'Você' : r.nome}</b><span>{fmtNum(r.xp)} XP</span></span>
                       </li>
                     ))}
@@ -328,7 +333,7 @@ export default function ComunidadeContent({ dados, nav }: { dados: DadosComunida
                   <>
                     <ol className="ranking num">
                       <li className="rk voce">
-                        <span className="foto-p" aria-hidden="true">{ranking.voce.iniciais}</span>
+                        <span className="foto-p" aria-hidden="true">{avatarProprio ?? ranking.voce.iniciais}</span>
                         <span className="rk-txt"><b>Você</b><span>{fmtNum(ranking.voce.xp)} XP</span></span>
                       </li>
                     </ol>
