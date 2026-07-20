@@ -23,8 +23,11 @@ import {
   type Estacao,
 } from "@/app/anamnese/actions";
 import type { AnamneseQuestao, AnamneseProgresso, Territorio } from "@/lib/queries/anamnese";
-import { IconeChevronLeft, IconeChevronRight } from "@/components/Icones";
+import { IconeChevronLeft, IconeChevronRight, IconeVolume, IconeVolumeMudo } from "@/components/Icones";
 import { tocarSom } from "@/lib/sons";
+import { cerimoniaMusica } from "@/lib/sons/cerimoniaMusica";
+
+const CHAVE_MUDO_SESSAO = "an-audio-mudo";
 
 type Props = {
   questoes: AnamneseQuestao[];
@@ -138,6 +141,23 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
   const [erro, setErro] = useState<string | null>(null);
   const [resultado, setResultado] = useState<ResultadoConclusao | null>(null);
 
+  /* ---------- áudio da cerimônia ---------- */
+  const [audioMudo, setAudioMudo] = useState(false);
+  useEffect(() => {
+    let salvo: string | null = null;
+    try { salvo = sessionStorage.getItem(CHAVE_MUDO_SESSAO); } catch { /* sessionStorage indisponível */ }
+    if (salvo === "1") { setAudioMudo(true); cerimoniaMusica.mudo(true); }
+    return () => cerimoniaMusica.sair();
+  }, []);
+  function alternarMudo() {
+    setAudioMudo((prev) => {
+      const novo = !prev;
+      cerimoniaMusica.mudo(novo);
+      try { sessionStorage.setItem(CHAVE_MUDO_SESSAO, novo ? "1" : "0"); } catch { /* sessionStorage indisponível */ }
+      return novo;
+    });
+  }
+
   const trocarCena = useCallback(
     (proxima: Cena, atraso = 0) => {
       const ir = () => {
@@ -153,6 +173,7 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
 
   /* ---------- CENA 0 · CONVITE ---------- */
   function iniciarMergulho() {
+    cerimoniaMusica.iniciar(sonsConquista); // gesto do clique libera autoplay
     setCena("mergulho");
   }
   useEffect(() => {
@@ -166,8 +187,19 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
   const ato = ATOS.find((a) => a.ordens.includes(q?.ordem ?? 0)) ?? ATOS[0];
   const emAtoIII = ato.numeral === "III";
 
+  useEffect(() => {
+    if (cena === "perguntas" && emAtoIII) cerimoniaMusica.entrarAtoIII();
+  }, [cena, emAtoIII]);
+
   async function handleResponder(opcaoOrdem: number) {
     if (enviandoResposta) return;
+    if (!cerimoniaMusica.estaAtiva()) {
+      // cena "convite" foi pulada (retomando uma anamnese parcial) — este
+      // clique é o primeiro gesto do usuário na página, então é aqui que
+      // o áudio pode iniciar de fato.
+      cerimoniaMusica.iniciar(sonsConquista);
+      if (emAtoIII) cerimoniaMusica.entrarAtoIII();
+    }
     setRespostasMap((prev) => ({ ...prev, [q.ordem]: opcaoOrdem }));
     setEnviandoResposta(true);
     const r = await responderQuestao(q.ordem, opcaoOrdem);
@@ -207,6 +239,11 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
   const linhaAtualIdx = charsPorLinha.findIndex((c, i) => c < (linhasDossie[i]?.length ?? 0));
 
   useEffect(() => {
+    if (cena !== "dossie") return;
+    cerimoniaMusica.entrarDossie();
+  }, [cena]);
+
+  useEffect(() => {
     if (cena !== "dossie" || linhasDossie.length === 0) return;
     if (reduzido) {
       setCharsPorLinha(linhasDossie.map((l) => l.length));
@@ -226,6 +263,7 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
           await new Promise((r) => setTimeout(r, atraso));
           contagem[li] = ci;
           setCharsPorLinha([...contagem]);
+          cerimoniaMusica.tocarTecla();
         }
         await new Promise((r) => setTimeout(r, 190));
       }
@@ -245,6 +283,7 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
   useEffect(() => {
     if (cena !== "carimbo") return;
     if (sonsConquista) tocarSom("carimbo");
+    cerimoniaMusica.entrarCarimbo();
     if (reduzido) { setCena("mesa"); return; }
     const t1 = setTimeout(() => setDossieRompendo(true), 1800);
     const t2 = setTimeout(() => setCena("mesa"), 2700);
@@ -252,6 +291,11 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
   }, [cena, sonsConquista, reduzido]);
 
   /* ---------- CENA 3 · MESA SE DESDOBRA ---------- */
+  useEffect(() => {
+    if (cena !== "mesa") return;
+    cerimoniaMusica.entrarMesa();
+  }, [cena]);
+
   const chaveFrase = resultado?.ok ? resultado.fraseEspelho : "";
   const [textoFrase, setTextoFrase] = useState("");
   useEffect(() => {
@@ -285,10 +329,11 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
     setSheetColapsado(false); setDragY(0);
     if (reduzido) {
       setLinhaDesenhada(true); setEstacaoChegou(true); setZoomAtivo(true); setCartaoVisivel(true);
+      cerimoniaMusica.pingEstacao();
       return;
     }
     const t1 = setTimeout(() => setLinhaDesenhada(true), 50);
-    const t2 = setTimeout(() => setEstacaoChegou(true), 50 + 1400);
+    const t2 = setTimeout(() => { setEstacaoChegou(true); cerimoniaMusica.pingEstacao(); }, 50 + 1400);
     const t3 = setTimeout(() => setZoomAtivo(true), 50 + 1400 + 300);
     const t4 = setTimeout(() => setCartaoVisivel(true), 50 + 1400 + 300 + 900);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
@@ -428,6 +473,7 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
   const [tesouroToastVisivel, setTesouroToastVisivel] = useState(false);
   useEffect(() => {
     if (cena !== "tesouro") return;
+    cerimoniaMusica.entrarTesouro();
     setTesouroTextoVisivel(false); setTesouroToastVisivel(false);
     if (reduzido) { setTesouroTextoVisivel(true); setTesouroToastVisivel(true); return; }
     const t1 = setTimeout(() => setTesouroTextoVisivel(true), 1400);
@@ -454,6 +500,11 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
   }, [resultado, textos]);
 
   /* ---------- CENA 6 · O MAPA É SEU ---------- */
+  useEffect(() => {
+    if (cena !== "mapa-final") return;
+    cerimoniaMusica.entrarMapaFinal();
+  }, [cena]);
+
   const [comecando, setComecando] = useState(false);
   async function handleComecarMinhaRota() {
     if (!resultado?.ok || comecando) return;
@@ -472,6 +523,17 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
 
   return (
     <div className={`pagina-anamnese${reduzido ? " reduzido" : ""}${mobile ? " mobile" : ""}`}>
+      {cena !== "convite" && (
+        <button
+          className="an-btn-mudo"
+          onClick={alternarMudo}
+          aria-label={audioMudo ? "Ativar som da cerimônia" : "Silenciar cerimônia"}
+          title={audioMudo ? "Ativar som" : "Silenciar"}
+        >
+          {audioMudo ? <IconeVolumeMudo size={16} /> : <IconeVolume size={16} />}
+        </button>
+      )}
+
       {/* ============ CENA 0 · CONVITE ============ */}
       {cena === "convite" && (
         <div className="an-cena ativa an-convite">

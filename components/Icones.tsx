@@ -282,3 +282,19 @@ export function IconeMegaphone(props: IconeProps) {
     </Svg>
   )
 }
+export function IconeVolume(props: IconeProps) {
+  return (
+    <Svg {...props}>
+      <path d="M4 10v4h4l5 4V6l-5 4H4z" />
+      <path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11" />
+    </Svg>
+  )
+}
+export function IconeVolumeMudo(props: IconeProps) {
+  return (
+    <Svg {...props}>
+      <path d="M4 10v4h4l5 4V6l-5 4H4z" />
+      <path d="M16 9l5 6M21 9l-5 6" />
+    </Svg>
+  )
+}

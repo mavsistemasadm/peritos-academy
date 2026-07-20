@@ -5477,6 +5477,15 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 .pagina-anamnese .an-cena.ativa .an-anim{animation:an-surgir .7s var(--suave) both}
 .pagina-anamnese .an-cena.saindo .an-conteudo{animation:an-sair .32s var(--suave) both}
 
+.pagina-anamnese .an-btn-mudo{
+  position:fixed;top:var(--s-4);right:var(--s-4);z-index:600;
+  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(7,9,8,.55);border:1px solid var(--linha);color:var(--cinza-claro);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  transition:background .2s,color .2s,border-color .2s;
+}
+.pagina-anamnese .an-btn-mudo:hover{background:rgba(7,9,8,.75);color:var(--creme);border-color:var(--linha-suave)}
+
 .pagina-anamnese .an-btn-primario,.pagina-anamnese .an-btn-fantasma,.pagina-anamnese .an-btn-voltar{
   display:inline-flex;align-items:center;gap:10px;border-radius:var(--r-pill);
   font-size:15px;font-weight:600;letter-spacing:-.01em;padding:14px 26px;min-height:48px;
