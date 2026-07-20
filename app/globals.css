@@ -5684,32 +5684,166 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 .pagina-anamnese .an-cartao-dados{font-size:13px;color:var(--cinza);font-weight:600}
 .pagina-anamnese .an-cartao-capitulo .an-btn-primario{margin-top:var(--s-3)}
 
-/* ============ FIM DO CAPÍTULO 1 ============ */
-.pagina-anamnese .an-fim-capitulo h2{font-size:clamp(28px,4vw,40px);font-weight:720;letter-spacing:-.03em;margin-bottom:var(--s-3)}
-.pagina-anamnese .an-fim-capitulo p{font-size:15px;color:var(--cinza-claro);margin-bottom:var(--s-5)}
+/* ============ CENA 5 · TESOURO ============ */
+.pagina-anamnese .an-tesouro-cena{flex-direction:column;gap:var(--s-5);background:radial-gradient(120% 100% at 50% 20%,rgba(32,217,166,.06),transparent 60%),#050709}
+.pagina-anamnese .an-tesouro-imagem{position:relative;max-width:380px;width:100%}
+.pagina-anamnese .an-tesouro-imagem img{
+  width:100%;display:block;border-radius:10px;transform:rotate(-3deg);
+  box-shadow:0 0 60px rgba(32,217,166,.35),0 30px 80px -20px rgba(0,0,0,.7);
+  animation:an-tesouro-revelar 1.4s cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes an-tesouro-revelar{from{filter:blur(10px) brightness(.6)}to{filter:blur(0) brightness(1)}}
+.pagina-anamnese .an-tesouro-texto{max-width:60ch;text-align:center;padding:0 var(--s-5)}
+.pagina-anamnese .an-tesouro-texto p{font-size:17px;line-height:1.6;color:var(--creme);margin-bottom:var(--s-3)}
+.pagina-anamnese .an-tesouro-prazo{font-size:13.5px!important;color:var(--cinza)!important}
+.pagina-anamnese .an-toast-xp{
+  position:fixed;bottom:var(--s-6);left:50%;transform:translateX(-50%);
+  background:var(--grad-marca);color:var(--carvao);font-weight:700;font-size:14px;
+  padding:12px 22px;border-radius:var(--r-pill);
+  animation:an-toast-subir .4s var(--forte) both;
+  box-shadow:0 20px 40px -10px rgba(32,217,166,.5);
+}
+@keyframes an-toast-subir{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* ============ CENA 6 · O MAPA É SEU ============ */
+.pagina-anamnese .an-mapa-final{flex-direction:column;gap:var(--s-5)}
+.pagina-anamnese .an-mapa-final-acoes{display:flex;gap:var(--s-3);justify-content:center;flex-wrap:wrap}
 
 /* ============ prefers-reduced-motion ============ */
 @media (prefers-reduced-motion:reduce){
   .pagina-anamnese *,.pagina-anamnese *::before,.pagina-anamnese *::after{animation:none!important;transition:none!important}
   .pagina-anamnese .an-anim,.pagina-anamnese .an-selo-carimbo,.pagina-anamnese .an-dossie,
-  .pagina-anamnese .an-palavra,.pagina-anamnese .an-folha,.pagina-anamnese .an-cartao-capitulo{
+  .pagina-anamnese .an-palavra,.pagina-anamnese .an-folha,.pagina-anamnese .an-cartao-capitulo,
+  .pagina-anamnese .an-tesouro-imagem img,.pagina-anamnese .an-toast-xp{
     opacity:1;transform:none;filter:none;
   }
   .pagina-anamnese .an-convite-bg{transform:none}
   .pagina-anamnese .an-linha-rota{stroke-dashoffset:0}
   .pagina-anamnese .an-mergulho-flash{display:none}
+  .pagina-anamnese .an-mapa-viva{transform:none!important}
 }
 .pagina-anamnese.reduzido .an-anim,.pagina-anamnese.reduzido .an-selo-carimbo,.pagina-anamnese.reduzido .an-dossie,
-.pagina-anamnese.reduzido .an-palavra,.pagina-anamnese.reduzido .an-folha,.pagina-anamnese.reduzido .an-cartao-capitulo{
+.pagina-anamnese.reduzido .an-palavra,.pagina-anamnese.reduzido .an-folha,.pagina-anamnese.reduzido .an-cartao-capitulo,
+.pagina-anamnese.reduzido .an-tesouro-imagem img,.pagina-anamnese.reduzido .an-toast-xp{
   opacity:1;transform:none;filter:none;animation:none;
 }
 .pagina-anamnese.reduzido .an-linha-rota{stroke-dashoffset:0;transition:none}
 .pagina-anamnese.reduzido .an-mergulho-flash{display:none}
 .pagina-anamnese.reduzido .an-convite-bg{animation:none}
+.pagina-anamnese.reduzido .an-mapa-viva{transform:none!important}
+
+/* ============ MOBILE · câmera deslizante + bottom sheet ============ */
+@media(max-width:640px){
+  .pagina-anamnese .an-rota-cena{padding:0;gap:0}
+  .pagina-anamnese .an-mapa-wrap{max-width:none;height:62vh;overflow:hidden;border-radius:0}
+  .pagina-anamnese .an-mapa-viva{
+    position:absolute;top:0;left:0;width:240%;max-width:none;height:auto;aspect-ratio:1456/816;
+    border-radius:0;transition:transform .9s var(--suave);
+  }
+  .pagina-anamnese .an-mapa-final .an-mapa-viva{width:100%;transform:none!important;position:relative}
+  .pagina-anamnese .an-territorio-rotulo{max-width:84px}
+  .pagina-anamnese .an-territorio-rotulo b{font-size:9px}
+
+  .pagina-anamnese .an-cartao-capitulo.sheet{
+    position:fixed;left:0;right:0;bottom:0;top:auto;max-width:none;width:100%;margin:0;
+    border-radius:20px 20px 0 0;padding-top:26px;max-height:68vh;overflow-y:auto;
+    transition:transform .3s var(--suave);animation:none;opacity:1;
+    box-shadow:0 -20px 60px -20px rgba(0,0,0,.7);
+  }
+  .pagina-anamnese .an-cartao-capitulo.sheet.colapsado{transition:transform .3s var(--suave)}
+  .pagina-anamnese .an-sheet-alca{
+    position:absolute;top:10px;left:50%;transform:translateX(-50%);
+    width:40px;height:5px;border-radius:3px;background:var(--linha);touch-action:none;cursor:grab;
+  }
+  .pagina-anamnese .an-mapa-final-acoes{flex-direction:column;width:100%;padding:0 var(--s-4) var(--s-4)}
+  .pagina-anamnese .an-mapa-final-acoes .an-btn-primario,
+  .pagina-anamnese .an-mapa-final-acoes .an-btn-fantasma{width:100%;justify-content:center}
+  .pagina-anamnese .an-tesouro-imagem{max-width:260px}
+}
+
+/* ============================================================
+   PERITOS ACADEMY — MEU PLANO (escopado em .pagina-meu-plano)
+   Mapa vivo da Rota do Perito — mesmo mapa da cerimônia, com
+   progresso real por trilha. Sem coreografia de descoberta.
+   ============================================================ */
+.pagina-meu-plano{
+  --carvao:#070908; --creme:#F1F2DF; --cinza:#989E99; --cinza-claro:#B9BFB8;
+  --verde:#20D9A6; --ciano:#36DCD1; --lima:#DDF784;
+  --linha:rgba(255,255,255,.10); --linha-suave:rgba(255,255,255,.07);
+  --grad-marca:linear-gradient(120deg,#20D9A6 0%,#36DCD1 48%,#DDF784 100%);
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --s-2:12px; --s-3:16px; --s-4:24px; --s-5:32px; --s-6:48px; --s-7:64px;
+  --r-pill:999px; --r-card:20px; --suave:cubic-bezier(.2,.7,.3,1);
+  font-family:var(--font);background:var(--carvao);color:var(--creme);
+  min-height:100vh;font-size:16px;line-height:1.55;
+}
+.pagina-meu-plano *{margin:0;padding:0;box-sizing:border-box}
+.pagina-meu-plano a{color:inherit;text-decoration:none}
+.pagina-meu-plano button{font:inherit;cursor:pointer}
+.pagina-meu-plano img{display:block;max-width:100%}
+
+.pagina-meu-plano .mp-conteudo{max-width:1300px;margin:0 auto;padding:var(--s-7) var(--s-5) var(--s-8)}
+.pagina-meu-plano .mp-cabecalho{margin-bottom:var(--s-5);text-align:center}
+.pagina-meu-plano .mp-cabecalho h1{font-size:clamp(28px,4vw,40px);font-weight:740;letter-spacing:-.03em;margin-bottom:8px}
+.pagina-meu-plano .mp-cabecalho p{font-size:14.5px;color:var(--cinza-claro)}
+
+.pagina-meu-plano .mp-vazio{
+  display:flex;flex-direction:column;align-items:center;gap:var(--s-4);
+  padding:var(--s-8) var(--s-4);text-align:center;
+}
+.pagina-meu-plano .mp-btn-primario{
+  display:inline-flex;align-items:center;gap:10px;background:var(--grad-marca);color:var(--carvao);
+  font-weight:600;font-size:15px;padding:14px 26px;border-radius:var(--r-pill);
+}
+
+.pagina-meu-plano .mp-mapa-wrap{position:relative;width:100%;max-width:1300px;margin:0 auto;border-radius:14px;overflow:hidden}
+.pagina-meu-plano .mp-mapa-viva{position:relative;width:100%;aspect-ratio:1456/816}
+.pagina-meu-plano .mp-mapa-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.pagina-meu-plano .mp-mapa-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+
+.pagina-meu-plano .mp-marcador-voce{
+  position:absolute;transform:translate(-50%,-120%);text-align:center;white-space:nowrap;
+  font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--creme);
+  background:rgba(7,9,8,.72);border:1px solid var(--linha);border-radius:var(--r-pill);padding:5px 12px;
+}
+.pagina-meu-plano .mp-territorio{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center}
+.pagina-meu-plano .mp-territorio-ponto{
+  width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+  background:var(--cinza);color:var(--carvao);border:2px solid rgba(255,255,255,.25);
+}
+.pagina-meu-plano .mp-territorio.na-rota.atual .mp-territorio-ponto{background:var(--lima)}
+.pagina-meu-plano .mp-territorio.na-rota.concluida .mp-territorio-ponto{background:var(--verde)}
+.pagina-meu-plano .mp-anel-pulsante{
+  position:absolute;width:38px;height:38px;border-radius:50%;border:2px solid rgba(221,247,132,.6);
+  animation:mp-anel-pulsar 2.2s ease-out infinite;
+}
+@keyframes mp-anel-pulsar{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.3);opacity:0}}
+.pagina-meu-plano .mp-territorio-rotulo{margin-top:6px;text-align:center;max-width:130px}
+.pagina-meu-plano .mp-territorio-rotulo b{display:block;font-size:11px;font-weight:650;line-height:1.3;color:var(--creme)}
+.pagina-meu-plano .mp-territorio.fora-rota .mp-territorio-rotulo b{color:var(--cinza);opacity:.6}
+.pagina-meu-plano .mp-territorio-pct{display:block;font-size:10px;color:var(--verde);font-weight:700;margin-top:2px}
+.pagina-meu-plano .mp-tag-explorar{
+  display:inline-block;font-style:normal;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  margin-top:3px;padding:2px 7px;border-radius:var(--r-pill);color:var(--cinza);border:1px solid var(--linha);
+}
+.pagina-meu-plano .mp-continuar{
+  display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:11px;font-weight:700;
+  color:var(--carvao);background:var(--grad-marca);border-radius:var(--r-pill);padding:4px 10px;
+}
+
+.pagina-meu-plano .mp-rodape{text-align:center;padding:var(--s-6) 0 0}
+.pagina-meu-plano .mp-btn-refazer{
+  font-size:13.5px;color:var(--cinza);border:1px solid var(--linha);border-radius:var(--r-pill);
+  padding:10px 20px;background:rgba(255,255,255,.02);transition:color .2s,border-color .2s;
+}
+.pagina-meu-plano .mp-btn-refazer:hover{color:var(--creme);border-color:var(--linha-suave)}
 
 @media(max-width:640px){
-  .pagina-anamnese .an-mapa-viva{aspect-ratio:816/1000}
-  .pagina-anamnese .an-mapa-img{object-fit:cover}
-  .pagina-anamnese .an-territorio-rotulo{max-width:90px}
-  .pagina-anamnese .an-territorio-rotulo b{font-size:9.5px}
+  .pagina-meu-plano .mp-mapa-wrap{height:62vh;border-radius:0}
+  .pagina-meu-plano .mp-mapa-viva{position:absolute;width:240%;height:auto;aspect-ratio:1456/816;transition:transform .5s var(--suave)}
+  .pagina-meu-plano .mp-territorio-rotulo{max-width:84px}
+  .pagina-meu-plano .mp-territorio-rotulo b{font-size:9px}
+}
+@media (prefers-reduced-motion:reduce){
+  .pagina-meu-plano *,.pagina-meu-plano *::before,.pagina-meu-plano *::after{animation:none!important;transition:none!important}
 }

@@ -1,19 +1,27 @@
 "use client";
 // components/AnamneseContent.tsx
-// Cerimônia do Mapa da Rota do Perito — Capítulo 1 (Cenas 0 a 4, primeira
-// estação apenas). Dados exclusivamente do motor (migration
-// 20260720_anamnese_motor_rota_perito.sql + correções de âncora/expansão) e
-// dos textos aprovados (anamnese_territorios/anamnese_frases_espelho/
-// anamnese_textos_gerais). Aqui só a coreografia visual.
+// Cerimônia do Mapa da Rota do Perito — fluxo completo (cenas 0 a 6).
+// Dados exclusivamente do motor (migration 20260720_anamnese_motor_rota_perito.sql
+// + correções de âncora/expansão) e dos textos aprovados (anamnese_territorios/
+// anamnese_frases_espelho/anamnese_textos_gerais). Aqui só a coreografia visual.
 //
-// A escolha de qual palavra de cada frase de espelho vira "palavra-chave" em
-// degradê teal, e a posição do marcador "você está aqui" (não especificados
-// no pacote de textos aprovado), são decisão de execução desta tela —
-// documentadas para revisão no checkpoint.
+// Decisões de execução não especificadas no pacote de textos aprovado
+// (documentadas para revisão): palavra-chave em degradê por frase de
+// espelho, posição do marcador "você está aqui", flexão do tesouro por
+// objetivo lido da Q1 (opções 4/5), e o mecanismo de câmera/pan mobile
+// (formula reaproveitada do zoom desktop).
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { responderQuestao, concluirAnamnese, buscarFraseEspelho, type ResultadoConclusao } from "@/app/anamnese/actions";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  responderQuestao,
+  concluirAnamnese,
+  buscarFraseEspelho,
+  buscarComecarMinhaRota,
+  type ResultadoConclusao,
+  type Estacao,
+} from "@/app/anamnese/actions";
 import type { AnamneseQuestao, AnamneseProgresso, Territorio } from "@/lib/queries/anamnese";
 import { IconeChevronLeft, IconeChevronRight } from "@/components/Icones";
 import { tocarSom } from "@/lib/sons";
@@ -35,7 +43,8 @@ type Cena =
   | "carimbo"
   | "mesa"
   | "rota"
-  | "fim-capitulo";
+  | "tesouro"
+  | "mapa-final";
 
 const ATOS = [
   { label: "Seu momento", numeral: "I", ordens: [0, 1, 2, 3, 4] },
@@ -59,6 +68,10 @@ const PALAVRA_CHAVE: Record<string, string> = {
 const ENTRADA_X = 50;
 const ENTRADA_Y = 95;
 
+function interpolar(tpl: string, valores: Record<string, string | number>) {
+  return tpl.replace(/\{(\w+)\}/g, (_, k) => String(valores[k] ?? ""));
+}
+
 function renderFrasePalavraAPalavra(frase: string, chave: string) {
   const palavraChave = PALAVRA_CHAVE[chave];
   const palavras = frase.split(" ");
@@ -72,17 +85,39 @@ function renderFrasePalavraAPalavra(frase: string, chave: string) {
         style={{ animationDelay: `${1600 + i * 110}ms` }}
       >
         {p}
-        {i < palavras.length - 1 ? " " : ""}
+        {i < palavras.length - 1 ? " " : ""}
       </span>
     );
   });
 }
 
+function renderStatusAceso(linha: string) {
+  const marcador = "[ROTA TRACADA]";
+  const idx = linha.indexOf(marcador);
+  if (idx === -1) return linha;
+  return (
+    <>
+      {linha.slice(0, idx)}
+      <span className="an-status-aceso">{marcador}</span>
+    </>
+  );
+}
+
 export default function AnamneseContent({ questoes, progressoInicial, textos, territorios, sonsConquista }: Props) {
+  const router = useRouter();
   const reduzido = useMemo(
     () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     []
   );
+
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    setMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const idxInicial = useMemo(() => {
     if (progressoInicial.questoesRespondidas === 0) return 0;
@@ -233,14 +268,21 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
     return () => clearTimeout(t);
   }, [cena, textoFrase, reduzido]);
 
-  /* ---------- CENA 4 · ROTA VIVA ---------- */
+  /* ---------- CENA 4 · ROTA VIVA (multi-estação) ---------- */
+  const estacoes = resultado?.ok ? resultado.estacoes : [];
+  const [segAtivo, setSegAtivo] = useState(0);
   const [linhaDesenhada, setLinhaDesenhada] = useState(false);
   const [estacaoChegou, setEstacaoChegou] = useState(false);
   const [zoomAtivo, setZoomAtivo] = useState(false);
   const [cartaoVisivel, setCartaoVisivel] = useState(false);
+  const [sheetColapsado, setSheetColapsado] = useState(false);
+  const [dragY, setDragY] = useState(0);
+  const dragRef = useRef<{ startY: number; ativo: boolean } | null>(null);
 
   useEffect(() => {
     if (cena !== "rota") return;
+    setLinhaDesenhada(false); setEstacaoChegou(false); setZoomAtivo(false); setCartaoVisivel(false);
+    setSheetColapsado(false); setDragY(0);
     if (reduzido) {
       setLinhaDesenhada(true); setEstacaoChegou(true); setZoomAtivo(true); setCartaoVisivel(true);
       return;
@@ -250,20 +292,185 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
     const t3 = setTimeout(() => setZoomAtivo(true), 50 + 1400 + 300);
     const t4 = setTimeout(() => setCartaoVisivel(true), 50 + 1400 + 300 + 900);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
-  }, [cena, reduzido]);
+  }, [cena, segAtivo, reduzido]);
 
-  if (!resultado && (cena === "dossie" || cena === "carimbo" || cena === "mesa" || cena === "rota")) {
+  function avancarEstacao() {
+    if (segAtivo + 1 < estacoes.length) {
+      setSegAtivo((i) => i + 1);
+    } else {
+      trocarCena("tesouro");
+    }
+  }
+
+  const estacaoAtual: Estacao | null = estacoes[segAtivo] ?? null;
+  const pontoAtual = estacaoAtual ? { x: estacaoAtual.xPct, y: estacaoAtual.yPct } : { x: ENTRADA_X, y: ENTRADA_Y };
+  const dx = estacaoAtual ? (50 - estacaoAtual.xPct) * 0.14 : 0;
+  const dy = estacaoAtual ? (50 - estacaoAtual.yPct) * 0.14 : 0;
+
+  /* ---------- câmera mobile (pan sobre o mapa grande) ---------- */
+  const mapaMobileRef = useRef<HTMLDivElement>(null);
+  const [camMobile, setCamMobile] = useState({ tx: 0, ty: 0 });
+  useEffect(() => {
+    if (!mobile || cena !== "rota") return;
+    const el = mapaMobileRef.current;
+    const wrap = el?.parentElement;
+    if (!el || !wrap) return;
+    const w = el.offsetWidth, h = el.offsetHeight;
+    const wrapW = wrap.clientWidth, wrapH = wrap.clientHeight;
+    const px = (pontoAtual.x / 100) * w;
+    const py = (pontoAtual.y / 100) * h;
+    let tx = wrapW / 2 - px;
+    let ty = wrapH / 2 - py;
+    tx = Math.min(0, Math.max(wrapW - w, tx));
+    ty = Math.min(0, Math.max(wrapH - h, ty));
+    setCamMobile({ tx, ty });
+  }, [mobile, cena, pontoAtual.x, pontoAtual.y]);
+
+  function onSheetPointerDown(e: React.PointerEvent) {
+    dragRef.current = { startY: e.clientY, ativo: true };
+  }
+  function onSheetPointerMove(e: React.PointerEvent) {
+    if (!dragRef.current?.ativo) return;
+    const delta = e.clientY - dragRef.current.startY;
+    if (delta > 0) setDragY(Math.min(delta, 220));
+  }
+  function onSheetPointerUp() {
+    if (!dragRef.current) return;
+    dragRef.current.ativo = false;
+    setSheetColapsado(dragY > 80);
+    setDragY(0);
+  }
+
+  function renderMapa(opts: { estacoesAcesas: Set<string>; segmentosAte: number; zoom: boolean }) {
+    const { estacoesAcesas, segmentosAte, zoom } = opts;
+    return (
+      <div
+        ref={mobile ? mapaMobileRef : undefined}
+        className="an-mapa-viva"
+        style={{
+          transform: mobile
+            ? `translate(${camMobile.tx}px, ${camMobile.ty}px)`
+            : zoom
+            ? `scale(1.14) translate(${dx}%, ${dy}%)`
+            : "none",
+        }}
+      >
+        <img src="/rota/mesa-perito.png" alt="Mapa da Rota do Perito" className="an-mapa-img" />
+
+        <svg className="an-mapa-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="an-grad-linha" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#20D9A6" />
+              <stop offset="100%" stopColor="#36DCD1" />
+            </linearGradient>
+          </defs>
+          {estacoes.map((e, i) => {
+            if (i > segmentosAte) return null;
+            const de = i === 0 ? { x: ENTRADA_X, y: ENTRADA_Y } : { x: estacoes[i - 1].xPct, y: estacoes[i - 1].yPct };
+            const animando = i === segmentosAte && cena === "rota";
+            return (
+              <path
+                key={e.trilhaId}
+                d={`M ${de.x} ${de.y} L ${e.xPct} ${e.yPct}`}
+                fill="none"
+                stroke="url(#an-grad-linha)"
+                strokeWidth="0.6"
+                strokeLinecap="round"
+                pathLength={100}
+                className={`an-linha-rota${!animando || linhaDesenhada ? " desenhada" : ""}`}
+              />
+            );
+          })}
+        </svg>
+
+        {!reduzido && cena === "rota" && (
+          <div
+            className="an-ponta-pulso"
+            style={{
+              left: `${linhaDesenhada ? pontoAtual.x : (segAtivo === 0 ? ENTRADA_X : estacoes[segAtivo - 1]?.xPct ?? ENTRADA_X)}%`,
+              top: `${linhaDesenhada ? pontoAtual.y : (segAtivo === 0 ? ENTRADA_Y : estacoes[segAtivo - 1]?.yPct ?? ENTRADA_Y)}%`,
+            }}
+          />
+        )}
+
+        <div className="an-marcador-voce" style={{ left: `${ENTRADA_X}%`, top: `${ENTRADA_Y}%` }}>
+          <span>{textos.microcopy_marcador_inicial}</span>
+        </div>
+
+        {territorios.map((t) => {
+          const naRota = estacoes.some((e) => e.trilhaId === t.trilhaId);
+          const posicaoNaRota = estacoes.findIndex((e) => e.trilhaId === t.trilhaId);
+          const ehPrimeira = posicaoNaRota === 0;
+          const acesa = estacoesAcesas.has(t.trilhaId);
+          return (
+            <div
+              key={t.trilhaId}
+              className={`an-territorio${naRota ? " na-rota" : " fora-rota"}${acesa ? " acesa" : ""}`}
+              style={{ left: `${t.xPct}%`, top: `${t.yPct}%` }}
+            >
+              <span className="an-territorio-ponto" />
+              {acesa && cena === "rota" && posicaoNaRota === segAtivo && <span className="an-anel-pulsante" />}
+              <div className="an-territorio-rotulo">
+                <b>{t.trilhaNome}</b>
+                {ehPrimeira && <em className="an-tag-partida">PONTO DE PARTIDA</em>}
+                {!naRota && <em className="an-tag-explorar">{textos.microcopy_territorio_explorar}</em>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  /* ---------- CENA 5 · TESOURO ---------- */
+  const [tesouroTextoVisivel, setTesouroTextoVisivel] = useState(false);
+  const [tesouroToastVisivel, setTesouroToastVisivel] = useState(false);
+  useEffect(() => {
+    if (cena !== "tesouro") return;
+    setTesouroTextoVisivel(false); setTesouroToastVisivel(false);
+    if (reduzido) { setTesouroTextoVisivel(true); setTesouroToastVisivel(true); return; }
+    const t1 = setTimeout(() => setTesouroTextoVisivel(true), 1400);
+    const t2 = setTimeout(() => setTesouroToastVisivel(true), 1400 + 800);
+    const t3 = setTimeout(() => trocarCena("mapa-final"), 1400 + 800 + 2600);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [cena, reduzido, trocarCena]);
+
+  const textoTesouro = useMemo(() => {
+    if (!resultado?.ok) return "";
+    const base = resultado.resumo.excedeMetaMeses
+      ? interpolar(textos.tesouro_aviso_excede ?? "", { horas_sugeridas: resultado.resumo.horasSemanaSugerida })
+      : textos.tesouro_base ?? "";
+    const flexao =
+      resultado.objetivo === "nomeacoes" ? textos.tesouro_flexao_nomeacoes
+      : resultado.objetivo === "negocio" ? textos.tesouro_flexao_negocio
+      : "";
+    return [base, flexao].filter(Boolean).join(" ");
+  }, [resultado, textos]);
+
+  const textoPrazoHonesto = useMemo(() => {
+    if (!resultado?.ok) return "";
+    return interpolar(textos.microcopy_prazo_honesto ?? "", { horas: resultado.resumo.horasSemanaDeclarada });
+  }, [resultado, textos]);
+
+  /* ---------- CENA 6 · O MAPA É SEU ---------- */
+  const [comecando, setComecando] = useState(false);
+  async function handleComecarMinhaRota() {
+    if (!resultado?.ok || comecando) return;
+    setComecando(true);
+    const primeira = resultado.estacoes[0];
+    const href = primeira.trilhaSlug ? await buscarComecarMinhaRota(primeira.trilhaSlug) : "/meu-plano";
+    router.push(href);
+  }
+
+  if (!resultado && (cena === "dossie" || cena === "carimbo" || cena === "mesa" || cena === "rota" || cena === "tesouro" || cena === "mapa-final")) {
     return null;
   }
 
-  const primeira = resultado?.ok ? resultado.primeiraEstacao : null;
-  const rotaIds = resultado?.ok ? resultado.rotaTrilhaIds : [];
-
-  const dx = primeira ? (50 - primeira.xPct) * 0.14 : 0;
-  const dy = primeira ? (50 - primeira.yPct) * 0.14 : 0;
+  const todasAcesasIds = new Set(estacoes.map((e) => e.trilhaId));
+  const acesasAteAgora = new Set(estacoes.slice(0, segAtivo + 1).map((e) => e.trilhaId));
 
   return (
-    <div className={`pagina-anamnese${reduzido ? " reduzido" : ""}`}>
+    <div className={`pagina-anamnese${reduzido ? " reduzido" : ""}${mobile ? " mobile" : ""}`}>
       {/* ============ CENA 0 · CONVITE ============ */}
       {cena === "convite" && (
         <div className="an-cena ativa an-convite">
@@ -403,108 +610,74 @@ export default function AnamneseContent({ questoes, progressoInicial, textos, te
       )}
 
       {/* ============ CENA 4 · ROTA VIVA ============ */}
-      {cena === "rota" && primeira && (
+      {cena === "rota" && estacaoAtual && (
         <div className="an-cena ativa an-rota-cena">
           <div className="an-mapa-wrap">
-            <div
-              className="an-mapa-viva"
-              style={{
-                transform: zoomAtivo ? `scale(1.14) translate(${dx}%, ${dy}%)` : "none",
-              }}
-            >
-              <img src="/rota/mesa-perito.png" alt="Mapa da Rota do Perito" className="an-mapa-img" />
-
-              <svg className="an-mapa-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="an-grad-linha" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#20D9A6" />
-                    <stop offset="100%" stopColor="#36DCD1" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d={`M ${ENTRADA_X} ${ENTRADA_Y} L ${primeira.xPct} ${primeira.yPct}`}
-                  fill="none"
-                  stroke="url(#an-grad-linha)"
-                  strokeWidth="0.6"
-                  strokeLinecap="round"
-                  pathLength={100}
-                  className={`an-linha-rota${linhaDesenhada ? " desenhada" : ""}`}
-                />
-              </svg>
-
-              {!reduzido && (
-                <div
-                  className="an-ponta-pulso"
-                  style={{
-                    left: `${linhaDesenhada ? primeira.xPct : ENTRADA_X}%`,
-                    top: `${linhaDesenhada ? primeira.yPct : ENTRADA_Y}%`,
-                  }}
-                />
-              )}
-
-              <div className="an-marcador-voce" style={{ left: `${ENTRADA_X}%`, top: `${ENTRADA_Y}%` }}>
-                <span>{textos.microcopy_marcador_inicial}</span>
-              </div>
-
-              {territorios.map((t) => {
-                const naRota = rotaIds.includes(t.trilhaId);
-                const ehPrimeira = t.trilhaId === primeira.trilhaId;
-                const acesa = ehPrimeira && estacaoChegou;
-                return (
-                  <div
-                    key={t.trilhaId}
-                    className={`an-territorio${naRota ? " na-rota" : " fora-rota"}${acesa ? " acesa" : ""}`}
-                    style={{ left: `${t.xPct}%`, top: `${t.yPct}%` }}
-                  >
-                    <span className="an-territorio-ponto" />
-                    {acesa && <span className="an-anel-pulsante" />}
-                    <div className="an-territorio-rotulo">
-                      <b>{t.trilhaNome}</b>
-                      {ehPrimeira && <em className="an-tag-partida">PONTO DE PARTIDA</em>}
-                      {!naRota && <em className="an-tag-explorar">{textos.microcopy_territorio_explorar}</em>}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            {renderMapa({ estacoesAcesas: acesasAteAgora, segmentosAte: segAtivo, zoom: zoomAtivo })}
           </div>
 
           {cartaoVisivel && (
-            <div className="an-cartao-capitulo">
-              <span className="an-cartao-eyebrow">TERRITÓRIO 1</span>
-              <h3>{primeira.trilhaNome}</h3>
-              <p>{primeira.justificativa}</p>
-              <p className="an-cartao-dados">{primeira.numCursos} cursos · {primeira.cargaHoras}h de conteúdo</p>
-              <button className="an-btn-primario" onClick={() => trocarCena("fim-capitulo")}>
-                Seguir no mapa <IconeChevronRight size={16} />
+            <div
+              className={`an-cartao-capitulo${mobile ? " sheet" : ""}${sheetColapsado ? " colapsado" : ""}`}
+              style={mobile ? { transform: `translateY(${sheetColapsado ? "calc(100% - 54px)" : `${dragY}px`})` } : undefined}
+            >
+              {mobile && (
+                <div
+                  className="an-sheet-alca"
+                  onPointerDown={onSheetPointerDown}
+                  onPointerMove={onSheetPointerMove}
+                  onPointerUp={onSheetPointerUp}
+                  onClick={() => sheetColapsado && setSheetColapsado(false)}
+                />
+              )}
+              <span className="an-cartao-eyebrow">TERRITÓRIO {segAtivo + 1}</span>
+              <h3>{estacaoAtual.trilhaNome}</h3>
+              <p>{estacaoAtual.justificativa}</p>
+              <p className="an-cartao-dados">{estacaoAtual.numCursos} cursos · {estacaoAtual.cargaHoras}h de conteúdo</p>
+              <button className="an-btn-primario" onClick={avancarEstacao}>
+                {segAtivo + 1 < estacoes.length ? "Seguir no mapa" : "Chegar ao tesouro"} <IconeChevronRight size={16} />
               </button>
             </div>
           )}
         </div>
       )}
 
-      {/* ============ FIM DO CAPÍTULO 1 (checkpoint) ============ */}
-      {cena === "fim-capitulo" && (
-        <div className="an-cena ativa an-fim-capitulo">
-          <div className="an-conteudo an-anim">
-            <h2>Fim do Capítulo 1</h2>
-            <p>O resto do mapa continua na próxima etapa da sua rota.</p>
-            <Link href="/" className="an-btn-primario">Voltar ao início</Link>
+      {/* ============ CENA 5 · TESOURO ============ */}
+      {cena === "tesouro" && (
+        <div className="an-cena ativa an-tesouro-cena">
+          <div className="an-tesouro-imagem">
+            <img src="/rota/tesouro.png" alt="Sua rota está selada" />
+          </div>
+          {tesouroTextoVisivel && (
+            <div className="an-tesouro-texto an-anim">
+              <p>{textoTesouro}</p>
+              <p className="an-tesouro-prazo">{textoPrazoHonesto}</p>
+            </div>
+          )}
+          {tesouroToastVisivel && (
+            <div className="an-toast-xp">
+              <span>{textos.microcopy_toast_xp}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ============ CENA 6 · O MAPA É SEU ============ */}
+      {cena === "mapa-final" && (
+        <div className="an-cena ativa an-rota-cena an-mapa-final">
+          <div className="an-mapa-wrap">
+            {renderMapa({ estacoesAcesas: todasAcesasIds, segmentosAte: estacoes.length - 1, zoom: false })}
+          </div>
+          <div className="an-mapa-final-acoes">
+            <button className="an-btn-primario" onClick={handleComecarMinhaRota} disabled={comecando}>
+              {textos.microcopy_cta_principal}
+            </button>
+            <Link href="/meu-plano" className="an-btn-fantasma">
+              {textos.microcopy_cta_secundario}
+            </Link>
           </div>
         </div>
       )}
     </div>
-  );
-}
-
-function renderStatusAceso(linha: string) {
-  const marcador = "[ROTA TRACADA]";
-  const idx = linha.indexOf(marcador);
-  if (idx === -1) return linha;
-  return (
-    <>
-      {linha.slice(0, idx)}
-      <span className="an-status-aceso">{marcador}</span>
-    </>
   );
 }
