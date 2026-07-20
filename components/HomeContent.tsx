@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from 'react'
 import type { DadosHome, CursoCard } from '@/lib/queries/home'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
+import type { PlanoVivo } from '@/lib/queries/meuPlano'
+import type { AnamneseProgresso } from '@/lib/queries/anamnese'
 import { IconePlay, IconeCheck } from '@/components/Icones'
 import { AoVivo } from '@/components/Emblemas'
 import TourGuiado from '@/components/TourGuiado'
@@ -39,12 +41,21 @@ function CardCurso({ c }: { c: CursoCard }) {
   )
 }
 
-export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: DadosNav }) {
+type Props = {
+  dados: DadosHome
+  nav: DadosNav
+  plano: PlanoVivo
+  progressoRota: AnamneseProgresso
+  textosRota: Record<string, string>
+}
+
+export default function HomeContent({ dados, nav, plano, progressoRota, textosRota }: Props) {
   const d = dados
   const raiz = useRef<HTMLDivElement>(null)
   const [heroCapaErro, setHeroCapaErro] = useState(false)
   const trilhoFeitas = d.trilho.filter(e => e.estado === 'feita').length
   const trilhoPct = d.trilho.length ? Math.round((trilhoFeitas / d.trilho.length) * 100) : 0
+  const estacaoAtualRota = plano.estacoes.find(e => e.estado === 'atual') ?? null
 
   // reveals + barras
   useEffect(() => {
@@ -187,23 +198,75 @@ export default function HomeContent({ dados, nav }: { dados: DadosHome; nav: Dad
         </div>
       </section>
 
-      {/* ============ MEU PLANO ============ */}
-      <section className="plano" aria-label="Meu plano de estudo">
+      {/* ============ ROTA DO PERITO ============ */}
+      <section className="rota" aria-label="Sua Rota do Perito">
         <div className="wrap">
           <div className="secao-cab reveal">
             <div>
-              <span className="eyebrow">Organize seus estudos</span>
-              <h2 className="h2">Meu plano.</h2>
-              <p className="sub">Agrupe cursos por objetivo e siga no seu ritmo.</p>
+              <span className="eyebrow">Sua rota</span>
+              <h2 className="h2 grad-txt">Minha Rota do Perito</h2>
             </div>
+            {plano.temPlano && <a className="link-secao" href="/meu-plano">Ver mapa completo <span className="seta">→</span></a>}
           </div>
-          <div className="plano-grid reveal">
-            <button className="plano-novo">
-              <span className="mais" aria-hidden="true">+</span>
-              <b>Criar novo plano</b>
-              <span>Monte uma sequência de cursos e acompanhe o avanço até o seu objetivo.</span>
-            </button>
-          </div>
+
+          {!plano.temPlano && progressoRota.questoesRespondidas === 0 && (
+            <div className="rota-convite reveal">
+              <div className="rota-convite-bg" aria-hidden="true" />
+              <div className="rota-convite-vinheta" aria-hidden="true" />
+              <div className="rota-convite-conteudo">
+                <h3>{textosRota.convite_titulo}</h3>
+                <p>{textosRota.meu_plano_convite_linha}</p>
+                <a className="btn btn-primario" href="/anamnese">{textosRota.convite_botao_acao}</a>
+              </div>
+            </div>
+          )}
+
+          {!plano.temPlano && progressoRota.questoesRespondidas > 0 && (
+            <div className="rota-retomar reveal">
+              <h3>{textosRota.meu_plano_retomar_titulo}</h3>
+              <p className="rota-retomar-sub">
+                Pergunta {Math.min(progressoRota.questoesRespondidas + 1, progressoRota.totalQuestoes)} de {progressoRota.totalQuestoes}
+              </p>
+              <div className="rota-retomar-barra">
+                <i style={{ width: `${Math.round((progressoRota.questoesRespondidas / progressoRota.totalQuestoes) * 100)}%` }} />
+              </div>
+              <a className="btn btn-primario" href="/anamnese">{textosRota.meu_plano_retomar_cta}</a>
+            </div>
+          )}
+
+          {plano.temPlano && (
+            <div className="rota-compacto reveal">
+              <a href="/meu-plano" className="rota-mapa-fundo" aria-label="Ver mapa completo da minha Rota do Perito">
+                <img src="/rota/mesa-perito.png" alt="Mapa da minha Rota do Perito" className="rota-mapa-img" />
+                {estacaoAtualRota && (
+                  <span className="rota-marcador" style={{ left: `${estacaoAtualRota.xPct}%`, top: `${estacaoAtualRota.yPct}%` }}>
+                    <b>{textosRota.microcopy_marcador_inicial}</b>
+                  </span>
+                )}
+              </a>
+              <div className="rota-compacto-info">
+                {estacaoAtualRota ? (
+                  <>
+                    <div className="rota-compacto-txt">
+                      <span className="rota-compacto-nome">{estacaoAtualRota.trilhaNome}</span>
+                      <span className="rota-compacto-pct num">{estacaoAtualRota.progressoPct}% concluído</span>
+                    </div>
+                    {estacaoAtualRota.continuarHref && (
+                      <a className="btn btn-primario" href={estacaoAtualRota.continuarHref}>Continuar</a>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="rota-compacto-txt">
+                      <span className="rota-compacto-nome">Rota concluída</span>
+                      <span className="rota-compacto-pct num">100%</span>
+                    </div>
+                    <a className="btn btn-primario" href="/meu-plano">Ver mapa completo</a>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

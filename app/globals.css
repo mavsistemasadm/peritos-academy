@@ -201,15 +201,48 @@
 .pagina-home .card-info .pct{font-size:12px;font-weight:600;color:var(--cinza)}
 .pagina-home .card-info .estado-novo{font-size:12px;font-weight:650;color:var(--verde);letter-spacing:.02em}
 
-/* MEU PLANO */
-.pagina-home .plano{background:var(--preto-elev-2);padding:var(--s-9) 0}
-.pagina-home .plano-grid{display:grid;grid-template-columns:1.45fr 1fr;gap:var(--s-4)}
-@media(max-width:900px){.pagina-home .plano-grid{grid-template-columns:1fr}}
-.pagina-home .plano-novo{border:1px dashed var(--linha);border-radius:var(--r-tile);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s-2);padding:var(--s-6);text-align:center;color:var(--cinza-claro);background:transparent;width:100%;transition:border-color .25s,background .25s}
-.pagina-home .plano-novo:hover{border-color:rgba(32,217,166,.45);background:rgba(32,217,166,.03)}
-.pagina-home .plano-novo .mais{width:44px;height:44px;border-radius:50%;border:1px solid var(--linha);display:grid;place-items:center;font-size:20px;font-weight:400;color:var(--creme);margin-bottom:4px}
-.pagina-home .plano-novo b{font-size:15px;font-weight:620;color:var(--creme)}
-.pagina-home .plano-novo span{font-size:13px;color:var(--cinza);max-width:32ch;line-height:1.5}
+/* ROTA DO PERITO */
+.pagina-home .grad-txt{background:var(--grad-marca);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pagina-home .rota{background:var(--preto-elev-2);padding:var(--s-9) 0}
+
+.pagina-home .rota-convite{
+  position:relative;border-radius:var(--r-tile);overflow:hidden;
+  min-height:300px;display:flex;align-items:center;justify-content:center;text-align:center;
+}
+.pagina-home .rota-convite-bg{position:absolute;inset:0;background:url('/rota/porta.png') center 30%/cover no-repeat}
+.pagina-home .rota-convite-vinheta{position:absolute;inset:0;background:radial-gradient(65% 60% at 50% 65%,rgba(7,9,8,.45),var(--preto-elev-2) 94%)}
+.pagina-home .rota-convite-conteudo{position:relative;z-index:1;padding:var(--s-6) var(--s-5);max-width:420px;display:flex;flex-direction:column;align-items:center;gap:var(--s-3)}
+.pagina-home .rota-convite-conteudo h3{
+  font-size:clamp(22px,3vw,28px);font-weight:720;letter-spacing:-.02em;margin-bottom:2px;
+  background:var(--grad-marca);-webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.pagina-home .rota-convite-conteudo p{font-size:14.5px;color:var(--cinza-claro);line-height:1.6;margin-bottom:var(--s-2)}
+
+.pagina-home .rota-retomar{
+  max-width:520px;margin:0 auto;text-align:center;padding:var(--s-6) var(--s-5);
+  border:1px solid var(--linha);border-radius:var(--r-tile);background:rgba(255,255,255,.02);
+}
+.pagina-home .rota-retomar h3{font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px}
+.pagina-home .rota-retomar-sub{font-size:13.5px;color:var(--cinza-claro);margin-bottom:var(--s-4)}
+.pagina-home .rota-retomar-barra{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:var(--s-5)}
+.pagina-home .rota-retomar-barra i{display:block;height:100%;background:var(--grad-marca);border-radius:3px}
+
+.pagina-home .rota-compacto{max-width:720px;margin:0 auto}
+.pagina-home .rota-mapa-fundo{position:relative;display:block;width:100%;aspect-ratio:1456/816;border-radius:var(--r-tile);overflow:hidden}
+.pagina-home .rota-mapa-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pagina-home .rota-marcador{
+  position:absolute;transform:translate(-50%,-120%);white-space:nowrap;
+  font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--creme);
+  background:rgba(7,9,8,.72);border:1px solid var(--linha);border-radius:var(--r-pill);padding:4px 10px;
+}
+.pagina-home .rota-compacto-info{
+  display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);flex-wrap:wrap;
+  margin-top:var(--s-3);
+}
+.pagina-home .rota-compacto-txt{display:flex;flex-direction:column;gap:2px}
+.pagina-home .rota-compacto-nome{font-size:15px;font-weight:640;color:var(--creme)}
+.pagina-home .rota-compacto-pct{font-size:13px;color:var(--verde);font-weight:600}
+@media(max-width:640px){.pagina-home .rota-convite{min-height:260px}}
 
 /* AO VIVO + COMUNIDADE */
 .pagina-home .duo{padding:var(--s-9) 0;background:var(--carvao)}
