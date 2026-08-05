@@ -4,7 +4,7 @@ import { getAula, primeiraAulaLiberada } from "@/lib/queries/aula";
 import { carregarNav } from "@/lib/queries/nav";
 import AulaContent from "@/components/AulaContent";
 import { criarClienteServidor } from "@/lib/supabase/server";
-import { verificarAcessoConteudo } from "@/lib/acesso/verificar";
+import { verificarAcessoCurso } from "@/lib/acesso/verificar";
 import AssinaturaNecessaria from "@/components/AssinaturaNecessaria";
 
 export default async function AulaPage({ params, searchParams }: {
@@ -19,7 +19,7 @@ export default async function AulaPage({ params, searchParams }: {
   const [dados, nav] = await Promise.all([getAula(slug, aulaId), carregarNav()]);
   if (!dados) notFound();
 
-  const acesso = await verificarAcessoConteudo();
+  const acesso = await verificarAcessoCurso(slug);
   if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} />;
 
   // acesso direto por URL a uma aula ainda travada (sequência ou avaliação de

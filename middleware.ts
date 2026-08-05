@@ -32,7 +32,14 @@ export async function middleware(request: NextRequest) {
     pathname === "/login" ||
     pathname === "/conta-suspensa" ||
     pathname === "/manutencao" ||
-    pathname === "/email/cancelar";
+    pathname === "/email/cancelar" ||
+    // Definir/recuperar senha precisa funcionar mesmo em manutenção: são os
+    // links que chegam por email e são abertos dias depois (campanha de
+    // migração, "esqueci minha senha"). Sem isso, ligar o modo manutenção
+    // durante a importação em lote transformaria a comunicação de migração
+    // inteira numa página de manutenção.
+    pathname === "/primeiro-acesso" ||
+    pathname === "/redefinir-senha";
   // Rotas de API têm autenticação própria (token/secret compartilhado —
   // cron, webhooks, ponte interna de email) e nunca devem ser redirecionadas
   // pra uma página HTML por suspensão/manutenção; isso quebraria o contrato

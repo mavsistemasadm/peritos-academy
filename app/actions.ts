@@ -18,3 +18,18 @@ export async function marcarTourVisto(): Promise<{ ok: boolean }> {
 
   return { ok: !error }
 }
+
+// marca as boas-vindas do aluno migrado como vistas — mesmo padrão do tour
+// acima (a mensagem é de transição de plataforma, então aparece uma vez só).
+export async function marcarBoasVindasMigrado(): Promise<{ ok: boolean }> {
+  const supabase = await criarClienteServidor()
+  const { data: auth } = await supabase.auth.getUser()
+  if (!auth?.user) return { ok: false }
+
+  const { error } = await supabase
+    .from('perfis')
+    .update({ boas_vindas_migrado_em: new Date().toISOString() })
+    .eq('id', auth.user.id)
+
+  return { ok: !error }
+}

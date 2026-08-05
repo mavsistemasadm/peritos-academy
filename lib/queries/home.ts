@@ -71,6 +71,10 @@ export type DadosHome = {
   // tour guiado de boas-vindas
   mostrarTourInicial: boolean       // true só na primeira visita (perfis.tour_visto_em IS NULL)
   tourPrimeiraAulaHref: string      // alvo do CTA final do tour — próxima aula pendente da Formação (ou /jornada)
+  // boas-vindas do aluno que veio de outra plataforma (importação em lote):
+  // aparece uma vez só, antes do tour, e explica que o acesso dele foi
+  // transferido. Null = não é aluno migrado (ou já viu).
+  boasVindasMigrado: { plataforma: string } | null
 }
 
 const TZ = 'America/Sao_Paulo'
@@ -120,7 +124,7 @@ export async function carregarHome(): Promise<DadosHome | null> {
     jornada,
     agenda,
   ] = await Promise.all([
-    supabase.from('perfis').select('nome, tour_visto_em').eq('id', uid).single(),
+    supabase.from('perfis').select('nome, tour_visto_em, migrado_de, boas_vindas_migrado_em').eq('id', uid).single(),
     supabase.from('cursos').select('id, slug, titulo, capa_url, capa_vertical_url, capa_horizontal_url, atualizado_em').eq('publicado', true).order('atualizado_em', { ascending: false }),
     supabase.from('modulos').select('id, curso_id, ordem').order('ordem', { ascending: true }),
     supabase.from('comunidade_posts').select('*').order('criado_em', { ascending: false }).limit(3),
@@ -335,6 +339,10 @@ export async function carregarHome(): Promise<DadosHome | null> {
       : null,
     movimento,
     mostrarTourInicial: !perfil.tour_visto_em,
+    boasVindasMigrado:
+      perfil.migrado_de && !perfil.boas_vindas_migrado_em
+        ? { plataforma: perfil.migrado_de }
+        : null,
     tourPrimeiraAulaHref: jornada.painelFormacao?.continuarHref ?? jornada.trilhaProtagonistaHome.continuarHref ?? '/jornada',
   }
 }

@@ -45,3 +45,17 @@ migracao/materiais/
 migracao/detalhes_brutos/
 
 .vercel
+
+# env sem o ponto na frente — o padrão `.env*` acima NÃO casa com "env.local",
+# e esse arquivo tem a service role key do Supabase e os segredos de
+# Resend/Anthropic/Panda/cron.
+env.local
+
+# Relatórios da importação de alunos: contêm nome, e-mail, telefone e valor
+# pago de gente real. Gerados a cada execução, não versionar.
+migracao/logs/
+
+# Arquivo de origem da migração da Ensinio — dado pessoal de 718 alunos.
+# Se quiser versionar mesmo assim, remova esta linha (mas lembre que histórico
+# de git não se apaga fácil).
+migracao/migracao_peritos_academy_FINAL.xlsx

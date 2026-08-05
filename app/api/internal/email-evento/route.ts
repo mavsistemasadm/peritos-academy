@@ -57,6 +57,18 @@ export async function POST(request: NextRequest) {
 
   try {
     if (tipo === "boas_vindas") {
+      // Aluno importado em lote (migração Ensinio) não recebe o email de
+      // boas-vindas padrão: a comunicação dele é outra, enviada à parte com
+      // texto próprio (ver scripts/migration/README.md). O trigger de
+      // auth.users dispara este endpoint pra QUALQUER usuário novo, então o
+      // corte é aqui. Lê o metadata do próprio auth.users em vez de
+      // perfis.migrado_de porque o metadata é gravado atomicamente no
+      // createUser — perfis só é atualizado pelo importador logo DEPOIS, e o
+      // net.http_post do trigger pode chegar antes disso (corrida real).
+      const { data: authUser } = await supabase.auth.admin.getUserById(usuarioId);
+      if (authUser?.user?.user_metadata?.migrado_de) {
+        return NextResponse.json({ ok: false, motivo: "aluno migrado — boas-vindas suprimido" });
+      }
       const { assunto, html } = emailBoasVindas({ primeiroNome: nomePrimeiro });
       const resultado = await enviarEmail({
         usuarioId,

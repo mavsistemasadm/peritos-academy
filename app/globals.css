@@ -5986,3 +5986,109 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 @media (prefers-reduced-motion:reduce){
   .pagina-meu-plano *,.pagina-meu-plano *::before,.pagina-meu-plano *::after{animation:none!important;transition:none!important}
 }
+
+/* ==========================================================================
+   BOAS-VINDAS DO ALUNO MIGRADO  (components/BoasVindasMigrado.tsx)
+   Overlay de primeira visita pra quem veio de outra plataforma. Não está
+   escopado numa classe de página porque monta na home mas é conceitualmente
+   global (mesmo caso do rodapé e do TourGuiado) — o prefixo `bvm-` faz o
+   isolamento.
+   ========================================================================== */
+.bvm-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;                 /* abaixo do tour (que só roda depois) */
+  display: grid;
+  place-items: center;
+  padding: var(--s-4);
+  background: color-mix(in srgb, var(--carvao) 82%, transparent);
+  backdrop-filter: blur(6px);
+  animation: bvmEntra 0.28s ease-out both;
+}
+
+.bvm-cartao {
+  position: relative;
+  width: min(520px, 100%);
+  max-height: 90dvh;
+  overflow-y: auto;
+  padding: var(--s-5);
+  border: 1px solid var(--linha);
+  border-radius: var(--r-card);
+  background:
+    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--verde) 12%, transparent), transparent 60%),
+    var(--preto-elev);
+  animation: bvmSobe 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.bvm-fechar {
+  position: absolute;
+  top: var(--s-3);
+  right: var(--s-3);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--linha-suave);
+  border-radius: 999px;
+  background: none;
+  color: var(--cinza-claro);
+  cursor: pointer;
+  transition: var(--suave);
+}
+.bvm-fechar:hover { color: var(--creme); border-color: var(--linha); }
+
+.bvm-eyebrow {
+  display: block;
+  margin-bottom: var(--s-2);
+  color: var(--verde);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bvm-cartao h2 {
+  margin: 0 0 var(--s-3);
+  padding-right: var(--s-5);      /* não passa por baixo do botão fechar */
+  font-size: clamp(1.35rem, 3.4vw, 1.75rem);
+  line-height: 1.15;
+}
+
+.bvm-cartao p { margin: 0 0 var(--s-3); color: var(--cinza-claro); line-height: 1.6; }
+
+.bvm-lista {
+  margin: 0 0 var(--s-3);
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--s-2);
+}
+.bvm-lista li {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: var(--s-2);
+  align-items: start;
+  color: var(--creme);
+  line-height: 1.5;
+}
+.bvm-lista svg { margin-top: 2px; color: var(--verde); }
+
+.bvm-nota {
+  padding: var(--s-3);
+  border-left: 2px solid var(--linha);
+  border-radius: 0 8px 8px 0;
+  background: color-mix(in srgb, var(--creme) 4%, transparent);
+  font-size: 0.9rem;
+}
+
+.bvm-cta { width: 100%; }
+
+@keyframes bvmEntra { from { opacity: 0 } to { opacity: 1 } }
+@keyframes bvmSobe {
+  from { opacity: 0; transform: translateY(12px) scale(0.98) }
+  to   { opacity: 1; transform: none }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bvm-fundo, .bvm-cartao { animation: none }
+}

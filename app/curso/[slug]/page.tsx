@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { buscarCurso } from "@/lib/queries/curso";
 import { carregarNav } from "@/lib/queries/nav";
 import { CursoContent } from "@/components/CursoContent";
-import { verificarAcessoConteudo } from "@/lib/acesso/verificar";
+import { verificarAcessoCurso } from "@/lib/acesso/verificar";
 import AssinaturaNecessaria from "@/components/AssinaturaNecessaria";
 
 export default async function PaginaCurso({
@@ -15,7 +15,7 @@ export default async function PaginaCurso({
 
   if (!dados) notFound();
 
-  const acesso = await verificarAcessoConteudo();
+  const acesso = await verificarAcessoCurso(slug);
   if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} />;
 
   return (

@@ -15,9 +15,14 @@ export async function baixarItem(planilhaId: string) {
   if (!auth?.user) return { ok: false as const, erro: 'Faça login para baixar.' }
 
   // 1) o aluno pertence ao grupo com acesso?
-  const { data: perfil } = await supabase
-    .from('perfis').select('acesso_biblioteca').eq('id', auth.user.id).single()
-  if (!perfil?.acesso_biblioteca) {
+  // Via RPC (não lendo perfis.acesso_biblioteca direto) porque agora há duas
+  // fontes de acesso: a flag do perfil, concedida à mão e sem prazo, e uma
+  // concessão vigente em acessos_conteudo — que o aluno migrado da Ensinio
+  // recebe junto do plano e que EXPIRA com ele.
+  const { data: temAcesso } = await supabase.rpc('tem_acesso_biblioteca', {
+    p_usuario_id: auth.user.id,
+  })
+  if (temAcesso !== true) {
     return { ok: false as const, erro: 'Sua conta ainda não tem acesso à Biblioteca.' }
   }
 

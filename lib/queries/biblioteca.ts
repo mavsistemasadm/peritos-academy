@@ -47,9 +47,12 @@ export async function carregarBiblioteca(): Promise<DadosBiblioteca> {
   const { data: auth } = await supabase.auth.getUser()
   if (!auth?.user) return VAZIO
 
-  const [{ data: perfil }, { data: areasRaw }, { data: itensRaw }, { data: contagemRaw }, { data: favoritasRaw }, { data: minhasRaw }, { data: termosRaw }] =
+  const [{ data: temAcesso }, { data: areasRaw }, { data: itensRaw }, { data: contagemRaw }, { data: favoritasRaw }, { data: minhasRaw }, { data: termosRaw }] =
     await Promise.all([
-      supabase.from('perfis').select('acesso_biblioteca').eq('id', auth.user.id).single(),
+      // duas fontes de acesso: perfis.acesso_biblioteca (concedida à mão, sem
+      // prazo) ou uma concessão vigente em acessos_conteudo (aluno migrado da
+      // Ensinio, que expira com o plano). A RPC resolve as duas.
+      supabase.rpc('tem_acesso_biblioteca', { p_usuario_id: auth.user.id }),
       supabase.from('planilha_areas').select('*').order('ordem'),
       // area_id null = "Termos de Uso" (fora da grade, ver termosRaw abaixo).
       // ordem (não atualizado_em) preserva a sequência original dos módulos
@@ -96,7 +99,7 @@ export async function carregarBiblioteca(): Promise<DadosBiblioteca> {
 
   return {
     logado: true,
-    temAcesso: perfil?.acesso_biblioteca === true,
+    temAcesso: temAcesso === true,
     areas,
     totalItens: itens.length,
     totalDownloads: itens.reduce((s, i) => s + i.downloads, 0),

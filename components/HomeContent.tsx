@@ -11,6 +11,7 @@ import type { AnamneseProgresso, Territorio } from '@/lib/queries/anamnese'
 import { IconePlay, IconeCheck } from '@/components/Icones'
 import { AoVivo } from '@/components/Emblemas'
 import TourGuiado from '@/components/TourGuiado'
+import BoasVindasMigrado from '@/components/BoasVindasMigrado'
 import { caminhoCurvo } from '@/lib/rota/caminhoCurvo'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
@@ -78,6 +79,8 @@ export default function HomeContent({ dados, nav, plano, progressoRota, textosRo
   return (
     <div ref={raiz} className="pagina-home">
       <div className="grao" aria-hidden="true"></div>
+
+      {d.boasVindasMigrado && <BoasVindasMigrado plataforma={d.boasVindasMigrado.plataforma} />}
 
       <TourGuiado mostrarInicial={d.mostrarTourInicial} primeiraAulaHref={d.tourPrimeiraAulaHref} />
 
