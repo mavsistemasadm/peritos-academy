@@ -11,6 +11,7 @@ import {
   IconeCamera, IconeEye, IconeLink, IconeDownload, IconePlay,
 } from '@/components/Icones'
 import { Certificado, FogoStreak } from '@/components/Emblemas'
+import NexusSugestao from '@/components/NexusSugestao'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -433,6 +434,11 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
             </ul>
             )}
           </div>
+
+          {/* Ferramentas do ecossistema: sugestão discreta, fechável. Fica no
+              fim do perfil por não existir bloco de "informações de plano"
+              nesta tela (o plano vive no admin financeiro, não aqui). */}
+          <NexusSugestao placement="perfil" variante="perfil" />
         </div>
       </section>
     </div>

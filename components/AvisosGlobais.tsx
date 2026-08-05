@@ -4,6 +4,9 @@
 'use client'
 
 import { useEffect, useRef, useState, useTransition } from 'react'
+import { buscarSugestaoNexus, registrarNexus } from '@/app/nexus/actions'
+import { NOME_APP, type SugestaoNexus } from '@/lib/nexus'
+import { IconeSparkle } from '@/components/Icones'
 import {
   marcarTodasNovidadesLidas,
   marcarNotificacaoLida,
@@ -75,6 +78,11 @@ export default function AvisosGlobais({ dados }: { dados: DadosAvisos }) {
   const [novidadesLidas, setNovidadesLidas] = useState(false)
   const [temMaisNotifs, setTemMaisNotifs] = useState(dados.notificacoes.length >= 12)
   const [carregandoMais, setCarregandoMais] = useState(false)
+  // Sugestão do ecossistema como item comum da lista (no máximo 1x por
+  // semana, teto conferido no servidor). Buscada só quando o sino abre —
+  // não faz sentido pagar essa consulta em todo carregamento de página.
+  const [sugNexus, setSugNexus] = useState<SugestaoNexus | null>(null)
+  const buscouNexus = useRef(false)
   const [, start] = useTransition()
   const areaSino = useRef<HTMLDivElement>(null)
 
@@ -106,6 +114,22 @@ useEffect(() => {
   const novidadesNaoLidas = novidadesLidas ? 0 : dados.novidades.filter(n => !n.lida).length
   const notifsNaoLidas = notifs.filter(n => !n.lida).length
   const contador = novidadesNaoLidas + notifsNaoLidas
+
+  useEffect(() => {
+    if (!sinoAberto || buscouNexus.current) return
+    buscouNexus.current = true
+    void (async () => {
+      const s = await buscarSugestaoNexus('sino', null)
+      if (!s) return
+      setSugNexus(s)
+      void registrarNexus('exibida', s.app, s.chave, 'sino', null)
+    })()
+  }, [sinoAberto])
+
+  function dispensarNexus() {
+    if (sugNexus) void registrarNexus('dispensada', sugNexus.app, sugNexus.chave, 'sino', null)
+    setSugNexus(null)
+  }
 
   function fecharPopup() { setPopupAberto(false) }
 
@@ -156,6 +180,29 @@ useEffect(() => {
             <ul className="sino-lista">
               {notifs.length === 0 && (
                 <li className="sino-vazio">Nada por aqui. Você está em dia.</li>
+              )}
+              {sugNexus && (
+                <li>
+                  <div className="notif nx-sino-item">
+                    <span className="notif-ico" aria-hidden="true"><IconeSparkle size={16} /></span>
+                    <span className="notif-txt">
+                      <span>{sugNexus.titulo}</span>
+                      <a
+                        className="nx-link"
+                        href={sugNexus.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => registrarNexus('clicada', sugNexus.app, sugNexus.chave, 'sino', null)}
+                      >
+                        Ver o {NOME_APP[sugNexus.app]}
+                      </a>
+                      <small className="nx-sino-marca">Sugestão do ecossistema</small>
+                    </span>
+                    <button className="nx-x" onClick={dispensarNexus} aria-label="Dispensar sugestão">
+                      <IconeClose size={14} />
+                    </button>
+                  </div>
+                </li>
               )}
               {notifs.map(n => (
                 <li key={n.id}>

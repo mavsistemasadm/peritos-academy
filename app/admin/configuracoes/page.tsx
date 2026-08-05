@@ -2,7 +2,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
-import { carregarConfigPlataforma, verificarIntegracoes } from '@/lib/queries/admin-configuracoes'
+import { carregarConfigPlataforma, verificarIntegracoes, carregarConfigNexus, carregarMetricasNexus } from '@/lib/queries/admin-configuracoes'
 import AdminConfiguracoesContent from '@/components/AdminConfiguracoesContent'
 
 export const metadata: Metadata = {
@@ -15,8 +15,19 @@ export default async function PaginaAdminConfiguracoes() {
   const admin = await obterAdminAtual()
   if (!temPermissao(admin, 'configuracoes')) redirect('/acesso-negado')
 
-  const config = await carregarConfigPlataforma()
+  const [config, configNexus, metricasNexus] = await Promise.all([
+    carregarConfigPlataforma(),
+    carregarConfigNexus(),
+    carregarMetricasNexus(),
+  ])
   const integracoes = verificarIntegracoes()
 
-  return <AdminConfiguracoesContent config={config} integracoes={integracoes} />
+  return (
+    <AdminConfiguracoesContent
+      config={config}
+      integracoes={integracoes}
+      configNexus={configNexus}
+      metricasNexus={metricasNexus}
+    />
+  )
 }

@@ -20,7 +20,7 @@ export default async function AulaPage({ params, searchParams }: {
   if (!dados) notFound();
 
   const acesso = await verificarAcessoCurso(slug);
-  if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} />;
+  if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} alvo={slug} />;
 
   // acesso direto por URL a uma aula ainda travada (sequência ou avaliação de
   // módulo pendente) → manda pra última aula liberada. Admin tem bypass total.

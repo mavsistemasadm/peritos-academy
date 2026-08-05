@@ -102,3 +102,34 @@ export async function emitirCertificadoManual(usuarioId: string, cursoId: string
   revalidar(usuarioId)
   return { ok: true }
 }
+
+// ============================================================
+// Status do aluno no MH Nexus (flag manual)
+// ============================================================
+// Enquanto não existe integração de assinatura entre as plataformas, quem
+// marca é o admin. 'active' desliga TODAS as sugestões do Nexus para o aluno;
+// 'cancelled' faz voltarem, com o pool de copies de ex-assinante.
+//
+// Via RPC security definer (não escrita direta) porque a policy de update de
+// `perfis` é por linha e o admin não é dono da linha do aluno — mesmo motivo
+// das outras ações administrativas. A RPC também grava em
+// admin_log_acoes_usuario com a ação 'nexus_status'.
+export async function definirNexusStatusUsuario(
+  usuarioId: string,
+  status: 'none' | 'active' | 'cancelled',
+  justificativa: string
+): Promise<Resultado> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  if (!justificativa?.trim()) return { ok: false, erro: 'Justificativa é obrigatória.' }
+
+  const supabase = await criarClienteServidor()
+  const { error } = await supabase.rpc('adm_definir_nexus_status', {
+    p_usuario_id: usuarioId,
+    p_status: status,
+    p_justificativa: justificativa.trim(),
+  })
+  if (error) return { ok: false, erro: error.message }
+
+  revalidar(usuarioId)
+  return { ok: true }
+}

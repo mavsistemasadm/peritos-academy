@@ -181,3 +181,23 @@ export async function carregarCursosParaCertificado(): Promise<CursoParaCertific
   const { data } = await supabase.from('cursos').select('id, titulo').order('titulo')
   return data ?? []
 }
+
+// ============================================================
+// Status do aluno em relação ao MH Nexus
+// ============================================================
+// Consulta separada em vez de dentro de admin_usuario_ficha: aquela RPC é
+// security definer e junta meia dúzia de tabelas; para um único campo não
+// vale redefini-la (e arriscar o resto da ficha). A leitura aqui já está
+// gateada pela permissão 'usuarios' na própria página.
+export type StatusNexus = 'none' | 'active' | 'cancelled'
+
+export async function carregarNexusStatus(usuarioId: string): Promise<StatusNexus> {
+  const supabase = await criarClienteServidor()
+  const { data } = await supabase
+    .from('perfis')
+    .select('nexus_status')
+    .eq('id', usuarioId)
+    .maybeSingle()
+  const v = data?.nexus_status
+  return v === 'active' || v === 'cancelled' ? v : 'none'
+}

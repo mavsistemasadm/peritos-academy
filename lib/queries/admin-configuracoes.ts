@@ -1,4 +1,6 @@
 // lib/queries/admin-configuracoes.ts
+import { criarClienteServidor } from '@/lib/supabase/server'
+
 export { carregarConfigPlataforma } from '@/lib/queries/config-plataforma'
 export type { ConfigPlataforma } from '@/lib/queries/config-plataforma'
 
@@ -46,4 +48,74 @@ export function verificarIntegracoes(): IntegracaoStatus[] {
       docUrl: 'https://pandavideo.com.br/',
     },
   ]
+}
+
+// ============================================================
+// Sugestões do Nexus (aba própria em /admin/configuracoes)
+// ============================================================
+export type ConfigNexus = {
+  linkGlobal: string
+  linkFinanceiro: string
+  linkOpera: string
+  linkGalacticos: string
+  linkPonto: string
+  linkAcheUmPerito: string
+  linkBiblioteca: string
+  ativo: boolean
+  ativoAula: boolean
+  ativoConquista: boolean
+  ativoSino: boolean
+  ativoPerfil: boolean
+  ativoBloqueio: boolean
+  maxSinoPorSemana: number
+  diasPausaDismissal: number
+  dispensasParaPausar: number
+}
+
+export type MetricaNexus = {
+  app: string
+  exibidas: number
+  clicadas: number
+  dispensadas: number
+}
+
+export async function carregarConfigNexus(): Promise<ConfigNexus> {
+  const supabase = await criarClienteServidor()
+  const { data } = await supabase.from('nexus_cta_config').select('*').eq('id', 1).maybeSingle()
+  return {
+    linkGlobal: data?.link_global ?? '',
+    linkFinanceiro: data?.link_financeiro ?? '',
+    linkOpera: data?.link_opera ?? '',
+    linkGalacticos: data?.link_galacticos ?? '',
+    linkPonto: data?.link_ponto ?? '',
+    linkAcheUmPerito: data?.link_ache_um_perito ?? '',
+    linkBiblioteca: data?.link_biblioteca ?? '',
+    ativo: data?.ativo ?? true,
+    ativoAula: data?.ativo_aula ?? true,
+    ativoConquista: data?.ativo_conquista ?? true,
+    ativoSino: data?.ativo_sino ?? true,
+    ativoPerfil: data?.ativo_perfil ?? true,
+    ativoBloqueio: data?.ativo_bloqueio ?? true,
+    maxSinoPorSemana: data?.max_sino_por_semana ?? 1,
+    diasPausaDismissal: data?.dias_pausa_dismissal ?? 30,
+    dispensasParaPausar: data?.dispensas_para_pausar ?? 3,
+  }
+}
+
+/**
+ * Desempenho por app: exibições, cliques e dispensas. É o que responde
+ * "qual dor desperta mais interesse" e "a frequência está incomodando?".
+ */
+export async function carregarMetricasNexus(): Promise<MetricaNexus[]> {
+  const supabase = await criarClienteServidor()
+  const { data } = await supabase.from('nexus_cta_interactions').select('app, acao')
+  const mapa = new Map<string, MetricaNexus>()
+  for (const i of data ?? []) {
+    const m = mapa.get(i.app) ?? { app: i.app, exibidas: 0, clicadas: 0, dispensadas: 0 }
+    if (i.acao === 'exibida') m.exibidas++
+    else if (i.acao === 'clicada') m.clicadas++
+    else if (i.acao === 'dispensada') m.dispensadas++
+    mapa.set(i.app, m)
+  }
+  return [...mapa.values()].sort((a, b) => b.exibidas - a.exibidas)
 }

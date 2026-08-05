@@ -34,6 +34,9 @@ Duas migrações, nesta ordem:
 
 1. `supabase/migrations/20260805_migracao_alunos_entitlements.sql`
 2. `supabase/migrations/20260805_criar_perfil_suprime_boas_vindas_migrado.sql`
+3. `supabase/migrations/20260805_extensao_desafio_viver_pericia.sql` (só depois da importação)
+4. `supabase/migrations/20260805_nexus_ctas.sql`
+5. `supabase/migrations/20260805_nexus_status_admin.sql`
 
 Podem ser aplicadas por aqui, sem abrir o SQL Editor — há um runner via
 Management API (usa `SUPABASE_ACCESS_TOKEN`, roda como `postgres`):
@@ -173,6 +176,7 @@ Cada execução grava em `migracao/logs/`:
 | `importarAlunos.mjs` | aplica o plano |
 | `validarCatalogo.mjs` | confere o catálogo contra o banco e contra o arquivo |
 | `testarMatrizAcesso.mjs` | testa a matriz com usuários descartáveis (28 asserções) |
+| `testarNexusCtas.mjs` | testa as regras das sugestões do Nexus (29 asserções) |
 | `sql.mjs` | roda SQL via Management API (migrações e consultas avulsas) |
 
 O dry-run e a execução chamam **o mesmo** `planejar()`, então não existe a

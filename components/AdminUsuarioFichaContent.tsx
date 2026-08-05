@@ -6,14 +6,22 @@ import type { FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import type {
   FichaUsuario, ExtratoPaginado, ComunidadeUsuario, AuditoriaLinha, CursoParaCertificado,
+  StatusNexus,
 } from '@/lib/queries/admin-suporte'
 import {
   suspenderUsuario, reativarUsuario, banirUsuario, resetarSenhaUsuario, concederCortesiaUsuario,
   ajustarGamificacaoUsuario, emitirCertificadoManual, carregarMaisExtrato,
+  definirNexusStatusUsuario,
 } from '@/app/admin/usuarios/actions'
 import { IconeUser, IconeMail, IconeMapPin, IconeCalendar, IconeClock, IconeLock, IconeEye } from '@/components/Icones'
 import { XP, Moeda, SeloNivel, FogoStreak, Certificado } from '@/components/Emblemas'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
+
+const NOME_NEXUS: Record<StatusNexus, string> = {
+  none: 'Sem Nexus',
+  active: 'Assinante ativo',
+  cancelled: 'Ex-assinante',
+}
 
 type Aba = 'geral' | 'progresso' | 'gamificacao' | 'financeiro' | 'comunidade' | 'auditoria'
 
@@ -31,8 +39,9 @@ function fmtBRL(centavos: number) {
   return (centavos / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-export default function AdminUsuarioFichaContent({ ficha, extratoInicial, comunidade, auditoria, cursos }: {
+export default function AdminUsuarioFichaContent({ ficha, extratoInicial, comunidade, auditoria, cursos, nexusStatus }: {
   ficha: FichaUsuario; extratoInicial: ExtratoPaginado; comunidade: ComunidadeUsuario; auditoria: AuditoriaLinha[]; cursos: CursoParaCertificado[]
+  nexusStatus: StatusNexus
 }) {
   const [aba, setAba] = useState<Aba>('geral')
   const toast = useAdminToast()
@@ -59,7 +68,7 @@ export default function AdminUsuarioFichaContent({ ficha, extratoInicial, comuni
         <button type="button" className={`ad-aba${aba === 'auditoria' ? ' ativa' : ''}`} onClick={() => setAba('auditoria')}>Auditoria ({auditoria.length})</button>
       </div>
 
-      {aba === 'geral' && <VisaoGeralAba ficha={ficha} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'geral' && <VisaoGeralAba ficha={ficha} nexusStatus={nexusStatus} onErro={toast.erro} onSucesso={toast.sucesso} />}
       {aba === 'progresso' && <ProgressoAba ficha={ficha} cursos={cursos} onErro={toast.erro} onSucesso={toast.sucesso} />}
       {aba === 'gamificacao' && <GamificacaoAba ficha={ficha} extratoInicial={extratoInicial} onErro={toast.erro} onSucesso={toast.sucesso} />}
       {aba === 'financeiro' && <FinanceiroAba ficha={ficha} />}
@@ -72,7 +81,7 @@ export default function AdminUsuarioFichaContent({ ficha, extratoInicial, comuni
 // ============================================================
 // Visão geral
 // ============================================================
-function VisaoGeralAba({ ficha, onErro, onSucesso }: { ficha: FichaUsuario; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
+function VisaoGeralAba({ ficha, nexusStatus, onErro, onSucesso }: { ficha: FichaUsuario; nexusStatus: StatusNexus; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
 
@@ -113,6 +122,46 @@ function VisaoGeralAba({ ficha, onErro, onSucesso }: { ficha: FichaUsuario; onEr
             {' '}{ficha.assinatura.planoNome}, próxima cobrança em {fmtData(ficha.assinatura.proximaCobranca)}
           </p>
         )}
+      </section>
+
+      <section className="ad-card">
+        <h2>MH Nexus</h2>
+        <p>
+          <span className={`ad-status-pill ${nexusStatus === 'active' ? 'ativa' : nexusStatus === 'cancelled' ? 'inadimplente' : ''}`}>
+            {NOME_NEXUS[nexusStatus]}
+          </span>
+        </p>
+        <p className="ad-fin-nota">
+          {nexusStatus === 'active'
+            ? 'Assinante ativo: nenhuma sugestão do Nexus aparece pra este aluno.'
+            : nexusStatus === 'cancelled'
+              ? 'Ex-assinante: vê as sugestões com o texto de retomada.'
+              : 'Nunca assinou: vê as sugestões normais do ecossistema.'}
+          {' '}Enquanto não há integração de assinatura entre as plataformas, esta marcação é manual.
+        </p>
+        <div className="ad-fin-detalhe-acoes" style={{ marginTop: 10 }}>
+          {(['active', 'cancelled', 'none'] as const)
+            .filter(alvo => alvo !== nexusStatus)
+            .map(alvo => (
+              <button
+                key={alvo}
+                type="button"
+                className="ad-btn-secundario"
+                disabled={pendente}
+                onClick={() => {
+                  const just = prompt(`Marcar como "${NOME_NEXUS[alvo]}". Justificativa:`)
+                  if (!just?.trim()) return
+                  startTransition(async () => {
+                    const r = await definirNexusStatusUsuario(ficha.id, alvo, just.trim())
+                    if (!r.ok) onErro(r.erro)
+                    else { onSucesso(`Status do Nexus: ${NOME_NEXUS[alvo]}`); router.refresh() }
+                  })
+                }}
+              >
+                Marcar como {NOME_NEXUS[alvo]}
+              </button>
+            ))}
+        </div>
       </section>
 
       <section className="ad-card">

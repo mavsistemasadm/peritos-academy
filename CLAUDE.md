@@ -210,6 +210,46 @@ Senha da importação é aleatória de 32 bytes e ninguém a conhece — nunca �
 - Conferência dupla contra o arquivo: os 13 produtos formam 13 triplas distintas `Produto :: Acesso :: Regra`, então a regra vem do nome do produto e a coluna descritiva "Acesso na Plataforma Nova" é usada só pra **abortar se divergir** — nunca parseada como entrada.
 - `.gitignore` ganhou `env.local` (o padrão `.env*` **não** casa com esse nome, e o arquivo tem a service role key e os segredos de Resend/Anthropic/Panda/cron), `migracao/logs/` e o próprio XLSX (dado pessoal de 718 pessoas).
 
+## Sugestões contextuais do MH Nexus — 2026-08-05
+CTAs discretos e fecháveis dentro da Academy, pra aluno que ainda não assina o Nexus. Não é vitrine: cada copy parte de uma dor real do perito e pinta a sensação de resolver. Spec do dono do produto reproduzida literalmente nas copies.
+
+### ⚠️ Escopo deliberado: NÃO existe integração com o Nexus
+Sem login único, sem sync de assinatura, sem webhook. Decisão explícita do dono do produto ("fica pra depois"). O status é **flag manual** em `perfis.nexus_status` (`none`/`active`/`cancelled`), editável na ficha do aluno (`/admin/usuarios/[id]`, aba Visão geral) via RPC `adm_definir_nexus_status`. Quando a integração existir, é só passar a escrever nesse campo — nada mais no motor muda. A única referência a Nexus que existia antes disso era a frase "Acesso em breve também pelo Nexus" em `LoginContent.tsx:115`.
+- `active` desliga TODAS as sugestões, em todo placement, imediatamente. `cancelled` faz voltarem, com o pool de copy de ex-assinante (tom de retomada, não de apresentação).
+
+### Tabelas
+- `nexus_cta_config` (singleton id=1) — `link_global` + override por app, 6 toggles (global + 5 placements), `max_sino_por_semana`, `dispensas_para_pausar`, `dias_pausa_dismissal`. Editável em `/admin/configuracoes` → aba "Sugestões do Nexus". Leitura pública (`using (true)`) porque a tela de bloqueio precisa dela; escrita só `super_admin`.
+- `nexus_cta_copies` — 42 variações (36 `publico='novo'` + 6 `publico='ex'`), `chave` unique, seed idempotente com `on conflict (chave) do update`, então corrigir texto é reaplicar a migração. **O texto não é editável pelo admin de propósito** — é copy aprovada, versionada no seed.
+- `nexus_cta_bloqueio` — copies da tela de conteúdo bloqueado, por `alvo` (slug do curso, `biblioteca`, ou `__padrao__`). Variam por CONTEÚDO, não por app, então tabela separada.
+- `nexus_cta_interactions` — `exibida`/`clicada`/`dispensada`/`assinou` por aluno/app/placement/copy. É ao mesmo tempo a fonte das métricas E a memória da rotação. RLS: aluno insere e lê as próprias; admin lê tudo.
+
+### Motor de seleção (`lib/nexus/servidor.ts`)
+Ordem das checagens, a primeira que barrar encerra: config ligada → placement ligado → logado → **não é assinante ativo** → teto semanal (só sino) → apps pausados por dispensas ficam fora → não repete o app da vez anterior → variação que o aluno ainda não viu.
+- **`escolherSugestaoNexus` NÃO registra a exibição.** Quem registra é o componente, quando de fato renderiza — o cliente ainda pode suprimir por já ter mostrado algo na sessão. Registrar no servidor inflaria as métricas e queimaria variações que o aluno nunca viu.
+- Pool esgotado recomeça do zero em vez de parar de sugerir (a regra é "não repetir até esgotar", não "nunca repetir").
+- `filaDeApps(contexto)` em `lib/nexus/index.ts` mapeia slug de curso/trilha → fila de apps por regex, e **sempre devolve a fila completa** (relevantes primeiro, resto depois) pra nunca ficar sem opção quando os preferidos estão pausados. A ORDEM das regras decide: `planilha-automatica-de-apuracao-de-jornada` casa a regra trabalhista (por "jornada") antes da de planilhas e vai pro MH Ponto — que é o resultado certo, mas é consequência da ordem, não coincidência.
+
+### Placements (5)
+1. **Aula** (`AulaContent`, aba Materiais) — variante `linha`, contexto = slug do curso.
+2. **Conquista** (`ConquistaToast`) — variante `toast`, entra 5s depois da celebração e sai sozinho em 8s. `z-index` abaixo do toast de conquista, que celebra primeiro.
+3. **Sino** (`AvisosGlobais`) — item comum no topo da lista, buscado **só quando o sino abre** (não pesa o carregamento de toda página). Teto de 1x/semana conferido no servidor.
+4. **Perfil** (`PerfilContent`) — variante `perfil`, no fim da página. A spec pedia "abaixo das informações de plano", mas essa tela não tem bloco de plano (plano vive no admin financeiro), então foi pro fim do corpo.
+5. **Conteúdo bloqueado** (`AssinaturaNecessaria` + a trava da `BibliotecaContent`) — não rotaciona, não é suprimido por sessão nem por dispensa; é informação sobre o que o aluno tentou abrir. As 3 páginas de curso passam `alvo={slug}` pra escolher a copy específica.
+- Todo variante tem X. `1x por sessão por placement` via `sessionStorage`, marcado só quando vai renderizar de fato.
+- **`AssinaturaNecessaria` virou async server component** (lê a copy no servidor). Se algum call site novo precisar dela como client component, isso quebra — passar a copy por prop nesse caso.
+
+### Efeito colateral bom do acesso por curso
+A tela de bloqueio deixou de ser rara: com acesso por curso (ver seção da migração Ensinio), um aluno "Apenas PJE Calc" bate nela navegando o catálogo. A mensagem antiga ("Sua conta não tem assinatura ativa, regularize") estava **errada** pra ele, que nunca teve assinatura pra regularizar. Agora a tela nomeia o conteúdo e explica o ecossistema.
+
+### Testado
+`scripts/migration/testarNexusCtas.mjs` — 29 asserções com usuários descartáveis: gating por status (incluindo pool `ex` pro ex-assinante), contexto→app nas 6 filas, rotação sem repetir app, pool sem repetir variação até esgotar, pausa após N dispensas (e que ainda sugere OUTRO app), teto semanal do sino sem afetar os outros placements, cada toggle do admin isoladamente, e resolução de link global vs override. A config é devolvida ao padrão no `finally`.
+
+## Extensão de acesso: Desafio Viver de Perícia — 2026-08-05
+Os 74 alunos migrados desse produto vinham com validade entre 2026-08-10 e 2026-08-25 — **73 deles perdiam acesso em menos de 15 dias** contados da importação, o que faria a comunicação de migração chegar junto com o bloqueio. Decisão comercial: estender todos até **2026-12-31**. A regra de acesso não mudou (escopo `total` sem biblioteca, "Tudo EXCETO: Biblioteca de Planilhas") — só a data.
+- `migracao_alunos.data_vencimento` **não** foi alterada de propósito: é o registro histórico do que veio da Ensinio, e a validade original tem que continuar auditável. A vigência real mora em `acessos_conteudo`, e cada linha estendida guarda a data original na `observacao`.
+- Migração usa `greatest(expira_em, '2026-12-31')` pra ser reaplicável sem encurtar ninguém.
+- Depois disso, nada vence em menos de 30 dias (o próximo vencimento é 2026-09-25).
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários; `tour_visto_em` timestamptz nullable — ver seção Tour guiado; `migrado_de`/`migrado_em`/`boas_vindas_migrado_em` — aluno importado em lote, ver seção Migração de alunos da Ensinio)
 - `cursos`, `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)
@@ -222,6 +262,7 @@ Senha da importação é aleatória de 32 bytes e ninguém a conhece — nunca �
 - `notificacoes` (notificações pessoais/sino), `admin_usuarios` (papéis do admin)
 - `config_gamificacao`, `gamificacao_gatilhos`, `gamificacao_niveis`, `gamificacao_extrato` (ledger de XP/moedas, ver seção Gamificação)
 - `planos_assinatura`, `assinaturas`, `cobrancas`, `webhook_eventos`, `config_financeiro`, `financeiro_log_acoes` (ver seção Financeiro — **não confundir `planos_assinatura` com `planos`**, tabelas diferentes)
+- `nexus_cta_config`, `nexus_cta_copies`, `nexus_cta_bloqueio`, `nexus_cta_interactions` (sugestões do MH Nexus — ver seção própria; `perfis.nexus_status` é flag manual, não há sync com o Nexus)
 - `acessos_conteudo`, `acessos_excecoes` (concessões de acesso por curso/trilha/biblioteca com vigência — **o gate de conteúdo não é mais só `assinaturas`**, ver seção Migração de alunos da Ensinio), `migracao_alunos` (histórico da importação, uma linha por aluno × produto)
 - `admin_log_acoes_usuario` (log unificado de ações administrativas sobre um aluno — suspender/reativar/banir/resetar senha/ajuste de gamificação/certificado manual, ver seção Usuários)
 - `config_plataforma` (registro único — identidade, contato, textos institucionais, comportamento, SEO; leitura pública `using (true)`, ver seção Configurações)

@@ -4,7 +4,7 @@ import { notFound, redirect } from 'next/navigation'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
 import {
   carregarFichaUsuario, carregarExtratoUsuario, carregarComunidadeUsuario,
-  carregarAuditoriaUsuario, carregarCursosParaCertificado,
+  carregarAuditoriaUsuario, carregarCursosParaCertificado, carregarNexusStatus,
 } from '@/lib/queries/admin-suporte'
 import AdminUsuarioFichaContent from '@/components/AdminUsuarioFichaContent'
 
@@ -27,11 +27,12 @@ export default async function PaginaAdminUsuarioFicha({ params }: { params: Prom
     notFound()
   }
 
-  const [extrato, comunidade, auditoria, cursos] = await Promise.all([
+  const [extrato, comunidade, auditoria, cursos, nexusStatus] = await Promise.all([
     carregarExtratoUsuario(id, 1),
     carregarComunidadeUsuario(id),
     carregarAuditoriaUsuario(id),
     carregarCursosParaCertificado(),
+    carregarNexusStatus(id),
   ])
 
   return (
@@ -41,6 +42,7 @@ export default async function PaginaAdminUsuarioFicha({ params }: { params: Prom
       comunidade={comunidade}
       auditoria={auditoria}
       cursos={cursos}
+      nexusStatus={nexusStatus}
     />
   )
 }

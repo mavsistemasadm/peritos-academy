@@ -6092,3 +6092,172 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 @media (prefers-reduced-motion: reduce) {
   .bvm-fundo, .bvm-cartao { animation: none }
 }
+
+/* ==========================================================================
+   SUGESTÕES DO MH NEXUS  (components/NexusSugestao.tsx)
+   Visual deliberadamente discreto: é ambiente de estudo, não vitrine. Sem
+   gradiente de marca, sem cor de destaque no fundo, tipografia menor que o
+   conteúdo em volta. Prefixo `nx-` isola — o componente é montado em páginas
+   diferentes (aula, perfil, toast global), então não cabe escopo por página.
+   ========================================================================== */
+.nx-linha,
+.nx-toast,
+.nx-perfil-card {
+  border: 1px solid var(--linha-suave);
+  border-radius: var(--r-card);
+  background: color-mix(in srgb, var(--creme) 3%, transparent);
+}
+
+.nx-ico {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--creme) 6%, transparent);
+  color: var(--cinza-claro);
+}
+
+.nx-corpo {
+  margin: 0;
+  color: var(--cinza-claro);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.nx-titulo {
+  display: block;
+  color: var(--creme);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.nx-link {
+  display: inline-block;
+  margin-top: var(--s-2);
+  color: var(--verde);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--suave);
+}
+.nx-link:hover { text-decoration: underline; }
+
+.nx-x {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--cinza);
+  cursor: pointer;
+  transition: var(--suave);
+}
+.nx-x:hover { color: var(--creme); background: color-mix(in srgb, var(--creme) 8%, transparent); }
+
+/* ---------- variante linha (página de aula) ---------- */
+.nx-linha {
+  display: flex;
+  gap: var(--s-3);
+  align-items: flex-start;
+  margin-top: var(--s-4);
+  padding: var(--s-3);
+}
+.nx-linha .nx-txt { flex: 1 1 auto; min-width: 0; }
+
+/* ---------- variante toast (após conquista) ---------- */
+.nx-toast {
+  position: fixed;
+  right: var(--s-4);
+  bottom: var(--s-4);
+  z-index: 9990;                  /* abaixo do ConquistaToast, que celebra primeiro */
+  display: flex;
+  gap: var(--s-3);
+  align-items: flex-start;
+  width: min(340px, calc(100vw - 2 * var(--s-4)));
+  padding: var(--s-3);
+  background: var(--preto-elev);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 45%);
+  animation: nxEntra 0.3s ease-out both;
+}
+.nx-toast .nx-txt { flex: 1 1 auto; min-width: 0; }
+.nx-toast .nx-link { margin-top: 4px; }
+
+/* ---------- variante perfil ---------- */
+.nx-perfil { margin-top: var(--s-5); }
+.nx-perfil-topo {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--s-3);
+}
+.nx-perfil-topo h3 {
+  margin: 0;
+  color: var(--creme);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.nx-perfil-card { padding: var(--s-4); }
+.nx-perfil-app {
+  display: block;
+  margin-bottom: var(--s-2);
+  color: var(--cinza);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---------- item do sino ---------- */
+/* Herda o layout de .aviso-item (lista do sino) e só marca discretamente que
+   é sugestão, sem virar banner no meio das notificações reais. */
+.nx-sino-marca {
+  display: block;
+  margin-top: 4px;
+  color: var(--cinza);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---------- bloco da tela de conteúdo bloqueado ---------- */
+.nx-bloqueio {
+  margin-top: var(--s-4);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--linha-suave);
+  text-align: left;
+}
+.nx-bloqueio .nx-corpo { margin-bottom: var(--s-3); }
+.nx-bloqueio .nx-link { margin-top: 0; }
+
+@keyframes nxEntra {
+  from { opacity: 0; transform: translateY(10px) }
+  to   { opacity: 1; transform: none }
+}
+
+@media (max-width: 640px) {
+  .nx-toast { right: var(--s-3); left: var(--s-3); bottom: var(--s-3); width: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-toast { animation: none }
+}
+
+/* Item de sugestão dentro da lista do sino: mesmo layout de .notif (grid de
+   ícone + texto), mas é uma div e não um button, então precisa herdar o
+   display explicitamente. Sem cor de fundo: é uma notificação comum entre as
+   outras, não um banner. */
+.nx-sino-item {
+  display: flex;
+  gap: var(--s-3);
+  align-items: flex-start;
+  width: 100%;
+  text-align: left;
+  cursor: default;
+}
+.nx-sino-item .nx-link { margin-top: 2px; font-size: 0.78rem; }

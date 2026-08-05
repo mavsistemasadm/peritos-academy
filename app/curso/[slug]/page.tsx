@@ -16,7 +16,7 @@ export default async function PaginaCurso({
   if (!dados) notFound();
 
   const acesso = await verificarAcessoCurso(slug);
-  if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} />;
+  if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} alvo={slug} />;
 
   return (
     <CursoContent

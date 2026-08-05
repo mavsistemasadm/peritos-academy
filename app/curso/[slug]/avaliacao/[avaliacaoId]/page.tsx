@@ -18,7 +18,7 @@ export default async function AvaliacaoPage({ params }: {
   const acesso = await verificarAcessoCurso(slug);
   if (!acesso.permitido) {
     const nav = await carregarNav();
-    return <AssinaturaNecessaria nav={nav} logado={acesso.logado} />;
+    return <AssinaturaNecessaria nav={nav} logado={acesso.logado} alvo={slug} />;
   }
 
   const supabase = await criarClienteServidor();

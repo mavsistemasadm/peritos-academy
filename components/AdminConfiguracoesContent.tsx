@@ -4,18 +4,20 @@
 import { useState, useTransition } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import type { ConfigPlataforma, IntegracaoStatus } from '@/lib/queries/admin-configuracoes'
+import type { ConfigPlataforma, IntegracaoStatus, ConfigNexus, MetricaNexus } from '@/lib/queries/admin-configuracoes'
 import {
   atualizarIdentidade, uploadLogo, uploadFavicon, uploadOgImage,
-  atualizarComportamento, atualizarTextos, atualizarSEO,
+  atualizarComportamento, atualizarTextos, atualizarSEO, atualizarNexus,
 } from '@/app/admin/configuracoes/actions'
 import { IconeCheck, IconeAlertTriangle, IconeLink } from '@/components/Icones'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
-type Aba = 'identidade' | 'comportamento' | 'textos' | 'seo' | 'integracoes'
+type Aba = 'identidade' | 'comportamento' | 'textos' | 'seo' | 'nexus' | 'integracoes'
 
-export default function AdminConfiguracoesContent({ config, integracoes }: {
+export default function AdminConfiguracoesContent({ config, integracoes, configNexus, metricasNexus }: {
   config: ConfigPlataforma; integracoes: IntegracaoStatus[]
+  configNexus: ConfigNexus
+  metricasNexus: MetricaNexus[]
 }) {
   const [aba, setAba] = useState<Aba>('identidade')
   const toast = useAdminToast()
@@ -35,6 +37,7 @@ export default function AdminConfiguracoesContent({ config, integracoes }: {
         <button type="button" className={`ad-aba${aba === 'comportamento' ? ' ativa' : ''}`} onClick={() => setAba('comportamento')}>Comportamento</button>
         <button type="button" className={`ad-aba${aba === 'textos' ? ' ativa' : ''}`} onClick={() => setAba('textos')}>Textos</button>
         <button type="button" className={`ad-aba${aba === 'seo' ? ' ativa' : ''}`} onClick={() => setAba('seo')}>SEO</button>
+        <button type="button" className={`ad-aba${aba === 'nexus' ? ' ativa' : ''}`} onClick={() => setAba('nexus')}>Sugestões do Nexus</button>
         <button type="button" className={`ad-aba${aba === 'integracoes' ? ' ativa' : ''}`} onClick={() => setAba('integracoes')}>Integrações</button>
       </div>
 
@@ -42,6 +45,7 @@ export default function AdminConfiguracoesContent({ config, integracoes }: {
       {aba === 'comportamento' && <ComportamentoAba config={config} onErro={toast.erro} onSucesso={toast.sucesso} />}
       {aba === 'textos' && <TextosAba config={config} onErro={toast.erro} onSucesso={toast.sucesso} />}
       {aba === 'seo' && <SEOAba config={config} onErro={toast.erro} onSucesso={toast.sucesso} />}
+      {aba === 'nexus' && <NexusAba config={configNexus} metricas={metricasNexus} onErro={toast.erro} onSucesso={toast.sucesso} />}
       {aba === 'integracoes' && <IntegracoesAba integracoes={integracoes} />}
     </div>
   )
@@ -367,5 +371,132 @@ function IntegracoesAba({ integracoes }: { integracoes: IntegracaoStatus[] }) {
         </p>
       </section>
     </>
+  )
+}
+
+// ============================================================
+// Sugestões do Nexus
+// ============================================================
+// O texto das copies não é editável aqui de propósito: são 42 variações
+// aprovadas, versionadas no seed da migração (nexus_cta_copies). O que muda
+// no dia a dia é para onde o link aponta e onde as sugestões aparecem.
+function NexusAba({ config, metricas, onErro, onSucesso }: {
+  config: ConfigNexus
+  metricas: MetricaNexus[]
+  onErro: (e: string) => void
+  onSucesso: (m: string) => void
+}) {
+  const router = useRouter()
+  const [pendente, startTransition] = useTransition()
+
+  function onSalvar(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    startTransition(async () => {
+      const r = await atualizarNexus(fd)
+      if (!r.ok) onErro(r.erro)
+      else { onSucesso('Sugestões do Nexus salvas'); router.refresh() }
+    })
+  }
+
+  const apps: { campo: string; rotulo: string; valor: string }[] = [
+    { campo: 'link_financeiro', rotulo: 'Financeiro MH', valor: config.linkFinanceiro },
+    { campo: 'link_opera', rotulo: 'Opera CRM', valor: config.linkOpera },
+    { campo: 'link_galacticos', rotulo: 'Galácticos IA', valor: config.linkGalacticos },
+    { campo: 'link_ponto', rotulo: 'MH Ponto', valor: config.linkPonto },
+    { campo: 'link_ache_um_perito', rotulo: 'Ache um Perito', valor: config.linkAcheUmPerito },
+    { campo: 'link_biblioteca', rotulo: 'Biblioteca de Planilhas', valor: config.linkBiblioteca },
+  ]
+
+  return (
+    <form onSubmit={onSalvar}>
+      <section className="ad-card">
+        <h2>Link de destino</h2>
+        <label>Link global
+          <input name="link_global" defaultValue={config.linkGlobal} placeholder="https://nexusperitosacademy.com.br" />
+        </label>
+        <p className="ad-fin-nota">Para onde o aluno vai ao clicar em qualquer sugestão. Os campos por app abaixo sobrescrevem este quando preenchidos.</p>
+        <div className="ad-form-linha" style={{ marginTop: 12 }}>
+          {apps.map(a => (
+            <label key={a.campo}>{a.rotulo}
+              <input name={a.campo} defaultValue={a.valor} placeholder="(usa o link global)" />
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <section className="ad-card">
+        <h2>Onde aparece</h2>
+        <label className="ad-checkbox-linha">
+          <input type="checkbox" name="ativo" defaultChecked={config.ativo} />
+          Ativar sugestões do Nexus
+        </label>
+        <p className="ad-fin-nota">Desligando aqui, nenhuma sugestão aparece em lugar nenhum, independente dos toggles abaixo.</p>
+        <div className="ad-form-linha" style={{ marginTop: 12 }}>
+          <label className="ad-checkbox-linha">
+            <input type="checkbox" name="ativo_aula" defaultChecked={config.ativoAula} />
+            Nas aulas
+          </label>
+          <label className="ad-checkbox-linha">
+            <input type="checkbox" name="ativo_conquista" defaultChecked={config.ativoConquista} />
+            Após conquistas
+          </label>
+          <label className="ad-checkbox-linha">
+            <input type="checkbox" name="ativo_sino" defaultChecked={config.ativoSino} />
+            No sino
+          </label>
+          <label className="ad-checkbox-linha">
+            <input type="checkbox" name="ativo_perfil" defaultChecked={config.ativoPerfil} />
+            No perfil
+          </label>
+          <label className="ad-checkbox-linha">
+            <input type="checkbox" name="ativo_bloqueio" defaultChecked={config.ativoBloqueio} />
+            Em conteúdo bloqueado
+          </label>
+        </div>
+      </section>
+
+      <section className="ad-card">
+        <h2>Frequência</h2>
+        <div className="ad-form-linha">
+          <label>Máximo de exibições por semana no sino
+            <input type="number" name="max_sino_por_semana" min={0} defaultValue={config.maxSinoPorSemana} />
+          </label>
+          <label>Dispensas até pausar o app
+            <input type="number" name="dispensas_para_pausar" min={1} defaultValue={config.dispensasParaPausar} />
+          </label>
+          <label>Dias de pausa após as dispensas
+            <input type="number" name="dias_pausa_dismissal" min={0} defaultValue={config.diasPausaDismissal} />
+          </label>
+        </div>
+        <p className="ad-fin-nota">Cada sugestão aparece no máximo 1x por sessão, e o mesmo app nunca aparece duas vezes seguidas. Assinante ativo do Nexus não vê nada.</p>
+      </section>
+
+      <section className="ad-card">
+        <h2>Desempenho por app</h2>
+        {metricas.length === 0 ? (
+          <p className="ad-fin-nota">Nenhuma interação registrada ainda.</p>
+        ) : (
+          <table className="ad-tabela">
+            <thead>
+              <tr><th>App</th><th>Exibidas</th><th>Cliques</th><th>Dispensas</th><th>Taxa de clique</th></tr>
+            </thead>
+            <tbody>
+              {metricas.map(m => (
+                <tr key={m.app}>
+                  <td>{m.app}</td>
+                  <td className="num">{m.exibidas}</td>
+                  <td className="num">{m.clicadas}</td>
+                  <td className="num">{m.dispensadas}</td>
+                  <td className="num">{m.exibidas > 0 ? `${Math.round((m.clicadas / m.exibidas) * 100)}%` : '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
+    </form>
   )
 }

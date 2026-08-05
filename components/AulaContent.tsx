@@ -16,6 +16,7 @@ import {
   IconeFileText, IconeBarChart, IconePaperclip, IconeLock,
 } from '@/components/Icones'
 import { Certificado, XP } from '@/components/Emblemas'
+import NexusSugestao from "@/components/NexusSugestao";
 
 
 let _sb: SupabaseClient | null = null;
@@ -529,6 +530,8 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
                       ))}
                     </ul>
                   )}
+                  {/* sugestão do ecossistema, contextual à trilha do curso */}
+                  <NexusSugestao placement="aula" contexto={curso.slug} variante="linha" />
                 </div>
 
                 {/* ANOTAÇÕES */}

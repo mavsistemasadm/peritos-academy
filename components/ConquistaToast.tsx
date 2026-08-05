@@ -6,6 +6,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import NexusSugestao from '@/components/NexusSugestao'
 import { criarClienteBrowser } from '@/lib/supabase/client'
 import { tocarSom, type TipoSom } from '@/lib/sons'
 import type { Notificacao } from '@/lib/queries/avisos'
@@ -38,6 +39,11 @@ function str(v: unknown): string | undefined { return typeof v === 'string' ? v 
 export default function ConquistaToast({ logado, sonsConquista }: { logado: boolean; sonsConquista: boolean }) {
   const [atual, setAtual] = useState<Notificacao | null>(null)
   const [saindo, setSaindo] = useState(false)
+  // Sugestão do ecossistema: entra como toast secundário DEPOIS da
+  // celebração (o próprio NexusSugestao espera 5s e sai sozinho em 8s).
+  // Uma vez ligada, não desliga — o componente já limita a 1x por sessão.
+  const [ctaLigado, setCtaLigado] = useState(false)
+  const [ctaContexto, setCtaContexto] = useState<string | null>(null)
 
   const filaRef = useRef<Notificacao[]>([])
   const cursorRef = useRef<string>(new Date().toISOString())
@@ -46,6 +52,14 @@ export default function ConquistaToast({ logado, sonsConquista }: { logado: bool
   const emAndamentoRef = useRef(false)
   const sonsRef = useRef(sonsConquista)
   useEffect(() => { sonsRef.current = sonsConquista }, [sonsConquista])
+
+  // Uma celebração apareceu: agenda a sugestão do ecossistema e guarda o
+  // curso como contexto (quando a notificação trouxer essa informação).
+  useEffect(() => {
+    if (!atual) return
+    setCtaContexto((antes) => antes ?? str(atual.dados?.curso_slug) ?? null)
+    setCtaLigado(true)
+  }, [atual])
 
   function fecharAtual() {
     if (fecharTimerRef.current) { clearTimeout(fecharTimerRef.current); fecharTimerRef.current = null }
@@ -126,19 +140,39 @@ export default function ConquistaToast({ logado, sonsConquista }: { logado: bool
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [logado])
 
-  if (!logado || !atual) return null
+  if (!logado) return null
+
+  const cta = ctaLigado ? (
+    <NexusSugestao
+      placement="conquista"
+      contexto={ctaContexto}
+      variante="toast"
+      atrasoMs={5000}
+      autoFecharMs={8000}
+    />
+  ) : null
+
+  if (!atual) return cta
 
   if (atual.tipo === 'nivel_up') {
-    return <ToastNivel n={atual} saindo={saindo} onFechar={fecharAtual} />
+    return (
+      <>
+        <ToastNivel n={atual} saindo={saindo} onFechar={fecharAtual} />
+        {cta}
+      </>
+    )
   }
 
   return (
-    <div className="conquista-toast">
-      {atual.tipo === 'avaliacao_aprovada' && <ToastAvaliacao n={atual} saindo={saindo} />}
-      {atual.tipo === 'curso_concluido' && <ToastCurso n={atual} saindo={saindo} />}
-      {atual.tipo === 'streak' && <ToastStreak key={atual.id} n={atual} saindo={saindo} />}
-      {atual.tipo === 'primeira_aula' && <ToastPrimeiraAula n={atual} saindo={saindo} />}
-    </div>
+    <>
+      <div className="conquista-toast">
+        {atual.tipo === 'avaliacao_aprovada' && <ToastAvaliacao n={atual} saindo={saindo} />}
+        {atual.tipo === 'curso_concluido' && <ToastCurso n={atual} saindo={saindo} />}
+        {atual.tipo === 'streak' && <ToastStreak key={atual.id} n={atual} saindo={saindo} />}
+        {atual.tipo === 'primeira_aula' && <ToastPrimeiraAula n={atual} saindo={saindo} />}
+      </div>
+      {cta}
+    </>
   )
 }
 

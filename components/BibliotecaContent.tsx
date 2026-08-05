@@ -21,7 +21,7 @@ function tamanhoBonito(kb: number | null) {
   return kb >= 1024 ? `${(kb / 1024).toFixed(1).replace('.', ',')} MB` : `${kb} KB`
 }
 
-export default function BibliotecaContent({ dados, nav }: { dados: DadosBiblioteca; nav: DadosNav }) {
+export default function BibliotecaContent({ dados, nav, nexusBloqueio }: { dados: DadosBiblioteca; nav: DadosNav; nexusBloqueio?: { corpo: string; link: string } | null }) {
   const d = dados
   const [abaArea, setAbaArea] = useState<string>('todas')     // 'todas' | slug | 'favoritas' | 'top'
   const [filtroTipo, setFiltroTipo] = useState<string>('todos')
@@ -107,7 +107,16 @@ export default function BibliotecaContent({ dados, nav }: { dados: DadosBibliote
         {!d.temAcesso && (
           <div className="bib-trava" role="note">
             <b><IconeLock size={14} /> Sua conta ainda não tem acesso à Biblioteca.</b>
-            <span>Este é um benefício de um grupo de alunos. Fale com o suporte para saber como participar.</span>
+            {nexusBloqueio ? (
+              <>
+                <span>{nexusBloqueio.corpo}</span>
+                <a className="nx-link" href={nexusBloqueio.link} target="_blank" rel="noopener noreferrer">
+                  Conhecer o MH Nexus
+                </a>
+              </>
+            ) : (
+              <span>Este é um benefício de um grupo de alunos. Fale com o suporte para saber como participar.</span>
+            )}
           </div>
         )}
 
