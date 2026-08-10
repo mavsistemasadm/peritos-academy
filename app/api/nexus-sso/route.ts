@@ -35,16 +35,42 @@ const NEXUS_VALIDATE_URL = 'https://www.nexuspericial.com.br/api/auth/token'
 // indistinguíveis do outro lado: todos batem na mesma rota com o mesmo corpo.
 const APP = 'academy'
 
-// ── A FLAG DO PILOTO SAIU DAQUI, E O QUE SOBROU NO LUGAR ──
-//
-// `NEXUS_SSO_EMAILS` liberava a entrada automática para um email antes dos 403
-// alunos, e o próprio comentário dela dizia: «quando for para todos, o caminho
-// é remover a chamada a emailLiberado, não encher a lista». É o que está feito.
-//
-// O que continua trancado é o que sempre importou: a fechadura é o token do
-// Nexus, validado em `validarNoNexus`, e ENTRAR NÃO É TER ACESSO. Quem chega
-// aqui sem direito a conteúdo vê a plataforma pedindo assinatura, porque quem
-// decide isso é `tem_acesso_plataforma` no banco daqui — nunca esta rota.
+/**
+ * A FLAG. `NEXUS_SSO_EMAILS` é a lista de quem pode entrar por aqui.
+ *
+ * Vazia ou ausente = ninguém. **Falha fechada de propósito**, e ao contrário do
+ * resto do ecossistema: um SSO que libere por engano cria conta e sessão em
+ * nome de outra pessoa, enquanto um SSO que recuse por engano manda o aluno
+ * para a tela de login que ele já usava ontem. Os dois erros não custam a mesma
+ * coisa.
+ *
+ * ── ELA FOI REMOVIDA EM 10/08/2026 E VOLTOU NO MESMO DIA ──
+ *
+ * O motivo da volta não é acesso, é EMAIL, e ele mora no banco daqui.
+ * `garantirConta` cria a conta com `origem: 'nexus_sso'` e **sem**
+ * `migrado_de`, e o trigger `criar_perfil`
+ * (20260805_criar_perfil_suprime_boas_vindas_migrado) só segura as boas-vindas
+ * de quem tem `migrado_de`. Aberto para toda a base do Nexus, o assinante que
+ * nunca foi aluno recebia "Dar meu primeiro passo" no primeiro clique, o
+ * "primeira semana" sete dias depois e a régua de inatividade em seguida —
+ * sobre uma plataforma cujo conteúdo ele não tem.
+ *
+ * Então a ordem de abrir para todos é: primeiro o trigger aprender a suprimir
+ * `origem = 'nexus_sso'`, depois remover a chamada a `emailLiberado`. Encher a
+ * lista continua não sendo o caminho.
+ *
+ * Lida por chamada, e não no carregamento do módulo: rota da Vercel reaproveita
+ * processo entre invocações, e uma env trocada no painel só valeria no próximo
+ * cold start.
+ */
+function emailLiberado(email: string): boolean {
+  const lista = (process.env.NEXUS_SSO_EMAILS || '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean)
+  if (lista.length === 0) return false
+  return lista.includes(email.trim().toLowerCase())
+}
 type UsuarioNexus = {
   id: string
   email: string
@@ -193,6 +219,14 @@ export async function GET(req: NextRequest) {
   const resposta = await validarNoNexus(token)
   const usuario = resposta?.user
   if (!resposta?.valid || !usuario?.email) return paraLogin('token_invalido')
+
+  // A flag. Quem está fora dela cai no login normal DESTA plataforma — que é
+  // exatamente onde o cartão do Nexus manda quem não está no piloto. Nenhum
+  // caminho leva mais à Ensinio.
+  if (!emailLiberado(usuario.email)) {
+    console.log('[SSO-ACADEMY] fora da lista, seguindo para login manual:', usuario.email)
+    return paraLogin('indisponivel')
+  }
 
   const conta = await garantirConta(usuario.email, usuario.nome || '')
   if (!conta?.id) return paraLogin('conta_falhou')

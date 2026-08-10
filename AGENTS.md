@@ -20,12 +20,28 @@ assinatura, igual ao login normal. Confundir as duas coisas daria o acervo
 inteiro a qualquer conta do Nexus, e o sintoma só apareceria em quem abrisse
 um curso.
 
-**A flag do piloto não existe mais, dos dois lados.** `NEXUS_SSO_EMAILS` aqui e
-`ACADEMY_SSO_EMAILS` no Nexus estrearam a entrada automática com um email antes
-dos 403 alunos migrados, e a saída prevista era esta: remover a chamada a
-`emailLiberado`, não encher a lista. A entrada vale para toda a base desde
-10/08/2026 — a fechadura continua sendo o token do Nexus, e entrar continua não
-sendo ter acesso (ver o parágrafo acima).
+**`NEXUS_SSO_EMAILS` é a flag, e ela falha FECHADA.** Vazia ou ausente = ninguém
+entra por aqui. É o oposto do padrão do resto do ecossistema, de propósito: um
+SSO que libere por engano abre sessão em nome de outra pessoa, enquanto um que
+recuse por engano manda a pessoa para a tela de login desta mesma plataforma.
+
+⚠️ **Ela foi removida em 10/08/2026 e voltou no mesmo dia, e o motivo não é
+acesso — é email.** `garantirConta` cria a conta com `origem: 'nexus_sso'` e
+**sem** `migrado_de`, e o trigger `criar_perfil`
+(`20260805_criar_perfil_suprime_boas_vindas_migrado`) só segura as boas-vindas
+de quem tem `migrado_de`. Aberto para toda a base do Nexus, o assinante que
+nunca foi aluno recebia "Dar meu primeiro passo" no primeiro clique, o
+"primeira semana" sete dias depois e a régua de inatividade em seguida, sobre
+uma plataforma cujo conteúdo ele não tem.
+
+A ordem para abrir a todos é: primeiro o trigger aprender a suprimir
+`origem = 'nexus_sso'`, depois remover a chamada a `emailLiberado`. Encher a
+lista continua não sendo o caminho.
+
+O Nexus tem a env espelho, `ACADEMY_SSO_EMAILS`, que decide se o painel
+**oferece** a entrada automática. Ela não é a fechadura: a URL do SSO é
+adivinhável e um link colado à mão não passa pelo painel. Quem recusa é a env
+daqui.
 
 ⚠️ **O cartão do Nexus apontava para a Ensinio até esta mesma data.**
 `membros.peritosacademy.com.br` é um CNAME de `dns.ensinio.com`, o LMS antigo, e
