@@ -35,32 +35,16 @@ const NEXUS_VALIDATE_URL = 'https://www.nexuspericial.com.br/api/auth/token'
 // indistinguíveis do outro lado: todos batem na mesma rota com o mesmo corpo.
 const APP = 'academy'
 
-/**
- * A FLAG. `NEXUS_SSO_EMAILS` é a lista de quem pode entrar por aqui.
- *
- * Vazia ou ausente = ninguém. **Falha fechada de propósito**, e ao contrário do
- * resto do ecossistema: um SSO que libere por engano cria conta e sessão em
- * nome de outra pessoa, enquanto um SSO que recuse por engano manda o aluno
- * para a tela de login que ele já usava ontem. Os dois erros não custam a mesma
- * coisa.
- *
- * Existe porque a entrada está sendo aberta para UM email primeiro, antes de
- * valer para os 403 alunos. Quando for para todos, o caminho é remover a
- * chamada a `emailLiberado`, não encher a lista.
- *
- * Lida por chamada, e não no carregamento do módulo: rota da Vercel reaproveita
- * processo entre invocações, e uma env trocada no painel só valeria no próximo
- * cold start.
- */
-function emailLiberado(email: string): boolean {
-  const lista = (process.env.NEXUS_SSO_EMAILS || '')
-    .split(',')
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean)
-  if (lista.length === 0) return false
-  return lista.includes(email.trim().toLowerCase())
-}
-
+// ── A FLAG DO PILOTO SAIU DAQUI, E O QUE SOBROU NO LUGAR ──
+//
+// `NEXUS_SSO_EMAILS` liberava a entrada automática para um email antes dos 403
+// alunos, e o próprio comentário dela dizia: «quando for para todos, o caminho
+// é remover a chamada a emailLiberado, não encher a lista». É o que está feito.
+//
+// O que continua trancado é o que sempre importou: a fechadura é o token do
+// Nexus, validado em `validarNoNexus`, e ENTRAR NÃO É TER ACESSO. Quem chega
+// aqui sem direito a conteúdo vê a plataforma pedindo assinatura, porque quem
+// decide isso é `tem_acesso_plataforma` no banco daqui — nunca esta rota.
 type UsuarioNexus = {
   id: string
   email: string
@@ -209,13 +193,6 @@ export async function GET(req: NextRequest) {
   const resposta = await validarNoNexus(token)
   const usuario = resposta?.user
   if (!resposta?.valid || !usuario?.email) return paraLogin('token_invalido')
-
-  // A flag. Enquanto ela existir, o resto da base continua entrando por
-  // email e senha, exatamente como entrava ontem.
-  if (!emailLiberado(usuario.email)) {
-    console.log('[SSO-ACADEMY] fora da lista, seguindo para login manual:', usuario.email)
-    return paraLogin('indisponivel')
-  }
 
   const conta = await garantirConta(usuario.email, usuario.nome || '')
   if (!conta?.id) return paraLogin('conta_falhou')

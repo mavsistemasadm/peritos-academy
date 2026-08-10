@@ -20,18 +20,20 @@ assinatura, igual ao login normal. Confundir as duas coisas daria o acervo
 inteiro a qualquer conta do Nexus, e o sintoma só apareceria em quem abrisse
 um curso.
 
-**`NEXUS_SSO_EMAILS` é a flag, e ela falha FECHADA.** Vazia ou ausente =
-ninguém entra por aqui. É o oposto do padrão do resto do ecossistema, de
-propósito: um SSO que libere por engano abre sessão em nome de outra pessoa,
-enquanto um que recuse por engano manda o aluno para a tela de login que ele já
-usava ontem. A entrada está estreando com um email antes de valer para os 403
-alunos migrados. Para abrir a todos, o caminho é remover a chamada a
-`emailLiberado` — não encher a lista.
+**A flag do piloto não existe mais, dos dois lados.** `NEXUS_SSO_EMAILS` aqui e
+`ACADEMY_SSO_EMAILS` no Nexus estrearam a entrada automática com um email antes
+dos 403 alunos migrados, e a saída prevista era esta: remover a chamada a
+`emailLiberado`, não encher a lista. A entrada vale para toda a base desde
+10/08/2026 — a fechadura continua sendo o token do Nexus, e entrar continua não
+sendo ter acesso (ver o parágrafo acima).
 
-O Nexus tem a env espelho, `ACADEMY_SSO_EMAILS`, que decide se o painel
-**oferece** a entrada automática. Ela não é a fechadura: a URL do SSO é
-adivinhável e um link colado à mão não passa pelo painel. Quem recusa é a env
-daqui.
+⚠️ **O cartão do Nexus apontava para a Ensinio até esta mesma data.**
+`membros.peritosacademy.com.br` é um CNAME de `dns.ensinio.com`, o LMS antigo, e
+estava cravado à mão no painel. O aluno migrado clicava e caía num login que já
+não era o dele, sem erro em lugar nenhum. O endereço desta plataforma vive hoje
+em `ACADEMY_URL`, no `lib/acesso/academy.ts` do Nexus, e vale
+`https://peritos-academy.vercel.app` enquanto não houver domínio próprio.
+Quando houver, é aquela linha que muda — e só ela.
 
 **A sessão é fechada no servidor, e a ordem importa.** O caminho óbvio seria
 redirecionar para o magic link, como faz o Ache um Perito. Aqui não funcionaria:
