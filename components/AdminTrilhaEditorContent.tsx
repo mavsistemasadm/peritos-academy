@@ -290,6 +290,17 @@ function CursoPickerMultiplo({ cursos, pendente, onVincular }: {
 
   return (
     <div className="ad-picker">
+      {/* ⚠️ ESTA LINHA EXISTE POR CAUSA DE UMA CONFUSÃO REAL (11/08/2026).
+          "Salvar dados gerais", lá em cima, grava nome/descrição/horas/alunos/
+          principal — e NÃO toca no vínculo de curso, que é uma tabela separada
+          (etapa_missoes) gravada por este botão. Quem marca os cursos aqui e vai
+          salvar no botão de cima não recebe erro nenhum: o formulário salva o
+          que é dele, com sucesso, e a seleção some na volta. Dizer isso na tela
+          custa uma frase e economiza a suspeita de que o admin não grava. */}
+      <p className="ad-picker-dica">
+        Marque os cursos e clique em <strong>Vincular selecionados</strong>, aqui embaixo.
+        O botão <em>Salvar dados gerais</em> não altera esta lista.
+      </p>
       <input
         type="text"
         className="ad-picker-busca"
@@ -308,9 +319,12 @@ function CursoPickerMultiplo({ cursos, pendente, onVincular }: {
           </label>
         ))}
       </div>
+      {/* Vira primário assim que existe seleção: com algo marcado, ESTE é o
+          botão que conclui a ação, e ele não pode parecer o secundário da tela
+          enquanto o "Salvar dados gerais" continua verde lá em cima. */}
       <button
         type="button"
-        className="ad-btn-secundario"
+        className={selecionados.size > 0 ? 'ad-btn-primario' : 'ad-btn-secundario'}
         disabled={pendente || selecionados.size === 0}
         onClick={vincular}
       >
