@@ -272,7 +272,7 @@ Quatro decisões:
 
 - **O plano da anamnese entra em 2º lugar**, com o rótulo "Do seu plano". A plataforma faz a anamnese, o motor gera a rota (`plano_trilhas`) e ela aparece na mesma tela logo abaixo — e a vitrine ignorava isso por completo. Nenhuma prescrição é recalculada aqui: lê `getPlanoVivo()` e usa o `continuarHref` da estação `atual`, mesmo padrão de `meuPlano.ts`.
 - **No máximo 2 vagas de continuidade**; a 3ª é sempre descoberta. Sem o teto, quem tem plano e cursos em andamento recebia três "continue de onde parou" e a seção virava lista de tarefas. O teto mora dentro de `tenta()`, por onde TODOS os níveis passam — é invariante por construção, não por disciplina de quem editar depois.
-- **Quem não tem rota recebe um convite**, não enchimento (`conviteRota`). Medido em 11/08/2026: só 4 dos 433 perfis têm plano, então essa é a situação de quase toda a base.
+- **Quem não tem rota recebe um convite**, não enchimento (`conviteRota`). Medido em 11/08/2026: 4 linhas em `planos` (parte delas do mesmo usuário, em testes), então essa é a situação de quase toda a base.
 - **O último nível deixou de ser global**: primeiro afinidade (trilhas em que a pessoa já encostou), depois rotação determinística por `semana + id do aluno`. Determinística de propósito — `Math.random()` daria um card diferente a cada F5 e a pessoa nunca reencontraria o que viu.
 
 Conferido sobre os 73 cursos publicados: 6 alunos → 6 conjuntos diferentes, e o mesmo aluno gira a cada semana. Antes, os mesmos 3 para todos.

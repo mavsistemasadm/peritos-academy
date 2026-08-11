@@ -101,7 +101,11 @@ function iniciaisDe(nome: string) {
  */
 export const CONVITE_ROTA = {
   titulo: 'Monte a sua rota',
-  texto: 'Seis perguntas e a plataforma passa a recomendar pelo seu objetivo, não pelo que é mais recente.',
+  // ⚠️ Sem número de perguntas. A anamnese é adaptativa — ela se estende
+  // conforme as respostas (ver 20260724_anamnese_expansao_continua.sql), então
+  // qualquer quantidade escrita aqui vira promessa quebrada no meio do caminho
+  // para quem receber mais perguntas do que o card anunciou.
+  texto: 'Conte onde você quer chegar e a plataforma passa a recomendar pelo seu objetivo, não pelo que é mais recente.',
   ctaRotulo: 'Responder agora',
   href: '/anamnese',
 } as const
