@@ -88,8 +88,24 @@ const META_DIAS_SEMANA = 5
 function iniciaisDe(nome: string) {
   return nome.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 }
+/**
+ * A saudação do topo da home.
+ *
+ * ⚠️ A MADRUGADA NÃO É MANHÃ. A faixa era `h < 12 → 'Bom dia'`, o que fazia o
+ * aluno que abre a plataforma às 00h21 ser recebido com "bom dia" — reportado
+ * em 11/08/2026, e o tipo de detalhe que faz a tela parecer que não sabe que
+ * horas são. Quem entra de madrugada não começou o dia: ainda não dormiu.
+ *
+ * As faixas: 5h–11h manhã, 12h–17h tarde, 18h–4h noite.
+ *
+ * `hourCycle: 'h23'` em vez de `hour12: false`: com `hour12: false` algumas
+ * versões do ICU devolvem **24** para a meia-noite em vez de 0, e 24 cairia na
+ * faixa da noite por acidente — certo pelo motivo errado, e quebrado no dia em
+ * que o runtime mudasse.
+ */
 function saudacaoPorHora(): string {
-  const h = Number(new Intl.DateTimeFormat('pt-BR', { timeZone: TZ, hour: 'numeric', hour12: false }).format(new Date()))
+  const h = Number(new Intl.DateTimeFormat('pt-BR', { timeZone: TZ, hour: 'numeric', hourCycle: 'h23' }).format(new Date()))
+  if (h < 5) return 'Boa noite'
   if (h < 12) return 'Bom dia'
   if (h < 18) return 'Boa tarde'
   return 'Boa noite'
