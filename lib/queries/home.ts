@@ -4,6 +4,7 @@
 // Nenhum dado inventado — o que não existe ainda mostra estado vazio.
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { carregarJornada } from '@/lib/queries/jornada'
+import { getPlanoVivo } from '@/lib/queries/meuPlano'
 import { carregarAgenda } from '@/lib/queries/agenda'
 import { tituloHeroDoDia } from '@/lib/titulosHero'
 
@@ -62,6 +63,8 @@ export type DadosHome = {
   evolucaoDescricao: string | null
   // vitrines
   vitrine: CursoCard[]         // régua de recomendação, até 3
+  /** Convite para a anamnese, só para quem ainda não tem rota. null = tem plano. */
+  conviteRota: typeof CONVITE_ROTA | null
   // ao vivo + comunidade
   eventoLive: {
     titulo: string; descricao: string | null
@@ -87,6 +90,34 @@ const META_DIAS_SEMANA = 5
 
 function iniciaisDe(nome: string) {
   return nome.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
+}
+
+/**
+ * O convite para montar a rota, quando o aluno ainda não fez a anamnese.
+ *
+ * Texto aqui e não no componente pelo mesmo motivo do resto: quem decide o que
+ * a seção oferece é a consulta, e o componente só desenha. Se a decisão de
+ * mostrar migrar para outro lugar um dia, o texto vai junto.
+ */
+export const CONVITE_ROTA = {
+  titulo: 'Monte a sua rota',
+  texto: 'Seis perguntas e a plataforma passa a recomendar pelo seu objetivo, não pelo que é mais recente.',
+  ctaRotulo: 'Responder agora',
+  href: '/anamnese',
+} as const
+
+/** Semana ISO aproximada — só precisa mudar uma vez por semana e ser estável. */
+function semanaDoAno(): number {
+  const agora = new Date()
+  const inicio = Date.UTC(agora.getUTCFullYear(), 0, 1)
+  return Math.floor((agora.getTime() - inicio) / (7 * 864e5))
+}
+
+/** Hash pobre e suficiente: só serve para dar um deslocamento por aluno. */
+function somaDosCodigos(texto: string): number {
+  let soma = 0
+  for (let i = 0; i < texto.length; i++) soma = (soma + texto.charCodeAt(i)) % 1_000_003
+  return soma
 }
 /**
  * A saudação do topo da home.
@@ -134,15 +165,23 @@ export async function carregarHome(): Promise<DadosHome | null> {
     { data: perfil },
     { data: cursosRaw },
     { data: modulosRaw },
+    { data: cursoTrilhaRaw },
     { data: postsRaw },
     { data: saldo },
     { data: statusNivel },
     jornada,
     agenda,
+    plano,
   ] = await Promise.all([
     supabase.from('perfis').select('nome, tour_visto_em, migrado_de, boas_vindas_migrado_em').eq('id', uid).single(),
     supabase.from('cursos').select('id, slug, titulo, capa_url, capa_vertical_url, capa_horizontal_url, atualizado_em').eq('publicado', true).order('atualizado_em', { ascending: false }),
     supabase.from('modulos').select('id, curso_id, ordem').order('ordem', { ascending: true }),
+    // Vínculo curso→trilha, para a afinidade do último nível da régua. A view
+    // é DISTINCT ON (curso_id), ou seja, no máximo UMA trilha por curso — o
+    // suficiente aqui: afinidade é sinal fraco de propósito, e um curso que
+    // esteja em duas trilhas não muda a recomendação a ponto de justificar ler
+    // as tabelas base.
+    supabase.from('curso_trilha').select('curso_id, trilha_slug'),
     supabase.from('comunidade_posts').select('*').order('criado_em', { ascending: false }).limit(3),
     supabase.from('gamificacao_saldo').select('xp_total, moedas_total').eq('usuario_id', uid).maybeSingle(),
     // nível real (XP + requisito composto) — nunca derivar localmente só por
@@ -150,6 +189,9 @@ export async function carregarHome(): Promise<DadosHome | null> {
     supabase.rpc('gam_status_proximo_nivel'),
     carregarJornada(),
     carregarAgenda(),
+    // A rota prescrita pela anamnese. Entra aqui porque a régua de recomendação
+    // abaixo passou a consultá-la — ver o bloco dela para o porquê.
+    getPlanoVivo(),
   ])
   if (!perfil) return null
 
@@ -198,19 +240,92 @@ export async function carregarHome(): Promise<DadosHome | null> {
   const cursos = (cursosRaw ?? []).map(montaCard)
   const cursoPorSlug = new Map(cursos.map(c => [c.slug, c]))
 
+  // slug do curso -> trilhas dele, para a afinidade da régua.
+  const slugPorId = new Map((cursosRaw ?? []).map(c => [c.id, c.slug]))
+  const trilhasPorCursoSlug = new Map<string, string[]>()
+  for (const ct of cursoTrilhaRaw ?? []) {
+    const slug = slugPorId.get(ct.curso_id)
+    if (!slug || !ct.trilha_slug) continue
+    if (!trilhasPorCursoSlug.has(slug)) trilhasPorCursoSlug.set(slug, [])
+    trilhasPorCursoSlug.get(slug)!.push(ct.trilha_slug)
+  }
+
   // curso a continuar: o de maior progresso ainda não terminado
   const emAndamento = cursos.filter(c => c.progressoPct > 0 && c.progressoPct < 100)
     .sort((a, b) => b.progressoPct - a.progressoPct)
   const continuarCurso = emAndamento[0] ? { ...emAndamento[0], motivo: 'Continue de onde parou' } : null
 
-  // ---------- régua de recomendação (até 3, sem repetir curso) ----------
+  // ══════════════════════════════════════════════════════
+  // A RÉGUA DE RECOMENDAÇÃO — "Escolhido para o seu momento"
+  //
+  // Três vagas. O que decide cada uma está abaixo, em ordem.
+  //
+  // ── O QUE ESTAVA ERRADO (11/08/2026) ──
+  //
+  // A régua não era fixa: ela DEGRADAVA. Os cinco primeiros níveis dependem de
+  // progresso, e o último preenchia o que sobrasse com "os cursos mais
+  // recentes" — a mesma lista para toda a base. Quem tinha pouco progresso caía
+  // quase inteiro nesse último nível, ou seja, o aluno NOVO — justamente quem
+  // mais precisa de direção — recebia a vitrine mais genérica da plataforma.
+  //
+  // ── AS QUATRO DECISÕES ──
+  //
+  // 1. **O plano da anamnese entra em segundo lugar.** A plataforma faz a
+  //    anamnese, o motor gera uma rota (`plano_trilhas`) e ela aparece na mesma
+  //    tela, logo abaixo, em "Minha Rota do Perito". Esta seção ignorava isso
+  //    completamente. Perguntar ao aluno o que ele quer e não usar a resposta na
+  //    vitrine é o desperdício mais caro que havia aqui.
+  //
+  // 2. **No máximo DUAS vagas de continuidade.** A terceira é sempre descoberta.
+  //    Sem esse teto, quem tem plano e cursos em andamento recebe três "continue
+  //    de onde parou" e a seção vira lista de tarefas — deixa de mostrar que
+  //    existe algo além do caminho já traçado, que é a função de uma vitrine.
+  //
+  // 3. **Quem não fez a anamnese recebe um convite, não enchimento.** Ver
+  //    `conviteRota` no retorno: em vez da terceira vaga virar um curso
+  //    aleatório, ela vira "monte sua rota". A seção passa a converter.
+  //
+  // 4. **O último nível deixou de ser global.** Primeiro afinidade (cursos das
+  //    trilhas que a pessoa já tocou), depois rotação determinística por semana
+  //    e por aluno. Dois alunos lado a lado deixam de ver a mesma coisa, e a
+  //    vitrine muda sozinha toda semana sem ninguém publicar nada.
+  // ══════════════════════════════════════════════════════
+  const VAGAS = 3
+  const MAX_CONTINUIDADE = 2
+
   const regua: CursoCard[] = []
   const usados = new Set<string>()
-  function tenta(card: CursoCard | null | undefined) {
-    if (!card || usados.has(card.slug) || regua.length >= 3) return
+  let continuidade = 0
+
+  /**
+   * `ehContinuidade` marca o que é "siga o caminho que você já está". Só essas
+   * contam para o teto — descoberta nunca é barrada, senão a decisão 2 se
+   * inverte quando o aluno tem muito progresso.
+   */
+  function tenta(card: CursoCard | null | undefined, ehContinuidade = true) {
+    if (!card || usados.has(card.slug) || regua.length >= VAGAS) return
+    if (ehContinuidade && continuidade >= MAX_CONTINUIDADE) return
     regua.push(card); usados.add(card.slug)
+    if (ehContinuidade) continuidade++
   }
+
   tenta(continuarCurso)
+
+  // ── NÍVEL 2: a rota que o próprio aluno pediu ──
+  //
+  // `estacoes` vem ordenada e traz o estado calculado; a "atual" é a estação em
+  // que ele está. `continuarHref` dela já aponta para o próximo curso pendente
+  // daquela trilha, então não há prescrição recalculada aqui — só leitura, no
+  // mesmo padrão de meuPlano.ts.
+  if (plano.temPlano) {
+    const estacaoAtual = plano.estacoes.find(e => e.estado === 'atual' && e.continuarHref)
+    if (estacaoAtual?.continuarHref) {
+      const slug = extrairSlug(estacaoAtual.continuarHref)
+      const base = slug ? cursoPorSlug.get(slug) : null
+      if (base) tenta({ ...base, motivo: 'Do seu plano', href: estacaoAtual.continuarHref })
+    }
+  }
+
   if (jornada.painelFormacao?.continuarHref) {
     const slug = extrairSlug(jornada.painelFormacao.continuarHref)
     const base = slug ? cursoPorSlug.get(slug) : null
@@ -233,19 +348,61 @@ export async function carregarHome(): Promise<DadosHome | null> {
       if (base) tenta({ ...base, motivo: 'Próximo na sua trilha', href: territorioAtivo.proximoHref })
     }
   }
-  if (regua.length < 3) {
+  if (regua.length < VAGAS) {
     const territorioAberto = jornada.territorios.find(t => t.progressoPct === 0 && t.proximoHref)
     if (territorioAberto?.proximoHref) {
       const slug = extrairSlug(territorioAberto.proximoHref)
       const base = slug ? cursoPorSlug.get(slug) : null
-      if (base) tenta({ ...base, motivo: 'Descubra', href: territorioAberto.proximoHref })
+      // Descoberta: não conta para o teto de continuidade.
+      if (base) tenta({ ...base, motivo: 'Descubra', href: territorioAberto.proximoHref }, false)
     }
   }
-  // completa com os cursos mais recentes ainda não usados, se sobrar espaço
-  for (const c of cursos) {
-    if (regua.length >= 3) break
-    tenta(c)
+
+  // ── ÚLTIMO NÍVEL: afinidade, e só então rotação ──
+  //
+  // Era `for (const c of cursos) tenta(c)` — e `cursos` vem ordenado por
+  // `atualizado_em`, então todo aluno sem progresso via exatamente os mesmos
+  // três cards, para sempre. Era essa a queixa.
+  const naoUsados = cursos.filter(c => !usados.has(c.slug) && c.progressoPct === 0)
+
+  // Afinidade: trilhas onde a pessoa já encostou em algum curso. É o sinal mais
+  // barato que existe aqui e não depende da anamnese — serve para quem nunca a
+  // respondeu mas já começou alguma coisa.
+  const trilhasTocadas = new Set(
+    cursos.filter(c => c.progressoPct > 0).flatMap(c => trilhasPorCursoSlug.get(c.slug) ?? [])
+  )
+  const afins = trilhasTocadas.size
+    ? naoUsados.filter(c => (trilhasPorCursoSlug.get(c.slug) ?? []).some(t => trilhasTocadas.has(t)))
+    : []
+  for (const c of afins) {
+    if (regua.length >= VAGAS) break
+    tenta({ ...c, motivo: 'Combina com o que você estuda' }, false)
   }
+
+  // Rotação determinística: muda por SEMANA e por ALUNO. Determinística de
+  // propósito — `Math.random()` daria um card diferente a cada F5, e a pessoa
+  // nunca reencontraria o que viu há um minuto. Com semana + id, a vitrine é
+  // estável enquanto a semana durar e diferente entre dois alunos lado a lado.
+  const giro = semanaDoAno() + somaDosCodigos(uid)
+  for (let i = 0; i < naoUsados.length && regua.length < VAGAS; i++) {
+    const c = naoUsados[(giro + i) % naoUsados.length]
+    tenta({ ...c, motivo: c.novo ? 'Novo na plataforma' : 'Para conhecer' }, false)
+  }
+
+  // Rede de segurança: base pequena, tudo já usado ou tudo com progresso. Aqui
+  // repetir é melhor que devolver uma seção vazia.
+  for (const c of cursos) {
+    if (regua.length >= VAGAS) break
+    tenta(c, false)
+  }
+
+  // ── O CONVITE ──
+  //
+  // Só quando não há plano E sobrou vaga depois de tudo acima. Um convite que
+  // aparece para quem já tem rota seria ruído; e roubar a vaga de um curso de
+  // quem tem catálogo cheio para pedir anamnese seria trocar conteúdo por
+  // formulário. Quem decide o que fazer com ele é o componente.
+  const conviteRota = plano.temPlano ? null : CONVITE_ROTA
 
   // ---------- hero: capa de fundo do curso em destaque ----------
   // Mesmo curso do "Você está em {curso}" do subtítulo. Conta nova sem
@@ -342,6 +499,7 @@ export async function carregarHome(): Promise<DadosHome | null> {
     evolucaoTitulo: jornada.trilhaProtagonistaHome.nome || 'Sua jornada',
     evolucaoDescricao: jornada.trilhaProtagonistaHome.descricao,
     vitrine: regua,
+    conviteRota,
     eventoLive: eventoLiveRaw
       ? {
           titulo: eventoLiveRaw.titulo,

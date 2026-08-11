@@ -190,6 +190,21 @@
 @media(max-width:720px){.pagina-home .carrossel{grid-auto-columns:calc((100% - var(--s-4)) / 1.45)}}
 @media(max-width:460px){.pagina-home .carrossel{grid-auto-columns:78%}}
 .pagina-home .card-curso{display:block}
+/* Convite para a anamnese na vitrine — mesma altura do pôster (3/4) para não
+   quebrar a linha do carrossel, mas sem capa: ele não é curso e não deve se
+   passar por um. */
+.pagina-home .card-convite-rota{
+  display:flex;flex-direction:column;justify-content:center;gap:10px;
+  aspect-ratio:3/4;padding:var(--s-5);border-radius:var(--r-card);
+  background:linear-gradient(160deg,rgba(32,217,166,.10),rgba(10,15,12,.9));
+  border:1px solid rgba(32,217,166,.22);
+  text-decoration:none;transition:transform .35s cubic-bezier(.2,.7,.3,1),border-color .3s;
+}
+.pagina-home .card-convite-rota:hover{transform:translateY(-4px);border-color:rgba(32,217,166,.45)}
+.pagina-home .ccr-selo{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--verde)}
+.pagina-home .ccr-titulo{font-size:22px;line-height:1.15;color:var(--creme)}
+.pagina-home .ccr-texto{font-size:13.5px;line-height:1.55;color:var(--cinza);margin:0}
+.pagina-home .ccr-cta{font-size:13px;font-weight:700;color:var(--verde);margin-top:4px}
 .pagina-home .card-capa{position:relative;border-radius:var(--r-card);overflow:hidden;aspect-ratio:3/4;background:linear-gradient(160deg,#15211C,#0A0F0C);background-size:cover;background-position:center;box-shadow:var(--sombra-card);transition:transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s;transform-origin:center bottom}
 .pagina-home .card-curso:hover .card-capa{transform:scale(1.02) translateY(-4px);box-shadow:var(--sombra-card-hover)}
 .pagina-home .card-capa .acao{position:absolute;inset:auto var(--s-3) var(--s-3) auto;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s}

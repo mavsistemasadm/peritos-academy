@@ -199,6 +199,19 @@ export default function HomeContent({ dados, nav, plano, progressoRota, textosRo
         <div className="wrap">
           <div className="carrossel reveal" role="list">
             {d.vitrine.map(c => <CardCurso key={c.slug} c={c} />)}
+            {/* O convite entra DEPOIS dos cursos, e só para quem ainda não tem
+                rota. A régua já reservou a vaga: ela devolve no máximo 3 cards e
+                não gasta a última com curso aleatório quando não há plano. Pôr o
+                convite antes seria trocar conteúdo por formulário logo na
+                primeira coisa que a pessoa vê. */}
+            {d.conviteRota && (
+              <a className="card-convite-rota" href={d.conviteRota.href} role="listitem">
+                <span className="ccr-selo">Para você</span>
+                <strong className="ccr-titulo">{d.conviteRota.titulo}</strong>
+                <p className="ccr-texto">{d.conviteRota.texto}</p>
+                <span className="ccr-cta">{d.conviteRota.ctaRotulo} <span aria-hidden="true">→</span></span>
+              </a>
+            )}
           </div>
         </div>
       </section>

@@ -265,6 +265,20 @@ O conserto tem três partes, e a terceira existe porque as duas primeiras a prov
 
 ⚠️ O corte de boas-vindas por `migrado_de` continua idêntico dentro do trigger — conferido no `prosrc` depois de aplicar, e num ensaio com duas contas descartáveis homônimas (slugs `-1`/`-2`, zero e-mail para a migrada).
 
+## "Escolhido para o seu momento" — a régua da vitrine — 2026-08-11
+A seção não era fixa: ela **degradava**. Os cinco níveis da régua dependem de progresso, e o último preenchia o resto com "os cursos mais recentes" — a mesma lista para toda a base. Quem tinha pouco progresso caía quase inteiro nesse nível, ou seja, **o aluno novo recebia a vitrine mais genérica da plataforma**, que é o oposto do que a seção promete.
+
+Quatro decisões:
+
+- **O plano da anamnese entra em 2º lugar**, com o rótulo "Do seu plano". A plataforma faz a anamnese, o motor gera a rota (`plano_trilhas`) e ela aparece na mesma tela logo abaixo — e a vitrine ignorava isso por completo. Nenhuma prescrição é recalculada aqui: lê `getPlanoVivo()` e usa o `continuarHref` da estação `atual`, mesmo padrão de `meuPlano.ts`.
+- **No máximo 2 vagas de continuidade**; a 3ª é sempre descoberta. Sem o teto, quem tem plano e cursos em andamento recebia três "continue de onde parou" e a seção virava lista de tarefas. O teto mora dentro de `tenta()`, por onde TODOS os níveis passam — é invariante por construção, não por disciplina de quem editar depois.
+- **Quem não tem rota recebe um convite**, não enchimento (`conviteRota`). Medido em 11/08/2026: só 4 dos 433 perfis têm plano, então essa é a situação de quase toda a base.
+- **O último nível deixou de ser global**: primeiro afinidade (trilhas em que a pessoa já encostou), depois rotação determinística por `semana + id do aluno`. Determinística de propósito — `Math.random()` daria um card diferente a cada F5 e a pessoa nunca reencontraria o que viu.
+
+Conferido sobre os 73 cursos publicados: 6 alunos → 6 conjuntos diferentes, e o mesmo aluno gira a cada semana. Antes, os mesmos 3 para todos.
+
+⚠️ Sem teste automatizado: o repositório não tem runner (só `lint` e `build`), e instalar um às pressas era decisão maior que o conserto. A regra do teto está centralizada em `tenta()` justamente para não depender de teste.
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários; `tour_visto_em` timestamptz nullable — ver seção Tour guiado; `migrado_de`/`migrado_em`/`boas_vindas_migrado_em` — aluno importado em lote, ver seção Migração de alunos da Ensinio)
 - `cursos`, `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)
