@@ -41,10 +41,20 @@ function TimelineMarcos({ marcos }: { marcos: Marco[] }) {
     <div className="marcos-wrap">
       <div className="marcos-linha">
         <div className="marcos-fio"><i style={{ width: `${pct}%` }}></i></div>
-        {marcos.map(m => (
+        {marcos.map((m, i) => (
           <div className={`marco-item ${m.estado}`} key={m.id}>
+            {/* ⚠️ O NÚMERO É A POSIÇÃO NA FILA, NÃO O CAMPO `ordem`.
+                Era `String(m.ordem + 1)`, e as duas fontes de marco têm bases
+                diferentes: `marcosDeEtapas` devolve `etapas.ordem`, que no banco
+                começa em 1, e `marcosDeCursos` devolve o índice do array, que
+                começa em 0. Somar 1 nos dois fazia a trilha principal exibir
+                02..06 para as suas 5 etapas — e o aluno procurava um "módulo 1"
+                que nunca existiu, enquanto o contador ao lado dizia 0/5, certo.
+                Pela posição, a numeração é sempre 01..N, sem depender da base de
+                cada fonte e sem furo se `ordem` tiver buraco (etapa apagada). É
+                também o que TrilhaDetalheContent já fazia (`numero={i + 1}`). */}
             <div className="marco-bola">
-              {m.estado === 'feita' ? <IconeCheck size={16} strokeWidth={2.8} /> : String(m.ordem + 1).padStart(2, '0')}
+              {m.estado === 'feita' ? <IconeCheck size={16} strokeWidth={2.8} /> : String(i + 1).padStart(2, '0')}
             </div>
             {m.estado === 'atual' && <span className="marco-sub">Em andamento</span>}
             <span className="marco-nome">{m.nome}</span>
