@@ -250,6 +250,21 @@ Os 74 alunos migrados desse produto vinham com validade entre 2026-08-10 e 2026-
 - Migração usa `greatest(expira_em, '2026-12-31')` pra ser reaplicável sem encurtar ninguém.
 - Depois disso, nada vence em menos de 30 dias (o próximo vencimento é 2026-09-25).
 
+## Perfil público e `perfis.slug` — 2026-08-11
+O menu do avatar tinha dois itens quebrados, os dois em silêncio.
+
+- **"Perfil público" dava 404.** O link era `/perito/${slug ?? ''}`, que vira `/perito/` — rota que não casa com `/perito/[slug]`. E o slug só nascia dentro de `salvarPerfil`, ou seja, quando a pessoa abria o perfil e clicava em salvar: **432 dos 433 perfis estavam sem slug**, porque ninguém migrado fez isso. Praticamente toda a base clicava e via erro.
+- **"Meus certificados" abria o topo do `/perfil`.** O item aponta para `/perfil#certificados` e a seção não tinha `id`. Sem âncora o navegador não tem onde parar, então a pessoa clicava em certificados e via a tela de dados do perfil.
+
+O conserto tem três partes, e a terceira existe porque as duas primeiras a provocariam:
+
+- `scripts/backfill-slugs-perfis.mjs` (simulação por padrão) gravou os 432 slugs que faltavam.
+- `20260811_criar_perfil_gera_slug.sql` faz o trigger `criar_perfil` gravar o slug no nascimento — a conta que o SSO do Nexus cria não passa por `salvarPerfil` e continuaria nascendo sem endereço.
+- **Unicidade não é extra.** `carregarPeritoPublico` busca com `.single()`, que ERRA com mais de uma linha: dois perfis com o mesmo slug derrubam a página pública **dos dois**, e nenhum descobre por quê. São 3 homônimos nesta base. Agora há `uq_perfis_slug` (índice único parcial) e desempate `-2`, `-3`… tanto no SQL (`slug_livre`) quanto no JS (`salvarPerfil`) — **as duas regras precisam concordar**, senão a primeira pessoa a salvar o perfil muda de endereço sozinha e quebra link já divulgado.
+- O trigger insere com `exception when unique_violation` e sufixo aleatório: duas contas criadas no mesmo instante podem calcular o mesmo slug antes de qualquer uma gravar, e o cadastro não pode falhar por causa de um endereço público.
+
+⚠️ O corte de boas-vindas por `migrado_de` continua idêntico dentro do trigger — conferido no `prosrc` depois de aplicar, e num ensaio com duas contas descartáveis homônimas (slugs `-1`/`-2`, zero e-mail para a migrada).
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários; `tour_visto_em` timestamptz nullable — ver seção Tour guiado; `migrado_de`/`migrado_em`/`boas_vindas_migrado_em` — aluno importado em lote, ver seção Migração de alunos da Ensinio)
 - `cursos`, `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)
