@@ -365,7 +365,12 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
             </div>
           </div>
 
-          <div className="secao reveal">
+          {/* ⚠️ `id` obrigatório: o menu do avatar aponta "Meus certificados"
+              para /perfil#certificados. Sem a âncora, o navegador não tinha
+              onde parar e abria o topo do /perfil — a pessoa clicava em
+              certificados e via a tela de dados do perfil, sem erro nenhum.
+              `scroll-margin-top` porque a navegação é fixa e cobriria o título. */}
+          <div className="secao reveal" id="certificados" style={{ scrollMarginTop: 96 }}>
             <div className="secao-cab">
               <h2>Certificados.</h2>
               <span className="meta num"><b>{d.certificados.filter(c => c.emitido).length} emitidos</b> · verificáveis publicamente</span>

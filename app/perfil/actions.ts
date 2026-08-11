@@ -22,13 +22,42 @@ export async function salvarPerfil(formData: FormData) {
 
   if (!nome || nome.length < 3) return { ok: false as const, erro: 'Nome precisa ter pelo menos 3 caracteres.' }
 
-  const slug = nome
+  // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+  // O SLUG PRECISA SER \u00daNICO, E ANTES N\u00c3O ERA.
+  //
+  // Ele nascia direto do nome, sem conferir se j\u00e1 existia. N\u00e3o h\u00e1 \u00edndice \u00fanico
+  // em `perfis.slug`, ent\u00e3o dois hom\u00f4nimos ficavam com o mesmo endere\u00e7o \u2014 e
+  // `carregarPeritoPublico` busca com `.single()`, que ERRA quando mais de uma
+  // linha casa. Ou seja: o segundo "Francisco Silva" a salvar o perfil derrubava
+  // a p\u00e1gina p\u00fablica DOS DOIS, e nenhum dos dois saberia por qu\u00ea.
+  //
+  // Medido em 11/08/2026 sobre os 433 perfis: gerar pelo nome produzia 3
+  // colis\u00f5es (6 pessoas).
+  //
+  // O desempate \u00e9 num\u00e9rico e est\u00e1vel: quem chegou primeiro mant\u00e9m o endere\u00e7o
+  // limpo, e o seguinte vira `-2`. Trocar o endere\u00e7o de quem j\u00e1 tinha quebraria
+  // link que a pessoa pode ter divulgado.
+  // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
+  const base = nome
     .toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '')
+    || 'perito'
+
+  let slug = base
+  for (let n = 2; n < 50; n++) {
+    const { data: ocupado } = await supabase
+      .from('perfis')
+      .select('id')
+      .eq('slug', slug)
+      .neq('id', auth.user.id)
+      .limit(1)
+    if (!ocupado?.length) break
+    slug = `${base}-${n}`
+  }
 
   const { error } = await supabase
     .from('perfis')

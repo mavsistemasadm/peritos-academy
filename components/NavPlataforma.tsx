@@ -155,7 +155,16 @@ export default function NavPlataforma({ dados, ativo }: { dados: DadosNav; ativo
                       <Certificado size={16} variante="mono" />
                       Meus certificados
                     </a>
-                    <a href={`/perito/${d.slug ?? ''}`} className="np-am-item" onClick={() => setMenuAvatar(false)}>
+                    {/* ⚠️ SEM SLUG, NÃO EXISTE ENDEREÇO PÚBLICO.
+                        Era `/perito/${d.slug ?? ''}`, que vira `/perito/` —
+                        rota que não casa com /perito/[slug] e devolve 404. Como
+                        432 dos 433 perfis não tinham slug (ele só nascia quando
+                        a pessoa salvava o perfil, e ninguém migrado salvou),
+                        esse item do menu levava praticamente todo mundo para
+                        uma tela de erro.
+                        Sem slug o destino passa a ser o próprio perfil, onde a
+                        pessoa completa os dados e o endereço nasce. */}
+                    <a href={d.slug ? `/perito/${d.slug}` : '/perfil'} className="np-am-item" onClick={() => setMenuAvatar(false)}>
                       <IconeGlobe size={16} strokeWidth={1.8} />
                       Perfil público
                     </a>
