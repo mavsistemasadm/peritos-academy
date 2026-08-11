@@ -59,6 +59,24 @@ const APP = 'academy'
  * `origem = 'nexus_sso'`, depois remover a chamada a `emailLiberado`. Encher a
  * lista continua não sendo o caminho.
  *
+ * ── ELA GUARDA A CRIAÇÃO DE CONTA, NÃO A ENTRADA (11/08/2026) ──
+ *
+ * Releia o parágrafo acima: TODO o motivo da flag é o e-mail que o trigger
+ * dispara ao CRIAR a conta. Para quem já tem conta aqui, `garantirConta` acha a
+ * existente, nada é criado e nenhum trigger roda — a flag estava barrando um
+ * risco que não existe naquele caso.
+ *
+ * E barrar ali custava caro, de um jeito que não aparecia como erro: recusado,
+ * o aluno era mandado para `/login`, e se o navegador já tivesse a sessão de
+ * OUTRA pessoa da Academy (o caso real: a conta de admin, num teste), ele caía
+ * dentro daquela conta. O cartão do Nexus abria a Academy sem identidade
+ * nenhuma, e a sessão velha era o único identificador presente.
+ *
+ * Por isso a checagem virou: **conta já existe OU está na lista**. Os 433
+ * alunos migrados entram logados com a conta certa, e o assinante do Nexus que
+ * nunca foi aluno continua parando aqui — que é exatamente quem o trigger
+ * alcançaria.
+ *
  * Lida por chamada, e não no carregamento do módulo: rota da Vercel reaproveita
  * processo entre invocações, e uma env trocada no painel só valeria no próximo
  * cold start.
@@ -220,15 +238,25 @@ export async function GET(req: NextRequest) {
   const usuario = resposta?.user
   if (!resposta?.valid || !usuario?.email) return paraLogin('token_invalido')
 
-  // A flag. Quem está fora dela cai no login normal DESTA plataforma — que é
-  // exatamente onde o cartão do Nexus manda quem não está no piloto. Nenhum
-  // caminho leva mais à Ensinio.
-  if (!emailLiberado(usuario.email)) {
-    console.log('[SSO-ACADEMY] fora da lista, seguindo para login manual:', usuario.email)
+  // ── A FLAG GUARDA A CRIAÇÃO, NÃO A ENTRADA ──
+  //
+  // Quem já tem conta aqui entra logado: nada é criado, nenhum trigger dispara,
+  // e é justamente o disparo do trigger que a flag existe para evitar (ver o
+  // bloco de `emailLiberado`).
+  //
+  // Recusar quem já tem conta era o que produzia o defeito de sessão trocada:
+  // devolvido para `/login`, quem tivesse a sessão de outra pessoa da Academy
+  // no navegador caía dentro daquela conta, sem nada acusando.
+  const existente = await acharNoAuth(usuario.email)
+  if (!existente && !emailLiberado(usuario.email)) {
+    console.log('[SSO-ACADEMY] conta inexistente e fora da lista, seguindo para login manual:', usuario.email)
     return paraLogin('indisponivel')
   }
 
-  const conta = await garantirConta(usuario.email, usuario.nome || '')
+  // `garantirConta` só é chamada quando a conta NÃO existe — e, aí, quem chegou
+  // até aqui passou pela lista. Reaproveita a busca acima em vez de listar o
+  // Auth inteiro de novo.
+  const conta = existente ?? (await garantirConta(usuario.email, usuario.nome || ''))
   if (!conta?.id) return paraLogin('conta_falhou')
 
   await marcarAssinanteNexus(conta.id, resposta.plano_tier)
