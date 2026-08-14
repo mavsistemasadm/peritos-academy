@@ -9,7 +9,7 @@ export type PapelAdmin = 'super_admin' | 'conteudo' | 'financeiro' | 'moderador'
 export type SecaoAdmin =
   | 'administradores' | 'configuracoes' | 'cursos' | 'financeiro'
   | 'desafios' | 'avaliacoes' | 'trilhas' | 'certificados'
-  | 'usuarios' | 'comunidade' | 'agenda' | 'avisos' | 'gamificacao' | 'relatorios'
+  | 'usuarios' | 'acessos' | 'comunidade' | 'agenda' | 'avisos' | 'gamificacao' | 'relatorios'
 
 export const PERMISSOES_SECAO: Record<SecaoAdmin, PapelAdmin[]> = {
   administradores: ['super_admin'],
@@ -21,6 +21,10 @@ export const PERMISSOES_SECAO: Record<SecaoAdmin, PapelAdmin[]> = {
   certificados:    ['super_admin', 'conteudo'],
   financeiro:      ['super_admin', 'financeiro'],
   usuarios:        ['super_admin', 'suporte'],
+  // Mesmos papéis de `usuarios`: conceder acesso é atendimento ao aluno, e
+  // quem já pode suspender e resetar senha não fica mais perigoso podendo
+  // liberar um curso.
+  acessos:         ['super_admin', 'suporte'],
   comunidade:      ['super_admin', 'moderador'],
   agenda:          ['super_admin', 'moderador', 'conteudo'],
   avisos:          ['super_admin', 'moderador'],
@@ -38,6 +42,7 @@ export const NOME_SECAO: Record<SecaoAdmin, string> = {
   certificados: 'Certificados',
   financeiro: 'Financeiro',
   usuarios: 'Usuários',
+  acessos: 'Acessos',
   comunidade: 'Comunidade',
   agenda: 'Agenda',
   avisos: 'Avisos',
