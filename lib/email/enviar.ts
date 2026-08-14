@@ -18,12 +18,7 @@ export type TipoEmail =
   | "primeira_semana"
   | "resumo_quinzenal"
   | "inatividade_7"
-  | "inatividade_21"
-  // Aviso de acesso concedido pelo admin. Fora de PRIORIDADE de propósito: é
-  // transacional, como boas_vindas e certificado. Se competisse pelo teto de
-  // "1 celebração por dia", um aluno que subiu de nível hoje ficaria sem saber
-  // que ganhou acesso — e ninguém veria, porque o teto recusa em silêncio.
-  | "acesso_liberado";
+  | "inatividade_21";
 
 const REMETENTES: Record<"pessoal" | "automatico", { from: string; replyTo: string }> = {
   pessoal: { from: "Marlos Henrique <marlos@peritosacademy.com.br>", replyTo: "marlos@peritosacademy.com.br" },

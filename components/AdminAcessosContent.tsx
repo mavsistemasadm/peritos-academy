@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import type { AcessoLinha, CursoOpcao, Escopo } from '@/lib/queries/admin-acessos'
 import {
   concederAcesso, alterarPrazoAcesso, revogarAcesso, reativarAcesso,
-  enviarEmailDeAcesso, linkDePrimeiroAcesso,
+  enviarEmailDeAcesso, linkDeEntrada,
 } from '@/app/admin/acessos/actions'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
@@ -22,6 +22,7 @@ type Recem = {
   vigencia: string
   contaCriada: boolean
   redundante: boolean
+  nexus: { ok: boolean; criada: boolean; jaEraAssinante: boolean; erro?: string }
 }
 
 function formatarBR(iso: string | null): string {
@@ -204,6 +205,7 @@ function FormConcessao({
         vigencia: vitalicio ? 'com acesso vitalício' : `com acesso até ${formatarBR(expiraEm)}`,
         contaCriada: r.contaCriada,
         redundante: r.redundante,
+        nexus: r.nexus,
       })
     })
   }
@@ -290,7 +292,7 @@ function PainelRecem({
 
   async function onEnviar() {
     setEnviando(true)
-    const r = await enviarEmailDeAcesso(recem.usuarioId, recem.nome, recem.oQueGanhou, recem.vigencia)
+    const r = await enviarEmailDeAcesso(recem.email, recem.nome, recem.usuarioId)
     setEnviando(false)
     if (!r.ok) { onErro(r.erro); return }
     setEnviado(true)
@@ -298,9 +300,9 @@ function PainelRecem({
   }
 
   async function onCopiar() {
-    const link = await linkDePrimeiroAcesso()
+    const link = await linkDeEntrada()
     await navigator.clipboard.writeText(link)
-    onSucesso('Link de primeiro acesso copiado')
+    onSucesso('Link de entrada do Nexus copiado')
   }
 
   return (
@@ -312,8 +314,29 @@ function PainelRecem({
 
       {recem.contaCriada && (
         <p className="ad-sub" style={{ margin: '0 0 6px' }}>
-          A conta foi criada agora. A senha é aleatória e ninguém a conhece: a pessoa precisa definir a dela
-          na página de primeiro acesso.
+          A conta da Academy foi criada agora, com senha aleatória que ninguém conhece.
+        </p>
+      )}
+
+      {/* A entrada dessa pessoa é o Nexus, e por isso o estado da conta de lá é
+          o que decide se o cadastro terminou ou não. Sem este bloco, um Nexus
+          fora do ar deixaria o operador fechar a tela achando que acabou. */}
+      {!recem.nexus.ok && (
+        <p className="ad-sub" style={{ margin: '0 0 6px', color: '#F03434', fontWeight: 600 }}>
+          A conta do Nexus NÃO foi criada: {recem.nexus.erro}. O acesso ao curso já está gravado, mas ela
+          ainda não tem por onde entrar — refaça o envio pelo botão abaixo quando o Nexus responder.
+        </p>
+      )}
+      {recem.nexus.ok && recem.nexus.criada && (
+        <p className="ad-sub" style={{ margin: '0 0 6px' }}>
+          Conta do Nexus criada. É por lá que ela entra: vai ver o painel em modo vitrine, com a oferta,
+          e o cartão da Academy abrindo o curso dela.
+        </p>
+      )}
+      {recem.nexus.ok && recem.nexus.jaEraAssinante && (
+        <p className="ad-sub" style={{ margin: '0 0 6px', fontWeight: 600 }}>
+          Atenção: essa pessoa já é assinante do Nexus, então o plano dela foi mantido intacto. Ela já
+          tinha acesso à plataforma inteira — confira se este cadastro de curso avulso era mesmo o caso.
         </p>
       )}
 
@@ -330,9 +353,9 @@ function PainelRecem({
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <button type="button" className="ad-btn-primario" disabled={enviando || enviado} onClick={onEnviar}>
-          {enviado ? 'E-mail enviado' : enviando ? 'Enviando...' : 'Enviar e-mail de acesso'}
+          {enviado ? 'Convite enviado' : enviando ? 'Enviando...' : 'Enviar convite para criar senha'}
         </button>
-        <button type="button" className="ad-btn-secundario" onClick={onCopiar}>Copiar link de primeiro acesso</button>
+        <button type="button" className="ad-btn-secundario" onClick={onCopiar}>Copiar link do Nexus</button>
         <button type="button" className="ad-btn-secundario" onClick={onFechar}>Fechar</button>
       </div>
     </section>

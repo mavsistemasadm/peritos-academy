@@ -24,9 +24,6 @@ import { criarClienteServidor } from '@/lib/supabase/server'
 import { criarClienteServico } from '@/lib/supabase/servico'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
 import { acharAlunoPorEmail, hojeDoGate, type Escopo } from '@/lib/queries/admin-acessos'
-import { emailAcessoLiberado } from '@/lib/email/templates/acessoLiberado'
-import { enviarEmail } from '@/lib/email/enviar'
-import { SITE_URL } from '@/lib/site'
 
 type Resultado = { ok: true; aviso?: string } | { ok: false; erro: string }
 
@@ -67,8 +64,69 @@ export type EntradaConcessao = {
 }
 
 export type ResultadoConcessao =
-  | { ok: true; usuarioId: string; contaCriada: boolean; redundante: boolean; nome: string }
+  | {
+      ok: true
+      usuarioId: string
+      contaCriada: boolean
+      redundante: boolean
+      nome: string
+      /** Como foi a criação da conta do Nexus — é por lá que ele entra. */
+      nexus: { ok: boolean; criada: boolean; jaEraAssinante: boolean; erro?: string }
+    }
   | { ok: false; erro: string }
+
+// ============================================================
+// A conta do NEXUS — é por lá que ele entra
+// ============================================================
+// ⚠️ **O login desta pessoa é o do Nexus, não o daqui.** A conta da Academy
+// existe para o SSO achar (e é ela que carrega a concessão do curso), mas quem
+// abre a porta todo dia é o painel do Nexus em modo vitrine: cinco cartões
+// trancados e a oferta no lugar da ação recomendada. Esse painel é o argumento
+// de venda. Se ela entrasse direto aqui, nunca mais ouviria falar do Nexus.
+//
+// A criação é fire and forget do ponto de vista da CONCESSÃO, e deliberadamente
+// não é do ponto de vista da TELA: se o Nexus estiver fora do ar, a concessão
+// aqui já está gravada e não deve ser desfeita — mas o operador PRECISA saber
+// que a pessoa ficou sem porta de entrada, senão ele fecha a tela achando que
+// terminou. Por isso o erro volta no resultado em vez de virar log.
+async function garantirContaNoNexus(
+  email: string,
+  nome: string,
+  academyUserId: string,
+  enviarConvite: boolean
+): Promise<{ ok: boolean; criada: boolean; jaEraAssinante: boolean; erro?: string }> {
+  const base = process.env.NEXUS_URL?.trim() || 'https://www.nexuspericial.com.br'
+  const chave = process.env.NEXUS_INTEGRACAO_KEY?.trim()
+  if (!chave) {
+    return { ok: false, criada: false, jaEraAssinante: false, erro: 'NEXUS_INTEGRACAO_KEY não configurada neste ambiente.' }
+  }
+
+  try {
+    const r = await fetch(`${base}/api/integracoes/aluno-curso`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-integracao-key': chave },
+      body: JSON.stringify({ email, nome, academyUserId, enviarConvite }),
+      cache: 'no-store',
+    })
+    const corpo = await r.json().catch(() => ({}))
+    if (!r.ok) {
+      return { ok: false, criada: false, jaEraAssinante: false, erro: corpo?.error ?? `Nexus respondeu ${r.status}.` }
+    }
+    return {
+      ok: true,
+      criada: corpo.criado === true,
+      // Conta que já existia com tier de assinante: o Nexus se recusa a
+      // rebaixá-la, e a tela precisa dizer isso — essa pessoa já tem acesso a
+      // tudo, e o cadastro do curso avulso pode ter sido engano.
+      jaEraAssinante: corpo.criado === false && corpo.ehAluno === false,
+      erro: corpo.convite?.enviado === false && enviarConvite
+        ? `Conta pronta, mas o convite de senha não saiu (${corpo.convite?.motivo ?? 'motivo desconhecido'}).`
+        : undefined,
+    }
+  } catch (e) {
+    return { ok: false, criada: false, jaEraAssinante: false, erro: e instanceof Error ? e.message : 'Nexus inacessível.' }
+  }
+}
 
 export async function concederAcesso(entrada: EntradaConcessao): Promise<ResultadoConcessao> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
@@ -180,8 +238,13 @@ export async function concederAcesso(entrada: EntradaConcessao): Promise<Resulta
     redundante = (total ?? []).some(t => t.vitalicio || (t.expira_em && t.expira_em >= hoje))
   }
 
+  // A porta de entrada. Depois da concessão gravada, nunca antes: se o Nexus
+  // estiver fora do ar, o acesso já existe e é recuperável mandando o convite
+  // depois. A ordem inversa deixaria a pessoa com conta no Nexus e sem o curso.
+  const nexus = await garantirContaNoNexus(email, aluno.nome, aluno.id, false)
+
   revalidar()
-  return { ok: true, usuarioId: aluno.id, contaCriada, redundante, nome: aluno.nome }
+  return { ok: true, usuarioId: aluno.id, contaCriada, redundante, nome: aluno.nome, nexus }
 }
 
 // ============================================================
@@ -254,50 +317,32 @@ export async function reativarAcesso(acessoId: string): Promise<Resultado> {
 // silêncio quem desligou os e-mails no perfil, e essa é gente que precisa
 // justamente saber que ganhou acesso. A tela mostra o motivo e o link para
 // avisar por fora.
+// ⚠️ **O convite é o do NEXUS, não o daqui.** A porta de entrada desta pessoa é
+// o painel do Nexus; mandá-la para o `/primeiro-acesso` da Academy criaria uma
+// senha que ela usaria uma vez e nunca mais, e a pularia justamente da tela que
+// existe para vender a assinatura a ela.
+//
+// Isso também evita duas redações para o mesmo evento: quem escreve o e-mail de
+// criação de senha é `lib/acesso/convite-senha.ts`, no Nexus, que já é
+// transacional, já sai pelo remetente do domínio principal e já distingue "não
+// tinha para quem mandar" de "mandei".
 export async function enviarEmailDeAcesso(
-  usuarioId: string,
+  email: string,
   nome: string,
-  oQueGanhou: string,
-  vigencia: string
+  academyUserId: string
 ): Promise<Resultado> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
 
-  const { assunto, html } = emailAcessoLiberado({
-    primeiroNome: (nome || '').trim().split(/\s+/)[0] || 'Olá',
-    oQueGanhou,
-    vigencia,
-  })
-
-  const r = await enviarEmail({
-    usuarioId,
-    tipo: 'acesso_liberado',
-    // `refId` único por envio: sem ele, o dedupe de `enviarEmail` (mesmo tipo +
-    // mesmo refId) bloquearia o segundo aviso para sempre — e o segundo aviso é
-    // caso real, porque a pessoa renova, ganha outro curso, ou não achou o
-    // primeiro e-mail.
-    refId: `${Date.now()}`,
-    assunto,
-    html,
-    remetente: 'automatico',
-  })
-
-  if (!r.enviado) {
-    const motivos: Record<string, string> = {
-      preferencia_desligada: 'Esse aluno desligou os e-mails da plataforma. Avise por fora — o link está aqui do lado.',
-      sem_email: 'A conta não tem e-mail utilizável.',
-      falha_resend: 'O provedor de e-mail recusou o envio. Tente de novo em alguns minutos.',
-      duplicado: 'Esse aviso já foi enviado.',
-      limite_diario: 'O aluno já recebeu um e-mail hoje pelo limite diário.',
-    }
-    return { ok: false, erro: motivos[r.motivo ?? ''] ?? `Não enviado (${r.motivo ?? 'motivo desconhecido'}).` }
-  }
-
+  const r = await garantirContaNoNexus(email, nome, academyUserId, true)
+  if (!r.ok) return { ok: false, erro: r.erro ?? 'Não consegui falar com o Nexus.' }
+  if (r.erro) return { ok: false, erro: r.erro }
   return { ok: true }
 }
 
-/** O link que o aluno usa para entrar pela primeira vez. */
-export async function linkDePrimeiroAcesso(): Promise<string> {
-  return `${SITE_URL}/primeiro-acesso`
+/** Onde essa pessoa entra. É o Nexus, não a Academy. */
+export async function linkDeEntrada(): Promise<string> {
+  const base = process.env.NEXUS_URL?.trim() || 'https://www.nexuspericial.com.br'
+  return `${base}/login`
 }
 
 function formatarBR(iso: string): string {
