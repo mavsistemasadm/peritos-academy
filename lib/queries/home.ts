@@ -3,6 +3,7 @@
 // lib/queries/jornada.ts), agenda real e comunidade numa passada só.
 // Nenhum dado inventado — o que não existe ainda mostra estado vazio.
 import { criarClienteServidor } from '@/lib/supabase/server'
+import { carregarResumoAcesso } from '@/lib/acesso/verificar'
 import { carregarJornada } from '@/lib/queries/jornada'
 import { getPlanoVivo } from '@/lib/queries/meuPlano'
 import { carregarAgenda } from '@/lib/queries/agenda'
@@ -406,7 +407,28 @@ export async function carregarHome(): Promise<DadosHome | null> {
   // aparece para quem já tem rota seria ruído; e roubar a vaga de um curso de
   // quem tem catálogo cheio para pedir anamnese seria trocar conteúdo por
   // formulário. Quem decide o que fazer com ele é o componente.
-  const conviteRota = plano.temPlano ? null : CONVITE_ROTA
+  // ⚠️ **QUEM NÃO TEM A PLATAFORMA NÃO É APRESENTADO A ELA** (14/08/2026).
+  //
+  // O comprador de um curso avulso entra aqui para abrir UM curso. Tudo o que a
+  // home oferece de onboarding fala do plano completo, e cada peça termina numa
+  // tela de cadeado:
+  //
+  //   - o TOUR passa pela Jornada, pela Comunidade e pela Agenda, que ele não
+  //     abre. Seis paradas em que a maioria é vitrine ensinam, na primeira
+  //     visita, que a tela inteira é propaganda;
+  //   - o CONVITE DA ROTA leva à cerimônia da Rota do Perito, que é do plano
+  //     completo — clicar dá cadeado, e o primeiro clique de alguém que acabou
+  //     de pagar não pode ser numa recusa;
+  //   - as BOAS-VINDAS DE MIGRADO dizem que a conta foi transferida de outra
+  //     plataforma, o que para ele não aconteceu.
+  //
+  // É a mesma decisão que o Nexus já tomou para o modo vitrine (ver
+  // lib/acesso/__tests__/onboarding-vitrine.test.ts lá): a apresentação da casa
+  // fica para quem vive nela; para quem comprou um cômodo, ela é uma lista do
+  // que ele não tem.
+  const acessoCompleto = (await carregarResumoAcesso()).completo
+
+  const conviteRota = !acessoCompleto || plano.temPlano ? null : CONVITE_ROTA
 
   // ---------- hero: capa de fundo do curso em destaque ----------
   // Mesmo curso do "Você está em {curso}" do subtítulo. Conta nova sem
@@ -516,9 +538,9 @@ export async function carregarHome(): Promise<DadosHome | null> {
         }
       : null,
     movimento,
-    mostrarTourInicial: !perfil.tour_visto_em,
+    mostrarTourInicial: acessoCompleto && !perfil.tour_visto_em,
     boasVindasMigrado:
-      perfil.migrado_de && !perfil.boas_vindas_migrado_em
+      acessoCompleto && perfil.migrado_de && !perfil.boas_vindas_migrado_em
         ? { plataforma: perfil.migrado_de }
         : null,
     tourPrimeiraAulaHref: jornada.painelFormacao?.continuarHref ?? jornada.trilhaProtagonistaHome.continuarHref ?? '/jornada',
