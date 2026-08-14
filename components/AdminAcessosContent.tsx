@@ -24,6 +24,9 @@ type Recem = {
   redundante: boolean
   /** Data de fim já formatada, ou null quando vitalício. */
   ate: string | null
+  escopo: Escopo
+  cursoSlug: string | null
+  tags: string[]
   nexus: { ok: boolean; criada: boolean; jaEraAssinante: boolean; erro?: string }
 }
 
@@ -194,7 +197,8 @@ function FormConcessao({
     const observacao = String(fd.get('observacao') ?? '')
 
     startTransition(async () => {
-      const r = await concederAcesso({ email, nome, escopo, cursoId, vitalicio, expiraEm, observacao })
+      const curso0 = cursos.find(c => c.id === cursoId)
+      const r = await concederAcesso({ email, nome, escopo, cursoId, cursoSlug: curso0?.slug ?? null, vitalicio, expiraEm, observacao })
       if (!r.ok) { onErro(r.erro); return }
       const curso = cursos.find(c => c.id === cursoId)
       onConcedido({
@@ -208,6 +212,9 @@ function FormConcessao({
         contaCriada: r.contaCriada,
         redundante: r.redundante,
         ate: vitalicio ? null : formatarBR(expiraEm),
+        escopo,
+        cursoSlug: curso0?.slug ?? null,
+        tags: r.nexus.tags ?? [],
         nexus: r.nexus,
       })
     })
@@ -295,7 +302,7 @@ function PainelRecem({
 
   async function onEnviar() {
     setEnviando(true)
-    const r = await enviarEmailDeAcesso(recem.email, recem.nome, recem.usuarioId, recem.oQueGanhou, recem.ate)
+    const r = await enviarEmailDeAcesso(recem.email, recem.nome, recem.usuarioId, recem.oQueGanhou, recem.ate, { escopo: recem.escopo, cursoSlug: recem.cursoSlug })
     setEnviando(false)
     if (!r.ok) { onErro(r.erro); return }
     setEnviado(true)
@@ -347,6 +354,25 @@ function PainelRecem({
         <p className="ad-sub" style={{ margin: '0 0 6px' }}>
           Atenção: esse aluno já tem acesso à plataforma inteira vigente, então esta concessão de curso é
           redundante hoje. Ela continua valendo se o acesso total expirar antes.
+        </p>
+      )}
+
+      {recem.tags.length > 0 && (
+        <p className="ad-sub" style={{ margin: '0 0 6px' }}>
+          Na base do Nexus com as etiquetas{' '}
+          {recem.tags.map((t, i) => (
+            <span key={t}>
+              {i > 0 && ' e '}
+              <code style={{ background: 'rgba(255,255,255,.07)', padding: '1px 6px', borderRadius: 5 }}>{t}</code>
+            </span>
+          ))}
+          {' '}— é por elas que você monta a audiência para vender a assinatura.
+        </p>
+      )}
+      {recem.nexus.ok && recem.tags.length === 0 && (
+        <p className="ad-sub" style={{ margin: '0 0 6px', color: '#F5A623' }}>
+          A conta foi criada, mas nenhuma etiqueta entrou na base do Nexus. Essa pessoa não vai aparecer
+          em recorte de campanha até isso ser resolvido.
         </p>
       )}
 

@@ -58,6 +58,8 @@ export type EntradaConcessao = {
   nome: string
   escopo: Escopo
   cursoId: string | null
+  /** `cursos.slug` — vira a tag do recorte no Nexus. */
+  cursoSlug: string | null
   vitalicio: boolean
   expiraEm: string | null
   observacao: string
@@ -71,7 +73,7 @@ export type ResultadoConcessao =
       redundante: boolean
       nome: string
       /** Como foi a criação da conta do Nexus — é por lá que ele entra. */
-      nexus: { ok: boolean; criada: boolean; jaEraAssinante: boolean; erro?: string }
+      nexus: { ok: boolean; criada: boolean; jaEraAssinante: boolean; tags?: string[]; erro?: string }
     }
   | { ok: false; erro: string }
 
@@ -95,8 +97,10 @@ async function garantirContaNoNexus(
   academyUserId: string,
   enviarConvite: boolean,
   /** O que ele comprou — só viaja quando o convite vai junto. */
-  acesso?: { oQue: string; ate: string | null } | null
-): Promise<{ ok: boolean; criada: boolean; jaEraAssinante: boolean; erro?: string }> {
+  acesso?: { oQue: string; ate: string | null } | null,
+  /** Decide a tag do recorte na base do Nexus: `aluno-avulso-<slug>`. */
+  recorte?: { escopo: Escopo; cursoSlug: string | null } | null
+): Promise<{ ok: boolean; criada: boolean; jaEraAssinante: boolean; tags?: string[]; erro?: string }> {
   const base = process.env.NEXUS_URL?.trim() || 'https://www.nexuspericial.com.br'
   const chave = process.env.NEXUS_INTEGRACAO_KEY?.trim()
   if (!chave) {
@@ -107,7 +111,12 @@ async function garantirContaNoNexus(
     const r = await fetch(`${base}/api/integracoes/aluno-curso`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-integracao-key': chave },
-      body: JSON.stringify({ email, nome, academyUserId, enviarConvite, acesso: acesso ?? null }),
+      body: JSON.stringify({
+        email, nome, academyUserId, enviarConvite,
+        acesso: acesso ?? null,
+        escopo: recorte?.escopo ?? null,
+        cursoSlug: recorte?.cursoSlug ?? null,
+      }),
       cache: 'no-store',
     })
     const corpo = await r.json().catch(() => ({}))
@@ -117,6 +126,7 @@ async function garantirContaNoNexus(
     return {
       ok: true,
       criada: corpo.criado === true,
+      tags: Array.isArray(corpo.tags) ? corpo.tags : [],
       // Conta que já existia com tier de assinante: o Nexus se recusa a
       // rebaixá-la, e a tela precisa dizer isso — essa pessoa já tem acesso a
       // tudo, e o cadastro do curso avulso pode ter sido engano.
@@ -243,7 +253,10 @@ export async function concederAcesso(entrada: EntradaConcessao): Promise<Resulta
   // A porta de entrada. Depois da concessão gravada, nunca antes: se o Nexus
   // estiver fora do ar, o acesso já existe e é recuperável mandando o convite
   // depois. A ordem inversa deixaria a pessoa com conta no Nexus e sem o curso.
-  const nexus = await garantirContaNoNexus(email, aluno.nome, aluno.id, false)
+  const nexus = await garantirContaNoNexus(email, aluno.nome, aluno.id, false, null, {
+    escopo: entrada.escopo,
+    cursoSlug: entrada.cursoSlug,
+  })
 
   revalidar()
   return { ok: true, usuarioId: aluno.id, contaCriada, redundante, nome: aluno.nome, nexus }
@@ -335,11 +348,12 @@ export async function enviarEmailDeAcesso(
   /** "o curso Revisão do saldo da conta PASEP" — já escrito pela tela. */
   oQueGanhou: string,
   /** "30/09/2026", ou null quando é vitalício. */
-  ate: string | null
+  ate: string | null,
+  recorte: { escopo: Escopo; cursoSlug: string | null }
 ): Promise<Resultado> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
 
-  const r = await garantirContaNoNexus(email, nome, academyUserId, true, { oQue: oQueGanhou, ate })
+  const r = await garantirContaNoNexus(email, nome, academyUserId, true, { oQue: oQueGanhou, ate }, recorte)
   if (!r.ok) return { ok: false, erro: r.erro ?? 'Não consegui falar com o Nexus.' }
   if (r.erro) return { ok: false, erro: r.erro }
   return { ok: true }
