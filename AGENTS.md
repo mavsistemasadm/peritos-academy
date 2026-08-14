@@ -46,10 +46,14 @@ daqui.
 ⚠️ **O cartão do Nexus apontava para a Ensinio até esta mesma data.**
 `membros.peritosacademy.com.br` é um CNAME de `dns.ensinio.com`, o LMS antigo, e
 estava cravado à mão no painel. O aluno migrado clicava e caía num login que já
-não era o dele, sem erro em lugar nenhum. O endereço desta plataforma vive hoje
-em `ACADEMY_URL`, no `lib/acesso/academy.ts` do Nexus, e vale
-`https://peritos-academy.vercel.app` enquanto não houver domínio próprio.
-Quando houver, é aquela linha que muda — e só ela.
+não era o dele, sem erro em lugar nenhum.
+
+O endereço desta plataforma é `https://evolua.peritosacademy.com.br` desde
+14/08/2026, e vive em **duas** linhas, uma de cada lado: `SITE_URL` em
+`lib/site.ts` aqui, e `ACADEMY_URL` em `lib/acesso/academy.ts` no Nexus. São dois
+repositórios que não compilam juntos, então mudança de endereço é deploy nos
+dois — e as duas linhas precisam concordar, porque quem manda o aluno para cá é
+o Nexus e quem escreve os links dos emails é este repositório.
 
 **A sessão é fechada no servidor, e a ordem importa.** O caminho óbvio seria
 redirecionar para o magic link, como faz o Ache um Perito. Aqui não funcionaria:

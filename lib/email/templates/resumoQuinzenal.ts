@@ -3,6 +3,8 @@
 // {TITULO_VARIAVEL}/{PARAGRAFO_CONTEXTO}/{FRASE_DESTAQUE}/{PARAGRAFO_PROXIMO}
 // variam por tom (Parte 3H da missão): >=10 aulas / >=3 / <3, com override
 // de celebração se o aluno subiu de nível no período.
+import { SITE_URL } from "@/lib/site";
+
 export type DadosResumoQuinzenal = {
   primeiroNome: string;
   xpPeriodo: number;
@@ -99,7 +101,7 @@ export function emailResumoQuinzenal(d: DadosResumoQuinzenal): { assunto: string
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">${proximo}</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Continuar a jornada</a>
+        <a href="${SITE_URL}" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Continuar a jornada</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #1DC8A0;padding-left:16px;">

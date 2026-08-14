@@ -1,5 +1,7 @@
 // lib/email/templates/boasVindas.ts
 // HTML copiado literalmente de docs/email-templates/email_nivel_01_boas_vindas.html
+import { SITE_URL } from "@/lib/site";
+
 export type DadosBoasVindas = { primeiroNome: string };
 
 export function emailBoasVindas(d: DadosBoasVindas): { assunto: string; html: string } {
@@ -22,7 +24,7 @@ export function emailBoasVindas(d: DadosBoasVindas): { assunto: string; html: st
 
     <div style="padding:40px 40px 0;text-align:center;">
       <div style="width:132px;height:132px;margin:0 auto 18px;border-radius:50%;background:#edf9f6;border:2px solid #1DC8A0;text-align:center;line-height:128px;overflow:hidden;">
-        <img src="https://peritos-academy.vercel.app/niveis/nivel-01-explorador-novato.png" alt="" width="92" style="vertical-align:middle;" />
+        <img src="${SITE_URL}/niveis/nivel-01-explorador-novato.png" alt="" width="92" style="vertical-align:middle;" />
       </div>
       <p style="font-size:11px;letter-spacing:3px;color:#0e9e82;font-weight:700;margin:0 0 8px;">SUA PRIMEIRA INSÍGNIA</p>
       <p style="font-size:22px;font-weight:800;color:#083952;margin:0 0 12px;letter-spacing:-0.3px;">Explorador Novato</p>
@@ -52,7 +54,7 @@ export function emailBoasVindas(d: DadosBoasVindas): { assunto: string; html: st
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Sua jornada começa com uma única aula. A primeira. E ela está te esperando agora.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Dar meu primeiro passo</a>
+        <a href="${SITE_URL}" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Dar meu primeiro passo</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #1DC8A0;padding-left:16px;">

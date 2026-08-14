@@ -10,6 +10,7 @@ import {
   atualizarComportamento, atualizarTextos, atualizarSEO, atualizarNexus,
 } from '@/app/admin/configuracoes/actions'
 import { IconeCheck, IconeAlertTriangle, IconeLink } from '@/components/Icones'
+import { SITE_HOST } from '@/lib/site'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 type Aba = 'identidade' | 'comportamento' | 'textos' | 'seo' | 'nexus' | 'integracoes'
@@ -324,7 +325,7 @@ function SEOAba({ config, onErro, onSucesso }: { config: ConfigPlataforma; onErr
             ? <img src={ogImageUrl} alt="Preview og:image" />
             : <div style={{ height: 180, display: 'grid', placeItems: 'center', color: 'var(--cinza)', fontSize: 12.5 }}>Sem imagem</div>}
           <div className="ad-og-preview-corpo">
-            <div className="ad-og-preview-dominio">peritos-academy.vercel.app</div>
+            <div className="ad-og-preview-dominio">{SITE_HOST}</div>
             <div className="ad-og-preview-titulo">{metaTitulo || config.nomePlataforma}</div>
             <div className="ad-og-preview-desc">{metaDescricao || 'Descrição aparece aqui quando o link for compartilhado.'}</div>
           </div>

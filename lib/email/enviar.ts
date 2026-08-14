@@ -6,6 +6,7 @@
 // lib/gamificacao/login-diario.ts.
 import { Resend } from "resend";
 import { criarClienteServico } from "@/lib/supabase/servico";
+import { SITE_URL } from "@/lib/site";
 import { gerarTokenCancelamento } from "./token";
 
 export type TipoEmail =
@@ -60,8 +61,8 @@ function inicioDoDiaSaoPauloISO(): string {
 }
 
 function injetarLinksRodape(html: string, usuarioId: string): string {
-  const prefUrl = "https://peritos-academy.vercel.app/perfil";
-  const cancelarUrl = `https://peritos-academy.vercel.app/email/cancelar?token=${gerarTokenCancelamento(usuarioId)}`;
+  const prefUrl = `${SITE_URL}/perfil`;
+  const cancelarUrl = `${SITE_URL}/email/cancelar?token=${gerarTokenCancelamento(usuarioId)}`;
   return html.replace(
     "Preferências de email · Cancelar inscrição",
     `<a href="${prefUrl}" style="color:#b4bac6;text-decoration:underline;">Preferências de email</a> · <a href="${cancelarUrl}" style="color:#b4bac6;text-decoration:underline;">Cancelar inscrição</a>`

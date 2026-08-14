@@ -7,6 +7,8 @@
 // É o "renascimento" da recomendação de curso — decisão de produto: sugestão
 // vive na conclusão, não durante o estudo (por isso não há link nenhum pra
 // próximo curso em nenhuma outra tela do app).
+import { SITE_URL } from "@/lib/site";
+
 export type DadosCursoConcluido = {
   primeiroNome: string;
   cursoNome: string;
@@ -22,12 +24,12 @@ export function emailCursoConcluido(d: DadosCursoConcluido): { assunto: string; 
       }</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app/curso/${d.proximoCurso.slug}" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Começar ${d.proximoCurso.titulo}</a>
+        <a href="${SITE_URL}/curso/${d.proximoCurso.slug}" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Começar ${d.proximoCurso.titulo}</a>
       </div>`
     : `<p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Você chegou numa fronteira: os cursos que já mapeamos aqui acabaram. Estamos preparando o que vem a seguir, e você vai ser avisado assim que sair do forno.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app/cursos" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Explorar outros cursos</a>
+        <a href="${SITE_URL}/cursos" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Explorar outros cursos</a>
       </div>`;
 
   const html = `<!DOCTYPE html>

@@ -10,7 +10,22 @@ Plataforma de educação para peritos judiciais (perícia bancária, cálculos j
 - **IA**: Anthropic API (Claude Haiku `claude-haiku-4-5-20251001`) para feedback de correções e explicações
 - **Gateway de pagamento**: Asaas (assinaturas — a integrar no admin)
 - **Deploy**: Vercel, repo `github.com/mavsistemasadm/peritos-academy`, branch `main`
+- **Endereço**: `https://evolua.peritosacademy.com.br` (domínio próprio desde 14/08/2026, apontado para o mesmo deploy que antes só respondia em `peritos-academy.vercel.app`). Ele mora em **`lib/site.ts`**, em `SITE_URL`, e mais em lugar nenhum — nem no HTML dos emails, nem em env. Ver "O endereço da plataforma" abaixo.
 - **Ambiente**: Windows, VS Code, PowerShell
+
+## O endereço da plataforma — 2026-08-14
+
+**Regra permanente.** O endereço desta plataforma é `SITE_URL`, em `lib/site.ts`, e `SITE_HOST` é derivado dele. **Nenhum arquivo escreve o endereço à mão** — nem o HTML dos emails, nem tela de admin, nem `redirectTo` de Auth.
+
+A plataforma nasceu em `peritos-academy.vercel.app` e ganhou domínio próprio em 14/08/2026: `https://evolua.peritosacademy.com.br`, apontado para o mesmo projeto da Vercel. O endereço do produto é o domínio; o `.vercel.app` é o host da hospedagem, e some no dia em que o deploy sair de lá.
+
+Por que a constante existe: o endereço estava **copiado em 38 lugares**, 36 deles dentro do HTML dos 18 emails (boas-vindas, primeira semana, os 9 de subida de nível, certificado, curso concluído, resumo quinzenal, carta pessoal, os 2 de inatividade) e nos links de rodapé de `lib/email/enviar.ts`. Email não tem tela de erro: link para host que parou de responder não avisa ninguém — o aluno clica, não abre, e desiste calado. E endereço copiado em 38 lugares não é trocado em 38 no dia da mudança: é trocado em 30, e os outros 8 seguem apontando para o lugar velho sem nada acusando. É o mesmo defeito que o cartão do Nexus teve por meses apontando para a Ensinio.
+
+⚠️ **Não lê env, de propósito.** `NEXT_PUBLIC_SITE_URL` era lida em `app/admin/usuarios/actions.ts` com o `.vercel.app` de fallback, e **nunca esteve definida em produção** (conferido em `vercel env ls` em 14/08/2026) — o fallback é que era o valor real. Env não definida em lugar nenhum é endereço que muda sem passar por revisão.
+
+⚠️ **O que a constante NÃO alcança, e precisa ser trocado à mão:**
+- **Os triggers do banco.** `criar_perfil`, `creditar_gamificacao` e `gam_trg_certificados` fazem `net.http_post` para `https://peritos-academy.vercel.app/api/internal/email-evento`, cravado dentro do corpo das funções SQL. Continua funcionando enquanto o `.vercel.app` responder; para no dia em que ele parar, e o sintoma é o email simplesmente não sair.
+- **Auth do Supabase**: Site URL e a allowlist de Redirect URLs. Sem `https://evolua.peritosacademy.com.br/**` na allowlist, o Supabase **troca o `redirectTo` por silêncio** e manda o link de redefinição de senha para o Site URL do projeto.
 
 ## ✅ Incidente produção — RESOLVIDO — 2026-07-13
 `https://peritos-academy.vercel.app` retornava `500 MIDDLEWARE_INVOCATION_FAILED` em **todas** as rotas. Causa raiz era **dupla** — dois bugs empilhados, por isso nenhum fix isolado de código resolvia sozinho. Produção confirmada no ar (login, cursos e nav funcionando).

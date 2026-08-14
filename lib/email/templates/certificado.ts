@@ -3,6 +3,8 @@
 // O parágrafo final do corpo ("Cada uma dessas aulas exigiu tempo...") É o
 // slot de {CONTEXTO_CERTIFICADO} — usa cursos.contexto_certificado quando
 // preenchido, senão essa frase exata (default do próprio template aprovado).
+import { SITE_URL } from "@/lib/site";
+
 export type DadosCertificado = {
   primeiroNome: string;
   nomeCompleto: string;
@@ -71,7 +73,7 @@ export function emailCertificado(d: DadosCertificado): { assunto: string; html: 
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">E amanhã é dia de abrir o próximo capítulo. Tem mais cursos esperando, mais certificados pra conquistar, e mais um degrau na jornada que só depende de você.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app/perfil" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver meu certificado no perfil</a>
+        <a href="${SITE_URL}/perfil" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver meu certificado no perfil</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #1DC8A0;padding-left:16px;">

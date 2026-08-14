@@ -2,6 +2,8 @@
 // HTML copiado literalmente de email_inatividade_07_dias.html e
 // email_inatividade_21_dias.html — uma função parametrizada por dias (7|21)
 // porque os dois templates têm a mesma estrutura, só cor/texto diferentes.
+import { SITE_URL } from "@/lib/site";
+
 export type DadosInatividade = {
   primeiroNome: string;
   xpTotal: number;
@@ -55,7 +57,7 @@ export function emailInatividade(dias: 7 | 21, d: DadosInatividade): { assunto: 
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Você não precisa de uma hora. Não precisa de um plano novo. Precisa de 15 minutos e uma aula. A próxima da sua fila já está lá, salva exatamente onde você parou.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app" style="display:inline-block;padding:16px 32px;background:#F5A623;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Retomar de onde parei</a>
+        <a href="${SITE_URL}" style="display:inline-block;padding:16px 32px;background:#F5A623;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Retomar de onde parei</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #F5A623;padding-left:16px;">
@@ -120,7 +122,7 @@ export function emailInatividade(dias: 7 | 21, d: DadosInatividade): { assunto: 
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;"><strong>15 minutos. Uma aula. Hoje.</strong> É só isso que separa "eu parei" de "eu voltei".</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app" style="display:inline-block;padding:18px 36px;background:#F03434;border-radius:10px;font-size:16px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Voltar agora</a>
+        <a href="${SITE_URL}" style="display:inline-block;padding:18px 36px;background:#F03434;border-radius:10px;font-size:16px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Voltar agora</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #F03434;padding-left:16px;">

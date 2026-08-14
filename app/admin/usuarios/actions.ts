@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
 import { carregarExtratoUsuario, type ExtratoPaginado } from '@/lib/queries/admin-suporte'
+import { SITE_URL } from '@/lib/site'
 
 type Resultado = { ok: true } | { ok: false; erro: string }
 
@@ -51,9 +52,14 @@ export async function resetarSenhaUsuario(usuarioId: string, justificativa: stri
   const { data: email, error } = await supabase.rpc('adm_resetar_senha', { p_usuario_id: usuarioId, p_justificativa: justificativa })
   if (error) return { ok: false, erro: error.message }
 
-  const origem = process.env.NEXT_PUBLIC_SITE_URL || 'https://peritos-academy.vercel.app'
+  // O destino do link de redefinição é o endereço da plataforma, sem env no
+  // meio: `NEXT_PUBLIC_SITE_URL` nunca esteve definida em produção, então o
+  // fallback é que era o valor real — e um endereço que uma env pode mudar sem
+  // revisão é um endereço que ninguém confere. Ele também precisa estar na
+  // allowlist de Redirect URLs do Auth do Supabase, senão o Supabase troca por
+  // silêncio o destino pelo Site URL do projeto.
   const { error: erroEmail } = await supabase.auth.resetPasswordForEmail(email as string, {
-    redirectTo: `${origem}/redefinir-senha`,
+    redirectTo: `${SITE_URL}/redefinir-senha`,
   })
   if (erroEmail) return { ok: false, erro: erroEmail.message }
 

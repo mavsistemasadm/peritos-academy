@@ -1,5 +1,7 @@
 // lib/email/templates/cartaPessoal.ts
 // HTML copiado literalmente de docs/email-templates/email_carta_pessoal_marlos.html
+import { SITE_URL } from "@/lib/site";
+
 export type DadosCartaPessoal = { primeiroNome: string };
 
 export function emailCartaPessoal(d: DadosCartaPessoal): { assunto: string; html: string } {
@@ -49,7 +51,7 @@ export function emailCartaPessoal(d: DadosCartaPessoal): { assunto: string; html
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Sua próxima aula está te esperando. E cada uma delas te leva mais perto do profissional que você decidiu se tornar.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Continuar minha jornada</a>
+        <a href="${SITE_URL}" style="display:inline-block;padding:16px 32px;background:#1DC8A0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Continuar minha jornada</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #1DC8A0;padding-left:16px;">

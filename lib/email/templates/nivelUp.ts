@@ -7,6 +7,7 @@
 // correspondente, porque a cor do botão CTA não segue um padrão único
 // entre níveis (varia entre "Destaque" e "Escura" da tabela da missão
 // dependendo do nível — conferido campo a campo contra o HTML aprovado).
+import { SITE_URL } from "@/lib/site";
 
 export type DadosNivelUp = {
   primeiroNome: string;
@@ -72,7 +73,7 @@ function nivel2(d: DadosNivelUp): string {
 
     <div style="padding:40px 40px 0;text-align:center;">
       <div style="width:132px;height:132px;margin:0 auto 18px;border-radius:50%;background:#fdeef5;border:2px solid #FF2D87;text-align:center;line-height:128px;overflow:hidden;">
-        <img src="https://peritos-academy.vercel.app/niveis/nivel-02-conhecedor-de-logicas.png" alt="" width="92" style="vertical-align:middle;" />
+        <img src="${SITE_URL}/niveis/nivel-02-conhecedor-de-logicas.png" alt="" width="92" style="vertical-align:middle;" />
       </div>
       <p style="font-size:11px;letter-spacing:3px;color:#D91A6E;font-weight:700;margin:0 0 8px;">NÍVEL 2 DE 10 · SUA PRIMEIRA SUBIDA</p>
       <p style="font-size:22px;font-weight:800;color:#083952;margin:0 0 12px;letter-spacing:-0.3px;">Conhecedor de Lógicas</p>
@@ -97,7 +98,7 @@ function nivel2(d: DadosNivelUp): string {
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">E o melhor? O que vem pela frente é ainda maior. O próximo nível já tem nome: <strong>Aspirante a Perito</strong>. E tem um posto esperando por você nele.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app/perfil" style="display:inline-block;padding:16px 32px;background:#FF2D87;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
+        <a href="${SITE_URL}/perfil" style="display:inline-block;padding:16px 32px;background:#FF2D87;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #FF2D87;padding-left:16px;">
@@ -119,7 +120,7 @@ function nivel3(d: DadosNivelUp): string {
 
     <div style="padding:40px 40px 0;text-align:center;">
       <div style="width:132px;height:132px;margin:0 auto 18px;border-radius:50%;background:#efedfc;border:2px solid #5B4BE0;text-align:center;line-height:128px;overflow:hidden;">
-        <img src="https://peritos-academy.vercel.app/niveis/nivel-03-aspirante-a-perito.png" alt="" width="92" style="vertical-align:middle;" />
+        <img src="${SITE_URL}/niveis/nivel-03-aspirante-a-perito.png" alt="" width="92" style="vertical-align:middle;" />
       </div>
       <p style="font-size:11px;letter-spacing:3px;color:#4257CE;font-weight:700;margin:0 0 8px;">NÍVEL 3 DE 10</p>
       <p style="font-size:22px;font-weight:800;color:#083952;margin:0 0 12px;letter-spacing:-0.3px;">Aspirante a Perito</p>
@@ -146,7 +147,7 @@ function nivel3(d: DadosNivelUp): string {
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Cada passo que você deu até aqui valeu. E cada passo que você der a partir daqui vale ainda mais.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app/perfil" style="display:inline-block;padding:16px 32px;background:#5B4BE0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
+        <a href="${SITE_URL}/perfil" style="display:inline-block;padding:16px 32px;background:#5B4BE0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #5B4BE0;padding-left:16px;">
@@ -168,7 +169,7 @@ function nivel4(d: DadosNivelUp): string {
 
     <div style="padding:40px 40px 0;text-align:center;">
       <div style="width:132px;height:132px;margin:0 auto 18px;border-radius:50%;background:#f3f9e9;border:2px solid #7CB92C;text-align:center;line-height:128px;overflow:hidden;">
-        <img src="https://peritos-academy.vercel.app/niveis/nivel-04-decifrador-de-calculos.png" alt="" width="92" style="vertical-align:middle;" />
+        <img src="${SITE_URL}/niveis/nivel-04-decifrador-de-calculos.png" alt="" width="92" style="vertical-align:middle;" />
       </div>
       <p style="font-size:11px;letter-spacing:3px;color:#4F9E5E;font-weight:700;margin:0 0 8px;">NÍVEL 4 DE 10</p>
       <p style="font-size:22px;font-weight:800;color:#083952;margin:0 0 12px;letter-spacing:-0.3px;">Decifrador de Cálculos</p>
@@ -193,7 +194,7 @@ function nivel4(d: DadosNivelUp): string {
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">E o que vem agora? O nível 5: <strong>Profissão Perito</strong>. É onde perícia deixa de ser estudo e vira profissão. O foguete da insígnia não é à toa. Você está prestes a decolar.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app/perfil" style="display:inline-block;padding:16px 32px;background:#1B5FB8;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
+        <a href="${SITE_URL}/perfil" style="display:inline-block;padding:16px 32px;background:#1B5FB8;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #7CB92C;padding-left:16px;">
@@ -215,7 +216,7 @@ function nivel5(d: DadosNivelUp): string {
 
     <div style="padding:40px 40px 0;text-align:center;">
       <div style="width:132px;height:132px;margin:0 auto 18px;border-radius:50%;background:#f5eefc;border:2px solid #9B4DE0;text-align:center;line-height:128px;overflow:hidden;">
-        <img src="https://peritos-academy.vercel.app/niveis/nivel-05-profissao-perito.png" alt="" width="92" style="vertical-align:middle;" />
+        <img src="${SITE_URL}/niveis/nivel-05-profissao-perito.png" alt="" width="92" style="vertical-align:middle;" />
       </div>
       <p style="font-size:11px;letter-spacing:3px;color:#7A38C4;font-weight:700;margin:0 0 8px;">NÍVEL 5 DE 10 · METADE DA JORNADA</p>
       <p style="font-size:22px;font-weight:800;color:#083952;margin:0 0 12px;letter-spacing:-0.3px;">Profissão Perito</p>
@@ -240,7 +241,7 @@ function nivel5(d: DadosNivelUp): string {
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Os próximos 5 níveis são onde nascem os peritos que os tribunais chamam pelo nome. O próximo deles é <strong>Autoridade Pericial</strong>. Quando você falar, vai ter peso. E isso se constrói a partir de agora.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app/perfil" style="display:inline-block;padding:16px 32px;background:#9B4DE0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
+        <a href="${SITE_URL}/perfil" style="display:inline-block;padding:16px 32px;background:#9B4DE0;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #9B4DE0;padding-left:16px;">
@@ -262,7 +263,7 @@ function nivel6(d: DadosNivelUp): string {
 
     <div style="padding:40px 40px 0;text-align:center;">
       <div style="width:132px;height:132px;margin:0 auto 18px;border-radius:50%;background:#f2f3f5;border:2px solid #8B909B;text-align:center;line-height:128px;overflow:hidden;">
-        <img src="https://peritos-academy.vercel.app/niveis/nivel-06-autoridade-pericial.png" alt="" width="92" style="vertical-align:middle;" />
+        <img src="${SITE_URL}/niveis/nivel-06-autoridade-pericial.png" alt="" width="92" style="vertical-align:middle;" />
       </div>
       <p style="font-size:11px;letter-spacing:3px;color:#5A5F6A;font-weight:700;margin:0 0 8px;">NÍVEL 6 DE 10</p>
       <p style="font-size:22px;font-weight:800;color:#083952;margin:0 0 12px;letter-spacing:-0.3px;">Autoridade Pericial</p>
@@ -287,7 +288,7 @@ function nivel6(d: DadosNivelUp): string {
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">E o que vem agora é onde poucos chegam: <strong>Desenvolvedor de Teses</strong>. É o nível onde você para de seguir teses e começa a criar as suas. As engrenagens da próxima insígnia dizem tudo.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app/perfil" style="display:inline-block;padding:16px 32px;background:#083952;border:2px solid #8B909B;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
+        <a href="${SITE_URL}/perfil" style="display:inline-block;padding:16px 32px;background:#083952;border:2px solid #8B909B;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #8B909B;padding-left:16px;">
@@ -309,7 +310,7 @@ function nivel7(d: DadosNivelUp): string {
 
     <div style="padding:40px 40px 0;text-align:center;">
       <div style="width:132px;height:132px;margin:0 auto 18px;border-radius:50%;background:#ebf9ee;border:2px solid #2ECC40;text-align:center;line-height:128px;overflow:hidden;">
-        <img src="https://peritos-academy.vercel.app/niveis/nivel-07-desenvolvedor-de-teses.png" alt="" width="92" style="vertical-align:middle;" />
+        <img src="${SITE_URL}/niveis/nivel-07-desenvolvedor-de-teses.png" alt="" width="92" style="vertical-align:middle;" />
       </div>
       <p style="font-size:11px;letter-spacing:3px;color:#1FA332;font-weight:700;margin:0 0 8px;">NÍVEL 7 DE 10</p>
       <p style="font-size:22px;font-weight:800;color:#083952;margin:0 0 12px;letter-spacing:-0.3px;">Desenvolvedor de Teses</p>
@@ -334,7 +335,7 @@ function nivel7(d: DadosNivelUp): string {
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Faltam três níveis. E o próximo é pra poucos: <strong>Estrategista Expert</strong>. É onde o perito para de resolver casos e começa a enxergar o jogo inteiro. O cérebro colorido da insígnia não é exagero. É o que acontece quando estratégia e experiência se encontram.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app/perfil" style="display:inline-block;padding:16px 32px;background:#117A2E;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
+        <a href="${SITE_URL}/perfil" style="display:inline-block;padding:16px 32px;background:#117A2E;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #2ECC40;padding-left:16px;">
@@ -356,7 +357,7 @@ function nivel8(d: DadosNivelUp): string {
 
     <div style="padding:40px 40px 0;text-align:center;">
       <div style="width:132px;height:132px;margin:0 auto 18px;border-radius:50%;background:#fdeeee;border:2px solid #E03131;text-align:center;line-height:128px;overflow:hidden;">
-        <img src="https://peritos-academy.vercel.app/niveis/nivel-08-estrategista-expert.png" alt="" width="92" style="vertical-align:middle;" />
+        <img src="${SITE_URL}/niveis/nivel-08-estrategista-expert.png" alt="" width="92" style="vertical-align:middle;" />
       </div>
       <p style="font-size:11px;letter-spacing:3px;color:#C71F2B;font-weight:700;margin:0 0 8px;">NÍVEL 8 DE 10</p>
       <p style="font-size:22px;font-weight:800;color:#083952;margin:0 0 12px;letter-spacing:-0.3px;">Estrategista Expert</p>
@@ -381,7 +382,7 @@ function nivel8(d: DadosNivelUp): string {
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Faltam dois níveis. Dois. O próximo é <strong>Mestre Supremo</strong>. O astronauta da insígnia laranja não está ali por acaso: é o nível de quem já saiu da órbita comum. E você está a um passo dele.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app/perfil" style="display:inline-block;padding:16px 32px;background:#A31220;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
+        <a href="${SITE_URL}/perfil" style="display:inline-block;padding:16px 32px;background:#A31220;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #E03131;padding-left:16px;">
@@ -403,7 +404,7 @@ function nivel9(d: DadosNivelUp): string {
 
     <div style="padding:40px 40px 0;text-align:center;">
       <div style="width:132px;height:132px;margin:0 auto 18px;border-radius:50%;background:#fef4e8;border:2px solid #F08C1B;text-align:center;line-height:128px;overflow:hidden;">
-        <img src="https://peritos-academy.vercel.app/niveis/nivel-09-mestre-supremo.png" alt="" width="92" style="vertical-align:middle;" />
+        <img src="${SITE_URL}/niveis/nivel-09-mestre-supremo.png" alt="" width="92" style="vertical-align:middle;" />
       </div>
       <p style="font-size:11px;letter-spacing:3px;color:#D96A0B;font-weight:700;margin:0 0 8px;">NÍVEL 9 DE 10 · PENÚLTIMO NÍVEL</p>
       <p style="font-size:22px;font-weight:800;color:#083952;margin:0 0 12px;letter-spacing:-0.3px;">Mestre Supremo</p>
@@ -430,7 +431,7 @@ function nivel9(d: DadosNivelUp): string {
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">Você está a um passo de se tornar Lenda.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app/perfil" style="display:inline-block;padding:16px 32px;background:#D96A0B;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
+        <a href="${SITE_URL}/perfil" style="display:inline-block;padding:16px 32px;background:#D96A0B;border-radius:10px;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia no perfil</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #F08C1B;padding-left:16px;">
@@ -455,7 +456,7 @@ function nivel10(d: DadosNivelUp): string {
 
     <div style="padding:44px 40px 0;text-align:center;">
       <div style="width:148px;height:148px;margin:0 auto 20px;border-radius:50%;background:#fdf7e3;border:3px solid #F2C21D;text-align:center;line-height:144px;overflow:hidden;">
-        <img src="https://peritos-academy.vercel.app/niveis/nivel-10-eu-sou-a-lenda.png" alt="" width="104" style="vertical-align:middle;" />
+        <img src="${SITE_URL}/niveis/nivel-10-eu-sou-a-lenda.png" alt="" width="104" style="vertical-align:middle;" />
       </div>
       <p style="font-size:11px;letter-spacing:3px;color:#B8860B;font-weight:700;margin:0 0 8px;">JORNADA COMPLETA</p>
       <p style="font-size:26px;font-weight:800;color:#083952;margin:0 0 12px;letter-spacing:-0.3px;">Eu Sou a Lenda</p>
@@ -492,7 +493,7 @@ function nivel10(d: DadosNivelUp): string {
       <p style="margin:0 0 22px;font-size:16px;line-height:30px;color:#2a2a27;">E esse profissional é você, ${d.primeiroNome}.</p>
 
       <div style="margin:8px 0 36px;text-align:center;">
-        <a href="https://peritos-academy.vercel.app/perfil" style="display:inline-block;padding:18px 36px;background:linear-gradient(135deg,#F2C21D 0%,#B8860B 100%);border-radius:10px;font-size:16px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia dourada</a>
+        <a href="${SITE_URL}/perfil" style="display:inline-block;padding:18px 36px;background:linear-gradient(135deg,#F2C21D 0%,#B8860B 100%);border-radius:10px;font-size:16px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:.01em;">Ver minha insígnia dourada</a>
       </div>
 
       <div style="margin-bottom:36px;border-left:3px solid #F2C21D;padding-left:16px;">
