@@ -12,6 +12,9 @@ import {
   suspenderUsuario, reativarUsuario, banirUsuario, resetarSenhaUsuario, concederCortesiaUsuario,
   ajustarGamificacaoUsuario, emitirCertificadoManual, carregarMaisExtrato,
   definirNexusStatusUsuario,
+  previaDeExclusao,
+  excluirUsuario,
+  type PreviaExclusao,
 } from '@/app/admin/usuarios/actions'
 import { IconeUser, IconeMail, IconeMapPin, IconeCalendar, IconeClock, IconeLock, IconeEye } from '@/components/Icones'
 import { XP, Moeda, SeloNivel, FogoStreak, Certificado } from '@/components/Emblemas'
@@ -182,7 +185,119 @@ function VisaoGeralAba({ ficha, nexusStatus, onErro, onSucesso }: { ficha: Ficha
           <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(concederCortesiaUsuario, 'Conceder cortesia', 'Cortesia concedida com sucesso')}>Conceder cortesia</button>
         </div>
       </section>
+
+      <ExcluirDeVez ficha={ficha} onErro={onErro} onSucesso={onSucesso} />
     </>
+  )
+}
+
+// ============================================================
+// Excluir de vez
+// ============================================================
+// Card SEPARADO das outras ações, e não mais um botão na mesma fileira: as de
+// cima são reversíveis, esta não é. Botão irreversível ao lado de botões
+// reversíveis é clicado com a mão de quem esperava poder desfazer.
+//
+// O fluxo tem três portas: pedir a prévia, ler o que vai junto, e digitar o
+// e-mail. Nenhum `confirm()` — aquele é clicado sem ler, e o erro mais provável
+// aqui não é "não quis apagar", é "apaguei a pessoa errada".
+function ExcluirDeVez({ ficha, onErro, onSucesso }: { ficha: FichaUsuario; onErro: (e: string) => void; onSucesso: (m: string) => void }) {
+  const router = useRouter()
+  const [pendente, startTransition] = useTransition()
+  const [previa, setPrevia] = useState<PreviaExclusao | null>(null)
+  const [emailDigitado, setEmailDigitado] = useState('')
+  const [motivo, setMotivo] = useState('')
+
+  function onPedirPrevia() {
+    startTransition(async () => {
+      const r = await previaDeExclusao(ficha.id)
+      if (!r.ok) { onErro(r.erro); return }
+      setPrevia(r.previa)
+    })
+  }
+
+  function onExcluir() {
+    startTransition(async () => {
+      const r = await excluirUsuario(ficha.id, emailDigitado, motivo)
+      if (!r.ok) { onErro(r.erro); return }
+      onSucesso(`Conta excluída dos dois bancos (${r.nexus})`)
+      router.push('/admin/usuarios')
+    })
+  }
+
+  return (
+    <section className="ad-card" style={{ borderColor: 'rgba(240,52,52,.35)' }}>
+      <h2 style={{ color: '#F03434' }}>Excluir de vez</h2>
+      <p className="ad-sub">
+        Apaga a conta desta plataforma <strong>e do Nexus</strong>. Não tem desfazer. Para quase todo caso,
+        <strong> suspender ou banir resolve</strong> e preserva o histórico.
+      </p>
+
+      {!previa && (
+        <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={onPedirPrevia}>
+          {pendente ? 'Conferindo...' : 'Ver o que será apagado'}
+        </button>
+      )}
+
+      {previa && (
+        <>
+          <div className="ad-tabela-scroll" style={{ margin: '14px 0' }}>
+            <table className="ad-tabela">
+              <thead><tr><th>Vai junto</th><th>Peritos Academy</th><th>Nexus</th></tr></thead>
+              <tbody>
+                <tr><td>Conta de login</td><td>sim</td><td>{previa.nexus.contaNoAuth ? 'sim' : '—'}</td></tr>
+                <tr><td>Certificados emitidos</td><td className="num">{previa.academy.certificados}</td><td>—</td></tr>
+                <tr><td>Concessões de acesso</td><td className="num">{previa.academy.acessos}</td><td>—</td></tr>
+                <tr><td>Progresso de aulas</td><td className="num">{previa.academy.progressoAulas}</td><td>—</td></tr>
+                <tr><td>Contato na base</td><td>—</td><td>{previa.nexus.contatoNaBase ? 'sim' : '—'}</td></tr>
+                <tr><td>Etiquetas</td><td>—</td><td className="num">{previa.nexus.tags}</td></tr>
+                <tr><td>Inscrições em esteira</td><td>—</td><td className="num">{previa.nexus.inscricoesEmEsteira}</td></tr>
+                <tr><td>Histórico de envios</td><td>—</td><td className="num">{previa.nexus.enviosDeMarketing}</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          {previa.academy.postsComunidade > 0 && (
+            <p className="ad-sub">
+              {previa.academy.postsComunidade} post(s) na comunidade <strong>permanecem</strong>, sem autor. Some o nome, não o texto.
+            </p>
+          )}
+          {previa.academy.ehAdmin && (
+            <p className="ad-sub" style={{ color: '#F03434', fontWeight: 600 }}>
+              Esta conta é administradora da plataforma. Remova o papel de admin antes de excluir.
+            </p>
+          )}
+          {!previa.nexus.ok && (
+            <p className="ad-sub" style={{ color: '#F5A623' }}>
+              Não consegui falar com o Nexus ({previa.nexus.erro}). A exclusão não vai começar sem ele.
+            </p>
+          )}
+
+          <div className="ad-form" style={{ marginTop: 14 }}>
+            <label>Digite <code>{previa.email}</code> para confirmar
+              <input value={emailDigitado} onChange={e => setEmailDigitado(e.target.value)} autoComplete="off" placeholder={previa.email} />
+            </label>
+            <label>Motivo (fica no log do servidor)
+              <input value={motivo} onChange={e => setMotivo(e.target.value)} autoComplete="off" placeholder="Ex.: conta de teste, pedido de remoção do titular" />
+            </label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                type="button"
+                className="ad-btn-perigo"
+                disabled={pendente || previa.academy.ehAdmin || !previa.nexus.ok
+                  || emailDigitado.trim().toLowerCase() !== previa.email.toLowerCase() || !motivo.trim()}
+                onClick={onExcluir}
+              >
+                {pendente ? 'Excluindo...' : 'Excluir dos dois bancos'}
+              </button>
+              <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => { setPrevia(null); setEmailDigitado(''); setMotivo('') }}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </section>
   )
 }
 

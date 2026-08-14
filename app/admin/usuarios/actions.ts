@@ -5,6 +5,9 @@ import { criarClienteServidor } from '@/lib/supabase/server'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
 import { carregarExtratoUsuario, type ExtratoPaginado } from '@/lib/queries/admin-suporte'
 import { SITE_URL } from '@/lib/site'
+// Service role só nos caminhos de exclusão, que precisam ler auth.users e
+// apagar a conta — e sempre depois de `checarPermissao()`.
+import { criarClienteServico } from '@/lib/supabase/servico'
 
 type Resultado = { ok: true } | { ok: false; erro: string }
 
@@ -138,4 +141,161 @@ export async function definirNexusStatusUsuario(
 
   revalidar(usuarioId)
   return { ok: true }
+}
+
+// ============================================================
+// Excluir de vez — os dois bancos
+// ============================================================
+// ⚠️ **IRREVERSÍVEL, e o alcance não é óbvio.** Apagar a conta do Auth da
+// Academy carrega junto, por `on delete cascade`, 48 tabelas: a concessão de
+// acesso, os certificados emitidos, o progresso de todas as aulas, as
+// matrículas, o extrato de gamificação, as respostas da Rota do Perito, as
+// reservas de evento. Post e comentário na comunidade FICAM, sem autor
+// (`set null`) — some o nome, não o texto.
+//
+// No Nexus vai junto o contato, com as etiquetas, as inscrições em esteira e o
+// histórico de envios de marketing.
+//
+// A regra da casa é desativar antes de apagar, e ela continua valendo: suspender
+// e banir existem para quase todos os casos. Isto aqui é para quando apagar É o
+// pedido — conta de teste, cadastro errado, ou pedido de remoção pelo titular.
+//
+// Por isso são DUAS funções: `previaDeExclusao` mostra o estrago, e só depois a
+// tela pergunta. Botão de excluir que apaga no primeiro clique, sem dizer o que
+// leva junto, é o desenho que produz o arrependimento.
+export type PreviaExclusao = {
+  email: string
+  nome: string
+  academy: {
+    certificados: number
+    acessos: number
+    progressoAulas: number
+    postsComunidade: number
+    ehAdmin: boolean
+  }
+  nexus: {
+    ok: boolean
+    contaNoAuth: boolean
+    contatoNaBase: boolean
+    tags: number
+    inscricoesEmEsteira: number
+    enviosDeMarketing: number
+    ehOperador: boolean
+    erro?: string
+  }
+}
+
+async function chamarNexusRemocao(email: string, simular: boolean) {
+  const base = process.env.NEXUS_URL?.trim() || 'https://www.nexuspericial.com.br'
+  const chave = process.env.NEXUS_INTEGRACAO_KEY?.trim()
+  if (!chave) return { ok: false, erro: 'NEXUS_INTEGRACAO_KEY não configurada.' }
+  try {
+    const r = await fetch(`${base}/api/integracoes/aluno-remover`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-integracao-key': chave },
+      body: JSON.stringify({ email, simular }),
+      cache: 'no-store',
+    })
+    const corpo = await r.json().catch(() => ({}))
+    if (!r.ok) return { ok: false, erro: corpo?.error ?? `Nexus respondeu ${r.status}.`, ...corpo }
+    return { ok: true, ...corpo }
+  } catch (e) {
+    return { ok: false, erro: e instanceof Error ? e.message : 'Nexus inacessível.' }
+  }
+}
+
+export async function previaDeExclusao(usuarioId: string): Promise<{ ok: true; previa: PreviaExclusao } | { ok: false; erro: string }> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+
+  const servico = criarClienteServico()
+  const { data: conta } = await servico.auth.admin.getUserById(usuarioId)
+  const email = conta?.user?.email
+  if (!email) return { ok: false, erro: 'Conta não encontrada.' }
+
+  const contar = async (tabela: string, coluna = 'usuario_id') => {
+    const { count } = await servico.from(tabela).select('*', { count: 'exact', head: true }).eq(coluna, usuarioId)
+    return count ?? 0
+  }
+
+  const [perfil, certificados, acessos, progresso, posts, admin] = await Promise.all([
+    servico.from('perfis').select('nome').eq('id', usuarioId).maybeSingle(),
+    contar('certificados'),
+    contar('acessos_conteudo'),
+    contar('aula_progresso'),
+    contar('comunidade_posts'),
+    servico.from('admin_usuarios').select('id').eq('usuario_id', usuarioId).limit(1),
+  ])
+
+  const nexus = await chamarNexusRemocao(email, true)
+
+  return {
+    ok: true,
+    previa: {
+      email,
+      nome: perfil.data?.nome ?? email,
+      academy: {
+        certificados, acessos, progressoAulas: progresso, postsComunidade: posts,
+        ehAdmin: (admin.data?.length ?? 0) > 0,
+      },
+      nexus: {
+        ok: nexus.ok === true,
+        contaNoAuth: !!(nexus as any).contaNoAuth,
+        contatoNaBase: !!(nexus as any).contatoNaBase,
+        tags: (nexus as any).tags ?? 0,
+        inscricoesEmEsteira: (nexus as any).inscricoesEmEsteira ?? 0,
+        enviosDeMarketing: (nexus as any).enviosDeMarketing ?? 0,
+        ehOperador: !!(nexus as any).ehOperador,
+        erro: (nexus as any).erro,
+      },
+    },
+  }
+}
+
+export async function excluirUsuario(
+  usuarioId: string,
+  emailDigitado: string,
+  justificativa: string
+): Promise<{ ok: true; nexus: string } | { ok: false; erro: string }> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  if (!justificativa?.trim()) return { ok: false, erro: 'Justificativa é obrigatória.' }
+
+  const servico = criarClienteServico()
+  const { data: conta } = await servico.auth.admin.getUserById(usuarioId)
+  const email = conta?.user?.email
+  if (!email) return { ok: false, erro: 'Conta não encontrada.' }
+
+  // O e-mail digitado é a trava. Um `confirm()` do navegador é clicado sem ler;
+  // digitar o endereço obriga a olhar QUEM está sendo apagado — e é o erro mais
+  // provável aqui, apagar a pessoa errada da lista.
+  if (emailDigitado.trim().toLowerCase() !== email.toLowerCase()) {
+    return { ok: false, erro: 'O e-mail digitado não confere com o da conta.' }
+  }
+
+  // Admin da Academy não é apagado: `admin_log_acoes_usuario.admin_id` é
+  // NO ACTION, então o delete falharia no meio se essa pessoa já tiver operado
+  // o painel — com parte do rastro perdido e a conta ainda de pé.
+  const { data: ehAdmin } = await servico.from('admin_usuarios').select('id').eq('usuario_id', usuarioId).limit(1)
+  if ((ehAdmin?.length ?? 0) > 0) {
+    return { ok: false, erro: 'Esta conta é administradora da plataforma. Remova o papel de admin antes de excluir.' }
+  }
+
+  // Nexus primeiro. Se falhar, nada foi apagado aqui e dá para tentar de novo;
+  // na ordem inversa, uma falha lá deixaria a pessoa sem conta na Academy e
+  // ainda recebendo campanha do Nexus.
+  const nexus = await chamarNexusRemocao(email, false)
+  if (!nexus.ok) return { ok: false, erro: `Nada foi apagado. O Nexus recusou: ${(nexus as any).erro}` }
+
+  const { error } = await servico.auth.admin.deleteUser(usuarioId)
+  if (error) {
+    return { ok: false, erro: `A pessoa foi removida do Nexus, mas a conta da Academy resistiu: ${error.message}` }
+  }
+
+  console.warn(`[EXCLUIR-USUARIO] ${email} removido dos dois bancos. Motivo: ${justificativa.trim()}`)
+  revalidatePath('/admin/usuarios')
+  return {
+    ok: true,
+    nexus: (nexus as any).contaApagada || (nexus as any).contatoApagado
+      ? 'conta e contato removidos do Nexus'
+      : 'não havia nada no Nexus',
+  }
 }
