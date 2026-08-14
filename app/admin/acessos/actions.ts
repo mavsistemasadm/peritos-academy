@@ -93,7 +93,9 @@ async function garantirContaNoNexus(
   email: string,
   nome: string,
   academyUserId: string,
-  enviarConvite: boolean
+  enviarConvite: boolean,
+  /** O que ele comprou — só viaja quando o convite vai junto. */
+  acesso?: { oQue: string; ate: string | null } | null
 ): Promise<{ ok: boolean; criada: boolean; jaEraAssinante: boolean; erro?: string }> {
   const base = process.env.NEXUS_URL?.trim() || 'https://www.nexuspericial.com.br'
   const chave = process.env.NEXUS_INTEGRACAO_KEY?.trim()
@@ -105,7 +107,7 @@ async function garantirContaNoNexus(
     const r = await fetch(`${base}/api/integracoes/aluno-curso`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-integracao-key': chave },
-      body: JSON.stringify({ email, nome, academyUserId, enviarConvite }),
+      body: JSON.stringify({ email, nome, academyUserId, enviarConvite, acesso: acesso ?? null }),
       cache: 'no-store',
     })
     const corpo = await r.json().catch(() => ({}))
@@ -329,11 +331,15 @@ export async function reativarAcesso(acessoId: string): Promise<Resultado> {
 export async function enviarEmailDeAcesso(
   email: string,
   nome: string,
-  academyUserId: string
+  academyUserId: string,
+  /** "o curso Revisão do saldo da conta PASEP" — já escrito pela tela. */
+  oQueGanhou: string,
+  /** "30/09/2026", ou null quando é vitalício. */
+  ate: string | null
 ): Promise<Resultado> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
 
-  const r = await garantirContaNoNexus(email, nome, academyUserId, true)
+  const r = await garantirContaNoNexus(email, nome, academyUserId, true, { oQue: oQueGanhou, ate })
   if (!r.ok) return { ok: false, erro: r.erro ?? 'Não consegui falar com o Nexus.' }
   if (r.erro) return { ok: false, erro: r.erro }
   return { ok: true }

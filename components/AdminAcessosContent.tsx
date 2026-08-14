@@ -22,6 +22,8 @@ type Recem = {
   vigencia: string
   contaCriada: boolean
   redundante: boolean
+  /** Data de fim já formatada, ou null quando vitalício. */
+  ate: string | null
   nexus: { ok: boolean; criada: boolean; jaEraAssinante: boolean; erro?: string }
 }
 
@@ -205,6 +207,7 @@ function FormConcessao({
         vigencia: vitalicio ? 'com acesso vitalício' : `com acesso até ${formatarBR(expiraEm)}`,
         contaCriada: r.contaCriada,
         redundante: r.redundante,
+        ate: vitalicio ? null : formatarBR(expiraEm),
         nexus: r.nexus,
       })
     })
@@ -292,7 +295,7 @@ function PainelRecem({
 
   async function onEnviar() {
     setEnviando(true)
-    const r = await enviarEmailDeAcesso(recem.email, recem.nome, recem.usuarioId)
+    const r = await enviarEmailDeAcesso(recem.email, recem.nome, recem.usuarioId, recem.oQueGanhou, recem.ate)
     setEnviando(false)
     if (!r.ok) { onErro(r.erro); return }
     setEnviado(true)
