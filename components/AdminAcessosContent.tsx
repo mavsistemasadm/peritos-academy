@@ -99,7 +99,7 @@ export default function AdminAcessosContent({
           <label style={{ flex: '1 1 220px' }}>Buscar aluno
             <input
               defaultValue={filtros.busca ?? ''}
-              placeholder="Nome do aluno"
+              placeholder="Nome ou e-mail do aluno"
               onKeyDown={e => { if (e.key === 'Enter') irPara({ busca: (e.target as HTMLInputElement).value }) }}
             />
           </label>

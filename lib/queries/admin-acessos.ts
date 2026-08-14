@@ -56,6 +56,16 @@ export type FiltrosAcessos = {
   cursoId?: string
   status?: StatusAcesso
   pagina?: number
+  /**
+   * Filtro por aluno já resolvido. Existe porque o e-mail mora em `auth.users`,
+   * que o PostgREST não alcança: buscar "fulano@x.com" na coluna de nome não
+   * acha nada, e a tela pareceria dizer que a pessoa não tem acesso nenhum
+   * quando ela tem. Quem digita um e-mail resolve o id ANTES (ver `page.tsx`) e
+   * passa por aqui.
+   */
+  usuarioId?: string
+  /** Nenhum aluno casou com o e-mail buscado — a lista tem que sair vazia. */
+  semResultado?: boolean
 }
 
 /**
@@ -95,6 +105,11 @@ export async function acharAlunoPorEmail(
 }
 
 export async function listarAcessos(filtros: FiltrosAcessos): Promise<{ linhas: AcessoLinha[]; total: number }> {
+  // E-mail que não casou com conta nenhuma: lista vazia, sem ir ao banco. Sem
+  // isto o filtro sumiria e a tela devolveria a base inteira — a resposta mais
+  // enganosa possível para "esta pessoa tem acesso?".
+  if (filtros.semResultado) return { linhas: [], total: 0 }
+
   const supabase = criarClienteServico()
   const pagina = Math.max(1, filtros.pagina ?? 1)
   const de = (pagina - 1) * acessosPorPagina
@@ -109,9 +124,10 @@ export async function listarAcessos(filtros: FiltrosAcessos): Promise<{ linhas: 
 
   if (filtros.escopo) q = q.eq('escopo', filtros.escopo)
   if (filtros.cursoId) q = q.eq('curso_id', filtros.cursoId)
+  if (filtros.usuarioId) q = q.eq('usuario_id', filtros.usuarioId)
 
   const busca = filtros.busca?.trim()
-  if (busca) q = q.ilike('perfis.nome', `%${busca}%`)
+  if (busca && !filtros.usuarioId) q = q.ilike('perfis.nome', `%${busca}%`)
 
   switch (filtros.status ?? 'vigentes') {
     case 'vigentes':

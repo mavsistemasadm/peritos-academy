@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
+import { criarClienteServidor } from '@/lib/supabase/server'
 import {
+  acharAlunoPorEmail,
   listarAcessos,
   listarCursosParaAcesso,
   acessosPorPagina,
@@ -31,9 +33,24 @@ export default async function PaginaAdminAcessos({ searchParams }: { searchParam
   const sp = await searchParams
   const pagina = Math.max(1, Number(sp.pagina) || 1)
 
+  // Busca por e-mail é resolvida para um id ANTES da listagem: o e-mail vive em
+  // `auth.users`, fora do alcance do PostgREST, então procurá-lo na coluna de
+  // nome não acharia nada — e a tela diria "nenhum acesso" sobre alguém que
+  // tem, que é o pior erro que esta tela pode cometer.
+  const busca = sp.busca?.trim()
+  let usuarioId: string | undefined
+  let semResultado = false
+  if (busca?.includes('@')) {
+    const aluno = await acharAlunoPorEmail(await criarClienteServidor(), busca)
+    if (aluno) usuarioId = aluno.id
+    else semResultado = true
+  }
+
   const [{ linhas, total }, cursos] = await Promise.all([
     listarAcessos({
-      busca: sp.busca,
+      busca,
+      usuarioId,
+      semResultado,
       escopo: (sp.escopo as Escopo) || undefined,
       cursoId: sp.curso || undefined,
       status: (sp.status as StatusAcesso) || 'vigentes',
