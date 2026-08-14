@@ -23,7 +23,8 @@ import { revalidatePath } from 'next/cache'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { criarClienteServico } from '@/lib/supabase/servico'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
-import { acharAlunoPorEmail, hojeDoGate, type Escopo } from '@/lib/queries/admin-acessos'
+import { hojeDoGate, type Escopo } from '@/lib/queries/admin-acessos'
+import { concederAcessoNaAcademy } from '@/lib/acessos/conceder'
 
 type Resultado = { ok: true; aviso?: string } | { ok: false; erro: string }
 
@@ -143,123 +144,41 @@ async function garantirContaNoNexus(
 export async function concederAcesso(entrada: EntradaConcessao): Promise<ResultadoConcessao> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
 
-  const email = entrada.email.trim().toLowerCase()
-  if (!email || !email.includes('@')) return { ok: false, erro: 'Informe um e-mail válido.' }
-
-  if (!['total', 'curso', 'biblioteca'].includes(entrada.escopo)) {
-    return { ok: false, erro: 'Escopo inválido.' }
-  }
-  if (entrada.escopo === 'curso' && !entrada.cursoId) {
-    return { ok: false, erro: 'Escolha o curso.' }
-  }
-  if (entrada.escopo !== 'curso' && entrada.cursoId) {
-    return { ok: false, erro: `Acesso "${entrada.escopo}" não é de um curso específico.` }
-  }
-
-  // A vigência é exclusiva no banco (check constraint `acessos_conteudo_vigencia`).
-  // Recusar aqui é só para a mensagem ser legível em vez de um erro de constraint.
-  if (entrada.vitalicio === !!entrada.expiraEm) {
-    return { ok: false, erro: 'Escolha vitalício OU uma data de expiração — nunca os dois, nem nenhum.' }
-  }
-
-  // Prazo no passado grava uma concessão que já nasce vencida. A tela diria
-  // "concedido com sucesso", o aluno entraria e não veria nada, e ninguém
-  // ligaria uma coisa à outra. Erro de digitação de ano é comum.
-  if (!entrada.vitalicio && entrada.expiraEm! < hojeDoGate()) {
-    return { ok: false, erro: `A data ${formatarBR(entrada.expiraEm!)} já passou — o acesso nasceria vencido.` }
-  }
-
-  const servidor = await criarClienteServidor()
-  const servico = criarClienteServico()
-
-  let aluno = await acharAlunoPorEmail(servidor, email)
-  let contaCriada = false
-
-  if (!aluno) {
-    const nome = entrada.nome.trim()
-    if (!nome) return { ok: false, erro: 'Esse e-mail ainda não tem conta. Informe o nome para criá-la.' }
-
-    // Senha aleatória que ninguém conhece, como na migração da Ensinio: a
-    // entrada é por /primeiro-acesso. `email_confirm: true` evita o e-mail de
-    // confirmação do Supabase, e `migrado_de` é o que segura o e-mail
-    // automático de boas-vindas — o trigger `criar_perfil` devolve antes do
-    // net.http_post quando essa chave existe. Sem ela, cadastrar 264 pessoas
-    // dispararia 264 "Dar meu primeiro passo" sem ninguém pedir, que foi
-    // exatamente o incidente do ensaio da migração.
-    const senha = crypto.randomUUID() + crypto.randomUUID()
-    const { data: criado, error: erroCriar } = await servico.auth.admin.createUser({
-      email,
-      password: senha,
-      email_confirm: true,
-      user_metadata: { nome, migrado_de: 'cadastro_admin' },
-    })
-    if (erroCriar || !criado?.user) {
-      return { ok: false, erro: `Não consegui criar a conta: ${erroCriar?.message ?? 'erro desconhecido'}` }
-    }
-    aluno = { id: criado.user.id, nome, email }
-    contaCriada = true
-  }
-
-  // Uma concessão vigente igual já existente vira DUAS linhas para o mesmo
-  // direito — e no dia em que alguém revogasse uma, o acesso seguiria de pé
-  // pela outra. Revogação que não revoga é pior que revogação que falha.
-  let consulta = servico
-    .from('acessos_conteudo')
-    .select('id, vitalicio, expira_em')
-    .eq('usuario_id', aluno.id)
-    .eq('escopo', entrada.escopo)
-    .eq('ativo', true)
-  // `curso_id` é nulo nos escopos `total` e `biblioteca`, e `.eq(col, null)`
-  // não casa com NULL em SQL — precisa ser `is`.
-  consulta = entrada.cursoId ? consulta.eq('curso_id', entrada.cursoId) : consulta.is('curso_id', null)
-
-  const { data: existentes, error: erroExistente } = await consulta
-  if (erroExistente) return { ok: false, erro: erroExistente.message }
-
-  const hoje = hojeDoGate()
-  const vigenteIgual = (existentes ?? []).find(
-    e => e.vitalicio || (e.expira_em && e.expira_em >= hoje)
-  )
-  if (vigenteIgual) {
-    const ate = vigenteIgual.vitalicio ? 'vitalício' : `até ${formatarBR(vigenteIgual.expira_em!)}`
-    return { ok: false, erro: `Esse aluno já tem esse acesso vigente (${ate}). Use "Alterar prazo" na linha existente.` }
-  }
-
-  const { error: erroInsert } = await servico.from('acessos_conteudo').insert({
-    usuario_id: aluno.id,
-    escopo: entrada.escopo,
-    curso_id: entrada.cursoId,
-    vitalicio: entrada.vitalicio,
-    expira_em: entrada.expiraEm,
-    origem: 'admin',
+  // As recusas e a criação de conta são do núcleo (lib/acessos/conceder.ts),
+  // compartilhado com a rota que o webhook de venda do Nexus chama. O que é
+  // exclusivo desta porta fica aqui: o papel do admin, a assinatura de quem
+  // concedeu, e a conta do Nexus.
+  const r = await concederAcessoNaAcademy({
+    ...entrada,
+    email: entrada.email.trim().toLowerCase(),
     observacao: assinar(entrada.observacao, await emailDoAdmin()),
   })
-  if (erroInsert) return { ok: false, erro: erroInsert.message }
+  if (!r.ok) return { ok: false, erro: r.erro }
 
-  // Não é recusa: conceder curso a quem já tem `total` vigente é redundante,
-  // não errado (o `total` pode ser temporário e o curso, vitalício). A tela
-  // avisa e a decisão fica com quem opera.
-  let redundante = false
-  if (entrada.escopo === 'curso') {
-    const { data: total } = await servico
-      .from('acessos_conteudo')
-      .select('id, vitalicio, expira_em')
-      .eq('usuario_id', aluno.id)
-      .eq('escopo', 'total')
-      .eq('ativo', true)
-    redundante = (total ?? []).some(t => t.vitalicio || (t.expira_em && t.expira_em >= hoje))
+  // Pela TELA, "já tem" é erro: o operador precisa saber que não fez nada, e
+  // que o caminho é alterar o prazo da linha existente. Pelo pagamento é o
+  // oposto — ver o bloco de idempotência no núcleo.
+  if (r.jaTinha) {
+    return {
+      ok: false,
+      erro: `Esse aluno já tem esse acesso vigente (${r.ate === 'vitalício' ? 'vitalício' : `até ${r.ate}`}). Use "Alterar prazo" na linha existente.`,
+    }
   }
 
-  // A porta de entrada. Depois da concessão gravada, nunca antes: se o Nexus
-  // estiver fora do ar, o acesso já existe e é recuperável mandando o convite
-  // depois. A ordem inversa deixaria a pessoa com conta no Nexus e sem o curso.
-  const nexus = await garantirContaNoNexus(email, aluno.nome, aluno.id, false, null, {
+  const nexus = await garantirContaNoNexus(entrada.email.trim().toLowerCase(), r.nome, r.usuarioId, false, null, {
     escopo: entrada.escopo,
     cursoSlug: entrada.cursoSlug,
   })
 
   revalidar()
-  return { ok: true, usuarioId: aluno.id, contaCriada, redundante, nome: aluno.nome, nexus }
+  return {
+    ok: true,
+    usuarioId: r.usuarioId,
+    contaCriada: r.contaCriada,
+    redundante: r.redundante,
+    nome: r.nome,
+    nexus,
+  }
 }
 
 // ============================================================
