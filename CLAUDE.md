@@ -30,6 +30,64 @@ Por que a constante existe: o endereço estava **copiado em 38 lugares**, 36 del
 
 ⚠️ Isso vale como regra, não como registro: **endereço nesta plataforma vive em três sistemas** — código (`lib/site.ts`), banco (corpo das funções) e config do Auth. Trocar só o primeiro passa em revisão, builda, deploya, e deixa dois terços do problema no ar.
 
+## Acesso parcial: o comprador de curso avulso — 2026-08-14
+
+**Regra permanente.** Seção que não é de um curso exige **acesso completo** —
+assinatura Asaas vigente **ou** concessão de escopo `total`. Quem decide é
+`verificarAcessoConteudo()` em `lib/acesso/verificar.ts`, e `carregarResumoAcesso()`
+é a fonte única do que a pessoa tem.
+
+⚠️ **Não use `tem_acesso_plataforma` para gatear página.** Aquela RPC é
+*"assinatura ativa OU **qualquer** concessão vigente"* — comprar um curso avulso
+abria Comunidade, Agenda e Desafios junto. Era decisão deliberada de 05/08, para
+o migrado "Apenas PASEP" não ficar fora da Comunidade; foi revertida em 14/08 por
+decisão comercial (quem tem de graça o que estamos vendendo não assina).
+
+A checagem ficou no **TypeScript** e a RPC não mudou, de propósito: ela também é
+lida por policies de RLS de material e de storage, e ainda é a resposta certa
+para *"esta pessoa tem algum acesso na Academy?"* — que é o que o Nexus pergunta
+em `lib/acesso/academy-db.ts` para decidir se o SSO entra. **As duas perguntas
+divergiram e têm nomes parecidos: cuidado ao mexer numa achando que é a outra.**
+
+### Onde tem portão, e onde não tinha nenhum
+
+| Seção | Exige |
+|---|---|
+| `/curso/[slug]`, `/aula`, `/avaliacao` | aquele curso (`tem_acesso_curso`) |
+| `/biblioteca` | escopo `biblioteca` ou a flag do perfil |
+| Materiais de aula (RLS + bucket) | aquele curso |
+| `/comunidade`, `/agenda`, `/desafios` | acesso completo |
+| `/jornada`, `/jornada/[slug]` | acesso completo |
+| `/anamnese`, `/meu-plano` (Rota do Perito) | acesso completo |
+| `/gamificacao` | acesso completo |
+| `/cursos` (catálogo) | só login — **de propósito**, ver o que existe é o que dá vontade de comprar |
+| Certificado | concluir o curso; não olha tipo de acesso |
+
+As cinco linhas de Jornada, Rota do Perito e Gamificação **não tinham portão
+nenhum** antes de 14/08 — bastava estar logado, para qualquer conta.
+
+Medido antes de aplicar: 458 pessoas seguem com tudo, **41 passam a ver o
+convite** — todas da migração da Ensinio, todas do PJE Calc avulso, nenhuma com
+linha em `assinaturas`, e **nenhuma jamais entrou na plataforma** (zero login,
+zero post). Perdem um acesso que nunca usaram.
+
+⚠️ A tela de bloqueio (`AssinaturaNecessaria`) mostra **o que a pessoa tem** —
+curso e prazo. Sem isso ela é indistinguível de um acesso quebrado para quem
+pagou por alguma coisa, e é o que faz abrir chamado ou desistir achando que foi
+enganado.
+
+### O login dele é o do NEXUS, não o daqui
+
+A conta da Academy existe para o SSO achar e para carregar a concessão. Mas ele
+entra pelo painel do Nexus em modo vitrine — é lá que a assinatura é vendida.
+`/admin/acessos` chama `POST /api/integracoes/aluno-curso` no Nexus
+(`NEXUS_INTEGRACAO_KEY`), que cria a conta com `plano_tier: 'academy_curso'` e
+grava o `academy_user_id`. O convite de criação de senha é o **do Nexus**.
+
+A chamada acontece **depois** de gravar a concessão: Nexus fora do ar não desfaz
+o acesso ao curso, mas o erro volta para a tela — senão o operador fecha a janela
+achando que terminou enquanto a pessoa ficou sem porta de entrada.
+
 ## ✅ Incidente produção — RESOLVIDO — 2026-07-13
 `https://peritos-academy.vercel.app` retornava `500 MIDDLEWARE_INVOCATION_FAILED` em **todas** as rotas. Causa raiz era **dupla** — dois bugs empilhados, por isso nenhum fix isolado de código resolvia sozinho. Produção confirmada no ar (login, cursos e nav funcionando).
 
