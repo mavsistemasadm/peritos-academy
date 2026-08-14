@@ -23,9 +23,12 @@ Por que a constante existe: o endereço estava **copiado em 38 lugares**, 36 del
 
 ⚠️ **Não lê env, de propósito.** `NEXT_PUBLIC_SITE_URL` era lida em `app/admin/usuarios/actions.ts` com o `.vercel.app` de fallback, e **nunca esteve definida em produção** (conferido em `vercel env ls` em 14/08/2026) — o fallback é que era o valor real. Env não definida em lugar nenhum é endereço que muda sem passar por revisão.
 
-⚠️ **O que a constante NÃO alcança, e precisa ser trocado à mão:**
-- **Os triggers do banco.** `criar_perfil`, `creditar_gamificacao` e `gam_trg_certificados` fazem `net.http_post` para `https://peritos-academy.vercel.app/api/internal/email-evento`, cravado dentro do corpo das funções SQL. Continua funcionando enquanto o `.vercel.app` responder; para no dia em que ele parar, e o sintoma é o email simplesmente não sair.
-- **Auth do Supabase**: Site URL e a allowlist de Redirect URLs. Sem `https://evolua.peritosacademy.com.br/**` na allowlist, o Supabase **troca o `redirectTo` por silêncio** e manda o link de redefinição de senha para o Site URL do projeto.
+⚠️ **A constante do TS não alcança dois lugares. Os dois foram trocados em 14/08/2026, e um deploy sozinho não teria trocado nenhum:**
+
+- **Os triggers do banco.** `criar_perfil`, `creditar_gamificacao`, `gam_trg_certificados` e `gam_verificar_progresso_curso` fazem `net.http_post` para `/api/internal/email-evento` com o endereço cravado dentro do corpo SQL — é assim que o Postgres avisa a aplicação, já que trigger não fala HTTPS. Trocado por `20260814_endereco_proprio_nos_triggers.sql`, gerado do `pg_get_functiondef` vivo de cada função (nunca redigitado), com a URL e só ela substituída. Isso não consertava nada quebrado hoje: consertava o dia em que o `.vercel.app` parasse de responder, e aquele dia não daria erro nenhum — o `net.http_post` é assíncrono e ninguém lê a resposta, então o sintoma seria o email não sair, sem log e sem alerta.
+- **Auth do Supabase**: `site_url` e a allowlist de Redirect URLs, que estavam nos dois no `.vercel.app`. Isso **anulava o `redirectTo` do código**: o Supabase não aceita destino fora da allowlist, ele o troca em silêncio pelo Site URL. Ou seja, o link de redefinição de senha continuaria indo para o endereço velho por mais que `SITE_URL` mudasse. A allowlist ficou com **os dois** endereços — link já enviado num email antigo aponta para o `.vercel.app`, e tirá-lo da lista quebraria quem clicasse nele depois.
+
+⚠️ Isso vale como regra, não como registro: **endereço nesta plataforma vive em três sistemas** — código (`lib/site.ts`), banco (corpo das funções) e config do Auth. Trocar só o primeiro passa em revisão, builda, deploya, e deixa dois terços do problema no ar.
 
 ## ✅ Incidente produção — RESOLVIDO — 2026-07-13
 `https://peritos-academy.vercel.app` retornava `500 MIDDLEWARE_INVOCATION_FAILED` em **todas** as rotas. Causa raiz era **dupla** — dois bugs empilhados, por isso nenhum fix isolado de código resolvia sozinho. Produção confirmada no ar (login, cursos e nav funcionando).
