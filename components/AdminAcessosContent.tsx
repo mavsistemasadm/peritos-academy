@@ -26,6 +26,8 @@ type Recem = {
   ate: string | null
   escopo: Escopo
   cursoSlug: string | null
+  /** Título do curso, para o e-mail dizer o que digitar na busca do catálogo. */
+  cursoTitulo: string | null
   tags: string[]
   nexus: { ok: boolean; criada: boolean; jaEraAssinante: boolean; erro?: string }
 }
@@ -214,6 +216,7 @@ function FormConcessao({
         ate: vitalicio ? null : formatarBR(expiraEm),
         escopo,
         cursoSlug: curso0?.slug ?? null,
+        cursoTitulo: curso0?.titulo ?? null,
         tags: r.nexus.tags ?? [],
         nexus: r.nexus,
       })
@@ -302,7 +305,7 @@ function PainelRecem({
 
   async function onEnviar() {
     setEnviando(true)
-    const r = await enviarEmailDeAcesso(recem.email, recem.nome, recem.usuarioId, recem.oQueGanhou, recem.ate, { escopo: recem.escopo, cursoSlug: recem.cursoSlug })
+    const r = await enviarEmailDeAcesso(recem.email, recem.nome, recem.usuarioId, recem.oQueGanhou, recem.ate, { escopo: recem.escopo, cursoSlug: recem.cursoSlug }, recem.cursoTitulo)
     setEnviando(false)
     if (!r.ok) { onErro(r.erro); return }
     setEnviado(true)

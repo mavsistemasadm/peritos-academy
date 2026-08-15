@@ -98,7 +98,7 @@ async function garantirContaNoNexus(
   academyUserId: string,
   enviarConvite: boolean,
   /** O que ele comprou — só viaja quando o convite vai junto. */
-  acesso?: { oQue: string; ate: string | null } | null,
+  acesso?: { oQue: string; ate: string | null; busca?: string } | null,
   /** Decide a tag do recorte na base do Nexus: `aluno-avulso-<slug>`. */
   recorte?: { escopo: Escopo; cursoSlug: string | null } | null
 ): Promise<{ ok: boolean; criada: boolean; jaEraAssinante: boolean; tags?: string[]; erro?: string }> {
@@ -268,11 +268,13 @@ export async function enviarEmailDeAcesso(
   oQueGanhou: string,
   /** "30/09/2026", ou null quando é vitalício. */
   ate: string | null,
-  recorte: { escopo: Escopo; cursoSlug: string | null }
+  recorte: { escopo: Escopo; cursoSlug: string | null },
+  /** O que digitar na busca do catálogo — o título do curso, sem a frase em volta. */
+  busca: string | null
 ): Promise<Resultado> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
 
-  const r = await garantirContaNoNexus(email, nome, academyUserId, true, { oQue: oQueGanhou, ate }, recorte)
+  const r = await garantirContaNoNexus(email, nome, academyUserId, true, { oQue: oQueGanhou, ate, busca: busca ?? undefined }, recorte)
   if (!r.ok) return { ok: false, erro: r.erro ?? 'Não consegui falar com o Nexus.' }
   if (r.erro) return { ok: false, erro: r.erro }
   return { ok: true }
