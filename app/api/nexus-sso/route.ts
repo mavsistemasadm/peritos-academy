@@ -299,6 +299,29 @@ export async function GET(req: NextRequest) {
   // Por isso o cliente escreve direto nesta resposta, no mesmo formato que o
   // middleware já usa.
   const redirecionamento = NextResponse.redirect(new URL('/', req.nextUrl.origin))
+
+  // ══════════════════════════════════════════════════════
+  // DE ONDE ESTA PESSOA VEIO — para o "Sair" saber para onde devolvê-la
+  //
+  // Quem entra por aqui não veio do /login desta plataforma: veio do painel do
+  // Nexus, e é lá que ela mora. Devolvê-la ao login da Academy ao sair a deixa
+  // numa tela que ela nunca usou, com uma senha que ela talvez nem tenha
+  // definido — a senha dela é a do Nexus.
+  //
+  // O sinal é a ORIGEM DA ENTRADA, e não o tier: os 336 alunos migrados e o
+  // comprador de curso avulso entram os dois pelo painel, mas um aluno que faça
+  // login direto aqui continua saindo para o login daqui. Só quem chegou pelo
+  // SSO volta para o Nexus.
+  //
+  // Cookie de sessão (sem `maxAge`): morre quando o navegador fecha, que é
+  // exatamente o tempo de vida da informação "esta visita começou no Nexus".
+  // ══════════════════════════════════════════════════════
+  redirecionamento.cookies.set('nexus_origem', '1', {
+    path: '/',
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: true,
+  })
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

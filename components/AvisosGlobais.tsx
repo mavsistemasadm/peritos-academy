@@ -109,12 +109,19 @@ useEffect(() => {
     }
   }, [sinoAberto])
 
-  if (!dados.logado) return null
-
-  const novidadesNaoLidas = novidadesLidas ? 0 : dados.novidades.filter(n => !n.lida).length
-  const notifsNaoLidas = notifs.filter(n => !n.lida).length
-  const contador = novidadesNaoLidas + notifsNaoLidas
-
+  // ⚠️ **O `return` DE DESLOGADO NÃO PODE VIR ANTES DE UM HOOK** (15/08/2026).
+  //
+  // Ele morava aqui, entre dois `useEffect`, e derrubava a aplicação inteira no
+  // LOGOUT: este componente é montado no layout raiz, então ele sobrevive à
+  // navegação. Quando `dados.logado` virava false, o render seguinte executava
+  // MENOS hooks que o anterior, e o React aborta com o erro #300 ("Rendered
+  // fewer hooks than expected") — a tela preta com "Application error: a
+  // client-side exception has occurred".
+  //
+  // Só aparecia no logout porque é a única transição true → false com a árvore
+  // já montada: quem chega deslogado nunca teve o render "de antes".
+  //
+  // Reproduzido no navegador em 15/08/2026, com o erro lido do console.
   useEffect(() => {
     if (!sinoAberto || buscouNexus.current) return
     buscouNexus.current = true
@@ -125,6 +132,10 @@ useEffect(() => {
       void registrarNexus('exibida', s.app, s.chave, 'sino', null)
     })()
   }, [sinoAberto])
+
+  const novidadesNaoLidas = novidadesLidas ? 0 : dados.novidades.filter(n => !n.lida).length
+  const notifsNaoLidas = notifs.filter(n => !n.lida).length
+  const contador = novidadesNaoLidas + notifsNaoLidas
 
   function dispensarNexus() {
     if (sugNexus) void registrarNexus('dispensada', sugNexus.app, sugNexus.chave, 'sino', null)
@@ -163,6 +174,9 @@ useEffect(() => {
     }
     setCarregandoMais(false)
   }
+
+  // Todos os hooks já rodaram acima: a partir daqui o `return` é seguro.
+  if (!dados.logado) return null
 
   return (
     <div className="avisos-globais">

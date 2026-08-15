@@ -2,6 +2,7 @@
 // Alimenta o sistema global de avisos: o popup de novidades
 // e o sino de notificações, presentes em todas as páginas.
 import { criarClienteServidor } from '@/lib/supabase/server'
+import { carregarResumoAcesso } from '@/lib/acesso/verificar'
 
 export type Novidade = {
   id: string
@@ -56,6 +57,8 @@ export async function carregarAvisos(): Promise<DadosAvisos> {
   const { data: auth } = await supabase.auth.getUser()
   if (!auth?.user) return VAZIO   // deslogado: sem popup, sem sino
 
+  const acessoCompleto = (await carregarResumoAcesso()).completo
+
   const [{ data: novidadesRaw }, { data: leituras }, { data: notifRaw }, { data: perfil }] =
     await Promise.all([
       supabase.from('novidades').select('*')
@@ -88,7 +91,21 @@ export async function carregarAvisos(): Promise<DadosAvisos> {
   return {
     logado: true,
     novidades,
-    temNovidadeNaoLida: novidades.some(n => !n.lida),
+    // ⚠️ **O POPUP DE NOVIDADES NÃO ABRE PARA ACESSO PARCIAL** (15/08/2026).
+    //
+    // Ele é a quarta peça de entrada da plataforma, e a que eu não tinha achado:
+    // mora no LAYOUT RAIZ (app/layout.tsx), não na home, e abre sozinho no
+    // primeiro carregamento. Só apareceu quando abri o navegador com uma conta
+    // de comprador de curso e olhei a tela.
+    //
+    // O conteúdo é o motivo: a novidade em cartaz anuncia "A Jornada do Perito
+    // chegou", com o botão "Abrir minha jornada" — e a Jornada é justamente uma
+    // das seções que este aluno não abre. A primeira coisa que ele veria ao
+    // entrar seria um convite para um cadeado.
+    //
+    // O SINO continua: ali chega o que é dele, o progresso do curso que comprou.
+    // O que sai é só a abertura automática.
+    temNovidadeNaoLida: acessoCompleto && novidades.some(n => !n.lida),
     notificacoes,
     naoLidas,
     sonsConquista: perfil?.sons_conquista ?? true,
