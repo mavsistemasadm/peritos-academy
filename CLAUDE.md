@@ -76,6 +76,33 @@ curso e prazo. Sem isso ela é indistinguível de um acesso quebrado para quem
 pagou por alguma coisa, e é o que faz abrir chamado ou desistir achando que foi
 enganado.
 
+### A home continua vendendo a plataforma inteira, e isso é decisão
+
+⚠️ **Não "conserte" isto.** A home do acesso parcial continua sendo o painel da
+Jornada: o título diz "Sua jornada está pronta", os botões são "Começar agora" e
+"Ver minha jornada", a barra mostra a Trilha de Formação, e o menu lista
+Comunidade, Agenda e Desafios. **Tudo isso leva ao cadeado**, e é assim de
+propósito — decisão comercial de 15/08/2026.
+
+O raciocínio é o mesmo do cartão trancado no painel do Nexus, que também é
+clicável: quem comprou um curso avulso é candidato a assinante, e deixá-lo
+navegar dá o gostinho. Cartão morto ensina a ignorar aquele canto da tela; tela
+apagada não gera desejo. É por isso que a tela de bloqueio (`AssinaturaNecessaria`)
+foi feita para ser um bom momento de venda, e não um beco: ela diz o que a pessoa
+TEM, com prazo, e convida.
+
+**O que sai é o que ele não escolheu ver.** A distinção é essa, e não "mostrar ou
+esconder a plataforma":
+
+| | Fica | Sai |
+|---|---|---|
+| Ele clica e explora | ✅ | |
+| Interrompe na porta | | ❌ |
+
+Por isso saem a apresentação, o tour, o popup de novidades e o convite da Rota —
+todos aparecem sem ele pedir, antes de ele ver qualquer coisa. E fica o resto da
+navegação, que ele abre quando quiser.
+
 ### O login dele é o do NEXUS, não o daqui
 
 A conta da Academy existe para o SSO achar e para carregar a concessão. Mas ele
