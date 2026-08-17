@@ -77,35 +77,35 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
   }
 
   return (
-    <div className="ad-curso-editor">
+    <div className="pnl-curso-editor">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <a href="/admin/avaliacoes" className="ad-voltar"><IconeChevronLeft size={14} /> Avaliações</a>
-      <div className="ad-editor-cab">
-        <h1>{avaliacao.titulo}{avaliacao.numeroCaso ? <span className="ad-caso-numero"> · Caso #{avaliacao.numeroCaso}</span> : null}</h1>
-        <div className="ad-editor-cab-acoes">
-          <label className={`ad-toggle-papel${avaliacao.publicado ? ' ativo' : ''}`}>
+      <a href="/admin/avaliacoes" className="pnl-voltar"><IconeChevronLeft size={14} /> Avaliações</a>
+      <div className="pnl-editor-cab">
+        <h1>{avaliacao.titulo}{avaliacao.numeroCaso ? <span className="pnl-caso-numero"> · Caso #{avaliacao.numeroCaso}</span> : null}</h1>
+        <div className="pnl-editor-cab-acoes">
+          <label className={`pnl-toggle-papel${avaliacao.publicado ? ' ativo' : ''}`}>
             <input type="checkbox" checked={avaliacao.publicado} disabled={pendente} onChange={e => onAlternarPublicacao(e.target.checked)} />
             {avaliacao.publicado ? 'Publicado' : 'Rascunho'}
           </label>
-          <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={onExcluir}>Excluir avaliação</button>
+          <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={onExcluir}>Excluir avaliação</button>
         </div>
       </div>
 
-      <div className="ad-editor-grid">
-        <section className="ad-card">
+      <div className="pnl-editor-grid">
+        <section className="pnl-card">
           <h2>Capa</h2>
-          <div className="ad-capa-preview" style={avaliacao.capaUrl ? { backgroundImage: `url(${avaliacao.capaUrl})` } : undefined}>
+          <div className="pnl-capa-preview" style={avaliacao.capaUrl ? { backgroundImage: `url(${avaliacao.capaUrl})` } : undefined}>
             {!avaliacao.capaUrl && <span>Sem capa</span>}
           </div>
-          <label className="ad-btn-secundario ad-upload-btn">
+          <label className="pnl-btn-secundario pnl-upload-btn">
             Trocar capa
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onUploadCapa} hidden disabled={pendente} />
           </label>
         </section>
 
-        <section className="ad-card ad-card-dados">
+        <section className="pnl-card pnl-card-dados">
           <h2>Dados gerais</h2>
-          <form onSubmit={onSalvarDados} className="ad-form">
+          <form onSubmit={onSalvarDados} className="pnl-form">
             <label>Título
               <input name="titulo" defaultValue={avaliacao.titulo} required minLength={3} />
             </label>
@@ -128,7 +128,7 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
             <label>Briefing / enunciado geral
               <textarea name="briefing" defaultValue={avaliacao.briefing ?? ''} rows={4} />
             </label>
-            <div className="ad-form-linha">
+            <div className="pnl-form-linha">
               <label>Nota mínima
                 <input name="nota_minima" type="number" step="0.1" min="0" max="10" defaultValue={avaliacao.notaMinima} />
               </label>
@@ -136,24 +136,24 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
                 <input name="peso" type="number" min="1" max="5" defaultValue={avaliacao.peso} />
               </label>
             </div>
-            <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar dados gerais'}</button>
+            <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar dados gerais'}</button>
           </form>
         </section>
       </div>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Questões</h2>
-        <div className="ad-nova-linha">
+        <div className="pnl-nova-linha">
           <select value={novoTipo} onChange={e => setNovoTipo(e.target.value as 'multipla_escolha' | 'valor')}>
             <option value="multipla_escolha">Múltipla escolha</option>
             <option value="valor">Resposta numérica</option>
           </select>
-          <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriarQuestao}>+ Questão</button>
+          <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onCriarQuestao}>+ Questão</button>
         </div>
 
-        {questoes.length === 0 && <p className="ad-vazio">Nenhuma questão cadastrada ainda.</p>}
+        {questoes.length === 0 && <p className="pnl-vazio">Nenhuma questão cadastrada ainda.</p>}
 
-        <div className="ad-modulos-lista">
+        <div className="pnl-modulos-lista">
           {questoes.map((q, i) => (
             <QuestaoBloco
               key={q.id}
@@ -246,22 +246,22 @@ function QuestaoBloco({ questao, avaliacaoId, cursoId, indice, total, expandida,
   }
 
   return (
-    <div className="ad-modulo-bloco">
-      <div className="ad-modulo-cab">
-        <button type="button" className="ad-modulo-toggle" onClick={onToggle}>
+    <div className="pnl-modulo-bloco">
+      <div className="pnl-modulo-cab">
+        <button type="button" className="pnl-modulo-toggle" onClick={onToggle}>
           {expandida ? '▾' : '▸'} {indice + 1}. {questao.enunciado.slice(0, 60)}{questao.enunciado.length > 60 ? '…' : ''}
         </button>
-        <div className="ad-modulo-acoes">
-          <span className="ad-modulo-contagem">{questao.tipo === 'valor' ? 'Numérica' : 'Múltipla escolha'}</span>
+        <div className="pnl-modulo-acoes">
+          <span className="pnl-modulo-contagem">{questao.tipo === 'valor' ? 'Numérica' : 'Múltipla escolha'}</span>
           <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
           <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
-          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir questão"><IconeTrash size={13} /></button>
+          <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir questão"><IconeTrash size={13} /></button>
         </div>
       </div>
 
       {expandida && (
-        <div className="ad-modulo-corpo">
-          <form onSubmit={onSalvar} className="ad-form">
+        <div className="pnl-modulo-corpo">
+          <form onSubmit={onSalvar} className="pnl-form">
             <label>Tipo
               <select name="tipo" value={tipo} onChange={e => setTipo(e.target.value as 'multipla_escolha' | 'valor')}>
                 <option value="multipla_escolha">Múltipla escolha</option>
@@ -272,7 +272,7 @@ function QuestaoBloco({ questao, avaliacaoId, cursoId, indice, total, expandida,
               <textarea name="enunciado" defaultValue={questao.enunciado} rows={3} required />
             </label>
             {tipo === 'valor' && (
-              <div className="ad-form-linha">
+              <div className="pnl-form-linha">
                 <label>Resposta correta (gabarito)
                   <input name="resposta_valor" type="number" step="0.01" defaultValue={questao.respostaValor ?? ''} required />
                 </label>
@@ -290,27 +290,27 @@ function QuestaoBloco({ questao, avaliacaoId, cursoId, indice, total, expandida,
             <label>Parecer (feedback exibido após a correção)
               <textarea name="parecer" defaultValue={questao.parecer ?? ''} rows={2} />
             </label>
-            <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar questão'}</button>
+            <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar questão'}</button>
           </form>
 
           {tipo === 'multipla_escolha' && (
-            <div className="ad-sublista">
+            <div className="pnl-sublista">
               <h3>Opções (marque a correta)</h3>
-              {questao.opcoes.length === 0 && <p className="ad-vazio-sm">Nenhuma opção cadastrada.</p>}
+              {questao.opcoes.length === 0 && <p className="pnl-vazio-sm">Nenhuma opção cadastrada.</p>}
               <ul>
                 {questao.opcoes.map(o => (
                   <li key={o.id}>
-                    <label className="ad-checkbox-linha">
+                    <label className="pnl-checkbox-linha">
                       <input type="radio" name={`correta-${questao.id}`} checked={o.correta} disabled={pendente} onChange={() => onMarcarCorreta(o.id)} />
                       {o.texto}
                     </label>
-                    <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluirOpcao(o.id)}><IconeTrash size={13} /></button>
+                    <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={() => onExcluirOpcao(o.id)}><IconeTrash size={13} /></button>
                   </li>
                 ))}
               </ul>
-              <div className="ad-nova-linha">
+              <div className="pnl-nova-linha">
                 <input type="text" placeholder="Texto da opção" value={novaOpcaoTexto} onChange={e => setNovaOpcaoTexto(e.target.value)} />
-                <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={onCriarOpcao}>+ Opção</button>
+                <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={onCriarOpcao}>+ Opção</button>
               </div>
             </div>
           )}

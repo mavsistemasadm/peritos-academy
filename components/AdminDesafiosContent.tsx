@@ -51,23 +51,23 @@ export default function AdminDesafiosContent({ desafios, categorias }: { desafio
   }
 
   return (
-    <div className="ad-cursos">
+    <div className="pnl-cursos">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <div className="ad-cursos-cab">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>Desafios</h1>
-          <p className="ad-sub">Casos periciais gamificados: "O Caso". Categorias, quesitos, documentos e gabarito.</p>
+          <p className="pnl-sub">Casos periciais gamificados: "O Caso". Categorias, quesitos, documentos e gabarito.</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button type="button" className="ad-btn-secundario" onClick={() => setMostrarCategorias(v => !v)}>Categorias</button>
-          <button type="button" className="ad-btn-primario" onClick={() => setCriando(v => !v)}>+ Novo desafio</button>
+          <button type="button" className="pnl-btn-secundario" onClick={() => setMostrarCategorias(v => !v)}>Categorias</button>
+          <button type="button" className="pnl-btn-primario" onClick={() => setCriando(v => !v)}>+ Novo desafio</button>
         </div>
       </div>
 
       {mostrarCategorias && <CategoriasBloco categorias={categorias} onErro={toast.erro} onSucesso={toast.sucesso} />}
 
       {criando && (
-        <div className="ad-busca-card">
+        <div className="pnl-busca-card">
           <label>Título
             <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex.: A Fraude no Extrato" autoFocus />
           </label>
@@ -77,32 +77,32 @@ export default function AdminDesafiosContent({ desafios, categorias }: { desafio
               {categorias.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
             </select>
           </label>
-          <div className="ad-form-acoes">
-            <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriar}>
+          <div className="pnl-form-acoes">
+            <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onCriar}>
               {pendente ? 'Criando...' : 'Criar e editar'}
             </button>
-            <button type="button" className="ad-btn-secundario" onClick={() => { setCriando(false); setTitulo('') }}>Cancelar</button>
+            <button type="button" className="pnl-btn-secundario" onClick={() => { setCriando(false); setTitulo('') }}>Cancelar</button>
           </div>
         </div>
       )}
 
-      <div className="ad-lista-admins">
-        {desafios.length === 0 && <p className="ad-vazio">Nenhum desafio cadastrado ainda.</p>}
+      <div className="pnl-lista-admins">
+        {desafios.length === 0 && <p className="pnl-vazio">Nenhum desafio cadastrado ainda.</p>}
         {desafios.map(d => (
-          <div key={d.id} className="ad-admin-linha">
-            <div className="ad-admin-quem">
+          <div key={d.id} className="pnl-admin-linha">
+            <div className="pnl-admin-quem">
               <div>
                 <a href={`/admin/desafios/${d.id}`}><b>{d.numero ? `#${d.numero} · ` : ''}{d.titulo}</b></a>
-                <span className="ad-admin-slug">{d.categoriaNome} · {d.totalEntregas} entrega{d.totalEntregas === 1 ? '' : 's'} · {d.xp} XP · {d.moedas} moedas</span>
+                <span className="pnl-admin-slug">{d.categoriaNome} · {d.totalEntregas} entrega{d.totalEntregas === 1 ? '' : 's'} · {d.xp} XP · {d.moedas} moedas</span>
               </div>
             </div>
-            <div className="ad-curso-acoes">
-              <label className={`ad-toggle-papel${d.publicado ? ' ativo' : ''}`}>
+            <div className="pnl-curso-acoes">
+              <label className={`pnl-toggle-papel${d.publicado ? ' ativo' : ''}`}>
                 <input type="checkbox" checked={d.publicado} disabled={pendente} onChange={e => onAlternarPublicacao(d.id, e.target.checked)} />
                 {d.publicado ? 'Publicado' : 'Rascunho'}
               </label>
-              <a href={`/admin/desafios/${d.id}`} className="ad-btn-secundario">Editar</a>
-              <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={() => onExcluir(d.id, d.titulo)}>Excluir</button>
+              <a href={`/admin/desafios/${d.id}`} className="pnl-btn-secundario">Editar</a>
+              <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={() => onExcluir(d.id, d.titulo)}>Excluir</button>
             </div>
           </div>
         ))}
@@ -150,14 +150,14 @@ function CategoriasBloco({ categorias, onErro, onSucesso }: { categorias: Catego
   }
 
   return (
-    <div className="ad-sublista ad-card">
+    <div className="pnl-sublista pnl-card">
       <h3>Categorias de desafio</h3>
-      {categorias.length === 0 && <p className="ad-vazio-sm">Nenhuma categoria cadastrada.</p>}
+      {categorias.length === 0 && <p className="pnl-vazio-sm">Nenhuma categoria cadastrada.</p>}
       <ul>
         {categorias.map(c => (
           <li key={c.id}>
             {editandoId === c.id ? (
-              <div className="ad-inline-edit">
+              <div className="pnl-inline-edit">
                 <input value={editNome} onChange={e => setEditNome(e.target.value)} autoFocus />
                 <button type="button" onClick={() => onSalvarEdicao(c.id)} disabled={pendente}>Salvar</button>
                 <button type="button" onClick={() => setEditandoId(null)}>Cancelar</button>
@@ -165,17 +165,17 @@ function CategoriasBloco({ categorias, onErro, onSucesso }: { categorias: Catego
             ) : (
               <>
                 <span>{c.nome}</span>
-                <span className="ad-sublista-meta">{c.totalDesafios} desafio{c.totalDesafios === 1 ? '' : 's'}</span>
+                <span className="pnl-sublista-meta">{c.totalDesafios} desafio{c.totalDesafios === 1 ? '' : 's'}</span>
                 <button type="button" onClick={() => { setEditandoId(c.id); setEditNome(c.nome) }}><IconePencil size={13} /></button>
-                <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(c.id, c.nome, c.totalDesafios)}><IconeTrash size={13} /></button>
+                <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(c.id, c.nome, c.totalDesafios)}><IconeTrash size={13} /></button>
               </>
             )}
           </li>
         ))}
       </ul>
-      <div className="ad-nova-linha">
+      <div className="pnl-nova-linha">
         <input type="text" placeholder="Nova categoria" value={nome} onChange={e => setNome(e.target.value)} />
-        <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={onCriar}>+ Categoria</button>
+        <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={onCriar}>+ Categoria</button>
       </div>
     </div>
   )

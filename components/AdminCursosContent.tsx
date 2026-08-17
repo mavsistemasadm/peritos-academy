@@ -44,20 +44,20 @@ export default function AdminCursosContent({ cursos }: { cursos: CursoListaItem[
   }
 
   return (
-    <div className="ad-cursos">
+    <div className="pnl-cursos">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <div className="ad-cursos-cab">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>Cursos</h1>
-          <p className="ad-sub">Gerencie cursos, módulos e aulas da plataforma.</p>
+          <p className="pnl-sub">Gerencie cursos, módulos e aulas da plataforma.</p>
         </div>
-        <button type="button" className="ad-btn-primario" onClick={() => setCriando(v => !v)}>
+        <button type="button" className="pnl-btn-primario" onClick={() => setCriando(v => !v)}>
           + Novo curso
         </button>
       </div>
 
       {criando && (
-        <div className="ad-busca-card">
+        <div className="pnl-busca-card">
           <label htmlFor="novo-curso-titulo">Título do curso</label>
           <input
             id="novo-curso-titulo"
@@ -67,34 +67,34 @@ export default function AdminCursosContent({ cursos }: { cursos: CursoListaItem[
             placeholder="Ex.: Perícia Bancária Aplicada"
             autoFocus
           />
-          <div className="ad-form-acoes">
-            <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriar}>
+          <div className="pnl-form-acoes">
+            <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onCriar}>
               {pendente ? 'Criando...' : 'Criar e editar'}
             </button>
-            <button type="button" className="ad-btn-secundario" onClick={() => { setCriando(false); setTitulo('') }}>
+            <button type="button" className="pnl-btn-secundario" onClick={() => { setCriando(false); setTitulo('') }}>
               Cancelar
             </button>
           </div>
         </div>
       )}
 
-      <div className="ad-cursos-grid">
-        {cursos.length === 0 && <p className="ad-vazio">Nenhum curso cadastrado ainda.</p>}
+      <div className="pnl-cursos-grid">
+        {cursos.length === 0 && <p className="pnl-vazio">Nenhum curso cadastrado ainda.</p>}
         {cursos.map(c => (
-          <div key={c.id} className="ad-curso-card">
-            <a href={`/admin/cursos/${c.id}`} className="ad-curso-capa" style={c.capaUrl ? { backgroundImage: `url(${c.capaUrl})` } : undefined}>
+          <div key={c.id} className="pnl-curso-card">
+            <a href={`/admin/cursos/${c.id}`} className="pnl-curso-capa" style={c.capaUrl ? { backgroundImage: `url(${c.capaUrl})` } : undefined}>
               {!c.capaUrl && <span>Sem capa</span>}
             </a>
-            <div className="ad-curso-info">
-              <a href={`/admin/cursos/${c.id}`} className="ad-curso-titulo">{c.titulo}</a>
-              {c.subtitulo && <p className="ad-curso-subtitulo">{c.subtitulo}</p>}
-              <div className="ad-curso-meta">
+            <div className="pnl-curso-info">
+              <a href={`/admin/cursos/${c.id}`} className="pnl-curso-titulo">{c.titulo}</a>
+              {c.subtitulo && <p className="pnl-curso-subtitulo">{c.subtitulo}</p>}
+              <div className="pnl-curso-meta">
                 <span>{c.totalModulos} módulo{c.totalModulos === 1 ? '' : 's'}</span>
                 <span>{c.totalAulas} aula{c.totalAulas === 1 ? '' : 's'}</span>
                 {c.nivel && <span>{c.nivel}</span>}
               </div>
-              <div className="ad-curso-acoes">
-                <label className={`ad-toggle-papel${c.publicado ? ' ativo' : ''}`}>
+              <div className="pnl-curso-acoes">
+                <label className={`pnl-toggle-papel${c.publicado ? ' ativo' : ''}`}>
                   <input
                     type="checkbox"
                     checked={c.publicado}
@@ -103,7 +103,7 @@ export default function AdminCursosContent({ cursos }: { cursos: CursoListaItem[
                   />
                   {c.publicado ? 'Publicado' : 'Rascunho'}
                 </label>
-                <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={() => onExcluir(c.id, c.titulo)}>
+                <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={() => onExcluir(c.id, c.titulo)}>
                   Excluir
                 </button>
               </div>

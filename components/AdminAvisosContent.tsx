@@ -34,30 +34,30 @@ export default function AdminAvisosContent({ novidades }: { novidades: NovidadeA
   }
 
   return (
-    <div className="ad-cursos">
+    <div className="pnl-cursos">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <div className="ad-cursos-cab">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>Avisos e novidades</h1>
-          <p className="ad-sub">Publica avisos no feed e banners do dashboard (imagem + link).</p>
+          <p className="pnl-sub">Publica avisos no feed e banners do dashboard (imagem + link).</p>
         </div>
-        <button type="button" className="ad-btn-primario" onClick={() => setCriando(v => !v)}>+ Novo aviso</button>
+        <button type="button" className="pnl-btn-primario" onClick={() => setCriando(v => !v)}>+ Novo aviso</button>
       </div>
 
       {criando && (
-        <div className="ad-busca-card">
+        <div className="pnl-busca-card">
           <label>Título
             <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex.: Nova trilha de Perícia Bancária no ar!" autoFocus />
           </label>
-          <div className="ad-form-acoes">
-            <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriar}>{pendente ? 'Criando...' : 'Criar'}</button>
-            <button type="button" className="ad-btn-secundario" onClick={() => { setCriando(false); setTitulo('') }}>Cancelar</button>
+          <div className="pnl-form-acoes">
+            <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onCriar}>{pendente ? 'Criando...' : 'Criar'}</button>
+            <button type="button" className="pnl-btn-secundario" onClick={() => { setCriando(false); setTitulo('') }}>Cancelar</button>
           </div>
         </div>
       )}
 
-      <div className="ad-modulos-lista">
-        {novidades.length === 0 && <p className="ad-vazio">Nenhum aviso cadastrado ainda.</p>}
+      <div className="pnl-modulos-lista">
+        {novidades.length === 0 && <p className="pnl-vazio">Nenhum aviso cadastrado ainda.</p>}
         {novidades.map(n => (
           <NovidadeBloco key={n.id} novidade={n} expandido={expandido === n.id} onToggle={() => setExpandido(expandido === n.id ? null : n.id)} onErro={toast.erro} onSucesso={toast.sucesso} />
         ))}
@@ -114,40 +114,40 @@ function NovidadeBloco({ novidade, expandido, onToggle, onErro, onSucesso }: {
   }
 
   return (
-    <div className="ad-modulo-bloco">
-      <div className="ad-modulo-cab">
-        <button type="button" className="ad-modulo-toggle" onClick={onToggle}>
+    <div className="pnl-modulo-bloco">
+      <div className="pnl-modulo-cab">
+        <button type="button" className="pnl-modulo-toggle" onClick={onToggle}>
           {expandido ? '▾' : '▸'} {novidade.titulo ?? 'Sem título'}
         </button>
-        <div className="ad-modulo-acoes">
-          <label className={`ad-toggle-papel${novidade.publicado ? ' ativo' : ''}`}>
+        <div className="pnl-modulo-acoes">
+          <label className={`pnl-toggle-papel${novidade.publicado ? ' ativo' : ''}`}>
             <input type="checkbox" checked={novidade.publicado} disabled={pendente} onChange={e => onAlternarPublicacao(e.target.checked)} />
             {novidade.publicado ? 'Publicado' : 'Rascunho'}
           </label>
-          <span className="ad-modulo-contagem">{novidade.totalLeituras} leitura{novidade.totalLeituras === 1 ? '' : 's'}</span>
-          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir"><IconeTrash size={13} /></button>
+          <span className="pnl-modulo-contagem">{novidade.totalLeituras} leitura{novidade.totalLeituras === 1 ? '' : 's'}</span>
+          <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir"><IconeTrash size={13} /></button>
         </div>
       </div>
 
       {expandido && (
-        <div className="ad-modulo-corpo">
-          <div className="ad-aula-capa-linha">
-            <div className="ad-capa-preview ad-capa-preview-sm" style={novidade.imagemUrl ? { backgroundImage: `url(${novidade.imagemUrl})` } : undefined}>
+        <div className="pnl-modulo-corpo">
+          <div className="pnl-aula-capa-linha">
+            <div className="pnl-capa-preview pnl-capa-preview-sm" style={novidade.imagemUrl ? { backgroundImage: `url(${novidade.imagemUrl})` } : undefined}>
               {!novidade.imagemUrl && <span>Sem imagem</span>}
             </div>
-            <label className="ad-btn-secundario ad-upload-btn">
+            <label className="pnl-btn-secundario pnl-upload-btn">
               Trocar imagem
               <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onUploadImagem} hidden disabled={pendente} />
             </label>
           </div>
-          <form onSubmit={onSalvar} className="ad-form">
+          <form onSubmit={onSalvar} className="pnl-form">
             <label>Título
               <input name="titulo" defaultValue={novidade.titulo ?? ''} required />
             </label>
             <label>Corpo (um parágrafo por linha)
               <textarea name="corpo" defaultValue={novidade.corpo.join('\n')} rows={3} />
             </label>
-            <div className="ad-form-linha">
+            <div className="pnl-form-linha">
               <label>Link
                 <input name="link_url" defaultValue={novidade.linkUrl ?? ''} placeholder="https://..." />
               </label>
@@ -158,7 +158,7 @@ function NovidadeBloco({ novidade, expandido, onToggle, onErro, onSucesso }: {
                 <input name="selo" defaultValue={novidade.selo ?? ''} placeholder="Novo" />
               </label>
             </div>
-            <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
+            <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
           </form>
         </div>
       )}

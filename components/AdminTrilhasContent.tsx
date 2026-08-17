@@ -36,20 +36,20 @@ export default function AdminTrilhasContent({ trilhas }: { trilhas: TrilhaListaI
   }
 
   return (
-    <div className="ad-trilhas">
+    <div className="pnl-trilhas">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <div className="ad-cursos-cab">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>Trilhas</h1>
-          <p className="ad-sub">Organize os cursos em trilhas e etapas, alimenta o catálogo em /biblioteca.</p>
+          <p className="pnl-sub">Organize os cursos em trilhas e etapas, alimenta o catálogo em /biblioteca.</p>
         </div>
-        <button type="button" className="ad-btn-primario" onClick={() => setCriando(v => !v)}>
+        <button type="button" className="pnl-btn-primario" onClick={() => setCriando(v => !v)}>
           + Nova trilha
         </button>
       </div>
 
       {criando && (
-        <div className="ad-busca-card">
+        <div className="pnl-busca-card">
           <label htmlFor="nova-trilha-nome">Nome da trilha</label>
           <input
             id="nova-trilha-nome"
@@ -59,30 +59,30 @@ export default function AdminTrilhasContent({ trilhas }: { trilhas: TrilhaListaI
             placeholder="Ex.: Perícia Bancária"
             autoFocus
           />
-          <div className="ad-form-acoes">
-            <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriar}>
+          <div className="pnl-form-acoes">
+            <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onCriar}>
               {pendente ? 'Criando...' : 'Criar e editar'}
             </button>
-            <button type="button" className="ad-btn-secundario" onClick={() => { setCriando(false); setNome('') }}>
+            <button type="button" className="pnl-btn-secundario" onClick={() => { setCriando(false); setNome('') }}>
               Cancelar
             </button>
           </div>
         </div>
       )}
 
-      <div className="ad-lista-admins">
-        {trilhas.length === 0 && <p className="ad-vazio">Nenhuma trilha cadastrada ainda.</p>}
+      <div className="pnl-lista-admins">
+        {trilhas.length === 0 && <p className="pnl-vazio">Nenhuma trilha cadastrada ainda.</p>}
         {trilhas.map(t => (
-          <div key={t.id} className="ad-admin-linha">
-            <div className="ad-admin-quem">
+          <div key={t.id} className="pnl-admin-linha">
+            <div className="pnl-admin-quem">
               <div>
                 <a href={`/admin/trilhas/${t.id}`}><b>{t.nome ?? 'Sem nome'}</b></a>
-                <span className="ad-admin-slug">{t.totalEtapas} etapa{t.totalEtapas === 1 ? '' : 's'}{t.principal ? ' · principal' : ''}</span>
+                <span className="pnl-admin-slug">{t.totalEtapas} etapa{t.totalEtapas === 1 ? '' : 's'}{t.principal ? ' · principal' : ''}</span>
               </div>
             </div>
-            <div className="ad-curso-acoes">
-              <a href={`/admin/trilhas/${t.id}`} className="ad-btn-secundario">Editar</a>
-              <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={() => onExcluir(t.id, t.nome ?? 'Sem nome')}>
+            <div className="pnl-curso-acoes">
+              <a href={`/admin/trilhas/${t.id}`} className="pnl-btn-secundario">Editar</a>
+              <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={() => onExcluir(t.id, t.nome ?? 'Sem nome')}>
                 Excluir
               </button>
             </div>

@@ -55,56 +55,56 @@ export default function AdminTrilhaEditorContent({ trilha, etapas, cursos }: {
   }
 
   return (
-    <div className="ad-curso-editor">
+    <div className="pnl-curso-editor">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <a href="/admin/trilhas" className="ad-voltar"><IconeChevronLeft size={14} /> Trilhas</a>
-      <div className="ad-editor-cab">
+      <a href="/admin/trilhas" className="pnl-voltar"><IconeChevronLeft size={14} /> Trilhas</a>
+      <div className="pnl-editor-cab">
         <h1>{trilha.nome ?? 'Trilha sem nome'}</h1>
-        <div className="ad-editor-cab-acoes">
-          <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={onExcluirTrilha}>Excluir trilha</button>
+        <div className="pnl-editor-cab-acoes">
+          <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={onExcluirTrilha}>Excluir trilha</button>
         </div>
       </div>
 
-      <section className="ad-card ad-card-dados">
+      <section className="pnl-card pnl-card-dados">
         <h2>Dados gerais</h2>
-        <form onSubmit={onSalvarDados} className="ad-form">
+        <form onSubmit={onSalvarDados} className="pnl-form">
           <label>Nome
             <input name="nome" defaultValue={trilha.nome ?? ''} required minLength={3} />
           </label>
           <label>Descrição
             <textarea name="descricao" defaultValue={trilha.descricao ?? ''} rows={2} />
           </label>
-          <div className="ad-form-linha">
+          <div className="pnl-form-linha">
             <label>Horas estimadas
               <input name="horas" type="number" min="0" defaultValue={trilha.horas ?? ''} />
             </label>
             <label>Alunos (vitrine)
               <input name="alunos" type="number" min="0" defaultValue={trilha.alunos ?? ''} />
             </label>
-            <label className="ad-checkbox-linha">
+            <label className="pnl-checkbox-linha">
               <input type="checkbox" name="principal" defaultChecked={trilha.principal ?? false} />
               Trilha principal
             </label>
           </div>
-          <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar dados gerais'}</button>
+          <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar dados gerais'}</button>
         </form>
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Etapas e cursos</h2>
-        <div className="ad-nova-linha">
+        <div className="pnl-nova-linha">
           <input
             type="text"
             placeholder="Nome da nova etapa"
             value={novaEtapaNome}
             onChange={e => setNovaEtapaNome(e.target.value)}
           />
-          <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriarEtapa}>{pendente ? 'Criando...' : '+ Etapa'}</button>
+          <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onCriarEtapa}>{pendente ? 'Criando...' : '+ Etapa'}</button>
         </div>
 
-        {etapas.length === 0 && <p className="ad-vazio">Nenhuma etapa cadastrada ainda.</p>}
+        {etapas.length === 0 && <p className="pnl-vazio">Nenhuma etapa cadastrada ainda.</p>}
 
-        <div className="ad-modulos-lista">
+        <div className="pnl-modulos-lista">
           {etapas.map((e, i) => (
             <EtapaBloco
               key={e.id}
@@ -196,31 +196,31 @@ function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggl
   }
 
   return (
-    <div className="ad-modulo-bloco">
-      <div className="ad-modulo-cab">
-        <button type="button" className="ad-modulo-toggle" onClick={onToggle}>
+    <div className="pnl-modulo-bloco">
+      <div className="pnl-modulo-cab">
+        <button type="button" className="pnl-modulo-toggle" onClick={onToggle}>
           {expandida ? '▾' : '▸'} {etapa.nome}
         </button>
-        <div className="ad-modulo-acoes">
-          <span className="ad-modulo-contagem">{etapa.missoes.length} curso{etapa.missoes.length === 1 ? '' : 's'}</span>
+        <div className="pnl-modulo-acoes">
+          <span className="pnl-modulo-contagem">{etapa.missoes.length} curso{etapa.missoes.length === 1 ? '' : 's'}</span>
           <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
           <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
           <button type="button" onClick={() => setEditando(v => !v)} title="Editar"><IconePencil size={13} /></button>
-          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir etapa"><IconeTrash size={13} /></button>
+          <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir etapa"><IconeTrash size={13} /></button>
         </div>
       </div>
 
       {expandida && (
-        <div className="ad-modulo-corpo">
+        <div className="pnl-modulo-corpo">
           {editando && (
-            <form onSubmit={onSalvar} className="ad-form">
+            <form onSubmit={onSalvar} className="pnl-form">
               <label>Nome
                 <input name="nome" defaultValue={etapa.nome} required />
               </label>
               <label>Descrição
                 <textarea name="descricao" defaultValue={etapa.descricao ?? ''} rows={2} />
               </label>
-              <div className="ad-form-linha">
+              <div className="pnl-form-linha">
                 <label>XP de conclusão
                   <input name="xp_conclusao" type="number" min="0" defaultValue={etapa.xpConclusao} />
                 </label>
@@ -228,20 +228,20 @@ function EtapaBloco({ etapa, trilhaId, indice, total, cursos, expandida, onToggl
                   <input name="insignia" defaultValue={etapa.insignia ?? ''} />
                 </label>
               </div>
-              <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar etapa'}</button>
+              <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar etapa'}</button>
             </form>
           )}
 
-          <div className="ad-sublista">
+          <div className="pnl-sublista">
             <h3>Cursos desta etapa</h3>
-            {etapa.missoes.length === 0 && <p className="ad-vazio-sm">Nenhum curso vinculado.</p>}
+            {etapa.missoes.length === 0 && <p className="pnl-vazio-sm">Nenhum curso vinculado.</p>}
             <ul>
               {etapa.missoes.map((m, i) => (
                 <li key={m.cursoId}>
                   <span>{m.curso.titulo}</span>
                   <button type="button" disabled={pendente || i === 0} onClick={() => onMoverMissao(m.cursoId, 'up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
                   <button type="button" disabled={pendente || i === etapa.missoes.length - 1} onClick={() => onMoverMissao(m.cursoId, 'down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
-                  <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onRemoverCurso(m.cursoId)}><IconeTrash size={13} /></button>
+                  <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={() => onRemoverCurso(m.cursoId)}><IconeTrash size={13} /></button>
                 </li>
               ))}
             </ul>
@@ -289,7 +289,7 @@ function CursoPickerMultiplo({ cursos, pendente, onVincular }: {
   }
 
   return (
-    <div className="ad-picker">
+    <div className="pnl-picker">
       {/* ⚠️ ESTA LINHA EXISTE POR CAUSA DE UMA CONFUSÃO REAL (11/08/2026).
           "Salvar dados gerais", lá em cima, grava nome/descrição/horas/alunos/
           principal — e NÃO toca no vínculo de curso, que é uma tabela separada
@@ -297,25 +297,25 @@ function CursoPickerMultiplo({ cursos, pendente, onVincular }: {
           salvar no botão de cima não recebe erro nenhum: o formulário salva o
           que é dele, com sucesso, e a seleção some na volta. Dizer isso na tela
           custa uma frase e economiza a suspeita de que o admin não grava. */}
-      <p className="ad-picker-dica">
+      <p className="pnl-picker-dica">
         Marque os cursos e clique em <strong>Vincular selecionados</strong>, aqui embaixo.
         O botão <em>Salvar dados gerais</em> não altera esta lista.
       </p>
       <input
         type="text"
-        className="ad-picker-busca"
+        className="pnl-picker-busca"
         placeholder="Buscar curso pelo título..."
         value={busca}
         onChange={e => setBusca(e.target.value)}
       />
-      <div className="ad-picker-lista">
-        {cursos.length === 0 && <p className="ad-vazio-sm">Não há cursos disponíveis pra vincular.</p>}
-        {cursos.length > 0 && filtrados.length === 0 && <p className="ad-vazio-sm">Nenhum curso encontrado pra "{busca}".</p>}
+      <div className="pnl-picker-lista">
+        {cursos.length === 0 && <p className="pnl-vazio-sm">Não há cursos disponíveis pra vincular.</p>}
+        {cursos.length > 0 && filtrados.length === 0 && <p className="pnl-vazio-sm">Nenhum curso encontrado pra "{busca}".</p>}
         {filtrados.map(c => (
-          <label key={c.id} className="ad-picker-item">
+          <label key={c.id} className="pnl-picker-item">
             <input type="checkbox" checked={selecionados.has(c.id)} onChange={() => alternar(c.id)} />
-            <span className="ad-picker-titulo">{c.titulo}</span>
-            {c.outraTrilhaNome && <span className="ad-picker-badge">também em: {c.outraTrilhaNome}</span>}
+            <span className="pnl-picker-titulo">{c.titulo}</span>
+            {c.outraTrilhaNome && <span className="pnl-picker-badge">também em: {c.outraTrilhaNome}</span>}
           </label>
         ))}
       </div>
@@ -324,7 +324,7 @@ function CursoPickerMultiplo({ cursos, pendente, onVincular }: {
           enquanto o "Salvar dados gerais" continua verde lá em cima. */}
       <button
         type="button"
-        className={selecionados.size > 0 ? 'ad-btn-primario' : 'ad-btn-secundario'}
+        className={selecionados.size > 0 ? 'pnl-btn-primario' : 'pnl-btn-secundario'}
         disabled={pendente || selecionados.size === 0}
         onClick={vincular}
       >

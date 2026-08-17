@@ -74,18 +74,18 @@ export default function AdminAcessosContent({
   }
 
   return (
-    <div className="ad-cursos">
+    <div className="pnl-cursos">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
 
-      <div className="ad-cursos-cab">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>Acessos</h1>
-          <p className="ad-sub">
+          <p className="pnl-sub">
             Libere um curso, a biblioteca ou a plataforma inteira para um aluno, com prazo ou vitalício.
             Serve para quem comprou por fora da assinatura — inclusive quem ainda nem tem login aqui.
           </p>
         </div>
-        <button type="button" className="ad-btn-primario" onClick={() => { setAbrirForm(v => !v); setRecem(null) }}>
+        <button type="button" className="pnl-btn-primario" onClick={() => { setAbrirForm(v => !v); setRecem(null) }}>
           {abrirForm ? 'Fechar' : '+ Conceder acesso'}
         </button>
       </div>
@@ -102,8 +102,8 @@ export default function AdminAcessosContent({
 
       {recem && <PainelRecem recem={recem} onErro={toast.erro} onSucesso={toast.sucesso} onFechar={() => setRecem(null)} />}
 
-      <section className="ad-card">
-        <div className="ad-filtros" style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: 16 }}>
+      <section className="pnl-card">
+        <div className="pnl-filtros" style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: 16 }}>
           <label style={{ flex: '1 1 220px' }}>Buscar aluno
             <input
               defaultValue={filtros.busca ?? ''}
@@ -135,11 +135,11 @@ export default function AdminAcessosContent({
           </label>
         </div>
 
-        {acessos.length === 0 && <p className="ad-vazio">Nenhum acesso encontrado com esses filtros.</p>}
+        {acessos.length === 0 && <p className="pnl-vazio">Nenhum acesso encontrado com esses filtros.</p>}
 
         {acessos.length > 0 && (
-          <div className="ad-tabela-scroll">
-            <table className="ad-tabela">
+          <div className="pnl-tabela-scroll">
+            <table className="pnl-tabela">
               <thead>
                 <tr><th>Aluno</th><th>Acesso</th><th>Vigência</th><th>Origem</th><th></th></tr>
               </thead>
@@ -162,10 +162,10 @@ export default function AdminAcessosContent({
 
         {totalPaginas > 1 && (
           <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 16 }}>
-            <button type="button" className="ad-btn-secundario" disabled={pagina <= 1}
+            <button type="button" className="pnl-btn-secundario" disabled={pagina <= 1}
               onClick={() => irPara({ pagina: String(pagina - 1) })}>Anterior</button>
-            <span className="ad-sub">Página {pagina} de {totalPaginas} · {total} concessões</span>
-            <button type="button" className="ad-btn-secundario" disabled={pagina >= totalPaginas}
+            <span className="pnl-sub">Página {pagina} de {totalPaginas} · {total} concessões</span>
+            <button type="button" className="pnl-btn-secundario" disabled={pagina >= totalPaginas}
               onClick={() => irPara({ pagina: String(pagina + 1) })}>Próxima</button>
           </div>
         )}
@@ -224,15 +224,15 @@ function FormConcessao({
   }
 
   return (
-    <section className="ad-card">
+    <section className="pnl-card">
       <h2>Conceder acesso</h2>
-      <p className="ad-sub">
+      <p className="pnl-sub">
         Se o e-mail ainda não tiver conta na plataforma, ela é criada aqui — com senha aleatória que ninguém
         conhece. A pessoa entra pela página de primeiro acesso e define a senha dela.
       </p>
 
-      <form onSubmit={onSubmit} className="ad-form">
-        <div className="ad-form-linha">
+      <form onSubmit={onSubmit} className="pnl-form">
+        <div className="pnl-form-linha">
           <label style={{ flex: 2 }}>E-mail do aluno
             <input name="email" type="email" required placeholder="pessoa@email.com" autoComplete="off" />
           </label>
@@ -241,7 +241,7 @@ function FormConcessao({
           </label>
         </div>
 
-        <div className="ad-form-linha">
+        <div className="pnl-form-linha">
           <label>O que ela ganha
             <select value={escopo} onChange={e => setEscopo(e.target.value as Escopo)}>
               <option value="curso">Um curso</option>
@@ -262,7 +262,7 @@ function FormConcessao({
           )}
         </div>
 
-        <div className="ad-form-linha" style={{ alignItems: 'flex-end' }}>
+        <div className="pnl-form-linha" style={{ alignItems: 'flex-end' }}>
           <label style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 8 }}>
             <input type="checkbox" checked={vitalicio} onChange={e => setVitalicio(e.target.checked)} style={{ width: 'auto' }} />
             Acesso vitalício
@@ -278,7 +278,7 @@ function FormConcessao({
           <input name="observacao" placeholder="Ex.: comprou o PASEP na Ensinio em 2025, pedido #1234" autoComplete="off" />
         </label>
 
-        <button type="submit" className="ad-btn-primario" disabled={pendente}>
+        <button type="submit" className="pnl-btn-primario" disabled={pendente}>
           {pendente ? 'Concedendo...' : 'Conceder acesso'}
         </button>
       </form>
@@ -319,14 +319,14 @@ function PainelRecem({
   }
 
   return (
-    <section className="ad-card">
+    <section className="pnl-card">
       <h2>Concedido</h2>
       <p style={{ margin: '0 0 6px' }}>
         <strong>{recem.nome}</strong> ({recem.email}) — {recem.oQueGanhou}, {recem.vigencia}.
       </p>
 
       {recem.contaCriada && (
-        <p className="ad-sub" style={{ margin: '0 0 6px' }}>
+        <p className="pnl-sub" style={{ margin: '0 0 6px' }}>
           A conta da Academy foi criada agora, com senha aleatória que ninguém conhece.
         </p>
       )}
@@ -335,33 +335,33 @@ function PainelRecem({
           o que decide se o cadastro terminou ou não. Sem este bloco, um Nexus
           fora do ar deixaria o operador fechar a tela achando que acabou. */}
       {!recem.nexus.ok && (
-        <p className="ad-sub" style={{ margin: '0 0 6px', color: '#F03434', fontWeight: 600 }}>
+        <p className="pnl-sub" style={{ margin: '0 0 6px', color: '#F03434', fontWeight: 600 }}>
           A conta do Nexus NÃO foi criada: {recem.nexus.erro}. O acesso ao curso já está gravado, mas ela
           ainda não tem por onde entrar — refaça o envio pelo botão abaixo quando o Nexus responder.
         </p>
       )}
       {recem.nexus.ok && recem.nexus.criada && (
-        <p className="ad-sub" style={{ margin: '0 0 6px' }}>
+        <p className="pnl-sub" style={{ margin: '0 0 6px' }}>
           Conta do Nexus criada. É por lá que ela entra: vai ver o painel em modo vitrine, com a oferta,
           e o cartão da Academy abrindo o curso dela.
         </p>
       )}
       {recem.nexus.ok && recem.nexus.jaEraAssinante && (
-        <p className="ad-sub" style={{ margin: '0 0 6px', fontWeight: 600 }}>
+        <p className="pnl-sub" style={{ margin: '0 0 6px', fontWeight: 600 }}>
           Atenção: essa pessoa já é assinante do Nexus, então o plano dela foi mantido intacto. Ela já
           tinha acesso à plataforma inteira — confira se este cadastro de curso avulso era mesmo o caso.
         </p>
       )}
 
       {recem.redundante && (
-        <p className="ad-sub" style={{ margin: '0 0 6px' }}>
+        <p className="pnl-sub" style={{ margin: '0 0 6px' }}>
           Atenção: esse aluno já tem acesso à plataforma inteira vigente, então esta concessão de curso é
           redundante hoje. Ela continua valendo se o acesso total expirar antes.
         </p>
       )}
 
       {recem.tags.length > 0 && (
-        <p className="ad-sub" style={{ margin: '0 0 6px' }}>
+        <p className="pnl-sub" style={{ margin: '0 0 6px' }}>
           Na base do Nexus com as etiquetas{' '}
           {recem.tags.map((t, i) => (
             <span key={t}>
@@ -373,22 +373,22 @@ function PainelRecem({
         </p>
       )}
       {recem.nexus.ok && recem.tags.length === 0 && (
-        <p className="ad-sub" style={{ margin: '0 0 6px', color: '#F5A623' }}>
+        <p className="pnl-sub" style={{ margin: '0 0 6px', color: '#F5A623' }}>
           A conta foi criada, mas nenhuma etiqueta entrou na base do Nexus. Essa pessoa não vai aparecer
           em recorte de campanha até isso ser resolvido.
         </p>
       )}
 
-      <p className="ad-sub" style={{ margin: '0 0 14px' }}>
+      <p className="pnl-sub" style={{ margin: '0 0 14px' }}>
         <strong>Ela ainda não sabe.</strong> Nada foi enviado automaticamente.
       </p>
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <button type="button" className="ad-btn-primario" disabled={enviando || enviado} onClick={onEnviar}>
+        <button type="button" className="pnl-btn-primario" disabled={enviando || enviado} onClick={onEnviar}>
           {enviado ? 'Convite enviado' : enviando ? 'Enviando...' : 'Enviar convite para criar senha'}
         </button>
-        <button type="button" className="ad-btn-secundario" onClick={onCopiar}>Copiar link do Nexus</button>
-        <button type="button" className="ad-btn-secundario" onClick={onFechar}>Fechar</button>
+        <button type="button" className="pnl-btn-secundario" onClick={onCopiar}>Copiar link do Nexus</button>
+        <button type="button" className="pnl-btn-secundario" onClick={onFechar}>Fechar</button>
       </div>
     </section>
   )
@@ -452,7 +452,7 @@ function LinhaAcesso({
     <tr>
       <td>
         <div>{acesso.alunoNome}</div>
-        <div className="ad-sub" style={{ fontSize: 12.5 }}>{acesso.alunoEmail ?? '—'}</div>
+        <div className="pnl-sub" style={{ fontSize: 12.5 }}>{acesso.alunoEmail ?? '—'}</div>
       </td>
       <td>{descreverAcesso(acesso.escopo, acesso.cursoTitulo)}
         {acesso.escopo === 'total' && acesso.observacao?.includes('EXCETO') ? ' *' : ''}
@@ -465,17 +465,17 @@ function LinhaAcesso({
               vitalício
             </label>
             {!vitalicio && <input type="date" value={data} onChange={e => setData(e.target.value)} />}
-            <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onSalvarPrazo}>Salvar</button>
-            <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => setEditando(false)}>Cancelar</button>
+            <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onSalvarPrazo}>Salvar</button>
+            <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => setEditando(false)}>Cancelar</button>
           </div>
         ) : vigencia}
       </td>
-      <td className="ad-sub">{acesso.origem === 'migracao_ensinio' ? 'migração' : acesso.origem}</td>
+      <td className="pnl-sub">{acesso.origem === 'migracao_ensinio' ? 'migração' : acesso.origem}</td>
       <td style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-        {!editando && <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => setEditando(true)}>Alterar prazo</button>}
+        {!editando && <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => setEditando(true)}>Alterar prazo</button>}
         {acesso.ativo
-          ? <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={onRevogar}>Revogar</button>
-          : <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={onReativar}>Reativar</button>}
+          ? <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={onRevogar}>Revogar</button>
+          : <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={onReativar}>Reativar</button>}
       </td>
     </tr>
   )

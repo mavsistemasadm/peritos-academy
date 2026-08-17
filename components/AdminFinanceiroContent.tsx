@@ -36,20 +36,20 @@ export default function AdminFinanceiroContent({ painel, assinaturas, planos, we
   const toast = useAdminToast()
 
   return (
-    <div className="ad-cursos">
+    <div className="pnl-cursos">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <div className="ad-cursos-cab">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>Financeiro</h1>
-          <p className="ad-sub">Assinaturas, planos e integração com o Asaas (webhooks).</p>
+          <p className="pnl-sub">Assinaturas, planos e integração com o Asaas (webhooks).</p>
         </div>
       </div>
 
-      <div className="ad-abas">
-        <button type="button" className={`ad-aba${aba === 'painel' ? ' ativa' : ''}`} onClick={() => setAba('painel')}>Painel</button>
-        <button type="button" className={`ad-aba${aba === 'assinaturas' ? ' ativa' : ''}`} onClick={() => setAba('assinaturas')}>Assinaturas ({assinaturas.length})</button>
-        <button type="button" className={`ad-aba${aba === 'planos' ? ' ativa' : ''}`} onClick={() => setAba('planos')}>Planos ({planos.length})</button>
-        <button type="button" className={`ad-aba${aba === 'webhooks' ? ' ativa' : ''}`} onClick={() => setAba('webhooks')}>Webhooks ({webhooks.length})</button>
+      <div className="pnl-abas">
+        <button type="button" className={`pnl-aba${aba === 'painel' ? ' ativa' : ''}`} onClick={() => setAba('painel')}>Painel</button>
+        <button type="button" className={`pnl-aba${aba === 'assinaturas' ? ' ativa' : ''}`} onClick={() => setAba('assinaturas')}>Assinaturas ({assinaturas.length})</button>
+        <button type="button" className={`pnl-aba${aba === 'planos' ? ' ativa' : ''}`} onClick={() => setAba('planos')}>Planos ({planos.length})</button>
+        <button type="button" className={`pnl-aba${aba === 'webhooks' ? ' ativa' : ''}`} onClick={() => setAba('webhooks')}>Webhooks ({webhooks.length})</button>
       </div>
 
       {aba === 'painel' && <PainelAba painel={painel} onErro={toast.erro} onSucesso={toast.sucesso} />}
@@ -80,35 +80,35 @@ function PainelAba({ painel, onErro, onSucesso }: { painel: PainelFinanceiro; on
 
   return (
     <>
-      <div className="ad-fin-stats">
-        <div className="ad-fin-stat"><b>{fmtBRL(painel.mrrCentavos)}</b><span>MRR</span></div>
-        <div className="ad-fin-stat"><b>{painel.assinantesAtivos}</b><span>Assinantes ativos</span></div>
-        <div className="ad-fin-stat"><b>{painel.inadimplentes}</b><span>Inadimplentes</span></div>
-        <div className="ad-fin-stat"><b>{painel.cortesias}</b><span>Cortesias</span></div>
-        <div className="ad-fin-stat"><b>{fmtBRL(painel.faturamentoMesCentavos)}</b><span>Faturamento do mês</span></div>
+      <div className="pnl-fin-stats">
+        <div className="pnl-fin-stat"><b>{fmtBRL(painel.mrrCentavos)}</b><span>MRR</span></div>
+        <div className="pnl-fin-stat"><b>{painel.assinantesAtivos}</b><span>Assinantes ativos</span></div>
+        <div className="pnl-fin-stat"><b>{painel.inadimplentes}</b><span>Inadimplentes</span></div>
+        <div className="pnl-fin-stat"><b>{painel.cortesias}</b><span>Cortesias</span></div>
+        <div className="pnl-fin-stat"><b>{fmtBRL(painel.faturamentoMesCentavos)}</b><span>Faturamento do mês</span></div>
       </div>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Receita por mês</h2>
-        {painel.receitaPorMes.length === 0 && <p className="ad-vazio">Nenhuma cobrança confirmada ainda.</p>}
+        {painel.receitaPorMes.length === 0 && <p className="pnl-vazio">Nenhuma cobrança confirmada ainda.</p>}
         {painel.receitaPorMes.length > 0 && (
-          <div className="ad-fin-grafico">
+          <div className="pnl-fin-grafico">
             {painel.receitaPorMes.map(r => (
-              <div className="ad-fin-barra-col" key={r.mes}>
-                <div className="ad-fin-barra" style={{ height: `${Math.max(4, (r.valorCentavos / maxReceita) * 100)}%` }} title={fmtBRL(r.valorCentavos)} />
-                <span className="ad-fin-barra-rot">{r.mes}</span>
+              <div className="pnl-fin-barra-col" key={r.mes}>
+                <div className="pnl-fin-barra" style={{ height: `${Math.max(4, (r.valorCentavos / maxReceita) * 100)}%` }} title={fmtBRL(r.valorCentavos)} />
+                <span className="pnl-fin-barra-rot">{r.mes}</span>
               </div>
             ))}
           </div>
         )}
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Carência de inadimplência</h2>
         <p>Dias que um aluno inadimplente mantém acesso ao conteúdo antes de ser bloqueado.</p>
-        <form onSubmit={onSalvarCarencia} className="ad-form" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <input name="dias_carencia" type="number" min="0" step="1" defaultValue={painel.diasCarencia} className="ad-input-sm" />
-          <button type="submit" className="ad-btn-secundario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
+        <form onSubmit={onSalvarCarencia} className="pnl-form" style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <input name="dias_carencia" type="number" min="0" step="1" defaultValue={painel.diasCarencia} className="pnl-input-sm" />
+          <button type="submit" className="pnl-btn-secundario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
         </form>
       </section>
     </>
@@ -133,9 +133,9 @@ function AssinaturasAba({ assinaturas, onErro, onSucesso }: { assinaturas: Assin
     <>
       <ConcederCortesiaCard onErro={onErro} onSucesso={onSucesso} />
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Assinaturas ({filtradas.length})</h2>
-        <div className="ad-form-linha" style={{ marginBottom: 12 }}>
+        <div className="pnl-form-linha" style={{ marginBottom: 12 }}>
           <label>Buscar aluno
             <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Nome do aluno..." />
           </label>
@@ -149,10 +149,10 @@ function AssinaturasAba({ assinaturas, onErro, onSucesso }: { assinaturas: Assin
           </label>
         </div>
 
-        {filtradas.length === 0 && <p className="ad-vazio">Nenhuma assinatura encontrada.</p>}
+        {filtradas.length === 0 && <p className="pnl-vazio">Nenhuma assinatura encontrada.</p>}
         {filtradas.length > 0 && (
-          <div className="ad-tabela-scroll">
-            <table className="ad-tabela">
+          <div className="pnl-tabela-scroll">
+            <table className="pnl-tabela">
               <thead><tr><th>Aluno</th><th>Plano</th><th>Status</th><th>Próxima cobrança</th><th>Iniciada em</th><th></th></tr></thead>
               <tbody>
                 {filtradas.map(a => (
@@ -160,11 +160,11 @@ function AssinaturasAba({ assinaturas, onErro, onSucesso }: { assinaturas: Assin
                     <tr>
                       <td>{a.usuarioNome}</td>
                       <td>{a.planoNome}</td>
-                      <td><span className={`ad-status-pill ${a.status}`}>{NOME_STATUS[a.status]}</span></td>
+                      <td><span className={`pnl-status-pill ${a.status}`}>{NOME_STATUS[a.status]}</span></td>
                       <td>{fmtData(a.proximaCobranca)}</td>
                       <td>{fmtData(a.iniciadaEm)}</td>
                       <td>
-                        <button type="button" className="ad-btn-secundario" onClick={() => setExpandida(expandida === a.id ? null : a.id)}>
+                        <button type="button" className="pnl-btn-secundario" onClick={() => setExpandida(expandida === a.id ? null : a.id)}>
                           {expandida === a.id ? 'Fechar' : 'Detalhes'}
                         </button>
                       </td>
@@ -220,14 +220,14 @@ function ConcederCortesiaCard({ onErro, onSucesso }: { onErro: (e: string) => vo
   }
 
   return (
-    <section className="ad-card">
+    <section className="pnl-card">
       <h2>Conceder cortesia</h2>
       <p>Dá acesso completo a um aluno sem cobrança, pra parcerias, testes ou pré-lançamento.</p>
-      <form onSubmit={onBuscar} className="ad-form-linha" style={{ alignItems: 'flex-end' }}>
+      <form onSubmit={onBuscar} className="pnl-form-linha" style={{ alignItems: 'flex-end' }}>
         <label style={{ flex: 2 }}>E-mail do aluno
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="aluno@email.com" required />
         </label>
-        <button type="submit" className="ad-btn-secundario" disabled={pendente}><IconeSearch size={14} /> Buscar</button>
+        <button type="submit" className="pnl-btn-secundario" disabled={pendente}><IconeSearch size={14} /> Buscar</button>
       </form>
 
       {achado && (
@@ -236,8 +236,8 @@ function ConcederCortesiaCard({ onErro, onSucesso }: { onErro: (e: string) => vo
           <label>Observação (opcional)
             <input value={observacao} onChange={e => setObservacao(e.target.value)} placeholder="Motivo da cortesia..." />
           </label>
-          <div className="ad-fin-detalhe-acoes">
-            <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onConceder}>Conceder cortesia</button>
+          <div className="pnl-fin-detalhe-acoes">
+            <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onConceder}>Conceder cortesia</button>
           </div>
         </div>
       )}
@@ -260,20 +260,20 @@ function AssinaturaDetalhe({ assinatura, onErro, onSucesso }: { assinatura: Assi
   }
 
   return (
-    <div className="ad-fin-detalhe">
-      {assinatura.observacao && <p className="ad-fin-nota">Observação atual: {assinatura.observacao}</p>}
+    <div className="pnl-fin-detalhe">
+      {assinatura.observacao && <p className="pnl-fin-nota">Observação atual: {assinatura.observacao}</p>}
 
       <h3 style={{ fontSize: 13.5, fontWeight: 650, marginBottom: 8 }}>Histórico de cobranças</h3>
-      {assinatura.cobrancas.length === 0 && <p className="ad-vazio-sm">Nenhuma cobrança registrada.</p>}
+      {assinatura.cobrancas.length === 0 && <p className="pnl-vazio-sm">Nenhuma cobrança registrada.</p>}
       {assinatura.cobrancas.length > 0 && (
-        <div className="ad-tabela-scroll">
-          <table className="ad-tabela">
+        <div className="pnl-tabela-scroll">
+          <table className="pnl-tabela">
             <thead><tr><th>Valor</th><th>Status</th><th>Vencimento</th><th>Pago em</th><th>Método</th></tr></thead>
             <tbody>
               {assinatura.cobrancas.map(c => (
                 <tr key={c.id}>
                   <td>{fmtBRL(c.valorCentavos)}</td>
-                  <td><span className={`ad-status-pill ${c.status}`}>{c.status}</span></td>
+                  <td><span className={`pnl-status-pill ${c.status}`}>{c.status}</span></td>
                   <td>{fmtData(c.vencimento)}</td>
                   <td>{fmtData(c.pagoEm)}</td>
                   <td>{c.metodo ?? '—'}</td>
@@ -284,15 +284,15 @@ function AssinaturaDetalhe({ assinatura, onErro, onSucesso }: { assinatura: Assi
         </div>
       )}
 
-      <div className="ad-fin-detalhe-acoes">
+      <div className="pnl-fin-detalhe-acoes">
         {assinatura.status !== 'suspensa' && (
-          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acao(suspenderAssinatura, 'Suspender', 'Assinatura suspensa com sucesso', true)}>Suspender</button>
+          <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => acao(suspenderAssinatura, 'Suspender', 'Assinatura suspensa com sucesso', true)}>Suspender</button>
         )}
         {assinatura.status !== 'ativa' && assinatura.status !== 'cancelada' && (
-          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acao(reativarAssinatura, 'Reativar', 'Assinatura reativada com sucesso', false)}>Reativar</button>
+          <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => acao(reativarAssinatura, 'Reativar', 'Assinatura reativada com sucesso', false)}>Reativar</button>
         )}
         {assinatura.status !== 'cancelada' && (
-          <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={() => acao(cancelarAssinatura, 'Cancelar', 'Assinatura cancelada com sucesso', true)}>Cancelar</button>
+          <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={() => acao(cancelarAssinatura, 'Cancelar', 'Assinatura cancelada com sucesso', true)}>Cancelar</button>
         )}
       </div>
     </div>
@@ -306,20 +306,20 @@ function PlanosAba({ planos, onErro, onSucesso }: { planos: PlanoAdmin[]; onErro
   const [criando, setCriando] = useState(false)
 
   return (
-    <section className="ad-card">
-      <div className="ad-cursos-cab">
+    <section className="pnl-card">
+      <div className="pnl-cursos-cab">
         <h2 style={{ margin: 0 }}>Planos</h2>
-        <button type="button" className="ad-btn-primario" onClick={() => setCriando(v => !v)}>
+        <button type="button" className="pnl-btn-primario" onClick={() => setCriando(v => !v)}>
           <IconePlus size={14} /> Novo plano
         </button>
       </div>
 
       {criando && <PlanoForm onCancelar={() => setCriando(false)} onErro={onErro} onSucesso={onSucesso} />}
 
-      {planos.length === 0 && <p className="ad-vazio">Nenhum plano cadastrado.</p>}
+      {planos.length === 0 && <p className="pnl-vazio">Nenhum plano cadastrado.</p>}
       {planos.length > 0 && (
-        <div className="ad-tabela-scroll">
-          <table className="ad-tabela">
+        <div className="pnl-tabela-scroll">
+          <table className="pnl-tabela">
             <thead><tr><th>Nome</th><th>Valor</th><th>Periodicidade</th><th>Ativo</th><th></th></tr></thead>
             <tbody>
               {planos.map(p => <PlanoLinha key={p.id} plano={p} onErro={onErro} onSucesso={onSucesso} />)}
@@ -357,13 +357,13 @@ function PlanoLinha({ plano, onErro, onSucesso }: { plano: PlanoAdmin; onErro: (
 
   return (
     <tr>
-      <td>{plano.nome}{plano.nome === 'Cortesia' && <span className="ad-fin-nota" style={{ marginLeft: 6 }}>(interno, não excluir)</span>}</td>
+      <td>{plano.nome}{plano.nome === 'Cortesia' && <span className="pnl-fin-nota" style={{ marginLeft: 6 }}>(interno, não excluir)</span>}</td>
       <td>{fmtBRL(plano.valorCentavos)}</td>
       <td>{plano.periodicidade === 'mensal' ? 'Mensal' : 'Anual'}</td>
       <td>{plano.ativo ? 'Sim' : 'Não'}</td>
       <td style={{ display: 'flex', gap: 6 }}>
-        <button type="button" className="ad-btn-secundario" onClick={() => setEditando(true)}><IconePencil size={13} /></button>
-        <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir}><IconeTrash size={13} /></button>
+        <button type="button" className="pnl-btn-secundario" onClick={() => setEditando(true)}><IconePencil size={13} /></button>
+        <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={onExcluir}><IconeTrash size={13} /></button>
       </td>
     </tr>
   )
@@ -384,8 +384,8 @@ function PlanoForm({ plano, onCancelar, onErro, onSucesso }: { plano?: PlanoAdmi
   }
 
   return (
-    <form onSubmit={onSalvar} className="ad-form" style={{ margin: '10px 0', padding: 12, border: '1px solid var(--linha-suave)', borderRadius: 12 }}>
-      <div className="ad-form-linha">
+    <form onSubmit={onSalvar} className="pnl-form" style={{ margin: '10px 0', padding: 12, border: '1px solid var(--linha-suave)', borderRadius: 12 }}>
+      <div className="pnl-form-linha">
         <label>Nome
           <input name="nome" defaultValue={plano?.nome} required />
         </label>
@@ -398,7 +398,7 @@ function PlanoForm({ plano, onCancelar, onErro, onSucesso }: { plano?: PlanoAdmi
             <option value="anual">Anual</option>
           </select>
         </label>
-        <label className="ad-checkbox-linha">
+        <label className="pnl-checkbox-linha">
           <input type="checkbox" name="ativo" defaultChecked={plano?.ativo ?? true} />
           Ativo
         </label>
@@ -406,9 +406,9 @@ function PlanoForm({ plano, onCancelar, onErro, onSucesso }: { plano?: PlanoAdmi
       <label>Descrição
         <input name="descricao" defaultValue={plano?.descricao ?? ''} />
       </label>
-      <div className="ad-fin-detalhe-acoes">
-        <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
-        <button type="button" className="ad-btn-secundario" onClick={onCancelar}>Cancelar</button>
+      <div className="pnl-fin-detalhe-acoes">
+        <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
+        <button type="button" className="pnl-btn-secundario" onClick={onCancelar}>Cancelar</button>
       </div>
     </form>
   )
@@ -421,13 +421,13 @@ function WebhooksAba({ webhooks }: { webhooks: WebhookEventoAdmin[] }) {
   const [expandido, setExpandido] = useState<string | null>(null)
 
   return (
-    <section className="ad-card">
+    <section className="pnl-card">
       <h2>Últimos eventos recebidos</h2>
       <p>Log bruto do que chega em /api/webhooks/asaas, útil pra depurar a integração quando as chaves reais entrarem.</p>
-      {webhooks.length === 0 && <p className="ad-vazio">Nenhum evento recebido ainda.</p>}
+      {webhooks.length === 0 && <p className="pnl-vazio">Nenhum evento recebido ainda.</p>}
       {webhooks.length > 0 && (
-        <div className="ad-tabela-scroll">
-          <table className="ad-tabela">
+        <div className="pnl-tabela-scroll">
+          <table className="pnl-tabela">
             <thead><tr><th>Recebido em</th><th>Tipo</th><th>Status</th><th>Erro</th><th></th></tr></thead>
             <tbody>
               {webhooks.map(w => (
@@ -435,10 +435,10 @@ function WebhooksAba({ webhooks }: { webhooks: WebhookEventoAdmin[] }) {
                   <tr>
                     <td>{new Date(w.recebidoEm).toLocaleString('pt-BR')}</td>
                     <td>{w.tipo ?? '—'}</td>
-                    <td><span className={`ad-status-pill ${w.processado ? 'ativa' : 'inadimplente'}`}>{w.processado ? 'Processado' : 'Pendente'}</span></td>
+                    <td><span className={`pnl-status-pill ${w.processado ? 'ativa' : 'inadimplente'}`}>{w.processado ? 'Processado' : 'Pendente'}</span></td>
                     <td>{w.erro ?? '—'}</td>
                     <td>
-                      <button type="button" className="ad-btn-secundario" onClick={() => setExpandido(expandido === w.id ? null : w.id)}>
+                      <button type="button" className="pnl-btn-secundario" onClick={() => setExpandido(expandido === w.id ? null : w.id)}>
                         {expandido === w.id ? 'Fechar' : 'Payload'}
                       </button>
                     </td>
@@ -446,7 +446,7 @@ function WebhooksAba({ webhooks }: { webhooks: WebhookEventoAdmin[] }) {
                   {expandido === w.id && (
                     <tr>
                       <td colSpan={5}>
-                        <pre className="ad-fin-payload">{JSON.stringify(w.payload, null, 2)}</pre>
+                        <pre className="pnl-fin-payload">{JSON.stringify(w.payload, null, 2)}</pre>
                       </td>
                     </tr>
                   )}

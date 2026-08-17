@@ -14,18 +14,18 @@ export default async function PaginaAdmin() {
   const superAdmin = admin?.papeis.includes('super_admin') ?? false
 
   return (
-    <div className="ad-dashboard">
+    <div className="pnl-dashboard">
       <h1>Painel Admin</h1>
-      <p className="ad-sub">Seus papéis: {admin?.papeis.map(p => NOME_PAPEL[p]).join(', ') ?? '—'}</p>
+      <p className="pnl-sub">Seus papéis: {admin?.papeis.map(p => NOME_PAPEL[p]).join(', ') ?? '—'}</p>
 
       {superAdmin && (
-        <a href="/admin/administradores" className="ad-card ad-card-link">
+        <a href="/admin/administradores" className="pnl-card pnl-card-link">
           <h2>Gestão de Administradores</h2>
           <p>Conceda ou revogue papéis de Super Admin, Conteúdo, Financeiro e Moderador.</p>
         </a>
       )}
 
-      <div className="ad-card ad-card-vazio">
+      <div className="pnl-card pnl-card-vazio">
         <p>As demais seções (Cursos, Financeiro, Desafios, Usuários...) serão construídas nas próximas etapas.</p>
       </div>
     </div>

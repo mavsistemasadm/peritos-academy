@@ -30,31 +30,31 @@ export default function AdminShell({ admin, children }: { admin: AdminAtual; chi
   const visiveis = secoes.filter(s => temPermissao(admin, s))
 
   return (
-    <div className="ad-shell">
-      <aside className="ad-sidebar">
-        <div className="ad-sidebar-cab">
-          <span className="ad-sidebar-titulo">Painel Admin</span>
-          <div className="ad-papeis">
+    <div className="pnl-shell">
+      <aside className="pnl-sidebar">
+        <div className="pnl-sidebar-cab">
+          <span className="pnl-sidebar-titulo">Painel Admin</span>
+          <div className="pnl-papeis">
             {admin.papeis.map(p => (
-              <span key={p} className="ad-pill">{NOME_PAPEL[p]}</span>
+              <span key={p} className="pnl-pill">{NOME_PAPEL[p]}</span>
             ))}
           </div>
         </div>
-        <nav className="ad-nav">
-          <a href="/admin" className="ad-nav-item">Início</a>
+        <nav className="pnl-nav">
+          <a href="/admin" className="pnl-nav-item">Início</a>
           {visiveis.map(secao => {
             const rota = ROTA_SECAO[secao]
             if (!rota) return (
-              <span key={secao} className="ad-nav-item em-breve" aria-disabled="true">
+              <span key={secao} className="pnl-nav-item em-breve" aria-disabled="true">
                 {NOME_SECAO[secao]}
                 <small>em breve</small>
               </span>
             )
-            return <a key={secao} href={rota} className="ad-nav-item">{NOME_SECAO[secao]}</a>
+            return <a key={secao} href={rota} className="pnl-nav-item">{NOME_SECAO[secao]}</a>
           })}
         </nav>
       </aside>
-      <main className="ad-conteudo">{children}</main>
+      <main className="pnl-conteudo">{children}</main>
     </div>
   )
 }

@@ -24,22 +24,22 @@ export default function AdminConfiguracoesContent({ config, integracoes, configN
   const toast = useAdminToast()
 
   return (
-    <div className="ad-cursos">
+    <div className="pnl-cursos">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <div className="ad-cursos-cab">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>Configurações</h1>
-          <p className="ad-sub">Identidade, comportamento e textos gerais da plataforma. Gamificação, Financeiro e Notificações têm configuração própria nos respectivos módulos.</p>
+          <p className="pnl-sub">Identidade, comportamento e textos gerais da plataforma. Gamificação, Financeiro e Notificações têm configuração própria nos respectivos módulos.</p>
         </div>
       </div>
 
-      <div className="ad-abas">
-        <button type="button" className={`ad-aba${aba === 'identidade' ? ' ativa' : ''}`} onClick={() => setAba('identidade')}>Identidade</button>
-        <button type="button" className={`ad-aba${aba === 'comportamento' ? ' ativa' : ''}`} onClick={() => setAba('comportamento')}>Comportamento</button>
-        <button type="button" className={`ad-aba${aba === 'textos' ? ' ativa' : ''}`} onClick={() => setAba('textos')}>Textos</button>
-        <button type="button" className={`ad-aba${aba === 'seo' ? ' ativa' : ''}`} onClick={() => setAba('seo')}>SEO</button>
-        <button type="button" className={`ad-aba${aba === 'nexus' ? ' ativa' : ''}`} onClick={() => setAba('nexus')}>Sugestões do Nexus</button>
-        <button type="button" className={`ad-aba${aba === 'integracoes' ? ' ativa' : ''}`} onClick={() => setAba('integracoes')}>Integrações</button>
+      <div className="pnl-abas">
+        <button type="button" className={`pnl-aba${aba === 'identidade' ? ' ativa' : ''}`} onClick={() => setAba('identidade')}>Identidade</button>
+        <button type="button" className={`pnl-aba${aba === 'comportamento' ? ' ativa' : ''}`} onClick={() => setAba('comportamento')}>Comportamento</button>
+        <button type="button" className={`pnl-aba${aba === 'textos' ? ' ativa' : ''}`} onClick={() => setAba('textos')}>Textos</button>
+        <button type="button" className={`pnl-aba${aba === 'seo' ? ' ativa' : ''}`} onClick={() => setAba('seo')}>SEO</button>
+        <button type="button" className={`pnl-aba${aba === 'nexus' ? ' ativa' : ''}`} onClick={() => setAba('nexus')}>Sugestões do Nexus</button>
+        <button type="button" className={`pnl-aba${aba === 'integracoes' ? ' ativa' : ''}`} onClick={() => setAba('integracoes')}>Integrações</button>
       </div>
 
       {aba === 'identidade' && <IdentidadeAba config={config} onErro={toast.erro} onSucesso={toast.sucesso} />}
@@ -97,35 +97,35 @@ function IdentidadeAba({ config, onErro, onSucesso }: { config: ConfigPlataforma
 
   return (
     <>
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Logo e favicon</h2>
-        <div className="ad-form-linha" style={{ alignItems: 'flex-start' }}>
+        <div className="pnl-form-linha" style={{ alignItems: 'flex-start' }}>
           <div>
-            <div className="ad-capa-preview ad-capa-preview-sm" style={logoUrl ? { backgroundImage: `url(${logoUrl})` } : undefined}>
+            <div className="pnl-capa-preview pnl-capa-preview-sm" style={logoUrl ? { backgroundImage: `url(${logoUrl})` } : undefined}>
               {!logoUrl && <span>Sem logo</span>}
             </div>
-            <label className="ad-btn-secundario ad-upload-btn" style={{ marginTop: 8 }}>
+            <label className="pnl-btn-secundario pnl-upload-btn" style={{ marginTop: 8 }}>
               Trocar logo
               <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={onUploadLogo} hidden disabled={pendente} />
             </label>
           </div>
           <div>
-            <div className="ad-capa-preview ad-capa-preview-sm" style={faviconUrl ? { backgroundImage: `url(${faviconUrl})` } : undefined}>
+            <div className="pnl-capa-preview pnl-capa-preview-sm" style={faviconUrl ? { backgroundImage: `url(${faviconUrl})` } : undefined}>
               {!faviconUrl && <span>Sem favicon</span>}
             </div>
-            <label className="ad-btn-secundario ad-upload-btn" style={{ marginTop: 8 }}>
+            <label className="pnl-btn-secundario pnl-upload-btn" style={{ marginTop: 8 }}>
               Trocar favicon
               <input type="file" accept="image/png,image/x-icon,image/svg+xml" onChange={onUploadFavicon} hidden disabled={pendente} />
             </label>
           </div>
         </div>
-        <p className="ad-fin-nota">Sem logo, o cabeçalho e a tela de login mostram o texto padrão "peritos academy".</p>
+        <p className="pnl-fin-nota">Sem logo, o cabeçalho e a tela de login mostram o texto padrão "peritos academy".</p>
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Identidade e contato</h2>
-        <form onSubmit={onSalvar} className="ad-form">
-          <div className="ad-form-linha">
+        <form onSubmit={onSalvar} className="pnl-form">
+          <div className="pnl-form-linha">
             <label>Nome da plataforma
               <input name="nome_plataforma" defaultValue={config.nomePlataforma} required />
             </label>
@@ -133,7 +133,7 @@ function IdentidadeAba({ config, onErro, onSucesso }: { config: ConfigPlataforma
               <input name="slogan" defaultValue={config.slogan ?? ''} placeholder="Do conhecimento à autoridade." />
             </label>
           </div>
-          <div className="ad-form-linha">
+          <div className="pnl-form-linha">
             <label>E-mail de suporte
               <input name="email_suporte" type="email" defaultValue={config.emailSuporte ?? ''} placeholder="suporte@peritosacademy.com" />
             </label>
@@ -141,7 +141,7 @@ function IdentidadeAba({ config, onErro, onSucesso }: { config: ConfigPlataforma
               <input name="whatsapp_suporte" defaultValue={config.whatsappSuporte ?? ''} placeholder="+55 11 90000-0000" />
             </label>
           </div>
-          <div className="ad-form-linha">
+          <div className="pnl-form-linha">
             <label>Instagram
               <input name="instagram_url" defaultValue={config.instagramUrl ?? ''} placeholder="https://instagram.com/..." />
             </label>
@@ -152,7 +152,7 @@ function IdentidadeAba({ config, onErro, onSucesso }: { config: ConfigPlataforma
               <input name="linkedin_url" defaultValue={config.linkedinUrl ?? ''} placeholder="https://linkedin.com/..." />
             </label>
           </div>
-          <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
+          <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
         </form>
       </section>
     </>
@@ -193,41 +193,41 @@ function ComportamentoAba({ config, onErro, onSucesso }: { config: ConfigPlatafo
 
   return (
     <form onSubmit={onSalvar}>
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Pós-login e módulos públicos</h2>
         <label>Página inicial após o login
           <input name="pagina_inicial_pos_login" defaultValue={config.paginaInicialPosLogin} placeholder="/" />
         </label>
-        <div className="ad-form-linha" style={{ marginTop: 12 }}>
-          <label className="ad-checkbox-linha">
+        <div className="pnl-form-linha" style={{ marginTop: 12 }}>
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="comunidade_ativa" defaultChecked={config.comunidadeAtiva} />
             Comunidade ativa
           </label>
-          <label className="ad-checkbox-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="desafios_ativos" defaultChecked={config.desafiosAtivos} />
             Desafios ativos
           </label>
-          <label className="ad-checkbox-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="agenda_ativa" defaultChecked={config.agendaAtiva} />
             Agenda ativa
           </label>
         </div>
-        <p className="ad-fin-nota">Desligar um módulo esconde o link no menu E bloqueia acesso direto à rota.</p>
+        <p className="pnl-fin-nota">Desligar um módulo esconde o link no menu E bloqueia acesso direto à rota.</p>
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2><IconeAlertTriangle size={16} /> Modo manutenção</h2>
-        <label className="ad-checkbox-linha">
+        <label className="pnl-checkbox-linha">
           <input type="checkbox" name="modo_manutencao" checked={manutencao} onChange={onToggleManutencao} />
           Ativar modo manutenção
         </label>
         <label style={{ marginTop: 10 }}>Mensagem exibida aos visitantes
           <textarea name="mensagem_manutencao" defaultValue={config.mensagemManutencao ?? ''} rows={3} placeholder="Estamos em manutenção programada. Voltamos em breve." />
         </label>
-        <p className="ad-fin-nota">Admins continuam navegando normalmente e veem um banner fixo avisando que o modo manutenção está ativo.</p>
+        <p className="pnl-fin-nota">Admins continuam navegando normalmente e veem um banner fixo avisando que o modo manutenção está ativo.</p>
       </section>
 
-      <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
+      <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
     </form>
   )
 }
@@ -250,10 +250,10 @@ function TextosAba({ config, onErro, onSucesso }: { config: ConfigPlataforma; on
   }
 
   return (
-    <section className="ad-card">
+    <section className="pnl-card">
       <h2>Textos institucionais</h2>
       <p>Renderizados em <a href="/termos" target="_blank" style={{ textDecoration: 'underline' }}>/termos</a> e <a href="/privacidade" target="_blank" style={{ textDecoration: 'underline' }}>/privacidade</a> (um parágrafo por linha).</p>
-      <form onSubmit={onSalvar} className="ad-form">
+      <form onSubmit={onSalvar} className="pnl-form">
         <label>Termos de uso
           <textarea name="termos_uso" defaultValue={config.termosUso ?? ''} rows={8} />
         </label>
@@ -263,7 +263,7 @@ function TextosAba({ config, onErro, onSucesso }: { config: ConfigPlataforma; on
         <label>Texto do rodapé
           <input name="texto_rodape" defaultValue={config.textoRodape ?? ''} placeholder="© Peritos Academy. Todos os direitos reservados." />
         </label>
-        <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
+        <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
       </form>
     </section>
   )
@@ -302,9 +302,9 @@ function SEOAba({ config, onErro, onSucesso }: { config: ConfigPlataforma; onErr
   }
 
   return (
-    <section className="ad-card">
+    <section className="pnl-card">
       <h2>SEO e compartilhamento</h2>
-      <form onSubmit={onSalvar} className="ad-form">
+      <form onSubmit={onSalvar} className="pnl-form">
         <label>Meta título
           <input name="meta_titulo" value={metaTitulo} onChange={e => setMetaTitulo(e.target.value)} />
         </label>
@@ -314,24 +314,24 @@ function SEOAba({ config, onErro, onSucesso }: { config: ConfigPlataforma; onErr
 
         <div>
           <span style={{ fontSize: 13.5, fontWeight: 650, display: 'block', marginBottom: 8 }}>Imagem de compartilhamento (og:image)</span>
-          <label className="ad-btn-secundario ad-upload-btn">
+          <label className="pnl-btn-secundario pnl-upload-btn">
             {ogImageUrl ? 'Trocar imagem' : 'Enviar imagem'}
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onUploadOg} hidden />
           </label>
         </div>
 
-        <div className="ad-og-preview">
+        <div className="pnl-og-preview">
           {ogImageUrl
             ? <img src={ogImageUrl} alt="Preview og:image" />
             : <div style={{ height: 180, display: 'grid', placeItems: 'center', color: 'var(--cinza)', fontSize: 12.5 }}>Sem imagem</div>}
-          <div className="ad-og-preview-corpo">
-            <div className="ad-og-preview-dominio">{SITE_HOST}</div>
-            <div className="ad-og-preview-titulo">{metaTitulo || config.nomePlataforma}</div>
-            <div className="ad-og-preview-desc">{metaDescricao || 'Descrição aparece aqui quando o link for compartilhado.'}</div>
+          <div className="pnl-og-preview-corpo">
+            <div className="pnl-og-preview-dominio">{SITE_HOST}</div>
+            <div className="pnl-og-preview-titulo">{metaTitulo || config.nomePlataforma}</div>
+            <div className="pnl-og-preview-desc">{metaDescricao || 'Descrição aparece aqui quando o link for compartilhado.'}</div>
           </div>
         </div>
 
-        <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
+        <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
       </form>
     </section>
   )
@@ -343,20 +343,20 @@ function SEOAba({ config, onErro, onSucesso }: { config: ConfigPlataforma; onErr
 function IntegracoesAba({ integracoes }: { integracoes: IntegracaoStatus[] }) {
   return (
     <>
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Status das integrações</h2>
         <p>Somente leitura. Chaves e tokens nunca são exibidos aqui, só se estão presentes ou não.</p>
         {integracoes.map(i => (
-          <div key={i.chave} className="ad-integracao-linha">
+          <div key={i.chave} className="pnl-integracao-linha">
             <div>
-              <div className="ad-integracao-nome">{i.nome}</div>
-              <div className="ad-integracao-onde">{i.info ?? i.onde}</div>
+              <div className="pnl-integracao-nome">{i.nome}</div>
+              <div className="pnl-integracao-onde">{i.info ?? i.onde}</div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span className={`ad-status-pill ${i.configurada ? 'ativa' : 'cancelada'}`}>
+              <span className={`pnl-status-pill ${i.configurada ? 'ativa' : 'cancelada'}`}>
                 {i.configurada ? <><IconeCheck size={12} /> Configurada</> : <><IconeAlertTriangle size={12} /> Ausente</>}
               </span>
-              <a href={i.docUrl} target="_blank" rel="noreferrer" className="ad-btn-secundario" title="Ver documentação">
+              <a href={i.docUrl} target="_blank" rel="noreferrer" className="pnl-btn-secundario" title="Ver documentação">
                 <IconeLink size={13} />
               </a>
             </div>
@@ -364,7 +364,7 @@ function IntegracoesAba({ integracoes }: { integracoes: IntegracaoStatus[] }) {
         ))}
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Pendência conhecida</h2>
         <p>
           <code>config_gamificacao.moeda_icone</code> é editável no{' '}
@@ -411,13 +411,13 @@ function NexusAba({ config, metricas, onErro, onSucesso }: {
 
   return (
     <form onSubmit={onSalvar}>
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Link de destino</h2>
         <label>Link global
           <input name="link_global" defaultValue={config.linkGlobal} placeholder="https://nexusperitosacademy.com.br" />
         </label>
-        <p className="ad-fin-nota">Para onde o aluno vai ao clicar em qualquer sugestão. Os campos por app abaixo sobrescrevem este quando preenchidos.</p>
-        <div className="ad-form-linha" style={{ marginTop: 12 }}>
+        <p className="pnl-fin-nota">Para onde o aluno vai ao clicar em qualquer sugestão. Os campos por app abaixo sobrescrevem este quando preenchidos.</p>
+        <div className="pnl-form-linha" style={{ marginTop: 12 }}>
           {apps.map(a => (
             <label key={a.campo}>{a.rotulo}
               <input name={a.campo} defaultValue={a.valor} placeholder="(usa o link global)" />
@@ -426,40 +426,40 @@ function NexusAba({ config, metricas, onErro, onSucesso }: {
         </div>
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Onde aparece</h2>
-        <label className="ad-checkbox-linha">
+        <label className="pnl-checkbox-linha">
           <input type="checkbox" name="ativo" defaultChecked={config.ativo} />
           Ativar sugestões do Nexus
         </label>
-        <p className="ad-fin-nota">Desligando aqui, nenhuma sugestão aparece em lugar nenhum, independente dos toggles abaixo.</p>
-        <div className="ad-form-linha" style={{ marginTop: 12 }}>
-          <label className="ad-checkbox-linha">
+        <p className="pnl-fin-nota">Desligando aqui, nenhuma sugestão aparece em lugar nenhum, independente dos toggles abaixo.</p>
+        <div className="pnl-form-linha" style={{ marginTop: 12 }}>
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="ativo_aula" defaultChecked={config.ativoAula} />
             Nas aulas
           </label>
-          <label className="ad-checkbox-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="ativo_conquista" defaultChecked={config.ativoConquista} />
             Após conquistas
           </label>
-          <label className="ad-checkbox-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="ativo_sino" defaultChecked={config.ativoSino} />
             No sino
           </label>
-          <label className="ad-checkbox-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="ativo_perfil" defaultChecked={config.ativoPerfil} />
             No perfil
           </label>
-          <label className="ad-checkbox-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="ativo_bloqueio" defaultChecked={config.ativoBloqueio} />
             Em conteúdo bloqueado
           </label>
         </div>
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Frequência</h2>
-        <div className="ad-form-linha">
+        <div className="pnl-form-linha">
           <label>Máximo de exibições por semana no sino
             <input type="number" name="max_sino_por_semana" min={0} defaultValue={config.maxSinoPorSemana} />
           </label>
@@ -470,15 +470,15 @@ function NexusAba({ config, metricas, onErro, onSucesso }: {
             <input type="number" name="dias_pausa_dismissal" min={0} defaultValue={config.diasPausaDismissal} />
           </label>
         </div>
-        <p className="ad-fin-nota">Cada sugestão aparece no máximo 1x por sessão, e o mesmo app nunca aparece duas vezes seguidas. Assinante ativo do Nexus não vê nada.</p>
+        <p className="pnl-fin-nota">Cada sugestão aparece no máximo 1x por sessão, e o mesmo app nunca aparece duas vezes seguidas. Assinante ativo do Nexus não vê nada.</p>
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Desempenho por app</h2>
         {metricas.length === 0 ? (
-          <p className="ad-fin-nota">Nenhuma interação registrada ainda.</p>
+          <p className="pnl-fin-nota">Nenhuma interação registrada ainda.</p>
         ) : (
-          <table className="ad-tabela">
+          <table className="pnl-tabela">
             <thead>
               <tr><th>App</th><th>Exibidas</th><th>Cliques</th><th>Dispensas</th><th>Taxa de clique</th></tr>
             </thead>
@@ -497,7 +497,7 @@ function NexusAba({ config, metricas, onErro, onSucesso }: {
         )}
       </section>
 
-      <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
+      <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
     </form>
   )
 }

@@ -64,39 +64,39 @@ export default function AdminEventoEditorContent({ evento, cursos }: { evento: E
   }
 
   return (
-    <div className="ad-curso-editor">
+    <div className="pnl-curso-editor">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <a href="/admin/agenda" className="ad-voltar"><IconeChevronLeft size={14} /> Agenda</a>
-      <div className="ad-editor-cab">
+      <a href="/admin/agenda" className="pnl-voltar"><IconeChevronLeft size={14} /> Agenda</a>
+      <div className="pnl-editor-cab">
         <h1>{evento.titulo}</h1>
-        <div className="ad-editor-cab-acoes">
-          <label className={`ad-toggle-papel${evento.publicado ? ' ativo' : ''}`}>
+        <div className="pnl-editor-cab-acoes">
+          <label className={`pnl-toggle-papel${evento.publicado ? ' ativo' : ''}`}>
             <input type="checkbox" checked={evento.publicado} disabled={pendente} onChange={e => onAlternarPublicacao(e.target.checked)} />
             {evento.publicado ? 'Publicado' : 'Rascunho'}
           </label>
-          <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={onExcluir}>Excluir evento</button>
+          <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={onExcluir}>Excluir evento</button>
         </div>
       </div>
 
-      <div className="ad-editor-grid">
-        <section className="ad-card">
+      <div className="pnl-editor-grid">
+        <section className="pnl-card">
           <h2>Thumbnail</h2>
-          <div className="ad-capa-preview" style={evento.gravacaoThumbUrl ? { backgroundImage: `url(${evento.gravacaoThumbUrl})` } : undefined}>
+          <div className="pnl-capa-preview" style={evento.gravacaoThumbUrl ? { backgroundImage: `url(${evento.gravacaoThumbUrl})` } : undefined}>
             {!evento.gravacaoThumbUrl && <span>Sem imagem</span>}
           </div>
-          <label className="ad-btn-secundario ad-upload-btn">
+          <label className="pnl-btn-secundario pnl-upload-btn">
             Trocar imagem
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onUploadThumb} hidden disabled={pendente} />
           </label>
         </section>
 
-        <section className="ad-card ad-card-dados">
+        <section className="pnl-card pnl-card-dados">
           <h2>Dados do evento</h2>
-          <form onSubmit={onSalvar} className="ad-form">
+          <form onSubmit={onSalvar} className="pnl-form">
             <label>Título
               <input name="titulo" defaultValue={evento.titulo} required minLength={3} />
             </label>
-            <div className="ad-form-linha">
+            <div className="pnl-form-linha">
               <label>Tipo
                 <select name="tipo" defaultValue={evento.tipo}>
                   <option value="sala_analise">Sala de análise</option>
@@ -118,7 +118,7 @@ export default function AdminEventoEditorContent({ evento, cursos }: { evento: E
             <label>Descrição
               <textarea name="descricao" defaultValue={evento.descricao ?? ''} rows={3} />
             </label>
-            <div className="ad-form-linha">
+            <div className="pnl-form-linha">
               <label>Data e hora de início
                 <input name="inicia_em" type="datetime-local" defaultValue={paraDatetimeLocal(evento.iniciaEm)} />
               </label>
@@ -132,7 +132,7 @@ export default function AdminEventoEditorContent({ evento, cursos }: { evento: E
             <label>Link da gravação (após o evento)
               <input name="gravacao_url" defaultValue={evento.gravacaoUrl ?? ''} placeholder="https://..." />
             </label>
-            <div className="ad-form-linha">
+            <div className="pnl-form-linha">
               <label>Apresentador (nome)
                 <input name="apresentador_nome" defaultValue={evento.apresentadorNome ?? ''} />
               </label>
@@ -140,7 +140,7 @@ export default function AdminEventoEditorContent({ evento, cursos }: { evento: E
                 <input name="apresentador_cargo" defaultValue={evento.apresentadorCargo ?? ''} />
               </label>
             </div>
-            <div className="ad-form-linha">
+            <div className="pnl-form-linha">
               <label>Curso vinculado (opcional)
                 <select name="curso_id" defaultValue={evento.cursoId ?? ''}>
                   <option value="">—</option>
@@ -154,26 +154,26 @@ export default function AdminEventoEditorContent({ evento, cursos }: { evento: E
             <label>Observação extra
               <input name="meta_extra" defaultValue={evento.metaExtra ?? ''} />
             </label>
-            <div className="ad-form-linha">
-              <label className="ad-checkbox-linha">
+            <div className="pnl-form-linha">
+              <label className="pnl-checkbox-linha">
                 <input type="checkbox" name="gravar" defaultChecked={evento.gravar} />
                 Gravar
               </label>
-              <label className="ad-checkbox-linha">
+              <label className="pnl-checkbox-linha">
                 <input type="checkbox" name="lembrete" defaultChecked={evento.lembrete} />
                 Enviar lembrete
               </label>
-              <label className="ad-checkbox-linha">
+              <label className="pnl-checkbox-linha">
                 <input type="checkbox" name="publicar_feed" defaultChecked={evento.publicarFeed} />
                 Publicar no feed da comunidade
               </label>
             </div>
-            <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar evento'}</button>
+            <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar evento'}</button>
           </form>
         </section>
       </div>
 
-      <p className="ad-sub">{evento.totalReservas} reserva{evento.totalReservas === 1 ? '' : 's'} de alunos pra este evento.</p>
+      <p className="pnl-sub">{evento.totalReservas} reserva{evento.totalReservas === 1 ? '' : 's'} de alunos pra este evento.</p>
     </div>
   )
 }

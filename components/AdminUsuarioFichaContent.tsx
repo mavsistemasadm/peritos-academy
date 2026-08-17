@@ -50,25 +50,25 @@ export default function AdminUsuarioFichaContent({ ficha, extratoInicial, comuni
   const toast = useAdminToast()
 
   return (
-    <div className="ad-cursos">
+    <div className="pnl-cursos">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <div className="ad-cursos-cab">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>{ficha.nome}</h1>
-          <p className="ad-sub">{ficha.email ?? '—'} · <span className={`ad-status-pill ${ficha.status}`}>{NOME_STATUS_CONTA[ficha.status]}</span></p>
+          <p className="pnl-sub">{ficha.email ?? '—'} · <span className={`pnl-status-pill ${ficha.status}`}>{NOME_STATUS_CONTA[ficha.status]}</span></p>
         </div>
-        <button type="button" className="ad-btn-secundario" disabled title="Em breve. Impersonação exige um desenho de segurança dedicado (sessão separada, banner visível, log reforçado, expiração)">
+        <button type="button" className="pnl-btn-secundario" disabled title="Em breve. Impersonação exige um desenho de segurança dedicado (sessão separada, banner visível, log reforçado, expiração)">
           <IconeEye size={14} /> Ver como este aluno
         </button>
       </div>
 
-      <div className="ad-abas">
-        <button type="button" className={`ad-aba${aba === 'geral' ? ' ativa' : ''}`} onClick={() => setAba('geral')}>Visão geral</button>
-        <button type="button" className={`ad-aba${aba === 'progresso' ? ' ativa' : ''}`} onClick={() => setAba('progresso')}>Progresso</button>
-        <button type="button" className={`ad-aba${aba === 'gamificacao' ? ' ativa' : ''}`} onClick={() => setAba('gamificacao')}>Gamificação</button>
-        <button type="button" className={`ad-aba${aba === 'financeiro' ? ' ativa' : ''}`} onClick={() => setAba('financeiro')}>Financeiro</button>
-        <button type="button" className={`ad-aba${aba === 'comunidade' ? ' ativa' : ''}`} onClick={() => setAba('comunidade')}>Comunidade</button>
-        <button type="button" className={`ad-aba${aba === 'auditoria' ? ' ativa' : ''}`} onClick={() => setAba('auditoria')}>Auditoria ({auditoria.length})</button>
+      <div className="pnl-abas">
+        <button type="button" className={`pnl-aba${aba === 'geral' ? ' ativa' : ''}`} onClick={() => setAba('geral')}>Visão geral</button>
+        <button type="button" className={`pnl-aba${aba === 'progresso' ? ' ativa' : ''}`} onClick={() => setAba('progresso')}>Progresso</button>
+        <button type="button" className={`pnl-aba${aba === 'gamificacao' ? ' ativa' : ''}`} onClick={() => setAba('gamificacao')}>Gamificação</button>
+        <button type="button" className={`pnl-aba${aba === 'financeiro' ? ' ativa' : ''}`} onClick={() => setAba('financeiro')}>Financeiro</button>
+        <button type="button" className={`pnl-aba${aba === 'comunidade' ? ' ativa' : ''}`} onClick={() => setAba('comunidade')}>Comunidade</button>
+        <button type="button" className={`pnl-aba${aba === 'auditoria' ? ' ativa' : ''}`} onClick={() => setAba('auditoria')}>Auditoria ({auditoria.length})</button>
       </div>
 
       {aba === 'geral' && <VisaoGeralAba ficha={ficha} nexusStatus={nexusStatus} onErro={toast.erro} onSucesso={toast.sucesso} />}
@@ -105,9 +105,9 @@ function VisaoGeralAba({ ficha, nexusStatus, onErro, onSucesso }: { ficha: Ficha
 
   return (
     <>
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Dados do perfil</h2>
-        <div className="ad-usu-info">
+        <div className="pnl-usu-info">
           <div><IconeUser size={14} /> {ficha.nome}</div>
           <div><IconeMail size={14} /> {ficha.email ?? '—'}</div>
           <div><IconeMapPin size={14} /> {[ficha.cidade, ficha.estado].filter(Boolean).join(', ') || '—'}</div>
@@ -116,25 +116,25 @@ function VisaoGeralAba({ ficha, nexusStatus, onErro, onSucesso }: { ficha: Ficha
         </div>
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Assinatura atual</h2>
-        {!ficha.assinatura && <p className="ad-vazio">Sem assinatura.</p>}
+        {!ficha.assinatura && <p className="pnl-vazio">Sem assinatura.</p>}
         {ficha.assinatura && (
           <p>
-            <span className={`ad-status-pill ${ficha.assinatura.status}`}>{ficha.assinatura.status}</span>
+            <span className={`pnl-status-pill ${ficha.assinatura.status}`}>{ficha.assinatura.status}</span>
             {' '}{ficha.assinatura.planoNome}, próxima cobrança em {fmtData(ficha.assinatura.proximaCobranca)}
           </p>
         )}
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>MH Nexus</h2>
         <p>
-          <span className={`ad-status-pill ${nexusStatus === 'active' ? 'ativa' : nexusStatus === 'cancelled' ? 'inadimplente' : ''}`}>
+          <span className={`pnl-status-pill ${nexusStatus === 'active' ? 'ativa' : nexusStatus === 'cancelled' ? 'inadimplente' : ''}`}>
             {NOME_NEXUS[nexusStatus]}
           </span>
         </p>
-        <p className="ad-fin-nota">
+        <p className="pnl-fin-nota">
           {nexusStatus === 'active'
             ? 'Assinante ativo: nenhuma sugestão do Nexus aparece pra este aluno.'
             : nexusStatus === 'cancelled'
@@ -142,14 +142,14 @@ function VisaoGeralAba({ ficha, nexusStatus, onErro, onSucesso }: { ficha: Ficha
               : 'Nunca assinou: vê as sugestões normais do ecossistema.'}
           {' '}Enquanto não há integração de assinatura entre as plataformas, esta marcação é manual.
         </p>
-        <div className="ad-fin-detalhe-acoes" style={{ marginTop: 10 }}>
+        <div className="pnl-fin-detalhe-acoes" style={{ marginTop: 10 }}>
           {(['active', 'cancelled', 'none'] as const)
             .filter(alvo => alvo !== nexusStatus)
             .map(alvo => (
               <button
                 key={alvo}
                 type="button"
-                className="ad-btn-secundario"
+                className="pnl-btn-secundario"
                 disabled={pendente}
                 onClick={() => {
                   const just = prompt(`Marcar como "${NOME_NEXUS[alvo]}". Justificativa:`)
@@ -167,22 +167,22 @@ function VisaoGeralAba({ ficha, nexusStatus, onErro, onSucesso }: { ficha: Ficha
         </div>
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Ações administrativas</h2>
-        <div className="ad-fin-detalhe-acoes">
+        <div className="pnl-fin-detalhe-acoes">
           {ficha.status !== 'ativo' && (
-            <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(reativarUsuario, 'Reativar', 'Conta reativada com sucesso')}>Reativar</button>
+            <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(reativarUsuario, 'Reativar', 'Conta reativada com sucesso')}>Reativar</button>
           )}
           {ficha.status !== 'suspenso' && (
-            <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(suspenderUsuario, 'Suspender', 'Conta suspensa com sucesso')}>Suspender</button>
+            <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(suspenderUsuario, 'Suspender', 'Conta suspensa com sucesso')}>Suspender</button>
           )}
           {ficha.status !== 'banido' && (
-            <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={() => acaoComJustificativa(banirUsuario, 'Banir', 'Conta banida com sucesso')}>Banir</button>
+            <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={() => acaoComJustificativa(banirUsuario, 'Banir', 'Conta banida com sucesso')}>Banir</button>
           )}
-          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(resetarSenhaUsuario, 'Resetar senha (envia e-mail de recuperação)', 'E-mail de redefinição enviado com sucesso')}>
+          <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(resetarSenhaUsuario, 'Resetar senha (envia e-mail de recuperação)', 'E-mail de redefinição enviado com sucesso')}>
             <IconeLock size={14} /> Resetar senha
           </button>
-          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(concederCortesiaUsuario, 'Conceder cortesia', 'Cortesia concedida com sucesso')}>Conceder cortesia</button>
+          <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => acaoComJustificativa(concederCortesiaUsuario, 'Conceder cortesia', 'Cortesia concedida com sucesso')}>Conceder cortesia</button>
         </div>
       </section>
 
@@ -226,23 +226,23 @@ function ExcluirDeVez({ ficha, onErro, onSucesso }: { ficha: FichaUsuario; onErr
   }
 
   return (
-    <section className="ad-card" style={{ borderColor: 'rgba(240,52,52,.35)' }}>
+    <section className="pnl-card" style={{ borderColor: 'rgba(240,52,52,.35)' }}>
       <h2 style={{ color: '#F03434' }}>Excluir de vez</h2>
-      <p className="ad-sub">
+      <p className="pnl-sub">
         Apaga a conta desta plataforma <strong>e do Nexus</strong>. Não tem desfazer. Para quase todo caso,
         <strong> suspender ou banir resolve</strong> e preserva o histórico.
       </p>
 
       {!previa && (
-        <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={onPedirPrevia}>
+        <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={onPedirPrevia}>
           {pendente ? 'Conferindo...' : 'Ver o que será apagado'}
         </button>
       )}
 
       {previa && (
         <>
-          <div className="ad-tabela-scroll" style={{ margin: '14px 0' }}>
-            <table className="ad-tabela">
+          <div className="pnl-tabela-scroll" style={{ margin: '14px 0' }}>
+            <table className="pnl-tabela">
               <thead><tr><th>Vai junto</th><th>Peritos Academy</th><th>Nexus</th></tr></thead>
               <tbody>
                 <tr><td>Conta de login</td><td>sim</td><td>{previa.nexus.contaNoAuth ? 'sim' : '—'}</td></tr>
@@ -258,22 +258,22 @@ function ExcluirDeVez({ ficha, onErro, onSucesso }: { ficha: FichaUsuario; onErr
           </div>
 
           {previa.academy.postsComunidade > 0 && (
-            <p className="ad-sub">
+            <p className="pnl-sub">
               {previa.academy.postsComunidade} post(s) na comunidade <strong>permanecem</strong>, sem autor. Some o nome, não o texto.
             </p>
           )}
           {previa.academy.ehAdmin && (
-            <p className="ad-sub" style={{ color: '#F03434', fontWeight: 600 }}>
+            <p className="pnl-sub" style={{ color: '#F03434', fontWeight: 600 }}>
               Esta conta é administradora da plataforma. Remova o papel de admin antes de excluir.
             </p>
           )}
           {!previa.nexus.ok && (
-            <p className="ad-sub" style={{ color: '#F5A623' }}>
+            <p className="pnl-sub" style={{ color: '#F5A623' }}>
               Não consegui falar com o Nexus ({previa.nexus.erro}). A exclusão não vai começar sem ele.
             </p>
           )}
 
-          <div className="ad-form" style={{ marginTop: 14 }}>
+          <div className="pnl-form" style={{ marginTop: 14 }}>
             <label>Digite <code>{previa.email}</code> para confirmar
               <input value={emailDigitado} onChange={e => setEmailDigitado(e.target.value)} autoComplete="off" placeholder={previa.email} />
             </label>
@@ -283,14 +283,14 @@ function ExcluirDeVez({ ficha, onErro, onSucesso }: { ficha: FichaUsuario; onErr
             <div style={{ display: 'flex', gap: 8 }}>
               <button
                 type="button"
-                className="ad-btn-perigo"
+                className="pnl-btn-perigo"
                 disabled={pendente || previa.academy.ehAdmin || !previa.nexus.ok
                   || emailDigitado.trim().toLowerCase() !== previa.email.toLowerCase() || !motivo.trim()}
                 onClick={onExcluir}
               >
                 {pendente ? 'Excluindo...' : 'Excluir dos dois bancos'}
               </button>
-              <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => { setPrevia(null); setEmailDigitado(''); setMotivo('') }}>
+              <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => { setPrevia(null); setEmailDigitado(''); setMotivo('') }}>
                 Cancelar
               </button>
             </div>
@@ -323,12 +323,12 @@ function ProgressoAba({ ficha, cursos, onErro, onSucesso }: { ficha: FichaUsuari
 
   return (
     <>
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Cursos</h2>
-        {ficha.cursos.length === 0 && <p className="ad-vazio">Nenhum curso iniciado ainda.</p>}
+        {ficha.cursos.length === 0 && <p className="pnl-vazio">Nenhum curso iniciado ainda.</p>}
         {ficha.cursos.length > 0 && (
-          <div className="ad-tabela-scroll">
-            <table className="ad-tabela">
+          <div className="pnl-tabela-scroll">
+            <table className="pnl-tabela">
               <thead><tr><th>Curso</th><th>Aulas concluídas</th><th>Progresso</th></tr></thead>
               <tbody>
                 {ficha.cursos.map(c => (
@@ -344,12 +344,12 @@ function ProgressoAba({ ficha, cursos, onErro, onSucesso }: { ficha: FichaUsuari
         )}
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Avaliações</h2>
-        {ficha.avaliacoes.length === 0 && <p className="ad-vazio">Nenhuma avaliação feita ainda.</p>}
+        {ficha.avaliacoes.length === 0 && <p className="pnl-vazio">Nenhuma avaliação feita ainda.</p>}
         {ficha.avaliacoes.length > 0 && (
-          <div className="ad-tabela-scroll">
-            <table className="ad-tabela">
+          <div className="pnl-tabela-scroll">
+            <table className="pnl-tabela">
               <thead><tr><th>Avaliação</th><th>Curso</th><th>Melhor nota</th><th>Aprovado</th><th>Tentativas</th></tr></thead>
               <tbody>
                 {ficha.avaliacoes.map(a => (
@@ -367,12 +367,12 @@ function ProgressoAba({ ficha, cursos, onErro, onSucesso }: { ficha: FichaUsuari
         )}
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Certificados emitidos</h2>
-        {ficha.certificados.length === 0 && <p className="ad-vazio">Nenhum certificado emitido ainda.</p>}
+        {ficha.certificados.length === 0 && <p className="pnl-vazio">Nenhum certificado emitido ainda.</p>}
         {ficha.certificados.length > 0 && (
-          <div className="ad-tabela-scroll">
-            <table className="ad-tabela">
+          <div className="pnl-tabela-scroll">
+            <table className="pnl-tabela">
               <thead><tr><th>Número</th><th>Curso</th><th>Nota</th><th>Emitido em</th></tr></thead>
               <tbody>
                 {ficha.certificados.map(c => (
@@ -388,14 +388,14 @@ function ProgressoAba({ ficha, cursos, onErro, onSucesso }: { ficha: FichaUsuari
           </div>
         )}
 
-        <form onSubmit={onEmitirManual} className="ad-form-linha" style={{ marginTop: 12, alignItems: 'flex-end' }}>
+        <form onSubmit={onEmitirManual} className="pnl-form-linha" style={{ marginTop: 12, alignItems: 'flex-end' }}>
           <label style={{ flex: 2 }}>Emitir certificado manual pra
             <select value={cursoId} onChange={e => setCursoId(e.target.value)}>
               <option value="">Selecione um curso...</option>
               {cursos.map(c => <option key={c.id} value={c.id}>{c.titulo}</option>)}
             </select>
           </label>
-          <button type="submit" className="ad-btn-primario" disabled={pendente}><Certificado size={14} variante="mono" /> Emitir</button>
+          <button type="submit" className="pnl-btn-primario" disabled={pendente}><Certificado size={14} variante="mono" /> Emitir</button>
         </form>
       </section>
     </>
@@ -439,32 +439,32 @@ function GamificacaoAba({ ficha, extratoInicial, onErro, onSucesso }: { ficha: F
 
   return (
     <>
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Resumo</h2>
-        <div className="ad-fin-stats">
-          <div className="ad-fin-stat"><b><XP size={16} variante="mono" /> {ficha.xp}</b><span>XP total</span></div>
-          <div className="ad-fin-stat"><b><Moeda size={16} variante="mono" /> {ficha.moedas}</b><span>Moedas</span></div>
-          <div className="ad-fin-stat"><b><SeloNivel size={16} variante="mono" nivel={ficha.nivel} /> {ficha.nivelNome}</b><span>Nível</span></div>
-          <div className="ad-fin-stat"><b><FogoStreak size={16} variante="mono" /> {ficha.streak}</b><span>Dias de sequência</span></div>
+        <div className="pnl-fin-stats">
+          <div className="pnl-fin-stat"><b><XP size={16} variante="mono" /> {ficha.xp}</b><span>XP total</span></div>
+          <div className="pnl-fin-stat"><b><Moeda size={16} variante="mono" /> {ficha.moedas}</b><span>Moedas</span></div>
+          <div className="pnl-fin-stat"><b><SeloNivel size={16} variante="mono" nivel={ficha.nivel} /> {ficha.nivelNome}</b><span>Nível</span></div>
+          <div className="pnl-fin-stat"><b><FogoStreak size={16} variante="mono" /> {ficha.streak}</b><span>Dias de sequência</span></div>
         </div>
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Ajuste manual</h2>
         <p>Correção pontual de XP/moedas, use valores negativos pra descontar. Fica registrado no extrato e na auditoria.</p>
-        <form onSubmit={onAjustar} className="ad-form-linha" style={{ alignItems: 'flex-end' }}>
+        <form onSubmit={onAjustar} className="pnl-form-linha" style={{ alignItems: 'flex-end' }}>
           <label>Pontos<input type="number" value={pontos} onChange={e => setPontos(e.target.value)} placeholder="0" /></label>
           <label>Moedas<input type="number" value={moedas} onChange={e => setMoedas(e.target.value)} placeholder="0" /></label>
-          <button type="submit" className="ad-btn-primario" disabled={pendente}>Ajustar</button>
+          <button type="submit" className="pnl-btn-primario" disabled={pendente}>Ajustar</button>
         </form>
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Extrato ({extrato.totalCount})</h2>
-        {extrato.linhas.length === 0 && <p className="ad-vazio">Nenhum lançamento ainda.</p>}
+        {extrato.linhas.length === 0 && <p className="pnl-vazio">Nenhum lançamento ainda.</p>}
         {extrato.linhas.length > 0 && (
-          <div className="ad-tabela-scroll">
-            <table className="ad-tabela">
+          <div className="pnl-tabela-scroll">
+            <table className="pnl-tabela">
               <thead><tr><th>Gatilho</th><th>Pontos</th><th>Moedas</th><th>Data</th></tr></thead>
               <tbody>
                 {extrato.linhas.map(l => (
@@ -480,7 +480,7 @@ function GamificacaoAba({ ficha, extratoInicial, onErro, onSucesso }: { ficha: F
           </div>
         )}
         {extrato.linhas.length < extrato.totalCount && (
-          <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={onCarregarMais} style={{ marginTop: 10 }}>
+          <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={onCarregarMais} style={{ marginTop: 10 }}>
             {pendente ? 'Carregando...' : 'Carregar mais'}
           </button>
         )}
@@ -494,29 +494,29 @@ function GamificacaoAba({ ficha, extratoInicial, onErro, onSucesso }: { ficha: F
 // ============================================================
 function FinanceiroAba({ ficha }: { ficha: FichaUsuario }) {
   return (
-    <section className="ad-card">
+    <section className="pnl-card">
       <h2>Assinatura e cobranças</h2>
       <p>Leitura apenas. Ações financeiras (suspender/cancelar assinatura, editar planos) ficam no <a href="/admin/financeiro" style={{ textDecoration: 'underline' }}>módulo Financeiro</a>.</p>
 
-      {!ficha.assinatura && <p className="ad-vazio">Sem assinatura.</p>}
+      {!ficha.assinatura && <p className="pnl-vazio">Sem assinatura.</p>}
       {ficha.assinatura && (
         <>
           <p style={{ marginBottom: 12 }}>
-            <span className={`ad-status-pill ${ficha.assinatura.status}`}>{ficha.assinatura.status}</span>
+            <span className={`pnl-status-pill ${ficha.assinatura.status}`}>{ficha.assinatura.status}</span>
             {' '}{ficha.assinatura.planoNome}
-            {ficha.assinatura.observacao && <span className="ad-fin-nota"> · {ficha.assinatura.observacao}</span>}
+            {ficha.assinatura.observacao && <span className="pnl-fin-nota"> · {ficha.assinatura.observacao}</span>}
           </p>
 
-          {ficha.assinatura.cobrancas.length === 0 && <p className="ad-vazio-sm">Nenhuma cobrança registrada.</p>}
+          {ficha.assinatura.cobrancas.length === 0 && <p className="pnl-vazio-sm">Nenhuma cobrança registrada.</p>}
           {ficha.assinatura.cobrancas.length > 0 && (
-            <div className="ad-tabela-scroll">
-              <table className="ad-tabela">
+            <div className="pnl-tabela-scroll">
+              <table className="pnl-tabela">
                 <thead><tr><th>Valor</th><th>Status</th><th>Vencimento</th><th>Pago em</th><th>Método</th></tr></thead>
                 <tbody>
                   {ficha.assinatura.cobrancas.map(c => (
                     <tr key={c.id}>
                       <td>{fmtBRL(c.valorCentavos)}</td>
-                      <td><span className={`ad-status-pill ${c.status}`}>{c.status}</span></td>
+                      <td><span className={`pnl-status-pill ${c.status}`}>{c.status}</span></td>
                       <td>{fmtData(c.vencimento)}</td>
                       <td>{fmtData(c.pagoEm)}</td>
                       <td>{c.metodo ?? '—'}</td>
@@ -538,15 +538,15 @@ function FinanceiroAba({ ficha }: { ficha: FichaUsuario }) {
 function ComunidadeAba({ comunidade }: { comunidade: ComunidadeUsuario }) {
   return (
     <>
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Posts recentes</h2>
         <p>Leitura apenas. Moderação (fixar, ocultar, excluir) fica no <a href="/admin/comunidade" style={{ textDecoration: 'underline' }}>módulo Comunidade</a>.</p>
-        {comunidade.posts.length === 0 && <p className="ad-vazio">Nenhum post ainda.</p>}
+        {comunidade.posts.length === 0 && <p className="pnl-vazio">Nenhum post ainda.</p>}
         {comunidade.posts.length > 0 && (
-          <ul className="ad-usu-lista">
+          <ul className="pnl-usu-lista">
             {comunidade.posts.map(p => (
               <li key={p.id}>
-                <b>{p.titulo ?? '(sem título)'}</b> <span className="ad-fin-nota">{fmtDataHora(p.criadoEm)}</span>
+                <b>{p.titulo ?? '(sem título)'}</b> <span className="pnl-fin-nota">{fmtDataHora(p.criadoEm)}</span>
                 <p>{p.corpo}</p>
               </li>
             ))}
@@ -554,14 +554,14 @@ function ComunidadeAba({ comunidade }: { comunidade: ComunidadeUsuario }) {
         )}
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Comentários recentes</h2>
-        {comunidade.comentarios.length === 0 && <p className="ad-vazio">Nenhum comentário ainda.</p>}
+        {comunidade.comentarios.length === 0 && <p className="pnl-vazio">Nenhum comentário ainda.</p>}
         {comunidade.comentarios.length > 0 && (
-          <ul className="ad-usu-lista">
+          <ul className="pnl-usu-lista">
             {comunidade.comentarios.map(c => (
               <li key={c.id}>
-                <span className="ad-fin-nota">{fmtDataHora(c.criadoEm)}</span>
+                <span className="pnl-fin-nota">{fmtDataHora(c.criadoEm)}</span>
                 <p>{c.corpo}</p>
               </li>
             ))}
@@ -583,12 +583,12 @@ const NOME_ACAO: Record<string, string> = {
 
 function AuditoriaAba({ auditoria }: { auditoria: AuditoriaLinha[] }) {
   return (
-    <section className="ad-card">
+    <section className="pnl-card">
       <h2>Log de ações administrativas</h2>
-      {auditoria.length === 0 && <p className="ad-vazio">Nenhuma ação registrada ainda.</p>}
+      {auditoria.length === 0 && <p className="pnl-vazio">Nenhuma ação registrada ainda.</p>}
       {auditoria.length > 0 && (
-        <div className="ad-tabela-scroll">
-          <table className="ad-tabela">
+        <div className="pnl-tabela-scroll">
+          <table className="pnl-tabela">
             <thead><tr><th>Quando</th><th>Admin</th><th>Ação</th><th>Justificativa</th></tr></thead>
             <tbody>
               {auditoria.map(a => (

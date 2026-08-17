@@ -4157,129 +4157,141 @@ body.teatro .trilho-aulas{display:none}
 .pagina-admin *{box-sizing:border-box}
 .pagina-admin a{color:inherit;text-decoration:none}
 .pagina-admin button{font:inherit;cursor:pointer}
-.pagina-admin .ad-shell{
+
+/* ⚠️ O PREFIXO DESTE PAINEL É `pnl-` (painel), E NÃO `ad-`. NÃO VOLTAR.
+   Ele era `ad-` até 17/08/2026, e bloqueador de anúncio come esses nomes:
+   `ad-sidebar` e `ad-card` estão nas listas de filtro do uBlock/AdBlock/Brave,
+   que aplicam display:none neles. O sintoma não parece CSS — parece falta de
+   permissão: um super admin real abria /admin, lia "Seus papéis: Super Admin"
+   e via a página vazia, sem menu lateral e sem cartão nenhum. Pior, o
+   .pnl-shell é um grid `240px 1fr`: com a sidebar removida da árvore, o
+   conteúdo escorrega para a coluna de 240px e a tela fica torta também.
+   Nada disso gera erro em log nenhum, e quem não usa bloqueador (o dono do
+   produto) nunca reproduz. Prefixo novo sem parentesco com publicidade —
+   evitar `ad`, `ads`, `advert`, `banner`, `promo`, `sponsor` em classe. */
+.pagina-admin .pnl-shell{
   display:grid;grid-template-columns:240px 1fr;gap:0;
   padding-top:var(--nav-h);min-height:100vh;
 }
-@media(max-width:860px){.pagina-admin .ad-shell{grid-template-columns:1fr}}
-.pagina-admin .ad-sidebar{
+@media(max-width:860px){.pagina-admin .pnl-shell{grid-template-columns:1fr}}
+.pagina-admin .pnl-sidebar{
   border-right:1px solid var(--linha-suave);padding:var(--s-5) var(--s-3);
   display:flex;flex-direction:column;gap:var(--s-4);
 }
-.pagina-admin .ad-sidebar-cab{display:flex;flex-direction:column;gap:8px}
-.pagina-admin .ad-sidebar-titulo{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cinza)}
-.pagina-admin .ad-papeis{display:flex;flex-wrap:wrap;gap:6px}
-.pagina-admin .ad-pill{
+.pagina-admin .pnl-sidebar-cab{display:flex;flex-direction:column;gap:8px}
+.pagina-admin .pnl-sidebar-titulo{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cinza)}
+.pagina-admin .pnl-papeis{display:flex;flex-wrap:wrap;gap:6px}
+.pagina-admin .pnl-pill{
   font-size:11px;font-weight:650;padding:4px 10px;border-radius:var(--r-pill);
   color:var(--verde);background:rgba(32,217,166,.1);border:1px solid rgba(32,217,166,.3);
 }
-.pagina-admin .ad-nav{display:flex;flex-direction:column;gap:2px}
-.pagina-admin .ad-nav-item{
+.pagina-admin .pnl-nav{display:flex;flex-direction:column;gap:2px}
+.pagina-admin .pnl-nav-item{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
   font-size:14px;font-weight:550;color:var(--cinza-claro);
   padding:10px 12px;border-radius:12px;transition:background .2s,color .2s;
 }
-.pagina-admin .ad-nav-item:hover{background:rgba(255,255,255,.05);color:var(--creme)}
-.pagina-admin .ad-nav-item.em-breve{color:var(--cinza);cursor:default;opacity:.6}
-.pagina-admin .ad-nav-item.em-breve small{font-size:10px;text-transform:uppercase;letter-spacing:.08em}
-.pagina-admin .ad-conteudo{padding:var(--s-5) var(--s-6)}
-@media(max-width:640px){.pagina-admin .ad-conteudo{padding:var(--s-4)}}
-.pagina-admin .ad-conteudo h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
-.pagina-admin .ad-sub{font-size:14px;color:var(--cinza);margin-bottom:var(--s-4)}
-.pagina-admin .ad-card{
+.pagina-admin .pnl-nav-item:hover{background:rgba(255,255,255,.05);color:var(--creme)}
+.pagina-admin .pnl-nav-item.em-breve{color:var(--cinza);cursor:default;opacity:.6}
+.pagina-admin .pnl-nav-item.em-breve small{font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+.pagina-admin .pnl-conteudo{padding:var(--s-5) var(--s-6)}
+@media(max-width:640px){.pagina-admin .pnl-conteudo{padding:var(--s-4)}}
+.pagina-admin .pnl-conteudo h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.pagina-admin .pnl-sub{font-size:14px;color:var(--cinza);margin-bottom:var(--s-4)}
+.pagina-admin .pnl-card{
   display:block;padding:var(--s-4);border:1px solid var(--linha);border-radius:var(--r-card);
   background:rgba(255,255,255,.02);margin-bottom:var(--s-3);
 }
-.pagina-admin .ad-card h2{font-size:16px;font-weight:650;margin-bottom:6px}
-.pagina-admin .ad-card p{font-size:13.5px;color:var(--cinza-claro);line-height:1.5}
-.pagina-admin .ad-card-link{transition:border-color .2s,transform .2s}
-.pagina-admin .ad-card-link:hover{border-color:rgba(32,217,166,.4);transform:translateY(-2px)}
-.pagina-admin .ad-card-vazio{color:var(--cinza)}
-.pagina-admin .ad-card-destaque{
+.pagina-admin .pnl-card h2{font-size:16px;font-weight:650;margin-bottom:6px}
+.pagina-admin .pnl-card p{font-size:13.5px;color:var(--cinza-claro);line-height:1.5}
+.pagina-admin .pnl-card-link{transition:border-color .2s,transform .2s}
+.pagina-admin .pnl-card-link:hover{border-color:rgba(32,217,166,.4);transform:translateY(-2px)}
+.pagina-admin .pnl-card-vazio{color:var(--cinza)}
+.pagina-admin .pnl-card-destaque{
   display:flex;align-items:center;justify-content:space-between;gap:var(--s-4);flex-wrap:wrap;
   padding:var(--s-4);border:1px solid rgba(32,217,166,.25);border-radius:var(--r-card);
   background:rgba(32,217,166,.05);
 }
-.pagina-admin .ad-card-destaque button{flex-shrink:0}
-.pagina-admin .ad-erro{
+.pagina-admin .pnl-card-destaque button{flex-shrink:0}
+.pagina-admin .pnl-erro{
   font-size:13.5px;font-weight:600;color:#E0776B;margin-bottom:var(--s-3);
   padding:10px 14px;border-radius:12px;background:rgba(224,107,107,.08);border:1px solid rgba(224,107,107,.25);
 }
 
 /* ---------- Toast de feedback (components/AdminToast.tsx) ---------- */
-.pagina-admin .ad-toast-pilha{
+.pagina-admin .pnl-toast-pilha{
   position:fixed;top:calc(var(--nav-h,64px) + 16px);right:20px;z-index:900;
   display:flex;flex-direction:column;gap:8px;max-width:360px;
 }
-.pagina-admin .ad-toast{
+.pagina-admin .pnl-toast{
   display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:12px;
   font-size:13.5px;font-weight:600;line-height:1.4;
   box-shadow:0 12px 30px -10px rgba(0,0,0,.5);
-  animation:ad-toast-entrar .25s var(--suave,ease-out);
+  animation:pnl-toast-entrar .25s var(--suave,ease-out);
 }
-.pagina-admin .ad-toast-sucesso{color:var(--verde);background:#0E1210;border:1px solid rgba(32,217,166,.35)}
-.pagina-admin .ad-toast-erro{color:#E0776B;background:#0E1210;border:1px solid rgba(224,107,107,.35)}
-.pagina-admin .ad-toast-ico{flex-shrink:0;margin-top:1px}
-.pagina-admin .ad-toast-msg{flex:1;color:var(--creme)}
-.pagina-admin .ad-toast-fechar{flex-shrink:0;color:var(--cinza);opacity:.7;transition:opacity .15s}
-.pagina-admin .ad-toast-fechar:hover{opacity:1}
-@keyframes ad-toast-entrar{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+.pagina-admin .pnl-toast-sucesso{color:var(--verde);background:#0E1210;border:1px solid rgba(32,217,166,.35)}
+.pagina-admin .pnl-toast-erro{color:#E0776B;background:#0E1210;border:1px solid rgba(224,107,107,.35)}
+.pagina-admin .pnl-toast-ico{flex-shrink:0;margin-top:1px}
+.pagina-admin .pnl-toast-msg{flex:1;color:var(--creme)}
+.pagina-admin .pnl-toast-fechar{flex-shrink:0;color:var(--cinza);opacity:.7;transition:opacity .15s}
+.pagina-admin .pnl-toast-fechar:hover{opacity:1}
+@keyframes pnl-toast-entrar{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
 
 
 
 
 /* ============================================================
    PERITOS ACADEMY — ADMIN: GESTÃO DE ADMINISTRADORES
-   (escopado em .pagina-admin, seção .ad-admins)
+   (escopado em .pagina-admin, seção .pnl-admins)
    ============================================================ */
-.pagina-admin .ad-busca-card{
+.pagina-admin .pnl-busca-card{
   padding:var(--s-4);border:1px solid var(--linha);border-radius:var(--r-card);
   background:rgba(255,255,255,.02);margin-bottom:var(--s-4);
 }
-.pagina-admin .ad-busca-card label{font-size:11px;font-weight:650;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza);display:block;margin-bottom:8px}
-.pagina-admin .ad-busca-card input{
+.pagina-admin .pnl-busca-card label{font-size:11px;font-weight:650;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza);display:block;margin-bottom:8px}
+.pagina-admin .pnl-busca-card input{
   width:100%;font:inherit;font-size:14px;color:var(--creme);
   background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:10px;
   padding:10px 14px;outline:none;transition:border-color .2s;
 }
-.pagina-admin .ad-busca-card input:focus{border-color:rgba(32,217,166,.4)}
-.pagina-admin .ad-busca-status{font-size:12px;color:var(--cinza);display:block;margin-top:8px}
-.pagina-admin .ad-busca-resultados{list-style:none;margin-top:var(--s-3);display:flex;flex-direction:column;gap:8px}
-.pagina-admin .ad-busca-resultados li{
+.pagina-admin .pnl-busca-card input:focus{border-color:rgba(32,217,166,.4)}
+.pagina-admin .pnl-busca-status{font-size:12px;color:var(--cinza);display:block;margin-top:8px}
+.pagina-admin .pnl-busca-resultados{list-style:none;margin-top:var(--s-3);display:flex;flex-direction:column;gap:8px}
+.pagina-admin .pnl-busca-resultados li{
   display:flex;align-items:center;gap:12px;padding:10px 12px;
   border:1px solid var(--linha-suave);border-radius:12px;flex-wrap:wrap;
 }
-.pagina-admin .ad-busca-nome{font-size:14px;font-weight:600;flex:1}
-.pagina-admin .ad-busca-acoes{display:flex;flex-wrap:wrap;gap:6px}
-.pagina-admin .ad-btn-papel{
+.pagina-admin .pnl-busca-nome{font-size:14px;font-weight:600;flex:1}
+.pagina-admin .pnl-busca-acoes{display:flex;flex-wrap:wrap;gap:6px}
+.pagina-admin .pnl-btn-papel{
   font-size:12px;font-weight:600;color:var(--verde);
   padding:6px 12px;border-radius:var(--r-pill);
   background:rgba(32,217,166,.08);border:1px solid rgba(32,217,166,.28);
   transition:background .2s;
 }
-.pagina-admin .ad-btn-papel:hover{background:rgba(32,217,166,.16)}
-.pagina-admin .ad-btn-papel:disabled{opacity:.5;cursor:default}
-.pagina-admin .ad-avatar{
+.pagina-admin .pnl-btn-papel:hover{background:rgba(32,217,166,.16)}
+.pagina-admin .pnl-btn-papel:disabled{opacity:.5;cursor:default}
+.pagina-admin .pnl-avatar{
   width:36px;height:36px;border-radius:50%;flex-shrink:0;
   background:linear-gradient(135deg,#173B31,#0E1F1A);border:1px solid var(--linha);
   display:grid;place-items:center;font-size:12px;font-weight:650;color:var(--creme);
 }
-.pagina-admin .ad-vazio{font-size:14px;color:var(--cinza)}
-.pagina-admin .ad-lista-admins{display:flex;flex-direction:column;gap:10px}
-.pagina-admin .ad-admin-linha{
+.pagina-admin .pnl-vazio{font-size:14px;color:var(--cinza)}
+.pagina-admin .pnl-lista-admins{display:flex;flex-direction:column;gap:10px}
+.pagina-admin .pnl-admin-linha{
   display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);flex-wrap:wrap;
   padding:14px 16px;border:1px solid var(--linha);border-radius:var(--r-card);
   background:rgba(255,255,255,.015);
 }
-.pagina-admin .ad-admin-quem{display:flex;align-items:center;gap:12px}
-.pagina-admin .ad-admin-quem b{font-size:14.5px;font-weight:650;display:block}
-.pagina-admin .ad-admin-slug{font-size:12px;color:var(--cinza)}
-.pagina-admin .ad-admin-papeis{display:flex;flex-wrap:wrap;gap:14px}
-.pagina-admin .ad-toggle-papel{
+.pagina-admin .pnl-admin-quem{display:flex;align-items:center;gap:12px}
+.pagina-admin .pnl-admin-quem b{font-size:14.5px;font-weight:650;display:block}
+.pagina-admin .pnl-admin-slug{font-size:12px;color:var(--cinza)}
+.pagina-admin .pnl-admin-papeis{display:flex;flex-wrap:wrap;gap:14px}
+.pagina-admin .pnl-toggle-papel{
   display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cinza-claro);cursor:pointer;
 }
-.pagina-admin .ad-toggle-papel.ativo{color:var(--creme);font-weight:600}
-.pagina-admin .ad-toggle-papel input[type="checkbox"]{width:16px;height:16px;accent-color:#20D9A6;cursor:pointer}
+.pagina-admin .pnl-toggle-papel.ativo{color:var(--creme);font-weight:600}
+.pagina-admin .pnl-toggle-papel input[type="checkbox"]{width:16px;height:16px;accent-color:#20D9A6;cursor:pointer}
 
 
 
@@ -4288,119 +4300,119 @@ body.teatro .trilho-aulas{display:none}
    PERITOS ACADEMY — ADMIN: CONTEÚDO
    (cursos, trilhas, avaliações — escopado em .pagina-admin)
    ============================================================ */
-.pagina-admin .ad-cursos-cab{
+.pagina-admin .pnl-cursos-cab{
   display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s-3);
   flex-wrap:wrap;margin-bottom:var(--s-4);
 }
-.pagina-admin .ad-btn-primario{
+.pagina-admin .pnl-btn-primario{
   font-size:13.5px;font-weight:650;color:var(--carvao);
   padding:10px 18px;border-radius:var(--r-pill);background:var(--verde);
   transition:opacity .2s;white-space:nowrap;
 }
-.pagina-admin .ad-btn-primario:hover{opacity:.88}
-.pagina-admin .ad-btn-primario:disabled{opacity:.5;cursor:default}
-.pagina-admin .ad-btn-secundario{
+.pagina-admin .pnl-btn-primario:hover{opacity:.88}
+.pagina-admin .pnl-btn-primario:disabled{opacity:.5;cursor:default}
+.pagina-admin .pnl-btn-secundario{
   font-size:13px;font-weight:600;color:var(--creme);
   padding:9px 16px;border-radius:var(--r-pill);
   background:rgba(255,255,255,.05);border:1px solid var(--linha);
   transition:background .2s;white-space:nowrap;display:inline-flex;align-items:center;
 }
-.pagina-admin .ad-btn-secundario:hover{background:rgba(255,255,255,.09)}
-.pagina-admin .ad-btn-secundario:disabled{opacity:.5;cursor:default}
-.pagina-admin .ad-btn-perigo{
+.pagina-admin .pnl-btn-secundario:hover{background:rgba(255,255,255,.09)}
+.pagina-admin .pnl-btn-secundario:disabled{opacity:.5;cursor:default}
+.pagina-admin .pnl-btn-perigo{
   font-size:12.5px;font-weight:600;color:#E0776B;
   padding:8px 14px;border-radius:var(--r-pill);
   background:rgba(224,107,107,.08);border:1px solid rgba(224,107,107,.25);
   transition:background .2s;white-space:nowrap;
 }
-.pagina-admin .ad-btn-perigo:hover{background:rgba(224,107,107,.16)}
-.pagina-admin .ad-btn-perigo:disabled{opacity:.5;cursor:default}
-.pagina-admin .ad-btn-perigo-sm{
+.pagina-admin .pnl-btn-perigo:hover{background:rgba(224,107,107,.16)}
+.pagina-admin .pnl-btn-perigo:disabled{opacity:.5;cursor:default}
+.pagina-admin .pnl-btn-perigo-sm{
   font-size:13px;line-height:1;color:#E0776B;
   padding:6px 8px;border-radius:8px;background:rgba(224,107,107,.08);
   transition:background .2s;
 }
-.pagina-admin .ad-btn-perigo-sm:hover{background:rgba(224,107,107,.16)}
-.pagina-admin .ad-btn-perigo-sm:disabled{opacity:.5;cursor:default}
-.pagina-admin .ad-form-acoes{display:flex;gap:8px;margin-top:var(--s-3)}
+.pagina-admin .pnl-btn-perigo-sm:hover{background:rgba(224,107,107,.16)}
+.pagina-admin .pnl-btn-perigo-sm:disabled{opacity:.5;cursor:default}
+.pagina-admin .pnl-form-acoes{display:flex;gap:8px;margin-top:var(--s-3)}
 
-.pagina-admin .ad-cursos-grid{
+.pagina-admin .pnl-cursos-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--s-3);
 }
-.pagina-admin .ad-curso-card{
+.pagina-admin .pnl-curso-card{
   border:1px solid var(--linha);border-radius:var(--r-card);overflow:hidden;
   background:rgba(255,255,255,.015);display:flex;flex-direction:column;
 }
-.pagina-admin .ad-curso-capa{
+.pagina-admin .pnl-curso-capa{
   display:block;aspect-ratio:16/9;background-size:cover;background-position:center;
   background-color:var(--preto-elev);display:grid;place-items:center;
   color:var(--cinza);font-size:12px;
 }
-.pagina-admin .ad-curso-info{padding:var(--s-3);display:flex;flex-direction:column;gap:8px}
-.pagina-admin .ad-curso-titulo{font-size:15px;font-weight:650;color:var(--creme)}
-.pagina-admin .ad-curso-subtitulo{font-size:12.5px;color:var(--cinza-claro);line-height:1.4}
-.pagina-admin .ad-curso-meta{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--cinza)}
-.pagina-admin .ad-curso-acoes{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pagina-admin .pnl-curso-info{padding:var(--s-3);display:flex;flex-direction:column;gap:8px}
+.pagina-admin .pnl-curso-titulo{font-size:15px;font-weight:650;color:var(--creme)}
+.pagina-admin .pnl-curso-subtitulo{font-size:12.5px;color:var(--cinza-claro);line-height:1.4}
+.pagina-admin .pnl-curso-meta{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--cinza)}
+.pagina-admin .pnl-curso-acoes{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:4px}
 
-.pagina-admin .ad-voltar{font-size:13px;color:var(--cinza);display:inline-block;margin-bottom:var(--s-3)}
-.pagina-admin .ad-voltar:hover{color:var(--creme)}
-.pagina-admin .ad-editor-cab{
+.pagina-admin .pnl-voltar{font-size:13px;color:var(--cinza);display:inline-block;margin-bottom:var(--s-3)}
+.pagina-admin .pnl-voltar:hover{color:var(--creme)}
+.pagina-admin .pnl-editor-cab{
   display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);flex-wrap:wrap;
   margin-bottom:var(--s-4);
 }
-.pagina-admin .ad-editor-cab h1{margin-bottom:0}
-.pagina-admin .ad-editor-cab-acoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.pagina-admin .ad-caso-numero{font-size:14px;font-weight:500;color:var(--cinza)}
+.pagina-admin .pnl-editor-cab h1{margin-bottom:0}
+.pagina-admin .pnl-editor-cab-acoes{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pagina-admin .pnl-caso-numero{font-size:14px;font-weight:500;color:var(--cinza)}
 
-.pagina-admin .ad-editor-grid{display:grid;grid-template-columns:220px 1fr;gap:var(--s-3);align-items:start}
-@media(max-width:760px){.pagina-admin .ad-editor-grid{grid-template-columns:1fr}}
-.pagina-admin .ad-capa-preview{
+.pagina-admin .pnl-editor-grid{display:grid;grid-template-columns:220px 1fr;gap:var(--s-3);align-items:start}
+@media(max-width:760px){.pagina-admin .pnl-editor-grid{grid-template-columns:1fr}}
+.pagina-admin .pnl-capa-preview{
   aspect-ratio:16/9;border-radius:14px;background-size:cover;background-position:center;
   background-color:var(--preto-elev);border:1px solid var(--linha);
   display:grid;place-items:center;color:var(--cinza);font-size:12px;margin-bottom:10px;
 }
-.pagina-admin .ad-capa-preview-sm{aspect-ratio:16/9;max-width:220px;margin-bottom:0}
-.pagina-admin .ad-upload-btn{display:inline-flex;cursor:pointer}
+.pagina-admin .pnl-capa-preview-sm{aspect-ratio:16/9;max-width:220px;margin-bottom:0}
+.pagina-admin .pnl-upload-btn{display:inline-flex;cursor:pointer}
 
-.pagina-admin .ad-form{display:flex;flex-direction:column;gap:var(--s-3)}
-/* botões de ação dentro de containers flex-column (ad-form, ad-picker) não
+.pagina-admin .pnl-form{display:flex;flex-direction:column;gap:var(--s-3)}
+/* botões de ação dentro de containers flex-column (pnl-form, pnl-picker) não
    devem esticar pra largura total — largura natural do conteúdo, alinhado
    à esquerda (mesmo bug corrigido em todo formulário "Salvar..." do admin) */
-.pagina-admin .ad-form > button[type="submit"],
-.pagina-admin .ad-picker > button{
+.pagina-admin .pnl-form > button[type="submit"],
+.pagina-admin .pnl-picker > button{
   align-self:flex-start;min-height:42px;
 }
-.pagina-admin .ad-form label{
+.pagina-admin .pnl-form label{
   display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:650;
   letter-spacing:.04em;color:var(--cinza);
 }
-.pagina-admin .ad-form input,
-.pagina-admin .ad-form textarea{
+.pagina-admin .pnl-form input,
+.pagina-admin .pnl-form textarea{
   width:100%;font:inherit;font-size:14px;font-weight:400;color:var(--creme);
   background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:10px;
   padding:10px 14px;outline:none;transition:border-color .2s;resize:vertical;
 }
-.pagina-admin .ad-form input:focus,
-.pagina-admin .ad-form textarea:focus{border-color:rgba(32,217,166,.4)}
-.pagina-admin .ad-form-linha{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--s-3)}
-.pagina-admin .ad-checkbox-linha{
+.pagina-admin .pnl-form input:focus,
+.pagina-admin .pnl-form textarea:focus{border-color:rgba(32,217,166,.4)}
+.pagina-admin .pnl-form-linha{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:var(--s-3)}
+.pagina-admin .pnl-checkbox-linha{
   flex-direction:row !important;align-items:center;gap:8px !important;font-size:13px !important;
   font-weight:500 !important;color:var(--cinza-claro) !important;text-transform:none;letter-spacing:normal;
   cursor:pointer;
 }
-.pagina-admin .ad-checkbox-linha input{width:16px;height:16px;accent-color:#20D9A6;cursor:pointer}
+.pagina-admin .pnl-checkbox-linha input{width:16px;height:16px;accent-color:#20D9A6;cursor:pointer}
 
-.pagina-admin .ad-nova-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:var(--s-3)}
-.pagina-admin .ad-nova-linha input{
+.pagina-admin .pnl-nova-linha{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:var(--s-3)}
+.pagina-admin .pnl-nova-linha input{
   flex:1;min-width:160px;font:inherit;font-size:13.5px;color:var(--creme);
   background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:10px;
   padding:9px 12px;outline:none;transition:border-color .2s;
 }
-.pagina-admin .ad-nova-linha input:focus{border-color:rgba(32,217,166,.4)}
+.pagina-admin .pnl-nova-linha input:focus{border-color:rgba(32,217,166,.4)}
 
-/* select nativo — regra única pra TODO o admin (cobre .ad-form, .ad-nova-linha,
-   .ad-busca-card e qualquer <select> solto num .ad-form-linha): sem isso, campos
-   fora de .ad-form/.ad-nova-linha ficavam com a aparência branca nativa do SO,
+/* select nativo — regra única pra TODO o admin (cobre .pnl-form, .pnl-nova-linha,
+   .pnl-busca-card e qualquer <select> solto num .pnl-form-linha): sem isso, campos
+   fora de .pnl-form/.pnl-nova-linha ficavam com a aparência branca nativa do SO,
    ilegível contra o tema escuro. Largura natural (não estica pra 100%) — um
    campo de 3 opções não deve ocupar a seção inteira; listas longas (curso,
    módulo) ainda crescem até o limite do próprio grid/flex container. */
@@ -4415,89 +4427,89 @@ body.teatro .trilho-aulas{display:none}
 }
 .pagina-admin select:focus{border-color:rgba(32,217,166,.4)}
 .pagina-admin select option{background:#12151a;color:var(--creme)}
-.pagina-admin .ad-form select,
-.pagina-admin .ad-nova-linha select{min-width:160px}
-.pagina-admin .ad-input-sm{flex:0 0 110px !important;min-width:0 !important}
+.pagina-admin .pnl-form select,
+.pagina-admin .pnl-nova-linha select{min-width:160px}
+.pagina-admin .pnl-input-sm{flex:0 0 110px !important;min-width:0 !important}
 
-.pagina-admin .ad-modulos-lista{display:flex;flex-direction:column;gap:10px}
-.pagina-admin .ad-modulo-bloco{border:1px solid var(--linha);border-radius:16px;background:rgba(255,255,255,.015);overflow:hidden}
-.pagina-admin .ad-modulo-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;flex-wrap:wrap}
-.pagina-admin .ad-modulo-toggle{font-size:14px;font-weight:650;color:var(--creme);text-align:left;flex:1}
-.pagina-admin .ad-modulo-acoes{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.pagina-admin .ad-modulo-acoes button{
+.pagina-admin .pnl-modulos-lista{display:flex;flex-direction:column;gap:10px}
+.pagina-admin .pnl-modulo-bloco{border:1px solid var(--linha);border-radius:16px;background:rgba(255,255,255,.015);overflow:hidden}
+.pagina-admin .pnl-modulo-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;flex-wrap:wrap}
+.pagina-admin .pnl-modulo-toggle{font-size:14px;font-weight:650;color:var(--creme);text-align:left;flex:1}
+.pagina-admin .pnl-modulo-acoes{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pagina-admin .pnl-modulo-acoes button{
   font-size:13px;color:var(--cinza-claro);padding:6px 9px;border-radius:8px;
   background:rgba(255,255,255,.04);transition:background .2s;
 }
-.pagina-admin .ad-modulo-acoes button:hover{background:rgba(255,255,255,.09)}
-.pagina-admin .ad-modulo-acoes button:disabled{opacity:.4;cursor:default}
-.pagina-admin .ad-modulo-contagem{font-size:12px;color:var(--cinza);margin-right:4px}
-.pagina-admin .ad-modulo-corpo{padding:0 14px 14px;border-top:1px solid var(--linha-suave);padding-top:12px;display:flex;flex-direction:column;gap:10px}
-.pagina-admin .ad-inline-edit{display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap}
-.pagina-admin .ad-inline-edit input{
+.pagina-admin .pnl-modulo-acoes button:hover{background:rgba(255,255,255,.09)}
+.pagina-admin .pnl-modulo-acoes button:disabled{opacity:.4;cursor:default}
+.pagina-admin .pnl-modulo-contagem{font-size:12px;color:var(--cinza);margin-right:4px}
+.pagina-admin .pnl-modulo-corpo{padding:0 14px 14px;border-top:1px solid var(--linha-suave);padding-top:12px;display:flex;flex-direction:column;gap:10px}
+.pagina-admin .pnl-inline-edit{display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap}
+.pagina-admin .pnl-inline-edit input{
   flex:1;min-width:160px;font:inherit;font-size:14px;color:var(--creme);
   background:rgba(255,255,255,.05);border:1px solid rgba(32,217,166,.4);border-radius:8px;padding:6px 10px;outline:none;
 }
-.pagina-admin .ad-inline-edit button{
+.pagina-admin .pnl-inline-edit button{
   font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:8px;
   background:rgba(255,255,255,.05);color:var(--creme);
 }
 
-.pagina-admin .ad-aula-bloco{border:1px solid var(--linha-suave);border-radius:12px;background:rgba(255,255,255,.012)}
-.pagina-admin .ad-aula-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;flex-wrap:wrap}
-.pagina-admin .ad-aula-toggle{font-size:13.5px;font-weight:600;color:var(--creme);text-align:left;flex:1}
-.pagina-admin .ad-aula-acoes{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.pagina-admin .ad-aula-acoes button{
+.pagina-admin .pnl-aula-bloco{border:1px solid var(--linha-suave);border-radius:12px;background:rgba(255,255,255,.012)}
+.pagina-admin .pnl-aula-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;flex-wrap:wrap}
+.pagina-admin .pnl-aula-toggle{font-size:13.5px;font-weight:600;color:var(--creme);text-align:left;flex:1}
+.pagina-admin .pnl-aula-acoes{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pagina-admin .pnl-aula-acoes button{
   font-size:12.5px;color:var(--cinza-claro);padding:5px 8px;border-radius:8px;
   background:rgba(255,255,255,.04);transition:background .2s;
 }
-.pagina-admin .ad-aula-acoes button:hover{background:rgba(255,255,255,.09)}
-.pagina-admin .ad-aula-acoes button:disabled{opacity:.4;cursor:default}
-.pagina-admin .ad-aula-meta{font-size:11.5px;color:var(--cinza);margin-right:4px;white-space:nowrap}
-.pagina-admin .ad-aula-corpo{padding:12px;border-top:1px solid var(--linha-suave);display:flex;flex-direction:column;gap:var(--s-3)}
-.pagina-admin .ad-aula-capa-linha{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.pagina-admin .pnl-aula-acoes button:hover{background:rgba(255,255,255,.09)}
+.pagina-admin .pnl-aula-acoes button:disabled{opacity:.4;cursor:default}
+.pagina-admin .pnl-aula-meta{font-size:11.5px;color:var(--cinza);margin-right:4px;white-space:nowrap}
+.pagina-admin .pnl-aula-corpo{padding:12px;border-top:1px solid var(--linha-suave);display:flex;flex-direction:column;gap:var(--s-3)}
+.pagina-admin .pnl-aula-capa-linha{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 
-.pagina-admin .ad-sublista{border-top:1px solid var(--linha-suave);padding-top:12px}
-.pagina-admin .ad-sublista h3{font-size:12px;font-weight:650;text-transform:uppercase;letter-spacing:.06em;color:var(--cinza);margin-bottom:8px}
-.pagina-admin .ad-sublista ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
-.pagina-admin .ad-sublista li{
+.pagina-admin .pnl-sublista{border-top:1px solid var(--linha-suave);padding-top:12px}
+.pagina-admin .pnl-sublista h3{font-size:12px;font-weight:650;text-transform:uppercase;letter-spacing:.06em;color:var(--cinza);margin-bottom:8px}
+.pagina-admin .pnl-sublista ul{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.pagina-admin .pnl-sublista li{
   display:flex;align-items:center;gap:10px;padding:7px 10px;
   border:1px solid var(--linha-suave);border-radius:9px;font-size:13px;color:var(--creme);
 }
-.pagina-admin .ad-sublista li span:first-of-type{flex:1}
-.pagina-admin .ad-sublista li label{flex:1;display:flex !important;flex-direction:row !important}
-.pagina-admin .ad-sublista-meta{font-size:11px;color:var(--cinza)}
-.pagina-admin .ad-vazio-sm{font-size:12.5px;color:var(--cinza);margin-bottom:8px}
+.pagina-admin .pnl-sublista li span:first-of-type{flex:1}
+.pagina-admin .pnl-sublista li label{flex:1;display:flex !important;flex-direction:row !important}
+.pagina-admin .pnl-sublista-meta{font-size:11px;color:var(--cinza)}
+.pagina-admin .pnl-vazio-sm{font-size:12.5px;color:var(--cinza);margin-bottom:8px}
 
-.pagina-admin .ad-picker{display:flex;flex-direction:column;gap:8px}
+.pagina-admin .pnl-picker{display:flex;flex-direction:column;gap:8px}
 /* Aviso de que o vínculo de curso NÃO sai pelo "Salvar dados gerais" — são
    tabelas e botões diferentes, e o de cima salva com sucesso sem tocar nisto. */
-.pagina-admin .ad-picker-dica{
+.pagina-admin .pnl-picker-dica{
   font-size:12.5px;line-height:1.5;color:var(--cinza);
   background:rgba(32,217,166,.06);border:1px solid rgba(32,217,166,.18);
   border-radius:10px;padding:8px 11px;margin:0;
 }
-.pagina-admin .ad-picker-dica strong{color:var(--creme)}
-.pagina-admin .ad-picker-busca{
+.pagina-admin .pnl-picker-dica strong{color:var(--creme)}
+.pagina-admin .pnl-picker-busca{
   width:100%;font:inherit;font-size:13.5px;color:var(--creme);
   background:rgba(255,255,255,.04);border:1px solid var(--linha);border-radius:10px;
   padding:9px 12px;outline:none;transition:border-color .2s;
 }
-.pagina-admin .ad-picker-busca:focus{border-color:rgba(32,217,166,.4)}
-.pagina-admin .ad-picker-lista{
+.pagina-admin .pnl-picker-busca:focus{border-color:rgba(32,217,166,.4)}
+.pagina-admin .pnl-picker-lista{
   max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;
   border:1px solid var(--linha-suave);border-radius:10px;padding:6px;
   background:rgba(255,255,255,.015);
 }
-.pagina-admin .ad-picker-item{
+.pagina-admin .pnl-picker-item{
   display:flex !important;flex-direction:row !important;align-items:center;gap:10px;
   padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .15s;
 }
-.pagina-admin .ad-picker-item:hover{background:rgba(255,255,255,.06)}
-.pagina-admin .ad-picker-item input[type="checkbox"]{
+.pagina-admin .pnl-picker-item:hover{background:rgba(255,255,255,.06)}
+.pagina-admin .pnl-picker-item input[type="checkbox"]{
   width:16px;height:16px;flex-shrink:0;accent-color:#20D9A6;cursor:pointer;
 }
-.pagina-admin .ad-picker-titulo{flex:1;font-size:13.5px;color:var(--creme)}
-.pagina-admin .ad-picker-badge{
+.pagina-admin .pnl-picker-titulo{flex:1;font-size:13.5px;color:var(--creme)}
+.pagina-admin .pnl-picker-badge{
   flex-shrink:0;font-size:11px;font-weight:600;color:var(--cinza);
   background:rgba(255,255,255,.06);border:1px solid var(--linha-suave);
   border-radius:var(--r-pill);padding:3px 9px;white-space:nowrap;
@@ -4509,80 +4521,80 @@ body.teatro .trilho-aulas{display:none}
    PERITOS ACADEMY — ADMIN: OPERAÇÃO
    (desafios, certificados, comunidade, agenda, avisos)
    ============================================================ */
-.pagina-admin .ad-form-subtitulo{font-size:13px;font-weight:650;text-transform:uppercase;letter-spacing:.06em;color:var(--cinza);margin-top:6px;padding-top:var(--s-3);border-top:1px solid var(--linha-suave)}
+.pagina-admin .pnl-form-subtitulo{font-size:13px;font-weight:650;text-transform:uppercase;letter-spacing:.06em;color:var(--cinza);margin-top:6px;padding-top:var(--s-3);border-top:1px solid var(--linha-suave)}
 
-.pagina-admin .ad-sublista-lista{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
-.pagina-admin .ad-doc-linha{
+.pagina-admin .pnl-sublista-lista{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.pagina-admin .pnl-doc-linha{
   display:flex;align-items:center;gap:10px;padding:8px 12px;
   border:1px solid var(--linha-suave);border-radius:10px;font-size:13px;color:var(--creme);flex-wrap:wrap;
 }
-.pagina-admin .ad-doc-linha span:first-child{flex:1;font-weight:600}
+.pagina-admin .pnl-doc-linha span:first-child{flex:1;font-weight:600}
 
-.pagina-admin .ad-tabela-scroll{overflow-x:auto}
-.pagina-admin .ad-tabela{width:100%;border-collapse:collapse;font-size:13px}
-.pagina-admin .ad-tabela th{
+.pagina-admin .pnl-tabela-scroll{overflow-x:auto}
+.pagina-admin .pnl-tabela{width:100%;border-collapse:collapse;font-size:13px}
+.pagina-admin .pnl-tabela th{
   text-align:left;font-size:11px;font-weight:650;text-transform:uppercase;letter-spacing:.05em;
   color:var(--cinza);padding:8px 10px;border-bottom:1px solid var(--linha);white-space:nowrap;
 }
-.pagina-admin .ad-tabela td{padding:9px 10px;border-bottom:1px solid var(--linha-suave);color:var(--creme);white-space:nowrap}
-.pagina-admin .ad-tabela tr:last-child td{border-bottom:none}
+.pagina-admin .pnl-tabela td{padding:9px 10px;border-bottom:1px solid var(--linha-suave);color:var(--creme);white-space:nowrap}
+.pagina-admin .pnl-tabela tr:last-child td{border-bottom:none}
 
-.pagina-admin .ad-abas{display:flex;gap:6px;margin-bottom:var(--s-4);flex-wrap:wrap;border-bottom:1px solid var(--linha-suave)}
-.pagina-admin .ad-aba{
+.pagina-admin .pnl-abas{display:flex;gap:6px;margin-bottom:var(--s-4);flex-wrap:wrap;border-bottom:1px solid var(--linha-suave)}
+.pagina-admin .pnl-aba{
   font-size:13.5px;font-weight:600;color:var(--cinza);padding:10px 16px;
   border-bottom:2px solid transparent;transition:color .2s,border-color .2s;
 }
-.pagina-admin .ad-aba:hover{color:var(--creme)}
-.pagina-admin .ad-aba.ativa{color:var(--verde);border-bottom-color:var(--verde)}
+.pagina-admin .pnl-aba:hover{color:var(--creme)}
+.pagina-admin .pnl-aba.ativa{color:var(--verde);border-bottom-color:var(--verde)}
 
 /* ============================================================
    PERITOS ACADEMY — ADMIN: FINANCEIRO
    ============================================================ */
-.pagina-admin .ad-fin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--s-3);margin-bottom:var(--s-4)}
-.pagina-admin .ad-fin-stat{
+.pagina-admin .pnl-fin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--s-3);margin-bottom:var(--s-4)}
+.pagina-admin .pnl-fin-stat{
   border:1px solid var(--linha-suave);border-radius:var(--r-card);padding:16px;
   background:rgba(255,255,255,.02);
 }
-.pagina-admin .ad-fin-stat b{display:block;font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px}
-.pagina-admin .ad-fin-stat span{font-size:11px;font-weight:650;text-transform:uppercase;letter-spacing:.05em;color:var(--cinza)}
+.pagina-admin .pnl-fin-stat b{display:block;font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px}
+.pagina-admin .pnl-fin-stat span{font-size:11px;font-weight:650;text-transform:uppercase;letter-spacing:.05em;color:var(--cinza)}
 
-.pagina-admin .ad-fin-grafico{display:flex;align-items:flex-end;gap:10px;height:120px;padding-top:10px}
-.pagina-admin .ad-fin-barra-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
-.pagina-admin .ad-fin-barra{width:100%;max-width:36px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--verde),var(--ciano));min-height:2px}
-.pagina-admin .ad-fin-barra-rot{font-size:10.5px;color:var(--cinza);white-space:nowrap}
+.pagina-admin .pnl-fin-grafico{display:flex;align-items:flex-end;gap:10px;height:120px;padding-top:10px}
+.pagina-admin .pnl-fin-barra-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.pagina-admin .pnl-fin-barra{width:100%;max-width:36px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--verde),var(--ciano));min-height:2px}
+.pagina-admin .pnl-fin-barra-rot{font-size:10.5px;color:var(--cinza);white-space:nowrap}
 
-.pagina-admin .ad-status-pill{
+.pagina-admin .pnl-status-pill{
   display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:650;
   padding:3px 10px;border-radius:var(--r-pill);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;
 }
-.pagina-admin .ad-status-pill.ativa{color:#20D9A6;background:rgba(32,217,166,.12)}
-.pagina-admin .ad-status-pill.cortesia{color:#DDF784;background:rgba(221,247,132,.12)}
-.pagina-admin .ad-status-pill.inadimplente{color:#E0B96B;background:rgba(224,185,107,.12)}
-.pagina-admin .ad-status-pill.suspensa{color:#B9BFB8;background:rgba(185,191,184,.12)}
-.pagina-admin .ad-status-pill.cancelada{color:#E0776B;background:rgba(224,119,107,.12)}
-.pagina-admin .ad-status-pill.pendente{color:#B9BFB8;background:rgba(185,191,184,.12)}
-.pagina-admin .ad-status-pill.confirmada{color:#20D9A6;background:rgba(32,217,166,.12)}
-.pagina-admin .ad-status-pill.vencida{color:#E0776B;background:rgba(224,119,107,.12)}
-.pagina-admin .ad-status-pill.estornada{color:#B9BFB8;background:rgba(185,191,184,.12)}
-.pagina-admin .ad-status-pill.ativo{color:#20D9A6;background:rgba(32,217,166,.12)}
-.pagina-admin .ad-status-pill.suspenso{color:#B9BFB8;background:rgba(185,191,184,.12)}
-.pagina-admin .ad-status-pill.banido{color:#E0776B;background:rgba(224,119,107,.12)}
-.pagina-admin .ad-status-pill.sem_assinatura{color:#B9BFB8;background:rgba(185,191,184,.12)}
+.pagina-admin .pnl-status-pill.ativa{color:#20D9A6;background:rgba(32,217,166,.12)}
+.pagina-admin .pnl-status-pill.cortesia{color:#DDF784;background:rgba(221,247,132,.12)}
+.pagina-admin .pnl-status-pill.inadimplente{color:#E0B96B;background:rgba(224,185,107,.12)}
+.pagina-admin .pnl-status-pill.suspensa{color:#B9BFB8;background:rgba(185,191,184,.12)}
+.pagina-admin .pnl-status-pill.cancelada{color:#E0776B;background:rgba(224,119,107,.12)}
+.pagina-admin .pnl-status-pill.pendente{color:#B9BFB8;background:rgba(185,191,184,.12)}
+.pagina-admin .pnl-status-pill.confirmada{color:#20D9A6;background:rgba(32,217,166,.12)}
+.pagina-admin .pnl-status-pill.vencida{color:#E0776B;background:rgba(224,119,107,.12)}
+.pagina-admin .pnl-status-pill.estornada{color:#B9BFB8;background:rgba(185,191,184,.12)}
+.pagina-admin .pnl-status-pill.ativo{color:#20D9A6;background:rgba(32,217,166,.12)}
+.pagina-admin .pnl-status-pill.suspenso{color:#B9BFB8;background:rgba(185,191,184,.12)}
+.pagina-admin .pnl-status-pill.banido{color:#E0776B;background:rgba(224,119,107,.12)}
+.pagina-admin .pnl-status-pill.sem_assinatura{color:#B9BFB8;background:rgba(185,191,184,.12)}
 
-.pagina-admin .ad-fin-detalhe{padding:14px 10px;border-bottom:1px solid var(--linha-suave);background:rgba(255,255,255,.015)}
-.pagina-admin .ad-fin-detalhe-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.pagina-admin .ad-fin-nota{font-size:12px;color:var(--cinza);margin-top:6px}
-.pagina-admin .ad-fin-payload{
+.pagina-admin .pnl-fin-detalhe{padding:14px 10px;border-bottom:1px solid var(--linha-suave);background:rgba(255,255,255,.015)}
+.pagina-admin .pnl-fin-detalhe-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pagina-admin .pnl-fin-nota{font-size:12px;color:var(--cinza);margin-top:6px}
+.pagina-admin .pnl-fin-payload{
   font-size:11px;color:var(--cinza-claro);background:rgba(0,0,0,.25);border-radius:8px;
   padding:8px 10px;max-width:360px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;
 }
 
-.pagina-admin .ad-usu-info{display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--creme)}
-.pagina-admin .ad-usu-info>div{display:flex;align-items:center;gap:8px;color:var(--cinza-claro)}
-.pagina-admin .ad-usu-lista{display:flex;flex-direction:column;gap:12px;list-style:none;padding:0;margin:0}
-.pagina-admin .ad-usu-lista li{padding:10px 0;border-bottom:1px solid var(--linha-suave)}
-.pagina-admin .ad-usu-lista li:last-child{border-bottom:none}
-.pagina-admin .ad-usu-lista p{margin-top:4px;color:var(--cinza-claro);font-size:13px;line-height:1.5}
+.pagina-admin .pnl-usu-info{display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--creme)}
+.pagina-admin .pnl-usu-info>div{display:flex;align-items:center;gap:8px;color:var(--cinza-claro)}
+.pagina-admin .pnl-usu-lista{display:flex;flex-direction:column;gap:12px;list-style:none;padding:0;margin:0}
+.pagina-admin .pnl-usu-lista li{padding:10px 0;border-bottom:1px solid var(--linha-suave)}
+.pagina-admin .pnl-usu-lista li:last-child{border-bottom:none}
+.pagina-admin .pnl-usu-lista p{margin-top:4px;color:var(--cinza-claro);font-size:13px;line-height:1.5}
 
 /* ============================================================
    PERITOS ACADEMY — PÁGINAS INSTITUCIONAIS (escopado em .pagina-institucional)
@@ -4605,23 +4617,23 @@ body.teatro .trilho-aulas{display:none}
 /* ============================================================
    PERITOS ACADEMY — BANNER FIXO DE COMPARTILHAMENTO OG (preview admin)
    ============================================================ */
-.pagina-admin .ad-og-preview{
+.pagina-admin .pnl-og-preview{
   max-width:380px;border:1px solid var(--linha-suave);border-radius:var(--r-card);overflow:hidden;
   background:rgba(255,255,255,.02);
 }
-.pagina-admin .ad-og-preview img{width:100%;height:180px;object-fit:cover;display:block;background:rgba(255,255,255,.04)}
-.pagina-admin .ad-og-preview-corpo{padding:10px 12px}
-.pagina-admin .ad-og-preview-dominio{font-size:11px;color:var(--cinza);text-transform:uppercase;letter-spacing:.04em}
-.pagina-admin .ad-og-preview-titulo{font-size:13.5px;font-weight:650;margin:2px 0;color:var(--creme)}
-.pagina-admin .ad-og-preview-desc{font-size:12px;color:var(--cinza-claro);line-height:1.4}
+.pagina-admin .pnl-og-preview img{width:100%;height:180px;object-fit:cover;display:block;background:rgba(255,255,255,.04)}
+.pagina-admin .pnl-og-preview-corpo{padding:10px 12px}
+.pagina-admin .pnl-og-preview-dominio{font-size:11px;color:var(--cinza);text-transform:uppercase;letter-spacing:.04em}
+.pagina-admin .pnl-og-preview-titulo{font-size:13.5px;font-weight:650;margin:2px 0;color:var(--creme)}
+.pagina-admin .pnl-og-preview-desc{font-size:12px;color:var(--cinza-claro);line-height:1.4}
 
-.pagina-admin .ad-integracao-linha{
+.pagina-admin .pnl-integracao-linha{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   padding:12px 0;border-bottom:1px solid var(--linha-suave);
 }
-.pagina-admin .ad-integracao-linha:last-child{border-bottom:none}
-.pagina-admin .ad-integracao-nome{font-size:14px;font-weight:650}
-.pagina-admin .ad-integracao-onde{font-size:12.5px;color:var(--cinza);margin-top:2px}
+.pagina-admin .pnl-integracao-linha:last-child{border-bottom:none}
+.pagina-admin .pnl-integracao-nome{font-size:14px;font-weight:650}
+.pagina-admin .pnl-integracao-onde{font-size:12.5px;color:var(--cinza);margin-top:2px}
 
 /* ============================================================
    PERITOS ACADEMY — /dev/icones (revisão do sistema de ícones)

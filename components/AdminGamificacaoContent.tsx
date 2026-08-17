@@ -26,19 +26,19 @@ export default function AdminGamificacaoContent({ config, gatilhos, niveis }: {
   const toast = useAdminToast()
 
   return (
-    <div className="ad-cursos">
+    <div className="pnl-cursos">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <div className="ad-cursos-cab">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>Gamificação</h1>
-          <p className="ad-sub">XP, moedas, níveis e os gatilhos que creditam pontos na plataforma.</p>
+          <p className="pnl-sub">XP, moedas, níveis e os gatilhos que creditam pontos na plataforma.</p>
         </div>
       </div>
 
-      <div className="ad-abas">
-        <button type="button" className={`ad-aba${aba === 'definicoes' ? ' ativa' : ''}`} onClick={() => setAba('definicoes')}>Definições</button>
-        <button type="button" className={`ad-aba${aba === 'gatilhos' ? ' ativa' : ''}`} onClick={() => setAba('gatilhos')}>Gatilhos ({gatilhos.length})</button>
-        <button type="button" className={`ad-aba${aba === 'niveis' ? ' ativa' : ''}`} onClick={() => setAba('niveis')}>Níveis ({niveis.length})</button>
+      <div className="pnl-abas">
+        <button type="button" className={`pnl-aba${aba === 'definicoes' ? ' ativa' : ''}`} onClick={() => setAba('definicoes')}>Definições</button>
+        <button type="button" className={`pnl-aba${aba === 'gatilhos' ? ' ativa' : ''}`} onClick={() => setAba('gatilhos')}>Gatilhos ({gatilhos.length})</button>
+        <button type="button" className={`pnl-aba${aba === 'niveis' ? ' ativa' : ''}`} onClick={() => setAba('niveis')}>Níveis ({niveis.length})</button>
       </div>
 
       {aba === 'definicoes' && <DefinicoesAba config={config} onErro={toast.erro} onSucesso={toast.sucesso} />}
@@ -63,44 +63,44 @@ function DefinicoesAba({ config, onErro, onSucesso }: { config: ConfigGamificaca
   }
 
   return (
-    <section className="ad-card">
-      <form onSubmit={onSalvar} className="ad-form">
+    <section className="pnl-card">
+      <form onSubmit={onSalvar} className="pnl-form">
         <h2>Switches</h2>
-        <div className="ad-form-linha">
-          <label className="ad-checkbox-linha">
+        <div className="pnl-form-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="gamificacao_ativa" defaultChecked={config.gamificacaoAtiva} />
             Gamificação ativa
           </label>
-          <label className="ad-checkbox-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="gatilhos_ativos" defaultChecked={config.gatilhosAtivos} />
             Gatilhos ativos
           </label>
-          <label className="ad-checkbox-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="ranking_ativo" defaultChecked={config.rankingAtivo} />
             Ranking ativo
           </label>
-          <label className="ad-checkbox-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="niveis_ativos" defaultChecked={config.niveisAtivos} />
             Níveis ativos
           </label>
-          <label className="ad-checkbox-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="loja_ativa" defaultChecked={config.lojaAtiva} />
             Loja ativa (em breve)
           </label>
         </div>
-        <div className="ad-form-linha">
-          <label className="ad-checkbox-linha">
+        <div className="pnl-form-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="exibir_pontuacao_perfil" defaultChecked={config.exibirPontuacaoPerfil} />
             Exibir pontuação no perfil
           </label>
-          <label className="ad-checkbox-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="exibir_nivel_previa_perfil" defaultChecked={config.exibirNivelPreviaPerfil} />
             Exibir prévia do nível no perfil
           </label>
         </div>
 
-        <h2 className="ad-form-subtitulo">Nomenclatura de XP</h2>
-        <div className="ad-form-linha">
+        <h2 className="pnl-form-subtitulo">Nomenclatura de XP</h2>
+        <div className="pnl-form-linha">
           <label>Singular
             <input name="xp_singular" defaultValue={config.xpSingular} />
           </label>
@@ -112,8 +112,8 @@ function DefinicoesAba({ config, onErro, onSucesso }: { config: ConfigGamificaca
           </label>
         </div>
 
-        <h2 className="ad-form-subtitulo">Nomenclatura de moedas</h2>
-        <div className="ad-form-linha">
+        <h2 className="pnl-form-subtitulo">Nomenclatura de moedas</h2>
+        <div className="pnl-form-linha">
           <label>Singular
             <input name="moeda_singular" defaultValue={config.moedaSingular} />
           </label>
@@ -124,7 +124,7 @@ function DefinicoesAba({ config, onErro, onSucesso }: { config: ConfigGamificaca
             <input name="moeda_abreviacao" defaultValue={config.moedaAbreviacao} />
           </label>
         </div>
-        <div className="ad-form-linha">
+        <div className="pnl-form-linha">
           <label>Cor (hex)
             <input name="moeda_cor" defaultValue={config.moedaCor ?? ''} placeholder="#DDF784" />
           </label>
@@ -133,13 +133,13 @@ function DefinicoesAba({ config, onErro, onSucesso }: { config: ConfigGamificaca
           </label>
         </div>
 
-        <h2 className="ad-form-subtitulo">Como acumular (texto explicativo)</h2>
+        <h2 className="pnl-form-subtitulo">Como acumular (texto explicativo)</h2>
         <label>Texto
           <textarea name="texto_como_acumular" defaultValue={config.textoComoAcumular ?? ''} rows={5} />
         </label>
 
-        <h2 className="ad-form-subtitulo">Motor de XP</h2>
-        <div className="ad-form-linha">
+        <h2 className="pnl-form-subtitulo">Motor de XP</h2>
+        <div className="pnl-form-linha">
           <label>XP base de avaliação
             <input name="avaliacao_xp_base" type="number" min="0" defaultValue={config.avaliacaoXpBase} />
           </label>
@@ -153,19 +153,19 @@ function DefinicoesAba({ config, onErro, onSucesso }: { config: ConfigGamificaca
             <input name="moeda_a_cada_xp" type="number" min="1" defaultValue={config.moedaACadaXp ?? ''} placeholder="sem conversão" />
           </label>
         </div>
-        <p className="ad-sublista-meta">
+        <p className="pnl-sublista-meta">
           XP base de avaliação: multiplicado por peso × % de acerto, só na 1ª aprovação. Bônus de curso: creditado ao concluir todas as aulas/avaliações. Teto de engajamento: soma diária máxima de XP dos gatilhos marcados &quot;conta pro teto&quot; (aba Gatilhos). Moeda a cada X XP: conversão automática quando o gatilho não define moedas fixas.
         </p>
 
-        <h2 className="ad-form-subtitulo">Gatilhos pendentes de agendamento</h2>
+        <h2 className="pnl-form-subtitulo">Gatilhos pendentes de agendamento</h2>
         <label>Códigos (separados por vírgula)
           <input name="gatilhos_pendentes_agendamento" defaultValue={config.gatilhosPendentesAgendamento.join(', ')} placeholder="aniversario, aniversario_plataforma" />
         </label>
-        <p className="ad-sublista-meta">
+        <p className="pnl-sublista-meta">
           Gatilhos ativos no catálogo mas sem mecanismo de disparo (cron) ligado ainda. Aparecem pro aluno em /gamificacao com selo &quot;em breve&quot;, sem prometer um valor de XP. Tire o código daqui assim que o agendamento for ligado de verdade, o valor real volta a aparecer sozinho.
         </p>
 
-        <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar definições'}</button>
+        <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar definições'}</button>
       </form>
     </section>
   )
@@ -179,10 +179,10 @@ function GatilhosAba({ gatilhos, onErro, onSucesso }: { gatilhos: GatilhoAdmin[]
         const doCat = gatilhos.filter(g => g.categoria === cat)
         if (doCat.length === 0) return null
         return (
-          <section className="ad-card" key={cat}>
+          <section className="pnl-card" key={cat}>
             <h2>{NOME_CATEGORIA[cat]}</h2>
-            <div className="ad-tabela-scroll">
-              <table className="ad-tabela">
+            <div className="pnl-tabela-scroll">
+              <table className="pnl-tabela">
                 <thead><tr><th>Gatilho</th><th>Pontos</th><th>Moedas</th><th>Limite/dia</th><th>Ativo</th><th></th></tr></thead>
                 <tbody>
                   {doCat.map(g => <GatilhoLinha key={g.codigo} gatilho={g} onErro={onErro} onSucesso={onSucesso} />)}
@@ -226,23 +226,23 @@ function GatilhoLinha({ gatilho, onErro, onSucesso }: { gatilho: GatilhoAdmin; o
     <tr>
       <td>
         <b>{gatilho.nome}</b>
-        {gatilho.descricao && <><br /><span className="ad-sublista-meta">{gatilho.descricao}</span></>}
-        {fonteReal && <><br /><span className="ad-sublista-meta" style={{ color: 'var(--ciano)' }}>Pontos abaixo é só o valor padrão, não o creditado. {fonteReal}.</span></>}
+        {gatilho.descricao && <><br /><span className="pnl-sublista-meta">{gatilho.descricao}</span></>}
+        {fonteReal && <><br /><span className="pnl-sublista-meta" style={{ color: 'var(--ciano)' }}>Pontos abaixo é só o valor padrão, não o creditado. {fonteReal}.</span></>}
       </td>
       <td colSpan={4}>
         <form onSubmit={onSalvar} style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <input name="pontos" type="number" min="0" defaultValue={gatilho.pontos} className="ad-input-sm" title="Pontos" />
-          <input name="moedas" type="number" min="0" defaultValue={gatilho.moedas} className="ad-input-sm" title="Moedas" />
-          <input name="limite_diario" type="number" min="0" defaultValue={gatilho.limiteDiario ?? ''} placeholder="sem limite" className="ad-input-sm" title="Limite diário" />
-          <label className="ad-checkbox-linha">
+          <input name="pontos" type="number" min="0" defaultValue={gatilho.pontos} className="pnl-input-sm" title="Pontos" />
+          <input name="moedas" type="number" min="0" defaultValue={gatilho.moedas} className="pnl-input-sm" title="Moedas" />
+          <input name="limite_diario" type="number" min="0" defaultValue={gatilho.limiteDiario ?? ''} placeholder="sem limite" className="pnl-input-sm" title="Limite diário" />
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="ativo" defaultChecked={gatilho.ativo} />
             Ativo
           </label>
-          <label className="ad-checkbox-linha" title="Soma no teto diário combinado de engajamento (config em Definições)">
+          <label className="pnl-checkbox-linha" title="Soma no teto diário combinado de engajamento (config em Definições)">
             <input type="checkbox" name="conta_teto_engajamento" defaultChecked={gatilho.contaTetoEngajamento} />
             Conta pro teto
           </label>
-          <button type="submit" className="ad-btn-secundario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
+          <button type="submit" className="pnl-btn-secundario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
         </form>
       </td>
     </tr>
@@ -280,39 +280,39 @@ function NiveisAba({ niveis, config, onErro, onSucesso }: { niveis: NivelAdmin[]
   }
 
   return (
-    <section className="ad-card">
+    <section className="pnl-card">
       <h2>Níveis</h2>
       <p>Nível atual do aluno exige XP mínimo <b>e</b> o requisito composto do nível ao mesmo tempo. Excedente de XP não substitui um requisito faltante.</p>
 
-      <div className="ad-card-destaque" style={{ marginBottom: 16 }}>
+      <div className="pnl-card-destaque" style={{ marginBottom: 16 }}>
         <div>
           <b>Teto de XP calculado:</b> {config.xpTetoCalculado?.toLocaleString('pt-BR') ?? 'nunca calculado'}
           {config.xpTetoCalculadoEm && (
-            <span className="ad-sublista-meta"> · em {new Date(config.xpTetoCalculadoEm).toLocaleString('pt-BR')}</span>
+            <span className="pnl-sublista-meta"> · em {new Date(config.xpTetoCalculadoEm).toLocaleString('pt-BR')}</span>
           )}
           <br />
-          <span className="ad-sublista-meta">
+          <span className="pnl-sublista-meta">
             Soma de todo XP de estudo disponível hoje (aulas + avaliações + etapas + desafios + bônus de curso). Os limiares dos 10 níveis são recalculados como percentuais desse teto. Rode de novo sempre que publicar avaliações/desafios novos.
           </span>
         </div>
-        <button type="button" className="ad-btn-primario" disabled={pendente || recalculando} onClick={onRecalcular}>
+        <button type="button" className="pnl-btn-primario" disabled={pendente || recalculando} onClick={onRecalcular}>
           {recalculando ? 'Recalculando...' : 'Recalcular curva'}
         </button>
       </div>
 
       {criando && (
-        <div className="ad-nova-linha">
+        <div className="pnl-nova-linha">
           <input type="text" placeholder="Nome do nível" value={nome} onChange={e => setNome(e.target.value)} />
-          <input type="number" placeholder="XP mínimo" min="0" value={pontosMinimos} onChange={e => setPontosMinimos(e.target.value)} className="ad-input-sm" />
-          <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriar}>Criar</button>
-          <button type="button" className="ad-btn-secundario" onClick={() => setCriando(false)}>Cancelar</button>
+          <input type="number" placeholder="XP mínimo" min="0" value={pontosMinimos} onChange={e => setPontosMinimos(e.target.value)} className="pnl-input-sm" />
+          <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onCriar}>Criar</button>
+          <button type="button" className="pnl-btn-secundario" onClick={() => setCriando(false)}>Cancelar</button>
         </div>
       )}
       {!criando && (
-        <button type="button" className="ad-btn-primario" onClick={() => setCriando(true)} style={{ marginBottom: 14 }}>+ Novo nível</button>
+        <button type="button" className="pnl-btn-primario" onClick={() => setCriando(true)} style={{ marginBottom: 14 }}>+ Novo nível</button>
       )}
 
-      <div className="ad-modulos-lista">
+      <div className="pnl-modulos-lista">
         {niveis.map((n, i) => (
           <NivelLinha key={n.id} nivel={n} indice={i} total={niveis.length} onErro={onErro} onSucesso={onSucesso} />
         ))}
@@ -366,27 +366,27 @@ function NivelLinha({ nivel, indice, total, onErro, onSucesso }: { nivel: NivelA
   }
 
   return (
-    <div className="ad-modulo-bloco">
-      <div className="ad-modulo-cab">
-        <span className="ad-modulo-toggle">
+    <div className="pnl-modulo-bloco">
+      <div className="pnl-modulo-cab">
+        <span className="pnl-modulo-toggle">
           {nivel.seloUrl && <img src={nivel.seloUrl} alt="" style={{ width: 22, height: 22, borderRadius: '50%', marginRight: 8, verticalAlign: 'middle', objectFit: 'cover' }} />}
-          {nivel.nome} <span className="ad-sublista-meta">· {nivel.pontosMinimos} XP mínimo{formatarRequisitos(nivel) && ` · ${formatarRequisitos(nivel)}`}</span>
+          {nivel.nome} <span className="pnl-sublista-meta">· {nivel.pontosMinimos} XP mínimo{formatarRequisitos(nivel) && ` · ${formatarRequisitos(nivel)}`}</span>
         </span>
-        <div className="ad-modulo-acoes">
+        <div className="pnl-modulo-acoes">
           <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
           <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
-          <label className="ad-btn-secundario ad-upload-btn" style={{ padding: '6px 10px', fontSize: 12 }}>
+          <label className="pnl-btn-secundario pnl-upload-btn" style={{ padding: '6px 10px', fontSize: 12 }}>
             Selo
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onUploadSelo} hidden disabled={pendente} />
           </label>
           <button type="button" onClick={() => setEditando(v => !v)} title="Editar"><IconePencil size={13} /></button>
-          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir"><IconeTrash size={13} /></button>
+          <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir"><IconeTrash size={13} /></button>
         </div>
       </div>
       {editando && (
-        <div className="ad-modulo-corpo">
-          <form onSubmit={onSalvar} className="ad-form">
-            <div className="ad-form-linha">
+        <div className="pnl-modulo-corpo">
+          <form onSubmit={onSalvar} className="pnl-form">
+            <div className="pnl-form-linha">
               <label>Nome
                 <input name="nome" defaultValue={nivel.nome} required />
               </label>
@@ -394,9 +394,9 @@ function NivelLinha({ nivel, indice, total, onErro, onSucesso }: { nivel: NivelA
                 <input name="pontos_minimos" type="number" min="0" defaultValue={nivel.pontosMinimos} required />
               </label>
             </div>
-            <h2 className="ad-form-subtitulo">Requisito composto (além do XP)</h2>
-            <p className="ad-sublista-meta">Vazio = sem exigência nesse critério. -1 = 100% do que existe hoje (só faz sentido em cursos/avaliações/desafios).</p>
-            <div className="ad-form-linha">
+            <h2 className="pnl-form-subtitulo">Requisito composto (além do XP)</h2>
+            <p className="pnl-sublista-meta">Vazio = sem exigência nesse critério. -1 = 100% do que existe hoje (só faz sentido em cursos/avaliações/desafios).</p>
+            <div className="pnl-form-linha">
               <label>Aulas concluídas
                 <input name="aulas_concluidas" type="number" defaultValue={nivel.aulasConcluidas ?? ''} placeholder="—" />
               </label>
@@ -416,7 +416,7 @@ function NivelLinha({ nivel, indice, total, onErro, onSucesso }: { nivel: NivelA
                 <input name="participacoes_comunidade" type="number" defaultValue={nivel.participacoesComunidade ?? ''} placeholder="—" />
               </label>
             </div>
-            <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar nível'}</button>
+            <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar nível'}</button>
           </form>
         </div>
       )}

@@ -51,18 +51,18 @@ export default function AdminAgendaContent({ eventos }: { eventos: EventoAdmin[]
   }
 
   return (
-    <div className="ad-cursos">
+    <div className="pnl-cursos">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <div className="ad-cursos-cab">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>Agenda</h1>
-          <p className="ad-sub">Eventos ao vivo e gravados: salas de análise, aulas, plantões, mentorias.</p>
+          <p className="pnl-sub">Eventos ao vivo e gravados: salas de análise, aulas, plantões, mentorias.</p>
         </div>
-        <button type="button" className="ad-btn-primario" onClick={() => setCriando(v => !v)}>+ Novo evento</button>
+        <button type="button" className="pnl-btn-primario" onClick={() => setCriando(v => !v)}>+ Novo evento</button>
       </div>
 
       {criando && (
-        <div className="ad-busca-card">
+        <div className="pnl-busca-card">
           <label>Título
             <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex.: Plantão de dúvidas: perícia bancária" autoFocus />
           </label>
@@ -71,32 +71,32 @@ export default function AdminAgendaContent({ eventos }: { eventos: EventoAdmin[]
               {Object.entries(NOME_TIPO).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
             </select>
           </label>
-          <div className="ad-form-acoes">
-            <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriar}>{pendente ? 'Criando...' : 'Criar e editar'}</button>
-            <button type="button" className="ad-btn-secundario" onClick={() => { setCriando(false); setTitulo('') }}>Cancelar</button>
+          <div className="pnl-form-acoes">
+            <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onCriar}>{pendente ? 'Criando...' : 'Criar e editar'}</button>
+            <button type="button" className="pnl-btn-secundario" onClick={() => { setCriando(false); setTitulo('') }}>Cancelar</button>
           </div>
         </div>
       )}
 
-      <div className="ad-lista-admins">
-        {eventos.length === 0 && <p className="ad-vazio">Nenhum evento cadastrado ainda.</p>}
+      <div className="pnl-lista-admins">
+        {eventos.length === 0 && <p className="pnl-vazio">Nenhum evento cadastrado ainda.</p>}
         {eventos.map(e => (
-          <div key={e.id} className="ad-admin-linha">
-            <div className="ad-admin-quem">
+          <div key={e.id} className="pnl-admin-linha">
+            <div className="pnl-admin-quem">
               <div>
                 <a href={`/admin/agenda/${e.id}`}><b>{e.titulo}</b></a>
-                <span className="ad-admin-slug">
+                <span className="pnl-admin-slug">
                   {NOME_TIPO[e.tipo] ?? e.tipo} · {e.iniciaEm ? new Date(e.iniciaEm).toLocaleString('pt-BR') : 'sem data'} · {e.totalReservas} reserva{e.totalReservas === 1 ? '' : 's'}
                 </span>
               </div>
             </div>
-            <div className="ad-curso-acoes">
-              <label className={`ad-toggle-papel${e.publicado ? ' ativo' : ''}`}>
+            <div className="pnl-curso-acoes">
+              <label className={`pnl-toggle-papel${e.publicado ? ' ativo' : ''}`}>
                 <input type="checkbox" checked={e.publicado} disabled={pendente} onChange={ev => onAlternarPublicacao(e.id, ev.target.checked)} />
                 {e.publicado ? 'Publicado' : 'Rascunho'}
               </label>
-              <a href={`/admin/agenda/${e.id}`} className="ad-btn-secundario">Editar</a>
-              <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={() => onExcluir(e.id, e.titulo)}>Excluir</button>
+              <a href={`/admin/agenda/${e.id}`} className="pnl-btn-secundario">Editar</a>
+              <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={() => onExcluir(e.id, e.titulo)}>Excluir</button>
             </div>
           </div>
         ))}

@@ -38,14 +38,14 @@ export function useAdminToast() {
 export function AdminToastContainer({ toasts, remover }: { toasts: ToastItem[]; remover: (id: number) => void }) {
   if (toasts.length === 0) return null
   return (
-    <div className="ad-toast-pilha">
+    <div className="pnl-toast-pilha">
       {toasts.map(t => (
-        <div key={t.id} className={`ad-toast ad-toast-${t.tipo}`} role="status">
-          <span className="ad-toast-ico" aria-hidden="true">
+        <div key={t.id} className={`pnl-toast pnl-toast-${t.tipo}`} role="status">
+          <span className="pnl-toast-ico" aria-hidden="true">
             {t.tipo === 'sucesso' ? <IconeCheck size={15} /> : <IconeAlertTriangle size={15} />}
           </span>
-          <span className="ad-toast-msg">{t.mensagem}</span>
-          <button type="button" className="ad-toast-fechar" onClick={() => remover(t.id)} aria-label="Fechar aviso">
+          <span className="pnl-toast-msg">{t.mensagem}</span>
+          <button type="button" className="pnl-toast-fechar" onClick={() => remover(t.id)} aria-label="Fechar aviso">
             <IconeClose size={12} />
           </button>
         </div>

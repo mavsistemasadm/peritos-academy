@@ -89,35 +89,35 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
   }
 
   return (
-    <div className="ad-curso-editor">
+    <div className="pnl-curso-editor">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <a href="/admin/desafios" className="ad-voltar"><IconeChevronLeft size={14} /> Desafios</a>
-      <div className="ad-editor-cab">
+      <a href="/admin/desafios" className="pnl-voltar"><IconeChevronLeft size={14} /> Desafios</a>
+      <div className="pnl-editor-cab">
         <h1>{desafio.numero ? `#${desafio.numero} · ` : ''}{desafio.titulo}</h1>
-        <div className="ad-editor-cab-acoes">
-          <label className={`ad-toggle-papel${desafio.publicado ? ' ativo' : ''}`}>
+        <div className="pnl-editor-cab-acoes">
+          <label className={`pnl-toggle-papel${desafio.publicado ? ' ativo' : ''}`}>
             <input type="checkbox" checked={desafio.publicado} disabled={pendente} onChange={e => onAlternarPublicacao(e.target.checked)} />
             {desafio.publicado ? 'Publicado' : 'Rascunho'}
           </label>
-          <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={onExcluirDesafio}>Excluir desafio</button>
+          <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={onExcluirDesafio}>Excluir desafio</button>
         </div>
       </div>
 
-      <div className="ad-editor-grid">
-        <section className="ad-card">
+      <div className="pnl-editor-grid">
+        <section className="pnl-card">
           <h2>Capa</h2>
-          <div className="ad-capa-preview" style={desafio.capaUrl ? { backgroundImage: `url(${desafio.capaUrl})` } : undefined}>
+          <div className="pnl-capa-preview" style={desafio.capaUrl ? { backgroundImage: `url(${desafio.capaUrl})` } : undefined}>
             {!desafio.capaUrl && <span>Sem capa</span>}
           </div>
-          <label className="ad-btn-secundario ad-upload-btn">
+          <label className="pnl-btn-secundario pnl-upload-btn">
             Trocar capa
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onUploadCapa} hidden disabled={pendente} />
           </label>
         </section>
 
-        <section className="ad-card ad-card-dados">
+        <section className="pnl-card pnl-card-dados">
           <h2>Dados gerais</h2>
-          <form onSubmit={onSalvarDados} className="ad-form">
+          <form onSubmit={onSalvarDados} className="pnl-form">
             <label>Título
               <input name="titulo" defaultValue={desafio.titulo} required minLength={3} />
             </label>
@@ -127,7 +127,7 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
                 {categorias.map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
               </select>
             </label>
-            <div className="ad-form-linha">
+            <div className="pnl-form-linha">
               <label>Prazo (dias)
                 <input name="prazo_dias" type="number" min="1" defaultValue={desafio.prazoDias} />
               </label>
@@ -148,11 +148,11 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
               </select>
             </label>
 
-            <h3 className="ad-form-subtitulo">Intimação</h3>
+            <h3 className="pnl-form-subtitulo">Intimação</h3>
             <label>Texto da intimação
               <textarea name="intimacao_texto" defaultValue={desafio.intimacaoTexto ?? ''} rows={3} />
             </label>
-            <div className="ad-form-linha">
+            <div className="pnl-form-linha">
               <label>Mensageiro (nome)
                 <input name="mensageiro_nome" defaultValue={desafio.mensageiroNome ?? ''} />
               </label>
@@ -167,20 +167,20 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
               <textarea name="instrucoes" defaultValue={desafio.instrucoes.join('\n')} rows={4} />
             </label>
 
-            <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar dados gerais'}</button>
+            <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar dados gerais'}</button>
           </form>
         </section>
       </div>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Documentos do processo</h2>
-        <ul className="ad-sublista-lista">
-          {desafio.documentos.length === 0 && <p className="ad-vazio-sm">Nenhum documento anexado.</p>}
+        <ul className="pnl-sublista-lista">
+          {desafio.documentos.length === 0 && <p className="pnl-vazio-sm">Nenhum documento anexado.</p>}
           {desafio.documentos.map((doc, i) => (
-            <li key={i} className="ad-doc-linha">
+            <li key={i} className="pnl-doc-linha">
               <span>{doc.nome}</span>
-              <span className="ad-sublista-meta">{doc.formato.toUpperCase()} · {doc.tamanho_kb} KB</span>
-              <button type="button" className="ad-btn-secundario" onClick={() => onBaixar(doc.path)}>Baixar</button>
+              <span className="pnl-sublista-meta">{doc.formato.toUpperCase()} · {doc.tamanho_kb} KB</span>
+              <button type="button" className="pnl-btn-secundario" onClick={() => onBaixar(doc.path)}>Baixar</button>
               <DocumentoExcluirBotao desafioId={desafio.id} indice={i} onErro={toast.erro} onSucesso={toast.sucesso} onRefresh={refresh} />
             </li>
           ))}
@@ -188,28 +188,28 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
         <NovoDocumentoForm desafioId={desafio.id} onErro={toast.erro} onSucesso={toast.sucesso} onRefresh={refresh} />
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Gabarito</h2>
         {desafio.gabaritoPath
-          ? <div className="ad-nova-linha"><span>{desafio.gabaritoPath.split('/').pop()}</span><button type="button" className="ad-btn-secundario" onClick={() => onBaixar(desafio.gabaritoPath!)}>Baixar</button></div>
-          : <p className="ad-vazio-sm">Nenhum gabarito enviado ainda.</p>}
+          ? <div className="pnl-nova-linha"><span>{desafio.gabaritoPath.split('/').pop()}</span><button type="button" className="pnl-btn-secundario" onClick={() => onBaixar(desafio.gabaritoPath!)}>Baixar</button></div>
+          : <p className="pnl-vazio-sm">Nenhum gabarito enviado ainda.</p>}
         <GabaritoForm desafioId={desafio.id} onErro={toast.erro} onSucesso={toast.sucesso} onRefresh={refresh} />
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Quesitos</h2>
-        <div className="ad-nova-linha">
+        <div className="pnl-nova-linha">
           <select value={novoTipo} onChange={e => setNovoTipo(e.target.value as Quesito['tipo'])}>
             <option value="valor">Resposta numérica</option>
             <option value="texto">Resposta em texto</option>
             <option value="multipla">Múltipla escolha</option>
           </select>
-          <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriarQuesito}>+ Quesito</button>
+          <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onCriarQuesito}>+ Quesito</button>
         </div>
 
-        {desafio.quesitos.length === 0 && <p className="ad-vazio">Nenhum quesito cadastrado ainda.</p>}
+        {desafio.quesitos.length === 0 && <p className="pnl-vazio">Nenhum quesito cadastrado ainda.</p>}
 
-        <div className="ad-modulos-lista">
+        <div className="pnl-modulos-lista">
           {desafio.quesitos.map((q, i) => (
             <QuesitoBloco
               key={i}
@@ -227,12 +227,12 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
         </div>
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Entregas dos alunos</h2>
-        {entregas.length === 0 && <p className="ad-vazio">Nenhuma entrega ainda.</p>}
+        {entregas.length === 0 && <p className="pnl-vazio">Nenhuma entrega ainda.</p>}
         {entregas.length > 0 && (
-          <div className="ad-tabela-scroll">
-            <table className="ad-tabela">
+          <div className="pnl-tabela-scroll">
+            <table className="pnl-tabela">
               <thead>
                 <tr><th>Aluno</th><th>Nota</th><th>Tempo</th><th>Aceito em</th><th>Entregue em</th><th>Arquivo</th></tr>
               </thead>
@@ -244,7 +244,7 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
                     <td>{segParaLabel(e.tempoSeg)}</td>
                     <td>{e.aceitoEm ? new Date(e.aceitoEm).toLocaleDateString('pt-BR') : '—'}</td>
                     <td>{e.entregueEm ? new Date(e.entregueEm).toLocaleDateString('pt-BR') : '—'}</td>
-                    <td>{e.arquivoPath ? <button type="button" className="ad-btn-secundario" onClick={() => onBaixar(e.arquivoPath!)}>Baixar</button> : '—'}</td>
+                    <td>{e.arquivoPath ? <button type="button" className="pnl-btn-secundario" onClick={() => onBaixar(e.arquivoPath!)}>Baixar</button> : '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -291,22 +291,22 @@ function QuesitoBloco({ quesito, indice, desafioId, total, expandido, onToggle, 
   }
 
   return (
-    <div className="ad-modulo-bloco">
-      <div className="ad-modulo-cab">
-        <button type="button" className="ad-modulo-toggle" onClick={onToggle}>
+    <div className="pnl-modulo-bloco">
+      <div className="pnl-modulo-cab">
+        <button type="button" className="pnl-modulo-toggle" onClick={onToggle}>
           {expandido ? '▾' : '▸'} {indice + 1}. {quesito.enunciado.slice(0, 60)}{quesito.enunciado.length > 60 ? '…' : ''}
         </button>
-        <div className="ad-modulo-acoes">
-          <span className="ad-modulo-contagem">{quesito.tipo}</span>
+        <div className="pnl-modulo-acoes">
+          <span className="pnl-modulo-contagem">{quesito.tipo}</span>
           <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
           <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
-          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir quesito"><IconeTrash size={13} /></button>
+          <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir quesito"><IconeTrash size={13} /></button>
         </div>
       </div>
 
       {expandido && (
-        <div className="ad-modulo-corpo">
-          <form onSubmit={onSalvar} className="ad-form">
+        <div className="pnl-modulo-corpo">
+          <form onSubmit={onSalvar} className="pnl-form">
             <label>Tipo
               <select name="tipo" value={tipo} onChange={e => setTipo(e.target.value as Quesito['tipo'])}>
                 <option value="valor">Resposta numérica</option>
@@ -318,7 +318,7 @@ function QuesitoBloco({ quesito, indice, desafioId, total, expandido, onToggle, 
               <textarea name="enunciado" defaultValue={quesito.enunciado} rows={2} required />
             </label>
             {tipo === 'valor' && (
-              <div className="ad-form-linha">
+              <div className="pnl-form-linha">
                 <label>Prefixo
                   <input name="prefixo" defaultValue={quesito.prefixo ?? ''} placeholder="R$" />
                 </label>
@@ -338,7 +338,7 @@ function QuesitoBloco({ quesito, indice, desafioId, total, expandido, onToggle, 
             <label>Resposta modelo (gabarito / referência de correção)
               <textarea name="resposta_modelo" defaultValue={quesito.resposta_modelo ?? ''} rows={2} />
             </label>
-            <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar quesito'}</button>
+            <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar quesito'}</button>
           </form>
         </div>
       )}
@@ -365,9 +365,9 @@ function NovoDocumentoForm({ desafioId, onErro, onSucesso, onRefresh }: { desafi
   }
 
   return (
-    <div className="ad-nova-linha">
+    <div className="pnl-nova-linha">
       <input type="text" placeholder="Nome do documento" value={nome} onChange={e => setNome(e.target.value)} />
-      <label className="ad-btn-secundario ad-upload-btn">
+      <label className="pnl-btn-secundario pnl-upload-btn">
         {pendente ? 'Enviando...' : 'Escolher arquivo'}
         <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.xlsm" onChange={onEnviar} hidden disabled={pendente} />
       </label>
@@ -384,7 +384,7 @@ function DocumentoExcluirBotao({ desafioId, indice, onErro, onSucesso, onRefresh
       else { onSucesso('Documento excluído com sucesso'); onRefresh() }
     })
   }
-  return <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir}><IconeTrash size={13} /></button>
+  return <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={onExcluir}><IconeTrash size={13} /></button>
 }
 
 function GabaritoForm({ desafioId, onErro, onSucesso, onRefresh }: { desafioId: string; onErro: (e: string) => void; onSucesso: (m: string) => void; onRefresh: () => void }) {
@@ -403,7 +403,7 @@ function GabaritoForm({ desafioId, onErro, onSucesso, onRefresh }: { desafioId: 
   }
 
   return (
-    <label className="ad-btn-secundario ad-upload-btn">
+    <label className="pnl-btn-secundario pnl-upload-btn">
       {pendente ? 'Enviando...' : 'Enviar gabarito'}
       <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.xlsm" onChange={onEnviar} hidden disabled={pendente} />
     </label>

@@ -105,35 +105,35 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
   }
 
   return (
-    <div className="ad-curso-editor">
+    <div className="pnl-curso-editor">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <a href="/admin/cursos" className="ad-voltar"><IconeChevronLeft size={14} /> Cursos</a>
-      <div className="ad-editor-cab">
+      <a href="/admin/cursos" className="pnl-voltar"><IconeChevronLeft size={14} /> Cursos</a>
+      <div className="pnl-editor-cab">
         <h1>{curso.titulo}</h1>
-        <div className="ad-editor-cab-acoes">
-          <label className={`ad-toggle-papel${curso.publicado ? ' ativo' : ''}`}>
+        <div className="pnl-editor-cab-acoes">
+          <label className={`pnl-toggle-papel${curso.publicado ? ' ativo' : ''}`}>
             <input type="checkbox" checked={curso.publicado} disabled={pendente} onChange={e => onAlternarPublicacao(e.target.checked)} />
             {curso.publicado ? 'Publicado' : 'Rascunho'}
           </label>
-          <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={onExcluirCurso}>Excluir curso</button>
+          <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={onExcluirCurso}>Excluir curso</button>
         </div>
       </div>
 
-      <div className="ad-editor-grid">
-        <section className="ad-card">
+      <div className="pnl-editor-grid">
+        <section className="pnl-card">
           <h2>Capa</h2>
-          <div className="ad-capa-preview" style={curso.capaUrl ? { backgroundImage: `url(${curso.capaUrl})` } : undefined}>
+          <div className="pnl-capa-preview" style={curso.capaUrl ? { backgroundImage: `url(${curso.capaUrl})` } : undefined}>
             {!curso.capaUrl && <span>Sem capa</span>}
           </div>
-          <label className="ad-btn-secundario ad-upload-btn">
+          <label className="pnl-btn-secundario pnl-upload-btn">
             Trocar capa
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onUploadCapa} hidden disabled={pendente} />
           </label>
         </section>
 
-        <section className="ad-card ad-card-dados">
+        <section className="pnl-card pnl-card-dados">
           <h2>Dados gerais</h2>
-          <form onSubmit={onSalvarDados} className="ad-form">
+          <form onSubmit={onSalvarDados} className="pnl-form">
             <label>Título
               <input name="titulo" defaultValue={curso.titulo} required minLength={3} />
             </label>
@@ -148,7 +148,7 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
                 <option value="Avançado">Avançado</option>
               </select>
             </label>
-            <div className="ad-form-linha">
+            <div className="pnl-form-linha">
               <label>Instrutor
                 <input name="instrutor_nome" defaultValue={curso.instrutorNome ?? ''} />
               </label>
@@ -165,8 +165,8 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
             <label>Objetivos (um por linha)
               <textarea name="objetivos" defaultValue={curso.objetivos.join('\n')} rows={4} />
             </label>
-            <div className="ad-form-linha">
-              <label className="ad-checkbox-linha">
+            <div className="pnl-form-linha">
+              <label className="pnl-checkbox-linha">
                 <input type="checkbox" name="emite_certificado" defaultChecked={curso.emiteCertificado} />
                 Emite certificado
               </label>
@@ -182,26 +182,26 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
                 placeholder="Deixe em branco pra usar o texto genérico padrão do email de certificado."
               />
             </label>
-            <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar dados gerais'}</button>
+            <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar dados gerais'}</button>
           </form>
         </section>
       </div>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Módulos e aulas</h2>
-        <div className="ad-nova-linha">
+        <div className="pnl-nova-linha">
           <input
             type="text"
             placeholder="Título do novo módulo"
             value={novoModuloTitulo}
             onChange={e => setNovoModuloTitulo(e.target.value)}
           />
-          <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriarModulo}>+ Módulo</button>
+          <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onCriarModulo}>+ Módulo</button>
         </div>
 
-        {modulos.length === 0 && <p className="ad-vazio">Nenhum módulo cadastrado ainda.</p>}
+        {modulos.length === 0 && <p className="pnl-vazio">Nenhum módulo cadastrado ainda.</p>}
 
-        <div className="ad-modulos-lista">
+        <div className="pnl-modulos-lista">
           {modulos.map((m, i) => (
             <ModuloBloco
               key={m.id}
@@ -284,32 +284,32 @@ function ModuloBloco({
   }
 
   return (
-    <div className="ad-modulo-bloco">
-      <div className="ad-modulo-cab">
+    <div className="pnl-modulo-bloco">
+      <div className="pnl-modulo-cab">
         {editando ? (
-          <div className="ad-inline-edit">
+          <div className="pnl-inline-edit">
             <input value={titulo} onChange={e => setTitulo(e.target.value)} autoFocus />
-            <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={onSalvarTitulo}>Salvar</button>
-            <button type="button" className="ad-btn-secundario" onClick={() => { setEditando(false); setTitulo(modulo.titulo) }}>Cancelar</button>
+            <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={onSalvarTitulo}>Salvar</button>
+            <button type="button" className="pnl-btn-secundario" onClick={() => { setEditando(false); setTitulo(modulo.titulo) }}>Cancelar</button>
           </div>
         ) : (
           <>
-            <button type="button" className="ad-modulo-toggle" onClick={onToggle}>
+            <button type="button" className="pnl-modulo-toggle" onClick={onToggle}>
               {expandido ? '▾' : '▸'} {modulo.titulo}
             </button>
-            <div className="ad-modulo-acoes">
-              <span className="ad-modulo-contagem">{modulo.aulas.length} aula{modulo.aulas.length === 1 ? '' : 's'}</span>
+            <div className="pnl-modulo-acoes">
+              <span className="pnl-modulo-contagem">{modulo.aulas.length} aula{modulo.aulas.length === 1 ? '' : 's'}</span>
               <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
               <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
               <button type="button" onClick={() => setEditando(true)} title="Renomear"><IconePencil size={13} /></button>
-              <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir módulo"><IconeTrash size={13} /></button>
+              <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir módulo"><IconeTrash size={13} /></button>
             </div>
           </>
         )}
       </div>
 
       {expandido && (
-        <div className="ad-modulo-corpo">
+        <div className="pnl-modulo-corpo">
           {modulo.aulas.map((a, i) => (
             <AulaBloco
               key={a.id}
@@ -325,9 +325,9 @@ function ModuloBloco({
               onRefresh={onRefresh}
             />
           ))}
-          <div className="ad-nova-linha">
+          <div className="pnl-nova-linha">
             <input type="text" placeholder="Título da nova aula" value={novaAulaTitulo} onChange={e => setNovaAulaTitulo(e.target.value)} />
-            <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={onCriarAula}>+ Aula</button>
+            <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={onCriarAula}>+ Aula</button>
           </div>
         </div>
       )}
@@ -401,22 +401,22 @@ function AulaBloco({
   }
 
   return (
-    <div className="ad-aula-bloco">
-      <div className="ad-aula-cab">
-        <button type="button" className="ad-aula-toggle" onClick={onToggle}>
+    <div className="pnl-aula-bloco">
+      <div className="pnl-aula-cab">
+        <button type="button" className="pnl-aula-toggle" onClick={onToggle}>
           {expandida ? '▾' : '▸'} {aula.titulo}
         </button>
-        <div className="ad-aula-acoes">
-          <span className="ad-aula-meta">{segParaLabel(aula.duracaoSeg)} · {aula.xp} XP</span>
+        <div className="pnl-aula-acoes">
+          <span className="pnl-aula-meta">{segParaLabel(aula.duracaoSeg)} · {aula.xp} XP</span>
           <button type="button" disabled={pendente || indice === 0} onClick={() => onMover('up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
           <button type="button" disabled={pendente || indice === total - 1} onClick={() => onMover('down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
-          <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir aula"><IconeTrash size={13} /></button>
+          <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={onExcluir} title="Excluir aula"><IconeTrash size={13} /></button>
         </div>
       </div>
 
       {expandida && (
-        <div className="ad-aula-corpo">
-          <form onSubmit={onSalvar} className="ad-form">
+        <div className="pnl-aula-corpo">
+          <form onSubmit={onSalvar} className="pnl-form">
             <label>Título
               <input name="titulo" defaultValue={aula.titulo} required />
             </label>
@@ -426,7 +426,7 @@ function AulaBloco({
             <label>URL do vídeo (Panda Video)
               <input name="video_url" defaultValue={aula.videoUrl ?? ''} placeholder="https://player-vz-....tv.pandavideo.com.br/embed/?v=..." />
             </label>
-            <div className="ad-form-linha">
+            <div className="pnl-form-linha">
               <label>Duração (segundos)
                 <input name="duracao_seg" type="number" min="0" defaultValue={aula.duracaoSeg} />
               </label>
@@ -440,14 +440,14 @@ function AulaBloco({
             <label>Sobre esta aula (um tópico por linha)
               <textarea name="sobre" defaultValue={aula.sobre.join('\n')} rows={3} />
             </label>
-            <button type="submit" className="ad-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar aula'}</button>
+            <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar aula'}</button>
           </form>
 
-          <div className="ad-aula-capa-linha">
-            <div className="ad-capa-preview ad-capa-preview-sm" style={aula.capaUrl ? { backgroundImage: `url(${aula.capaUrl})` } : undefined}>
+          <div className="pnl-aula-capa-linha">
+            <div className="pnl-capa-preview pnl-capa-preview-sm" style={aula.capaUrl ? { backgroundImage: `url(${aula.capaUrl})` } : undefined}>
               {!aula.capaUrl && <span>Sem capa</span>}
             </div>
-            <label className="ad-btn-secundario ad-upload-btn">
+            <label className="pnl-btn-secundario pnl-upload-btn">
               Trocar capa da aula
               <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onUploadCapa} hidden disabled={pendente} />
             </label>
@@ -489,22 +489,22 @@ function CapitulosBloco({ aula, cursoId, onErro, onSucesso, onRefresh }: {
   }
 
   return (
-    <div className="ad-sublista">
+    <div className="pnl-sublista">
       <h3>Capítulos do vídeo</h3>
-      {aula.capitulos.length === 0 && <p className="ad-vazio-sm">Nenhum capítulo.</p>}
+      {aula.capitulos.length === 0 && <p className="pnl-vazio-sm">Nenhum capítulo.</p>}
       <ul>
         {aula.capitulos.map(c => (
           <li key={c.id}>
             <span>{c.titulo}</span>
-            <span className="ad-sublista-meta">{segParaLabel(c.tempoSeg)}</span>
-            <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(c.id)}><IconeTrash size={13} /></button>
+            <span className="pnl-sublista-meta">{segParaLabel(c.tempoSeg)}</span>
+            <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(c.id)}><IconeTrash size={13} /></button>
           </li>
         ))}
       </ul>
-      <div className="ad-nova-linha">
+      <div className="pnl-nova-linha">
         <input type="text" placeholder="Título do capítulo" value={titulo} onChange={e => setTitulo(e.target.value)} />
-        <input type="number" placeholder="Segundos" min="0" value={tempo} onChange={e => setTempo(e.target.value)} className="ad-input-sm" />
-        <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={onCriar}>+ Capítulo</button>
+        <input type="number" placeholder="Segundos" min="0" value={tempo} onChange={e => setTempo(e.target.value)} className="pnl-input-sm" />
+        <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={onCriar}>+ Capítulo</button>
       </div>
     </div>
   )
@@ -562,32 +562,32 @@ function MateriaisBloco({ aula, cursoId, onErro, onSucesso, onRefresh }: {
   }
 
   return (
-    <div className="ad-sublista">
+    <div className="pnl-sublista">
       <h3>Materiais de apoio</h3>
-      {aula.materiais.length === 0 && <p className="ad-vazio-sm">Nenhum material.</p>}
+      {aula.materiais.length === 0 && <p className="pnl-vazio-sm">Nenhum material.</p>}
       <ul>
         {aula.materiais.map((m, i) => (
           <li key={m.id}>
             {editandoId === m.id ? (
-              <div className="ad-inline-edit">
+              <div className="pnl-inline-edit">
                 <input value={nomeEditado} onChange={e => setNomeEditado(e.target.value)} autoFocus />
-                <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => onSalvarNome(m.id)}>Salvar</button>
-                <button type="button" className="ad-btn-secundario" onClick={() => setEditandoId(null)}>Cancelar</button>
+                <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => onSalvarNome(m.id)}>Salvar</button>
+                <button type="button" className="pnl-btn-secundario" onClick={() => setEditandoId(null)}>Cancelar</button>
               </div>
             ) : (
               <>
                 <span>{m.nome}</span>
-                <span className="ad-sublista-meta">{m.tipo.toUpperCase()}{m.tamanhoBytes ? ` · ${fmtBytes(m.tamanhoBytes)}` : ''}</span>
+                <span className="pnl-sublista-meta">{m.tipo.toUpperCase()}{m.tamanhoBytes ? ` · ${fmtBytes(m.tamanhoBytes)}` : ''}</span>
                 <button type="button" disabled={pendente || i === 0} onClick={() => onMover(m.id, 'up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
                 <button type="button" disabled={pendente || i === aula.materiais.length - 1} onClick={() => onMover(m.id, 'down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
                 <button type="button" onClick={() => { setEditandoId(m.id); setNomeEditado(m.nome) }} title="Renomear"><IconePencil size={13} /></button>
-                <button type="button" className="ad-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(m.id, m.nome)} title="Excluir"><IconeTrash size={13} /></button>
+                <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(m.id, m.nome)} title="Excluir"><IconeTrash size={13} /></button>
               </>
             )}
           </li>
         ))}
       </ul>
-      <label className="ad-btn-secundario ad-upload-btn">
+      <label className="pnl-btn-secundario pnl-upload-btn">
         <IconeUpload size={13} /> Enviar arquivos (PDF, XLSX, DOCX, ZIP, até 20MB cada)
         <input type="file" multiple accept=".pdf,.xlsx,.xls,.docx,.doc,.zip" onChange={onUpload} hidden disabled={pendente} />
       </label>

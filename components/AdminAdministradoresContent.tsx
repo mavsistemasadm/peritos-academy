@@ -53,12 +53,12 @@ export default function AdminAdministradoresContent({ administradores }: { admin
   }
 
   return (
-    <div className="ad-admins">
+    <div className="pnl-admins">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
       <h1>Gestão de Administradores</h1>
-      <p className="ad-sub">Conceda ou revogue papéis de acesso ao painel admin.</p>
+      <p className="pnl-sub">Conceda ou revogue papéis de acesso ao painel admin.</p>
 
-      <div className="ad-busca-card">
+      <div className="pnl-busca-card">
         <label htmlFor="busca-admin">Buscar por nome ou slug</label>
         <input
           id="busca-admin"
@@ -68,21 +68,21 @@ export default function AdminAdministradoresContent({ administradores }: { admin
           placeholder="Digite ao menos 2 caracteres..."
           autoComplete="off"
         />
-        {buscando && <span className="ad-busca-status">Buscando...</span>}
+        {buscando && <span className="pnl-busca-status">Buscando...</span>}
         {resultados.length > 0 && (
-          <ul className="ad-busca-resultados">
+          <ul className="pnl-busca-resultados">
             {resultados.map(p => (
               <li key={p.id}>
-                <span className="ad-avatar">{iniciais(p.nome)}</span>
-                <span className="ad-busca-nome">{p.nome}</span>
-                <div className="ad-busca-acoes">
+                <span className="pnl-avatar">{iniciais(p.nome)}</span>
+                <span className="pnl-busca-nome">{p.nome}</span>
+                <div className="pnl-busca-acoes">
                   {PAPEIS.map(papel => (
                     <button
                       key={papel}
                       type="button"
                       disabled={salvando}
                       onClick={() => onConceder(p.id, papel)}
-                      className="ad-btn-papel"
+                      className="pnl-btn-papel"
                     >
                       + {NOME_PAPEL[papel]}
                     </button>
@@ -94,20 +94,20 @@ export default function AdminAdministradoresContent({ administradores }: { admin
         )}
       </div>
 
-      <div className="ad-lista-admins">
-        {administradores.length === 0 && <p className="ad-vazio">Nenhum administrador cadastrado.</p>}
+      <div className="pnl-lista-admins">
+        {administradores.length === 0 && <p className="pnl-vazio">Nenhum administrador cadastrado.</p>}
         {administradores.map(a => (
-          <div key={a.usuarioId} className="ad-admin-linha">
-            <div className="ad-admin-quem">
-              <span className="ad-avatar">{iniciais(a.nome)}</span>
+          <div key={a.usuarioId} className="pnl-admin-linha">
+            <div className="pnl-admin-quem">
+              <span className="pnl-avatar">{iniciais(a.nome)}</span>
               <div>
                 <b>{a.nome}</b>
-                {a.slug && <span className="ad-admin-slug">/perito/{a.slug}</span>}
+                {a.slug && <span className="pnl-admin-slug">/perito/{a.slug}</span>}
               </div>
             </div>
-            <div className="ad-admin-papeis">
+            <div className="pnl-admin-papeis">
               {a.papeis.map(pc => (
-                <label key={pc.id} className={`ad-toggle-papel${pc.ativo ? ' ativo' : ''}`}>
+                <label key={pc.id} className={`pnl-toggle-papel${pc.ativo ? ' ativo' : ''}`}>
                   <input
                     type="checkbox"
                     checked={pc.ativo}

@@ -171,6 +171,35 @@ Sequência de build de cada página:
 - `@keyframes` têm sufixo por página (são globais): ex. `certBounce`, `piscaAg`, `np-drop`
 - A classe raiz DEVE estar no elemento wrapper ou os seletores não casam
 - Definir custom properties antes de usar em animações
+- ⚠️ **Nome de classe nunca pode parecer anúncio** — evitar `ad`, `ads`, `advert`,
+  `banner`, `promo`, `sponsor` (ver "O painel admin invisível" abaixo)
+
+## O painel admin invisível: o prefixo `ad-` — 2026-08-17
+
+**Regra permanente.** O prefixo do painel admin é **`pnl-`** (painel). Ele era
+`ad-` e não volta a ser. Classe que pareça anúncio é comida por bloqueador:
+`ad-sidebar` e `ad-card` estão nas listas de filtro do uBlock/AdBlock/Brave, que
+aplicam `display:none` neles no navegador do usuário.
+
+O sintoma **não parece CSS, parece falta de permissão**, e foi assim que chegou:
+um super admin real (o Lucas, papel concedido em 10/08) abria `/admin`, a página
+dizia "Seus papéis: Super Admin" — servidor reconhecendo tudo — e o resto era
+tela preta. Sem menu lateral (`.ad-sidebar`), sem cartão nenhum (`.ad-card`).
+Sobrava só o `<h1>` e o `.ad-sub`, que não casam com filtro nenhum.
+
+E a tela ficava torta de brinde: `.pnl-shell` é um grid `240px 1fr`; removida a
+sidebar da árvore, o `<main>` escorrega para a coluna de 240px e o conteúdo
+quebra em duas linhas dentro de uma faixa estreita.
+
+⚠️ **Ninguém do lado do servidor consegue ver isso.** Não gera erro, não aparece
+em log, `admin_usuarios` está certo, RLS está certa, o middleware libera. Só
+reproduz em quem tem bloqueador — e o dono do produto não tinha, então para ele
+o painel sempre funcionou. Foi preciso um print do outro lado para descobrir.
+
+Ainda existem duas classes de risco parecido, não renomeadas por serem de baixo
+alcance: `.np-banner-manutencao` (banner de manutenção, só admin vê) e
+`.mp-tesouro-banner` (Meu Plano). Se alguém relatar "sumiu um pedaço da tela",
+suspeitar disso antes de procurar bug de dado.
 
 ## Supabase — padrões críticos
 - Cliente via `criarClienteServidor()` de `@/lib/supabase/server` (NUNCA `createClient` direto em queries — quebra o build por falta de env vars)

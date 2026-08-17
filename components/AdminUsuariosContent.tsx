@@ -52,22 +52,22 @@ export default function AdminUsuariosContent({ usuarios, totalCount, pagina, por
   }
 
   return (
-    <div className="ad-cursos">
-      <div className="ad-cursos-cab">
+    <div className="pnl-cursos">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>Usuários</h1>
-          <p className="ad-sub">Visão 360° de cada aluno: suporte, progresso, gamificação e financeiro.</p>
+          <p className="pnl-sub">Visão 360° de cada aluno: suporte, progresso, gamificação e financeiro.</p>
         </div>
       </div>
 
-      <section className="ad-card">
-        <div className="ad-form-linha" style={{ marginBottom: 12 }}>
+      <section className="pnl-card">
+        <div className="pnl-form-linha" style={{ marginBottom: 12 }}>
           <form
             onSubmit={e => { e.preventDefault(); navegar({ busca }) }}
             style={{ display: 'flex', gap: 8, flex: 2 }}
           >
             <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Nome ou e-mail..." />
-            <button type="submit" className="ad-btn-secundario"><IconeSearch size={14} /></button>
+            <button type="submit" className="pnl-btn-secundario"><IconeSearch size={14} /></button>
           </form>
           <label>Status da conta
             <select value={filtrosAtuais.status ?? ''} onChange={e => navegar({ status: e.target.value || undefined })}>
@@ -92,10 +92,10 @@ export default function AdminUsuariosContent({ usuarios, totalCount, pagina, por
           </label>
         </div>
 
-        {usuarios.length === 0 && <p className="ad-vazio">Nenhum usuário encontrado com esses filtros.</p>}
+        {usuarios.length === 0 && <p className="pnl-vazio">Nenhum usuário encontrado com esses filtros.</p>}
         {usuarios.length > 0 && (
-          <div className="ad-tabela-scroll">
-            <table className="ad-tabela">
+          <div className="pnl-tabela-scroll">
+            <table className="pnl-tabela">
               <thead>
                 <tr>
                   <th style={{ cursor: 'pointer' }} onClick={() => onOrdenar('nome')}>Nome</th>
@@ -112,12 +112,12 @@ export default function AdminUsuariosContent({ usuarios, totalCount, pagina, por
                   <tr key={u.id}>
                     <td>{u.nome}</td>
                     <td>{u.email ?? '—'}</td>
-                    <td><span className={`ad-status-pill ${u.assinaturaStatus}`}>{NOME_STATUS_ASSINATURA[u.assinaturaStatus] ?? u.assinaturaStatus}</span></td>
+                    <td><span className={`pnl-status-pill ${u.assinaturaStatus}`}>{NOME_STATUS_ASSINATURA[u.assinaturaStatus] ?? u.assinaturaStatus}</span></td>
                     <td>{u.nivelNome ?? `Nível ${u.nivel}`}</td>
                     <td>{fmtDataHora(u.ultimoAcesso)}</td>
-                    <td><span className={`ad-status-pill ${u.status}`}>{NOME_STATUS_CONTA[u.status]}</span></td>
+                    <td><span className={`pnl-status-pill ${u.status}`}>{NOME_STATUS_CONTA[u.status]}</span></td>
                     <td>
-                      <a href={`/admin/usuarios/${u.id}`} className="ad-btn-secundario">Ver ficha</a>
+                      <a href={`/admin/usuarios/${u.id}`} className="pnl-btn-secundario">Ver ficha</a>
                     </td>
                   </tr>
                 ))}
@@ -128,11 +128,11 @@ export default function AdminUsuariosContent({ usuarios, totalCount, pagina, por
 
         {totalPaginas > 1 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
-            <button type="button" className="ad-btn-secundario" disabled={pagina <= 1} onClick={() => navegar({ pagina: String(pagina - 1) })}>
+            <button type="button" className="pnl-btn-secundario" disabled={pagina <= 1} onClick={() => navegar({ pagina: String(pagina - 1) })}>
               <IconeChevronLeft size={14} />
             </button>
-            <span className="ad-fin-nota">Página {pagina} de {totalPaginas} ({totalCount} usuários)</span>
-            <button type="button" className="ad-btn-secundario" disabled={pagina >= totalPaginas} onClick={() => navegar({ pagina: String(pagina + 1) })}>
+            <span className="pnl-fin-nota">Página {pagina} de {totalPaginas} ({totalCount} usuários)</span>
+            <button type="button" className="pnl-btn-secundario" disabled={pagina >= totalPaginas} onClick={() => navegar({ pagina: String(pagina + 1) })}>
               <IconeChevronRight size={14} />
             </button>
           </div>

@@ -56,19 +56,19 @@ export default function AdminAvaliacoesContent({ avaliacoes, cursos, cursoFiltro
   }
 
   return (
-    <div className="ad-cursos">
+    <div className="pnl-cursos">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <div className="ad-cursos-cab">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>Avaliações</h1>
-          <p className="ad-sub">Quizzes por módulo e provas finais (desafios periciais) de cada curso.</p>
+          <p className="pnl-sub">Quizzes por módulo e provas finais (desafios periciais) de cada curso.</p>
         </div>
-        <button type="button" className="ad-btn-primario" onClick={() => setCriando(v => !v)}>
+        <button type="button" className="pnl-btn-primario" onClick={() => setCriando(v => !v)}>
           + Nova avaliação
         </button>
       </div>
 
-      <div className="ad-nova-linha">
+      <div className="pnl-nova-linha">
         <select value={cursoFiltro} onChange={e => onFiltrar(e.target.value)}>
           <option value="">Todos os cursos</option>
           {cursos.map(c => (
@@ -78,7 +78,7 @@ export default function AdminAvaliacoesContent({ avaliacoes, cursos, cursoFiltro
       </div>
 
       {criando && (
-        <div className="ad-busca-card">
+        <div className="pnl-busca-card">
           <label>Curso
             <select value={cursoId} onChange={e => setCursoId(e.target.value)}>
               <option value="">Selecione um curso...</option>
@@ -96,31 +96,31 @@ export default function AdminAvaliacoesContent({ avaliacoes, cursos, cursoFiltro
           <label>Título
             <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ex.: Caso Perícia Contábil 01" autoFocus />
           </label>
-          <div className="ad-form-acoes">
-            <button type="button" className="ad-btn-primario" disabled={pendente} onClick={onCriar}>
+          <div className="pnl-form-acoes">
+            <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onCriar}>
               {pendente ? 'Criando...' : 'Criar e editar'}
             </button>
-            <button type="button" className="ad-btn-secundario" onClick={() => { setCriando(false); setTitulo('') }}>
+            <button type="button" className="pnl-btn-secundario" onClick={() => { setCriando(false); setTitulo('') }}>
               Cancelar
             </button>
           </div>
         </div>
       )}
 
-      <div className="ad-lista-admins">
-        {avaliacoes.length === 0 && <p className="ad-vazio">Nenhuma avaliação cadastrada ainda.</p>}
+      <div className="pnl-lista-admins">
+        {avaliacoes.length === 0 && <p className="pnl-vazio">Nenhuma avaliação cadastrada ainda.</p>}
         {avaliacoes.map(a => (
-          <div key={a.id} className="ad-admin-linha">
-            <div className="ad-admin-quem">
+          <div key={a.id} className="pnl-admin-linha">
+            <div className="pnl-admin-quem">
               <div>
                 <a href={`/admin/avaliacoes/${a.id}`}><b>{a.titulo}</b></a>
-                <span className="ad-admin-slug">
+                <span className="pnl-admin-slug">
                   {a.cursoTitulo}{a.moduloTitulo ? ` · ${a.moduloTitulo}` : ''} · {a.tipo === 'prova' ? 'Prova final' : 'Avaliação'} · {a.totalQuestoes} questão{a.totalQuestoes === 1 ? '' : 'ões'}
                 </span>
               </div>
             </div>
-            <div className="ad-curso-acoes">
-              <label className={`ad-toggle-papel${a.publicado ? ' ativo' : ''}`}>
+            <div className="pnl-curso-acoes">
+              <label className={`pnl-toggle-papel${a.publicado ? ' ativo' : ''}`}>
                 <input
                   type="checkbox"
                   checked={a.publicado}
@@ -129,8 +129,8 @@ export default function AdminAvaliacoesContent({ avaliacoes, cursos, cursoFiltro
                 />
                 {a.publicado ? 'Publicado' : 'Rascunho'}
               </label>
-              <a href={`/admin/avaliacoes/${a.id}`} className="ad-btn-secundario">Editar</a>
-              <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={() => onExcluir(a.id, a.cursoId, a.titulo)}>
+              <a href={`/admin/avaliacoes/${a.id}`} className="pnl-btn-secundario">Editar</a>
+              <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={() => onExcluir(a.id, a.cursoId, a.titulo)}>
                 Excluir
               </button>
             </div>

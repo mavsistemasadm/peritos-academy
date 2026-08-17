@@ -415,7 +415,7 @@ export default function DevIconesContent() {
           <div className="di-ctx-card">
             <h4>Item da sidebar do admin <span className="di-tam-badge">sem ícone</span></h4>
             <p className="di-ctx-fonte">
-              AdminShell.tsx — .ad-nav-item. <b>Nota:</b> a sidebar do admin não usa nenhum ícone hoje,
+              AdminShell.tsx — .pnl-nav-item. <b>Nota:</b> a sidebar do admin não usa nenhum ícone hoje,
               só texto — não há tamanho pra auditar aqui, é uma lacuna do sistema de ícones que talvez
               valha entrar na passada de ajustes.
             </p>

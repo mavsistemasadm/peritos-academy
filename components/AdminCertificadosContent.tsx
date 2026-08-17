@@ -31,20 +31,20 @@ export default function AdminCertificadosContent({ certificados, cursos }: { cer
   }
 
   return (
-    <div className="ad-cursos">
+    <div className="pnl-cursos">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
-      <div className="ad-cursos-cab">
+      <div className="pnl-cursos-cab">
         <div>
           <h1>Certificados</h1>
-          <p className="ad-sub">Certificados emitidos automaticamente ao concluir um curso com certificação.</p>
+          <p className="pnl-sub">Certificados emitidos automaticamente ao concluir um curso com certificação.</p>
         </div>
       </div>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Cursos com certificação</h2>
         <p>Defina quais cursos emitem certificado e a carga horária que aparece nele.</p>
-        <div className="ad-tabela-scroll">
-          <table className="ad-tabela">
+        <div className="pnl-tabela-scroll">
+          <table className="pnl-tabela">
             <thead><tr><th>Curso</th><th>Emite certificado</th><th>Carga horária (h)</th><th></th></tr></thead>
             <tbody>
               {cursos.map(c => <CursoCertificadoLinha key={c.id} curso={c} onErro={toast.erro} onSucesso={toast.sucesso} />)}
@@ -53,12 +53,12 @@ export default function AdminCertificadosContent({ certificados, cursos }: { cer
         </div>
       </section>
 
-      <section className="ad-card">
+      <section className="pnl-card">
         <h2>Certificados emitidos</h2>
-        {certificados.length === 0 && <p className="ad-vazio">Nenhum certificado emitido ainda.</p>}
+        {certificados.length === 0 && <p className="pnl-vazio">Nenhum certificado emitido ainda.</p>}
         {certificados.length > 0 && (
-          <div className="ad-tabela-scroll">
-            <table className="ad-tabela">
+          <div className="pnl-tabela-scroll">
+            <table className="pnl-tabela">
               <thead><tr><th>Número</th><th>Aluno</th><th>Curso</th><th>Nota</th><th>Carga h</th><th>Emitido em</th><th></th></tr></thead>
               <tbody>
                 {certificados.map(c => (
@@ -70,8 +70,8 @@ export default function AdminCertificadosContent({ certificados, cursos }: { cer
                     <td>{c.cargaHoras ?? '—'}</td>
                     <td>{new Date(c.emitidoEm).toLocaleDateString('pt-BR')}</td>
                     <td style={{ display: 'flex', gap: 6 }}>
-                      <button type="button" className="ad-btn-secundario" disabled={pendente} onClick={() => onReemitir(c.id)}>Reemitir</button>
-                      <button type="button" className="ad-btn-perigo" disabled={pendente} onClick={() => onRevogar(c.id, c.numero)}>Revogar</button>
+                      <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => onReemitir(c.id)}>Reemitir</button>
+                      <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={() => onRevogar(c.id, c.numero)}>Revogar</button>
                     </td>
                   </tr>
                 ))}
@@ -103,12 +103,12 @@ function CursoCertificadoLinha({ curso, onErro, onSucesso }: { curso: CursoCerti
       <td>{curso.titulo}</td>
       <td colSpan={3}>
         <form onSubmit={onSalvar} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <label className="ad-checkbox-linha">
+          <label className="pnl-checkbox-linha">
             <input type="checkbox" name="emite_certificado" defaultChecked={curso.emiteCertificado} />
             Emite
           </label>
-          <input name="carga_horas" type="number" step="0.5" min="0" defaultValue={curso.cargaHoras ?? ''} className="ad-input-sm" placeholder="horas" />
-          <button type="submit" className="ad-btn-secundario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
+          <input name="carga_horas" type="number" step="0.5" min="0" defaultValue={curso.cargaHoras ?? ''} className="pnl-input-sm" placeholder="horas" />
+          <button type="submit" className="pnl-btn-secundario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar'}</button>
         </form>
       </td>
     </tr>
