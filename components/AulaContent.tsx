@@ -6,7 +6,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { criarClienteBrowser } from "@/lib/supabase/client";
 import type { AulaCompleta, Anotacao, Duvida, Material } from "@/lib/queries/aula";
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
@@ -19,14 +20,14 @@ import { Certificado, XP } from '@/components/Emblemas'
 import NexusSugestao from "@/components/NexusSugestao";
 
 
+// ATENÇÃO: tem que ser o cliente de @supabase/ssr (criarClienteBrowser), que lê a
+// sessão dos COOKIES. Um createClient() cru de @supabase/supabase-js procura a
+// sessão no localStorage — onde nada nesta plataforma grava — e sai como `anon`:
+// toda escrita aqui (progresso de vídeo, anotações, dúvidas) volta 42501 da RLS.
+// Foi assim que o progresso de vídeo ficou meses sem gravar um único segundo.
 let _sb: SupabaseClient | null = null;
 function sb() {
-  if (!_sb) {
-    _sb = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-  }
+  if (!_sb) _sb = criarClienteBrowser();
   return _sb;
 }
 
@@ -87,6 +88,14 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
   const notaTaRef = useRef<HTMLTextAreaElement>(null);
   const regressivaRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const segundosRef = useRef(dados.aula.segundosAssistidos);
+  const terminouRef = useRef(dados.aula.videoTerminou);
+  // gravação do progresso do vídeo, exposta pra poder ser esvaziada (flush) antes
+  // de concluir — o servidor lê o que está GRAVADO, não o que está na tela.
+  const flushProgressoRef = useRef<() => Promise<void>>(async () => {});
+  // uma tentativa automática por vez em que os critérios passam a bater: sem isso,
+  // uma recusa do servidor volta `concluindo` pra false, o efeito dispara de novo e
+  // a página entra em laço (botão preso em "Concluindo...", tela piscando).
+  const autoTentadoRef = useRef(false);
 
   const seek = (_s: number) => {
     /* seek no iframe do Panda exige o SDK do player — reativar na próxima fase */
@@ -136,14 +145,17 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
     let ultimoTempo = 0;
     let ultimoPersist = 0;
 
-    const persistir = (forcar = false, terminou = false) => {
+    const persistir = async (forcar = false, terminou = false) => {
       const agora = Date.now();
       if (!forcar && agora - ultimoPersist < 10000) return;
       ultimoPersist = agora;
       const payload: Record<string, unknown> = { usuario_id: usuarioId, aula_id: aula.id, segundos_assistidos: Math.floor(segundosRef.current) };
-      if (terminou) payload.video_terminou = true;
-      sb().from("aula_progresso").upsert(payload).then(() => {});
+      if (terminou || terminouRef.current) payload.video_terminou = true;
+      const { error } = await sb().from("aula_progresso").upsert(payload);
+      // erro aqui é o aluno assistindo sem que nada seja contado — nunca engolir
+      if (error) console.error("[aula] falha ao gravar progresso do vídeo", error);
     };
+    flushProgressoRef.current = () => persistir(true);
 
     const onMessage = (e: MessageEvent) => {
       const data = e.data;
@@ -164,6 +176,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
       } else if (data.message === "panda_ended") {
         const novo = aula.duracaoSeg || segundosRef.current;
         segundosRef.current = novo;
+        terminouRef.current = true;
         setSegundosAssistidos(novo);
         setVideoTerminou(true);
         persistir(true, true);
@@ -215,6 +228,11 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
     if (!usuarioId) { alert("Entre na sua conta para registrar o progresso."); return; }
     if (!podeConcluir) return; // botão já vem desabilitado nesse estado — defesa extra
     setConcluindo(true);
+    // o servidor valida os 70% pelo que está GRAVADO em aula_progresso, e a gravação
+    // é represada em ~10s. Sem esvaziar a fila antes, a primeira tentativa (que é
+    // exatamente a automática, no instante em que os 70% batem) é recusada por um
+    // número velho, com a tela mostrando o critério cumprido.
+    try { await flushProgressoRef.current(); } catch { /* best-effort */ }
     const r = await concluirAula(aula.id);
     setConcluindo(false);
     if (!r.ok) {
@@ -261,9 +279,10 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
      botão "Marcar como concluída" continua existindo como reforço/fallback,
      mas some a necessidade de clicar no caminho normal do aluno. */
   useEffect(() => {
-    if (!concluida && !concluindo && criteriosOk && usuarioId) {
-      marcarConcluida();
-    }
+    if (!criteriosOk) { autoTentadoRef.current = false; return; }
+    if (concluida || concluindo || !usuarioId || autoTentadoRef.current) return;
+    autoTentadoRef.current = true;
+    marcarConcluida();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [criteriosOk, concluida, concluindo, usuarioId]);
 
