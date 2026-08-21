@@ -1,5 +1,5 @@
 // app/curso/[slug]/avaliacao/[avaliacaoId]/page.tsx
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getAvaliacao, type ResultadoCorrecao, type GabaritoItem } from "@/lib/queries/avaliacao";
 import AvaliacaoContent from "@/components/AvaliacaoContent";
 import { criarClienteServidor } from "@/lib/supabase/server";
@@ -7,10 +7,12 @@ import { carregarNav } from "@/lib/queries/nav";
 import { verificarAcessoCurso } from "@/lib/acesso/verificar";
 import AssinaturaNecessaria from "@/components/AssinaturaNecessaria";
 
-export default async function AvaliacaoPage({ params }: {
+export default async function AvaliacaoPage({ params, searchParams }: {
   params: Promise<{ slug: string; avaliacaoId: string }>;
+  searchParams: Promise<{ bloqueada?: string }>;
 }) {
   const { slug, avaliacaoId } = await params;
+  const { bloqueada } = await searchParams;
 
   const dados = await getAvaliacao(slug, avaliacaoId);
   if (!dados) notFound();
@@ -23,6 +25,17 @@ export default async function AvaliacaoPage({ params }: {
 
   const supabase = await criarClienteServidor();
   const { data: auth } = await supabase.auth.getUser();
+
+  // gate de sequência: a prova não pula as aulas. Sem isto, o link direto da
+  // avaliação abriria a prova de um curso nunca assistido — e a RPC de
+  // submissão recusaria só depois de o aluno responder tudo. Admin passa.
+  const { data: pendencia } = await supabase.rpc("avaliacao_pendencia", { p_avaliacao: avaliacaoId });
+  if ((pendencia as any)?.bloqueado) {
+    const alvo = (pendencia as any).tipo === "aula" && (pendencia as any).id
+      ? `/curso/${slug}/aula/${(pendencia as any).id}`
+      : `/curso/${slug}`;
+    redirect(`${alvo}?bloqueada=1`);
+  }
   const usuarioNome =
     (auth?.user?.user_metadata?.nome as string | undefined) ??
     (auth?.user?.user_metadata?.full_name as string | undefined) ??
@@ -125,7 +138,7 @@ Seja justo mas exigente.`,
   }
 
   return (
-    <AvaliacaoContent dados={dados} usuarioNome={usuarioNome} submeter={submeter} />
+    <AvaliacaoContent dados={dados} usuarioNome={usuarioNome} submeter={submeter} vindoDeBloqueio={bloqueada === "1"} />
   );
 }
 

@@ -237,6 +237,11 @@ suspeitar disso antes de procurar bug de dado.
 - **Ideia futura (não implementada de propósito)**: gatilho de gamificação `baixar_material` (XP por baixar um material) — deixar pra próxima sessão de calibragem de gatilhos, junto com os outros valores placeholder já registrados na seção Gamificação.
 
 ## Progressão sequencial de aulas — 2026-07-14
+⚠️ **A trava de avaliação descrita aqui foi substituída em 21/08/2026** — ver
+"A avaliação é um item da jornada" logo abaixo. O que continua valendo desta
+seção: critérios de conclusão (70% de vídeo, materiais baixados), tracking do
+Panda, trigger de escrita protegida e bypass de admin.
+
 Aula N+1 só libera após aula N concluída, e "concluída" passou a ter critérios (antes era um clique livre). Chokepoint único: RPC `concluir_aula(p_aula_id)`, `security definer` (EXECUTE revogado de `anon`/`PUBLIC` nomeando os papéis — mesma pegadinha do `notificar()`, revoke de `PUBLIC` sozinho não bastou).
 
 ### Critérios de conclusão (todos avaliados dentro da RPC, nunca só no client)
@@ -268,6 +273,83 @@ Checklist ao vivo acima das abas (some quando a aula não tem vídeo nem materia
 
 ### Testado (SQL direto via MCP, usuário descartável, tudo revertido ao final)
 Curso real com 2 módulos (`desvendando-os-segredos-das-instituicoes-bancarias`) e uma avaliação de módulo publicada temporariamente pro teste (revertida a `publicado=false` depois): rejeição sem progresso, tentativa de bypass direto de `concluida=true` revertida pelo trigger, 70% de vídeo liberando o critério, download parcial (5 de 6 materiais) ainda bloqueando, conclusão completa creditando gamificação (`concluir_aula` + `iniciar_curso` no `gamificacao_extrato`), pulo de aula no meio do módulo bloqueado, módulo seguinte bloqueado até aprovar a avaliação e liberado depois de aprovar, bypass total de admin numa aula nunca vista. **Não testado**: fluxo real em navegador (login, clique, player do Panda de verdade) — verificação ficou no nível de banco/RPC + `npm run build`; recomendado um teste manual único em preview antes do próximo grande lançamento de conteúdo.
+
+## A avaliação é um item da jornada — 2026-08-21
+
+**Regra permanente.** A avaliação ocupa uma **posição na sequência do curso**, e
+nada depois dela abre sem aprovação. Aula de correção ("Resolução Avaliação I",
+"Prova corrigida", "Desafio corrigido") vem **sempre depois** da sua avaliação.
+
+### O que estava errado, e como chegou
+
+A avaliação só travava a passagem **para o módulo seguinte**. Dentro do módulo
+ela não travava nada — e a aula de correção é quase sempre a última aula do
+**próprio** módulo. Ou seja: **o vídeo com a resposta abria antes da pergunta.**
+
+E mesmo essa trava frouxa não funcionava: `getAula` montava a lista plana com
+`modulos.flatMap(m => m.aulas)`, e o `select` aninhado não traz `modulo_id` —
+então `cruzouModulo` comparava `undefined !== undefined`, **sempre falso**. A
+página nunca detectava virada de módulo. `primeiraAulaLiberada` e `curso.ts`
+injetavam `modulo_id` na mão e acertavam; a terceira cópia, não.
+
+Como isso chegou: uma aluna assistiu a aula "Resolução Avaliação I", achou que
+tinha feito a avaliação (nome parecido, e ela nunca viu a prova), o auto-avanço
+de 5s a empurrou para a aula seguinte — trancada —, ela assistiu 23 dos 25
+minutos e só então levou "Conclua a avaliação do módulo anterior primeiro", **sem
+link e sem nome**. A página da aula não tinha uma única menção a avaliações.
+Eram 7 alunos no mesmo estado e **zero tentativas de avaliação na plataforma
+inteira**.
+
+### O modelo
+
+- **`avaliacoes.posicao`** = quantas aulas do módulo vêm antes dela. `3` → entra
+  depois das 3 primeiras e antes da 4ª. `null` = fim do módulo (default de
+  avaliação nova). É contagem de aulas, e **não** valor de `aulas.ordem`, de
+  propósito: reordenar aulas no admin não joga a avaliação para o meio do
+  conteúdo. Editável em `/admin/avaliacoes/[id]` ("Posição no módulo").
+- **`curso_sequencia(curso_id)`** — a ordem, em um lugar só: módulos → aulas e
+  avaliações intercaladas. Prova sem módulo fecha o curso.
+- **`progresso_pendencia(usuario, curso, item)`** — devolve o primeiro item
+  anterior não cumprido, **nomeado e com id**. Interna (revoke de
+  authenticated/anon, mesmo padrão de `notificar()`); a porta pública é
+  `avaliacao_pendencia(avaliacao)`, que usa `auth.uid()`.
+- **`lib/progresso/sequencia.ts`** — lê a ordem da RPC e deriva o estado de cada
+  item. Página do curso, página da aula, RPC de conclusão e RPC de submissão
+  passaram todas a ler daqui.
+
+⚠️ **A trava vale dos dois lados.** `submeter_avaliacao` recusa prova fora de
+ordem e a página da avaliação barra antes de o aluno responder. Sem isso, o link
+direto da prova (público para quem tem o curso) abriria a avaliação de um curso
+nunca assistido.
+
+⚠️ **Item bloqueado não conta como concluído, mesmo com a linha gravada.**
+Decisão do dono do produto: quem concluiu a correção antes da prova volta a
+vê-la trancada. O progresso **não é apagado** — aprovando a prova, a aula
+reaparece concluída e ninguém reassiste nada. Medido ao aplicar: 4 aulas, 4
+alunos.
+
+### Backfill das 37 avaliações
+
+27 casaram sozinhas pela heurística "tantas aulas de correção quanto avaliações
+→ 1-a-1 na ordem" (regex `resolu|corrigid|resolvid|gabarito`). 4 ficaram no fim
+do módulo por não terem correção nenhuma (Desvendando mód. 2 e 4, Leitura mód.
+3), que é o lugar certo. As 6 restantes são dois módulos com 3 avaliações e 1
+única correção (Tabela de Atualização Monetária, Cheque Especial): posicionadas
+à mão, acumuladas antes da correção/encerramento — nenhuma avaliação foi enfiada
+no meio do conteúdo.
+
+⚠️ Bug adjacente corrigido no caminho: `atualizarAvaliacao` gravava numa coluna
+`avaliacoes.xp` que **não existe** desde que virou `peso` — salvar dados gerais
+de avaliação no admin falhava inteiro, em silêncio, e `peso` nunca era salvo.
+
+### Testado
+11 asserções em SQL com usuários descartáveis (apagados no fim): prova trancada
+antes das aulas, prova abrindo depois delas, correção trancada até a aprovação,
+módulo seguinte nomeando a prova, nota abaixo da mínima não destravando,
+aprovação destravando, `concluir_aula` recusando com o nome certo,
+`submeter_avaliacao` recusando prova fora de ordem, e o retroativo (correção
+concluída sem prova não serve de escada). **Não testado em navegador** — a
+verificação ficou em banco/RPC + `npm run build`.
 
 ## Tour guiado + Guia da plataforma — 2026-07-15
 Onboarding em duas peças: overlay com spotlight (8 passos) na primeira visita à home, e `/guia` (documentação viva, link no dropdown do avatar entre "Perfil público" e "Sair", ícone `IconeCompass` novo).

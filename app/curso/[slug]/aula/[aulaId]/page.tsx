@@ -1,6 +1,6 @@
 // app/curso/[slug]/aula/[aulaId]/page.tsx
 import { notFound, redirect } from "next/navigation";
-import { getAula, primeiraAulaLiberada } from "@/lib/queries/aula";
+import { getAula, proximoPassoDoCurso } from "@/lib/queries/aula";
 import { carregarNav } from "@/lib/queries/nav";
 import AulaContent from "@/components/AulaContent";
 import { criarClienteServidor } from "@/lib/supabase/server";
@@ -22,12 +22,13 @@ export default async function AulaPage({ params, searchParams }: {
   const acesso = await verificarAcessoCurso(slug);
   if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} alvo={slug} />;
 
-  // acesso direto por URL a uma aula ainda travada (sequência ou avaliação de
-  // módulo pendente) → manda pra última aula liberada. Admin tem bypass total.
+  // acesso direto por URL a uma aula ainda travada → manda pro próximo passo
+  // REAL da jornada, que pode ser uma avaliação. Admin tem bypass total.
   if (dados.aula.bloqueada && !nav.isAdmin) {
-    const liberadaId = await primeiraAulaLiberada(slug);
-    if (liberadaId && liberadaId !== aulaId) {
-      redirect(`/curso/${slug}/aula/${liberadaId}?bloqueada=1`);
+    const passo = await proximoPassoDoCurso(slug);
+    if (passo && passo.id !== aulaId) {
+      const sep = passo.href.includes("?") ? "&" : "?";
+      redirect(`${passo.href}${sep}bloqueada=1`);
     }
   }
 

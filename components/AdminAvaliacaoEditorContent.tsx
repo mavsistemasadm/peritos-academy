@@ -20,6 +20,10 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
   const toast = useAdminToast()
   const [pendente, startTransition] = useTransition()
   const [tipo, setTipo] = useState(avaliacao.tipo)
+  const [moduloId, setModuloId] = useState(avaliacao.moduloId ?? '')
+  // '' = fim do módulo (null no banco); '0' = antes da 1ª aula; 'k' = depois da k-ésima
+  const [posicao, setPosicao] = useState(avaliacao.posicao === null ? '' : String(avaliacao.posicao))
+  const aulasDoModulo = modulos.find(m => m.id === moduloId)?.aulas ?? []
   const [questaoExpandida, setQuestaoExpandida] = useState<string | null>(questoes[0]?.id ?? null)
   const [novoTipo, setNovoTipo] = useState<'multipla_escolha' | 'valor'>('multipla_escolha')
 
@@ -116,14 +120,29 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
               </select>
             </label>
             {tipo === 'avaliacao' && (
-              <label>Módulo
-                <select name="modulo_id" defaultValue={avaliacao.moduloId ?? ''}>
-                  <option value="">—</option>
-                  {modulos.map(m => (
-                    <option key={m.id} value={m.id}>{m.titulo}</option>
-                  ))}
-                </select>
-              </label>
+              <>
+                <label>Módulo
+                  <select name="modulo_id" value={moduloId} onChange={e => { setModuloId(e.target.value); setPosicao('') }}>
+                    <option value="">—</option>
+                    {modulos.map(m => (
+                      <option key={m.id} value={m.id}>{m.titulo}</option>
+                    ))}
+                  </select>
+                </label>
+                {/* Posição na jornada: a avaliação é um item da sequência, e o
+                    aluno só passa dela sendo aprovado. A aula de correção tem
+                    que vir DEPOIS — se ficar antes, o vídeo entrega a resposta
+                    da prova (foi o que acontecia até 21/08/2026). */}
+                <label>Posição no módulo
+                  <select name="posicao" value={posicao} onChange={e => setPosicao(e.target.value)}>
+                    <option value="0">Antes de tudo (abre o módulo)</option>
+                    {aulasDoModulo.map((a, i) => (
+                      <option key={a.id} value={String(i + 1)}>Depois de: {a.titulo}</option>
+                    ))}
+                    <option value="">No fim do módulo</option>
+                  </select>
+                </label>
+              </>
             )}
             <label>Briefing / enunciado geral
               <textarea name="briefing" defaultValue={avaliacao.briefing ?? ''} rows={4} />

@@ -49,6 +49,8 @@ export type AvaliacaoAdmin = {
   peso: number
   tipo: 'avaliacao' | 'prova'
   ordem: number
+  /** quantas aulas do módulo vêm antes desta avaliação; null = fim do módulo */
+  posicao: number | null
   tema: number
   publicado: boolean
   capaUrl: string | null
@@ -59,7 +61,12 @@ export type AvaliacaoDetalheAdmin = {
   questoes: QuestaoAdmin[]
 }
 
-export type ModuloPicker = { id: string; titulo: string }
+export type ModuloPicker = {
+  id: string
+  titulo: string
+  /** aulas na ordem — a avaliação é posicionada em relação a elas */
+  aulas: { id: string; titulo: string }[]
+}
 
 export async function carregarAvaliacoesAdmin(cursoId?: string): Promise<AvaliacaoListaItem[]> {
   const supabase = await criarClienteServidor()
@@ -105,7 +112,7 @@ export async function carregarAvaliacaoAdmin(id: string): Promise<AvaliacaoDetal
 
   const { data: av } = await supabase
     .from('avaliacoes')
-    .select('id, curso_id, modulo_id, numero_caso, titulo, briefing, nota_minima, peso, tipo, ordem, tema, publicado, capa_url')
+    .select('id, curso_id, modulo_id, numero_caso, titulo, briefing, nota_minima, peso, tipo, ordem, posicao, tema, publicado, capa_url')
     .eq('id', id)
     .single()
   if (!av) return null
@@ -140,7 +147,7 @@ export async function carregarAvaliacaoAdmin(id: string): Promise<AvaliacaoDetal
     avaliacao: {
       id: av.id, cursoId: av.curso_id, moduloId: av.modulo_id, numeroCaso: av.numero_caso,
       titulo: av.titulo, briefing: av.briefing, notaMinima: Number(av.nota_minima), peso: av.peso,
-      tipo: av.tipo, ordem: av.ordem, tema: av.tema, publicado: av.publicado, capaUrl: av.capa_url,
+      tipo: av.tipo, ordem: av.ordem, posicao: av.posicao, tema: av.tema, publicado: av.publicado, capaUrl: av.capa_url,
     },
     questoes,
   }
@@ -150,8 +157,14 @@ export async function carregarModulosDoCurso(cursoId: string): Promise<ModuloPic
   const supabase = await criarClienteServidor()
   const { data } = await supabase
     .from('modulos')
-    .select('id, titulo')
+    .select('id, titulo, ordem, aulas ( id, titulo, ordem )')
     .eq('curso_id', cursoId)
     .order('ordem', { ascending: true })
-  return data ?? []
+  return (data ?? []).map((m: any) => ({
+    id: m.id,
+    titulo: m.titulo,
+    aulas: ((m.aulas ?? []) as any[])
+      .sort((a, b) => a.ordem - b.ordem)
+      .map((a) => ({ id: a.id, titulo: a.titulo })),
+  }))
 }

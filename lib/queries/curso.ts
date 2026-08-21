@@ -1,4 +1,5 @@
 import { criarClienteServidor } from "@/lib/supabase/server";
+import { carregarSequencia, motivoDe } from "@/lib/progresso/sequencia";
 
 type ModuloEstado = "concluido" | "bloqueado" | "andamento" | "nao_iniciado";
 
@@ -147,85 +148,43 @@ export async function buscarCurso(slug: string) {
     lista.push(av);
     avalsPorModulo.set(av.modulo_id, lista);
   }
-  const moduloLiberadoPorAvaliacoes = (moduloId: string) => {
-    const avs = avalsPorModulo.get(moduloId);
-    if (!avs || avs.length === 0) return true;
-    return avs.every((av) => aprovadasSet.has(av.id));
-  };
-
-  // 6. progresso do aluno logado — a rota já gateia por verificarAcessoConteudo,
-  // então userId normalmente existe; mesmo assim tratamos null defensivamente
-  // (concluidasSet vazio = tudo trava a partir da 2ª aula, mesmo comportamento
-  // do algoritmo em lib/queries/aula.ts).
+  // 6. estado do aluno: ordem e trava vêm da sequência única do curso
+  // (lib/progresso/sequencia.ts) — a MESMA que a página da aula e as RPCs de
+  // escrita usam. Esta página e a da aula calculavam isso separado, e foi a
+  // divergência entre as duas cópias que deixou a trava furada por meses.
   const { data: auth } = await supabase.auth.getUser();
   const userId = auth?.user?.id ?? null;
 
-  let concluidasSet = new Set<string>();
-  let aprovadasSet = new Set<string>();
-  const notaPorAvaliacao = new Map<string, number>();
+  const sequencia = await carregarSequencia(supabase, curso.id, userId);
+  const estadoDe = (id: string) => sequencia.porId.get(id) ?? null;
+  const cumprido = (id: string) => {
+    const e = estadoDe(id);
+    return !!e?.cumprido && !e.bloqueado;
+  };
 
-  if (userId) {
-    const [{ data: prog }, { data: tent }] = await Promise.all([
-      todas.length > 0
-        ? supabase.from("aula_progresso").select("aula_id").eq("usuario_id", userId).eq("concluida", true).in("aula_id", todas.map((a) => a.id))
-        : Promise.resolve({ data: [] as { aula_id: string }[] }),
-      idsAvaliacoes.length > 0
-        ? supabase.from("avaliacao_tentativas").select("avaliacao_id, nota, aprovado").eq("usuario_id", userId).eq("aprovado", true).in("avaliacao_id", idsAvaliacoes)
-        : Promise.resolve({ data: [] as { avaliacao_id: string; nota: number; aprovado: boolean }[] }),
-    ]);
-    concluidasSet = new Set((prog ?? []).map((p) => p.aula_id));
-    aprovadasSet = new Set((tent ?? []).map((t) => t.avaliacao_id));
+  // a nota exibida ao lado da avaliação continua vindo das tentativas (a
+  // sequência só sabe se passou ou não, não com quanto)
+  const notaPorAvaliacao = new Map<string, number>();
+  if (userId && idsAvaliacoes.length > 0) {
+    const { data: tent } = await supabase
+      .from("avaliacao_tentativas")
+      .select("avaliacao_id, nota, aprovado")
+      .eq("usuario_id", userId)
+      .eq("aprovado", true)
+      .in("avaliacao_id", idsAvaliacoes);
     for (const t of tent ?? []) {
       const atual = notaPorAvaliacao.get(t.avaliacao_id) ?? -1;
       if (t.nota > atual) notaPorAvaliacao.set(t.avaliacao_id, t.nota);
     }
   }
 
-  // primeira avaliação não aprovada (por ordem) de um módulo — pra nomear
-  // exatamente o que falta, em vez de só apontar o número do módulo.
-  const primeiraAvaliacaoPendente = (moduloId: string): AvaliacaoRaw | null => {
-    const avs = avalsPorModulo.get(moduloId);
-    if (!avs) return null;
-    return avs.find((av) => !aprovadasSet.has(av.id)) ?? null;
-  };
-
-  // trava sequencial: mesmo algoritmo de lib/queries/aula.ts (aula[i] só libera
-  // se aula[i-1] concluída e, ao cruzar módulo, avaliações do módulo anterior aprovadas).
-  // motivoBloqueio nomeia o que falta, pro toast de clique na aula travada (B2).
-  const bloqueadaPorAula = new Map<string, boolean>();
-  const motivoBloqueioPorAula = new Map<string, string>();
-  for (let i = 0; i < todas.length; i++) {
-    const a = todas[i];
-    if (i === 0) { bloqueadaPorAula.set(a.id, false); continue; }
-    const anterior = todas[i - 1];
-    const anteriorConcluida = concluidasSet.has(anterior.id);
-    const cruzouModulo = a.modulo_id !== anterior.modulo_id;
-    const gateModulo = cruzouModulo ? moduloLiberadoPorAvaliacoes(anterior.modulo_id) : true;
-    const bloqueada = !(anteriorConcluida && gateModulo);
-    bloqueadaPorAula.set(a.id, bloqueada);
-    if (bloqueada) {
-      if (!anteriorConcluida) {
-        motivoBloqueioPorAula.set(a.id, "Conclua a aula anterior para desbloquear.");
-      } else {
-        const pendente = primeiraAvaliacaoPendente(anterior.modulo_id);
-        motivoBloqueioPorAula.set(
-          a.id,
-          pendente
-            ? `Falta a aprovação na avaliação Caso ${pendente.numero_caso ?? pendente.titulo} para desbloquear este módulo.`
-            : "Conclua a avaliação do módulo anterior para desbloquear."
-        );
-      }
-    }
-  }
-
-  // "aula atual": primeira não concluída E acessível. No raro caso em que a
-  // única aula não concluída está travada por uma avaliação de módulo
-  // pendente, cai no fallback (mostra ela mesma, já marcada bloqueada — o
-  // toast de clique explica que falta a avaliação).
-  const aulaAtual =
-    todas.find((a) => !concluidasSet.has(a.id) && !bloqueadaPorAula.get(a.id)) ??
-    todas.find((a) => !concluidasSet.has(a.id)) ??
-    null;
+  // "item atual" = primeiro não cumprido e liberado, na jornada inteira. Pode
+  // ser uma avaliação: é assim que o "Continuar" para de empurrar o aluno pra
+  // uma aula trancada por uma prova que ele nem sabia que existia.
+  const itemAtual = sequencia.proximoPasso;
+  const aulaAtual = itemAtual?.tipo === "aula"
+    ? (todas.find((a) => a.id === itemAtual.id) ?? null)
+    : null;
 
   // progresso detalhado só da aula atual, pra "45% assistido · 1 de 2 materiais"
   let aulaAtualDetalhe: ProgressoCurso["aulaAtualDetalhe"] = null;
@@ -253,32 +212,36 @@ export async function buscarCurso(slug: string) {
   }
 
   const modulos: ModuloComEstado[] = modulosBase.map((m, idx) => {
-    const aulasComEstado: AulaComEstado[] = m.aulas.map((a) => ({
-      id: a.id, titulo: a.titulo, descricao: a.descricao, duracao_seg: dur(a),
-      ordem: a.ordem, xp: xpDe(a), tipo: a.tipo ?? null,
-      concluida: concluidasSet.has(a.id),
-      atual: aulaAtual?.id === a.id,
-      bloqueada: bloqueadaPorAula.get(a.id) ?? false,
-      motivoBloqueio: motivoBloqueioPorAula.get(a.id) ?? null,
-    }));
+    const aulasComEstado: AulaComEstado[] = m.aulas.map((a) => {
+      const e = estadoDe(a.id);
+      return {
+        id: a.id, titulo: a.titulo, descricao: a.descricao, duracao_seg: dur(a),
+        ordem: a.ordem, xp: xpDe(a), tipo: a.tipo ?? null,
+        // aula bloqueada não conta como concluída nem com a linha gravada: é a
+        // decisão de 21/08/2026 de re-trancar o que passou por cima da prova.
+        concluida: !!e?.cumprido && !e.bloqueado,
+        atual: itemAtual?.id === a.id,
+        bloqueada: !!e?.bloqueado,
+        motivoBloqueio: motivoDe(e?.pendencia ?? null),
+      };
+    });
     const totalAulas = aulasComEstado.length;
     const concluidasNoModulo = aulasComEstado.filter((a) => a.concluida).length;
-    const aulasDoModuloConcluidas = totalAulas === 0 || concluidasNoModulo === totalAulas;
-    const bloqueado = totalAulas > 0 ? (bloqueadaPorAula.get(aulasComEstado[0].id) ?? false) : false;
+    // o módulo está trancado quando o PRIMEIRO item dele (que pode ser uma
+    // avaliação, não necessariamente uma aula) está trancado
+    const itensDoModulo = sequencia.itens.filter((i) => i.moduloId === m.id);
+    const bloqueado = itensDoModulo.length > 0 ? itensDoModulo[0].bloqueado : false;
 
     // avaliações do módulo, na sequência de avaliacoes.ordem: aprovada (real),
     // disponível (aulas do módulo prontas + avaliações anteriores do módulo
     // aprovadas) ou bloqueada — mesma fonte de dado que já trava o módulo
     // seguinte, nunca um estado inventado à parte.
-    let avaliacoesAnterioresAprovadas = true;
     const avaliacoesComEstado: AvaliacaoComEstado[] = (avalsPorModulo.get(m.id) ?? []).map((av) => {
-      const aprovada = aprovadasSet.has(av.id);
+      const e = estadoDe(av.id);
+      const aprovada = !!e?.cumprido && !e.bloqueado;
       const estado: AvaliacaoComEstado["estado"] = aprovada
         ? "aprovada"
-        : aulasDoModuloConcluidas && avaliacoesAnterioresAprovadas
-          ? "disponivel"
-          : "bloqueada";
-      if (!aprovada) avaliacoesAnterioresAprovadas = false;
+        : e?.bloqueado ? "bloqueada" : "disponivel";
       return {
         id: av.id,
         numeroCaso: av.numero_caso,
@@ -290,7 +253,7 @@ export async function buscarCurso(slug: string) {
       };
     });
 
-    const moduloConcluido = totalAulas > 0 && concluidasNoModulo === totalAulas && moduloLiberadoPorAvaliacoes(m.id);
+    const moduloConcluido = itensDoModulo.length > 0 && itensDoModulo.every((i) => i.cumprido && !i.bloqueado);
     const estado: ModuloEstado =
       moduloConcluido ? "concluido"
         : bloqueado ? "bloqueado"
@@ -300,23 +263,12 @@ export async function buscarCurso(slug: string) {
     // motivo de bloqueio do MÓDULO (tooltip do cabeçalho, distinto do motivo
     // por aula): quando o módulo anterior ainda tem aula pendente, nomeia
     // aulas + avaliação juntas; quando só falta a avaliação, nomeia o caso.
-    let motivoBloqueioModulo: string | null = null;
-    if (bloqueado && idx > 0) {
-      const anteriorBase = modulosBase[idx - 1];
-      const aulasAnteriorConcluidas = (anteriorBase.aulas ?? []).every((a) => concluidasSet.has(a.id));
-      const numModAnterior = String(anteriorBase.ordem).padStart(2, "0");
-      if (!aulasAnteriorConcluidas) {
-        const avsAnterior = avalsPorModulo.get(anteriorBase.id) ?? [];
-        motivoBloqueioModulo = avsAnterior.length > 0
-          ? `Conclua as aulas e seja aprovado ${avsAnterior.length > 1 ? "nas avaliações" : "na avaliação"} do Módulo ${numModAnterior} para desbloquear.`
-          : `Conclua as aulas do Módulo ${numModAnterior} para desbloquear.`;
-      } else {
-        const pendente = primeiraAvaliacaoPendente(anteriorBase.id);
-        motivoBloqueioModulo = pendente
-          ? `Falta a aprovação na avaliação Caso ${pendente.numero_caso ?? pendente.titulo} para desbloquear este módulo.`
-          : `Conclua a avaliação do Módulo ${numModAnterior} para desbloquear.`;
-      }
-    }
+    // motivo de bloqueio do MÓDULO (tooltip do cabeçalho): nomeia exatamente o
+    // item que trava — aula ou avaliação, com o título dele. Genérico ("conclua
+    // a avaliação do módulo anterior") é o que deixou aluno sem saída.
+    const motivoBloqueioModulo = bloqueado && itensDoModulo.length > 0
+      ? motivoDe(itensDoModulo[0].pendencia)
+      : null;
 
     return {
       id: m.id, titulo: m.titulo, ordem: m.ordem,
@@ -329,12 +281,13 @@ export async function buscarCurso(slug: string) {
     };
   });
 
-  const concluidas = todas.filter((a) => concluidasSet.has(a.id)).length;
-  const total = todas.length;
+  const cumpridosSeq = sequencia.itens.filter((i) => i.cumprido && !i.bloqueado);
+  const concluidas = cumpridosSeq.length;
+  const total = sequencia.itens.length;
   const moduloAtual = modulos.find((m) => m.ehAtual) ?? modulos[0] ?? null;
 
   const totalAvaliacoes = (avaliacoesRaw ?? []).length;
-  const avaliacoesAprovadas = (avaliacoesRaw ?? []).filter((av) => aprovadasSet.has(av.id)).length;
+  const avaliacoesAprovadas = cumpridosSeq.filter((i) => i.tipo === "avaliacao").length;
   const xpTotalAvaliacoes = (avaliacoesRaw ?? []).reduce((s, av) => s + avaliacaoXpBase * Math.max(av.peso ?? 1, 1), 0);
 
   // XP disponível do curso = o que o motor de fato pode creditar: aulas +
@@ -351,7 +304,7 @@ export async function buscarCurso(slug: string) {
     cursoCompleto,
     aulaAtualId: aulaAtual?.id ?? (todas[0]?.id ?? null),
     aulaAtualTitulo: aulaAtual?.titulo ?? null,
-    aulaAtualBloqueada: aulaAtual ? (bloqueadaPorAula.get(aulaAtual.id) ?? false) : false,
+    aulaAtualBloqueada: itemAtual ? itemAtual.bloqueado : false,
     moduloAtualOrdem: moduloAtual?.ordem ?? null,
     aulaAtualDetalhe,
   };
@@ -361,21 +314,15 @@ export async function buscarCurso(slug: string) {
   // avaliação disponível pendente, o próximo passo de verdade é ela — fecha
   // o "beco invisível" (aluno travado sem saber que precisa fazer o Caso).
   let proximoPasso: ProximoPasso = { tipo: "nenhum" };
-  if (!cursoCompleto) {
-    if (aulaAtual && !(bloqueadaPorAula.get(aulaAtual.id) ?? false)) {
-      proximoPasso = { tipo: "aula", aulaId: aulaAtual.id, titulo: aulaAtual.titulo };
-    } else {
-      let avalPendente: AvaliacaoComEstado | null = null;
-      for (const mod of modulos) {
-        const achada = mod.avaliacoes.find((a) => a.estado === "disponivel");
-        if (achada) { avalPendente = achada; break; }
-      }
-      if (avalPendente) {
-        proximoPasso = { tipo: "avaliacao", avaliacaoId: avalPendente.id, numeroCaso: avalPendente.numeroCaso, titulo: avalPendente.titulo };
-      } else if (aulaAtual) {
-        proximoPasso = { tipo: "aula", aulaId: aulaAtual.id, titulo: aulaAtual.titulo };
-      }
-    }
+  if (!cursoCompleto && itemAtual) {
+    proximoPasso = itemAtual.tipo === "avaliacao"
+      ? {
+          tipo: "avaliacao",
+          avaliacaoId: itemAtual.id,
+          numeroCaso: (avaliacoesRaw ?? []).find((av) => av.id === itemAtual.id)?.numero_caso ?? null,
+          titulo: itemAtual.titulo,
+        }
+      : { tipo: "aula", aulaId: itemAtual.id, titulo: itemAtual.titulo };
   }
 
   return {

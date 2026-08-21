@@ -26,6 +26,15 @@ async function revalidarAvaliacao(id: string | undefined, cursoId: string) {
 
 // ---------- Avaliação ----------
 
+// posicao = quantas aulas do módulo vêm antes da avaliação. Campo vazio no form
+// significa "fim do módulo" (null), que é o default de avaliação nova.
+function lerPosicao(formData: FormData): number | null {
+  const bruto = (formData.get('posicao') as string)?.trim()
+  if (!bruto) return null
+  const n = Number(bruto)
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : null
+}
+
 export async function criarAvaliacao(formData: FormData): Promise<Resultado> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
 
@@ -49,6 +58,7 @@ export async function criarAvaliacao(formData: FormData): Promise<Resultado> {
       briefing: (formData.get('briefing') as string)?.trim() || null,
       nota_minima: Number((formData.get('nota_minima') as string) || 7),
       peso: Number((formData.get('peso') as string) || 1),
+      posicao: lerPosicao(formData),
       publicado: false,
     })
     .select('id')
@@ -77,7 +87,10 @@ export async function atualizarAvaliacao(id: string, cursoId: string, formData: 
     modulo_id: tipo === 'prova' ? null : moduloId,
     briefing: (formData.get('briefing') as string)?.trim() || null,
     nota_minima: Number((formData.get('nota_minima') as string) || 7),
-    xp: Number((formData.get('xp') as string) || 200),
+    // era `xp`, coluna que não existe desde que virou `peso` (multiplicador das
+    // faixas de acerto) — o update falhava inteiro e nada era salvo aqui.
+    peso: Number((formData.get('peso') as string) || 1),
+    posicao: lerPosicao(formData),
   }).eq('id', id)
 
   if (error) return { ok: false, erro: error.message }

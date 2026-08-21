@@ -54,7 +54,7 @@ function embaralhar<T>(lista: T[]): T[] {
   return copia;
 }
 
-export default function AvaliacaoContent({ dados, usuarioNome, submeter }: Props) {
+export default function AvaliacaoContent({ dados, usuarioNome, submeter, vindoDeBloqueio }: Props & { vindoDeBloqueio?: boolean }) {
   const { curso, modulo, avaliacao, questoes } = dados;
   const ehProva = avaliacao.tipo === "prova";
   const nQ = questoes.length;
@@ -256,6 +256,14 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter }: Props
             <span className="eyebrow">
               {ehProva ? "O juízo convocou você para a prova final" : "Você foi designado para o caso"}
             </span>
+            {/* quem cai aqui vindo de uma aula trancada precisa saber POR QUE
+                foi parar na prova — sem isso a tela parece um desvio aleatório */}
+            {vindoDeBloqueio && (
+              <p className="brief-desvio" role="status">
+                O conteúdo que você tentou abrir vem depois desta avaliação. Seja
+                aprovado aqui e ele destrava na hora.
+              </p>
+            )}
             <h1>
               {avaliacao.titulo.split(" ").slice(0, -1).join(" ")}{" "}
               <span className="grad-txt">{avaliacao.titulo.split(" ").slice(-1)[0]}.</span>

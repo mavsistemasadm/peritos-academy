@@ -14,7 +14,7 @@ import type { DadosNav } from '@/lib/queries/nav'
 import { verificarCertificado, baixarMaterialAula, concluirAula } from '@/app/curso/[slug]/aula/[aulaId]/actions'
 import {
   IconeChevronLeft, IconeChevronRight, IconePlay, IconeCheck, IconeDownload, IconeSend, IconeHeadset, IconeAlertTriangle,
-  IconeFileText, IconeBarChart, IconePaperclip, IconeLock,
+  IconeFileText, IconeBarChart, IconePaperclip, IconeLock, IconeClipboard,
 } from '@/components/Icones'
 import { Certificado, XP } from '@/components/Emblemas'
 import NexusSugestao from "@/components/NexusSugestao";
@@ -68,6 +68,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
   const [concluida, setConcluida] = useState(aula.concluida);
   const [concluindo, setConcluindo] = useState(false);
   const [pendenciaMsg, setPendenciaMsg] = useState<string | null>(null);
+  const [pendenciaHref, setPendenciaHref] = useState<string | null>(null);
   const [progresso, setProgresso] = useState(dados.progressoCurso);
   const [toast, setToast] = useState(false);
   const [pulso, setPulso] = useState(false);
@@ -240,7 +241,15 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
       if (r.video_ok === false) itens.push("assista pelo menos 70% da aula");
       (r.materiais_pendentes ?? []).forEach((m) => itens.push(`baixe "${m.nome}"`));
       setPendenciaMsg(itens.length ? `Ainda falta: ${itens.join(" · ")}` : (r.erro ?? "Ainda não dá pra concluir esta aula."));
-      setTimeout(() => setPendenciaMsg(null), 5000);
+      const pend = r.pendencia ?? null;
+      setPendenciaHref(
+        pend?.id
+          ? pend.tipo === "avaliacao"
+            ? `/curso/${curso.slug}/avaliacao/${pend.id}`
+            : `/curso/${curso.slug}/aula/${pend.id}`
+          : null
+      );
+      setTimeout(() => { setPendenciaMsg(null); setPendenciaHref(null); }, 8000);
       return;
     }
     setConcluida(true);
@@ -267,7 +276,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
         if (s <= 0) {
           clearInterval(regressivaRef.current!);
           setContador("→");
-          router.push(`/curso/${curso.slug}/aula/${proxima.id}`);
+          router.push(proxima.href);
         } else setContador(s);
       }, 1000);
     }
@@ -293,7 +302,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
   const ficar = () => { if (regressivaRef.current) clearInterval(regressivaRef.current); setProxVisivel(false); };
   const irAgora = () => {
     if (regressivaRef.current) clearInterval(regressivaRef.current);
-    if (proxima) router.push(`/curso/${curso.slug}/aula/${proxima.id}`);
+    if (proxima) router.push(proxima.href);
   };
 
   const salvarNota = async () => {
@@ -334,6 +343,10 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
   const faltamModulo = modulo.totalAulas - modulo.concluidasNoModulo - (concluida && !aula.concluida ? 1 : 0);
   const momento = "00:00";
   const proximaLiberada = proxima ? (admin || concluida) : false;
+  // a avaliação é um item da jornada como qualquer outro: quando ela é o próximo
+  // passo, o botão diz isso em vez de "Próxima" — antes o aluno era mandado por
+  // cima dela direto pra aula seguinte, que estava trancada por causa dela.
+  const proximaEhAvaliacao = proxima?.tipoItem === "avaliacao";
 
   return (
     <div style={{ ["--arte" as string]: aula.capa_url ? `url('${aula.capa_url}')` : "none" }}>
@@ -418,7 +431,7 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
                 </div>
                 <div className="aula-acoes">
                   {anterior ? (
-                    <Link className="btn btn-fantasma btn-nav-aula" href={`/curso/${curso.slug}/aula/${anterior.id}`} aria-label="Aula anterior">
+                    <Link className="btn btn-fantasma btn-nav-aula" href={anterior.href} aria-label="Aula anterior">
                       <IconeChevronLeft size={14} strokeWidth={2.4} />
                     </Link>
                   ) : null}
@@ -435,8 +448,8 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
                   </button>
                   {proxima ? (
                     proximaLiberada ? (
-                      <Link className="btn btn-primario btn-nav-aula" href={`/curso/${curso.slug}/aula/${proxima.id}`} aria-label="Próxima aula">
-                        Próxima
+                      <Link className="btn btn-primario btn-nav-aula" href={proxima.href} aria-label={proximaEhAvaliacao ? "Ir para a avaliação" : "Próxima aula"}>
+                        {proximaEhAvaliacao ? "Fazer a avaliação" : "Próxima"}
                         <IconeChevronRight size={14} strokeWidth={2.4} />
                       </Link>
                     ) : (
@@ -453,6 +466,12 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
                 <div className="pendencia-msg" role="status">
                   <IconeAlertTriangle size={14} strokeWidth={2.2} />
                   <span>{pendenciaMsg}</span>
+                  {/* mensagem sem saída é o que fez a aluna travar por dias: ela
+                      lia "conclua a avaliação do módulo anterior" e não tinha
+                      como descobrir onde essa avaliação ficava. */}
+                  {pendenciaHref && (
+                    <Link className="pendencia-link" href={pendenciaHref}>Ir para lá</Link>
+                  )}
                 </div>
               )}
 
@@ -496,9 +515,9 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
                     <b className="num">{contador}</b>
                   </div>
                   <div className="prox-txt">
-                    <span className="rot">A seguir</span>
+                    <span className="rot">{proximaEhAvaliacao ? "Sua avaliação" : "A seguir"}</span>
                     <b>{proxima.titulo}</b>
-                    <span className="num">{fmtDurSeg(proxima.duracaoSeg)}</span>
+                    <span className="num">{proximaEhAvaliacao ? "Avaliação do módulo" : fmtDurSeg(proxima.duracaoSeg)}</span>
                   </div>
                   <button className="btn btn-primario" onClick={irAgora}>Ir agora</button>
                   <button className="btn btn-fantasma" onClick={ficar}>Ficar aqui</button>
@@ -646,36 +665,45 @@ export default function AulaContent({ dados, usuarioId, usuarioNome, nav, avisoB
             </div>
 
             {/* ============ TRILHO DO MÓDULO ============ */}
-            <aside className="trilho-aulas" aria-label="Aulas deste módulo">
+            <aside className="trilho-aulas" aria-label="Jornada deste módulo">
               <div className="trilho-cab">
                 <span className="eyebrow">Módulo {mm} · <b>Você está aqui</b></span>
                 <h2>{modulo.titulo}</h2>
-                <p className="meta num">{modulo.concluidasNoModulo + (concluida && !aula.concluida ? 1 : 0)} de {modulo.totalAulas} concluídas · {fmtDurSeg(modulo.duracaoModuloSeg)}</p>
+                <p className="meta num">{modulo.concluidasNoModulo + (concluida && !aula.concluida ? 1 : 0)} de {modulo.totalAulas} cumpridos · {fmtDurSeg(modulo.duracaoModuloSeg)}</p>
               </div>
               <ul className="trilho-lista">
                 {trilho.map((t) => {
+                  const ehAvaliacao = t.tipoItem === "avaliacao";
                   const feita = t.concluida || (t.atual && concluida);
                   const efetivamenteBloqueada = t.bloqueada && !t.atual && !feita && !admin;
-                  const cls = `t-aula${feita ? " feita" : ""}${t.atual ? " atual" : ""}${efetivamenteBloqueada ? " bloqueada" : ""}`;
+                  const cls = `t-aula${feita ? " feita" : ""}${t.atual ? " atual" : ""}${efetivamenteBloqueada ? " bloqueada" : ""}${ehAvaliacao ? " t-avaliacao" : ""}`;
+                  const legenda = t.atual ? "Assistindo agora"
+                    : feita ? (ehAvaliacao ? "Aprovada" : "Assistida")
+                    : efetivamenteBloqueada ? (t.motivo ?? "Bloqueada")
+                    : ehAvaliacao ? "Avaliação · faça para seguir"
+                    : t.tipo === "quiz" ? "Quiz do módulo"
+                    : fmtDurSeg(t.duracaoSeg);
                   return (
                     <li className={cls} key={t.id}>
                       <Link
-                        href={`/curso/${curso.slug}/aula/${t.id}`}
+                        href={t.href}
                         aria-current={t.atual || undefined}
                         aria-disabled={efetivamenteBloqueada || undefined}
-                        title={efetivamenteBloqueada ? "Conclua a aula anterior para desbloquear" : undefined}
+                        title={efetivamenteBloqueada ? (t.motivo ?? undefined) : undefined}
                         onClick={(e) => { if (efetivamenteBloqueada) e.preventDefault(); }}
                       >
                         <span className={`t-estado${!feita && !t.atual ? " num" : ""}`} aria-hidden="true">
                           {efetivamenteBloqueada ? <IconeLock size={11} strokeWidth={2.2} />
                             : t.atual && !feita ? <span className="eq"><i></i><i></i><i></i></span>
-                            : feita ? <IconeCheck size={12} /> : t.ordem}
+                            : feita ? <IconeCheck size={12} />
+                            : ehAvaliacao ? <IconeClipboard size={12} strokeWidth={2.2} />
+                            : t.ordem}
                         </span>
                         <span className="t-txt">
                           <b>{t.titulo}</b>
-                          <span>{t.atual ? "Assistindo agora" : feita ? "Assistida" : efetivamenteBloqueada ? "Bloqueada" : t.tipo === "quiz" ? "Quiz do módulo" : fmtDurSeg(t.duracaoSeg)}</span>
+                          <span>{legenda}</span>
                         </span>
-                        <span className="t-dur num">{fmtDurSeg(t.duracaoSeg)}</span>
+                        <span className="t-dur num">{ehAvaliacao ? "" : fmtDurSeg(t.duracaoSeg)}</span>
                       </Link>
                     </li>
                   );

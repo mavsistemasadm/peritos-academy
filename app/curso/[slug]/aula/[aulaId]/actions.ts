@@ -55,7 +55,15 @@ export async function baixarMaterialAula(materialId: string): Promise<
 // escreve concluida diretamente (bloqueado por trigger de proteção no banco).
 export type ConcluirAulaResultado =
   | { ok: true }
-  | { ok: false; erro?: string; video_ok?: boolean; video_pct?: number; materiais_pendentes?: { id: string; nome: string }[] }
+  | {
+      ok: false; erro?: string; video_ok?: boolean; video_pct?: number
+      materiais_pendentes?: { id: string; nome: string }[]
+      // o que trava esta aula na sequência do curso, nomeado e com id — é o que
+      // permite a tela oferecer "Ir para lá" em vez de deixar o aluno adivinhar
+      // onde fica a avaliação que ele nunca viu.
+      bloqueada_sequencia?: boolean
+      pendencia?: { tipo: 'aula' | 'avaliacao'; id: string; titulo: string } | null
+    }
 
 export async function concluirAula(aulaId: string): Promise<ConcluirAulaResultado> {
   const supabase = await criarClienteServidor()
