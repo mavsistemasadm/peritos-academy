@@ -196,10 +196,15 @@ function FormaInscricao({ eventoId, aoVivo, aoInscrever }: {
   }
 
   return (
-    <form className="ev-forma" onSubmit={enviar}>
+    <form className={`ev-forma${aoVivo ? ' no-ar' : ''}`} onSubmit={enviar}>
       <p className="ev-forma-cab">
+        {/* ⚠️ Durante a transmissão, o pedido é UM só e é o que a pessoa quer
+            agora: falar. A versão anterior prometia "o material e os próximos
+            encontros", que é uma segunda oferta disputando atenção com a única
+            que a página deveria estar fazendo no fim, a do ecossistema. Duas
+            ofertas na mesma tela não somam: dividem. */}
         {aoVivo
-          ? 'Deixe seu nome e email para receber o material e os próximos encontros.'
+          ? <><b>Quer perguntar?</b> Deixe seu nome e email para falar no chat.</>
           : 'Deixe seu nome e email e eu te aviso na véspera e na hora de começar.'}
       </p>
       <label className="ev-campo">
@@ -210,13 +215,19 @@ function FormaInscricao({ eventoId, aoVivo, aoInscrever }: {
         <span>Seu melhor email</span>
         <input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" placeholder="voce@email.com" />
       </label>
-      <label className="ev-campo">
-        <span>WhatsApp <i>(opcional)</i></span>
-        <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} autoComplete="tel" placeholder="(00) 00000-0000" inputMode="tel" />
-      </label>
+      {/* Durante a transmissão, o terceiro campo é o que faz a pessoa desistir:
+          ela quer perguntar agora, não preencher cadastro. O telefone continua
+          sendo pedido quando ela se inscreve com antecedência, que é quando ela
+          tem paciência para dar. */}
+      {!aoVivo && (
+        <label className="ev-campo">
+          <span>WhatsApp <i>(opcional)</i></span>
+          <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} autoComplete="tel" placeholder="(00) 00000-0000" inputMode="tel" />
+        </label>
+      )}
       {erro && <p className="ev-erro" role="alert">{erro}</p>}
       <button type="submit" className="btn btn-primario" disabled={pendente}>
-        {pendente ? 'Confirmando…' : aoVivo ? 'Quero acompanhar' : 'Quero participar'}
+        {pendente ? 'Confirmando…' : aoVivo ? 'Entrar no chat' : 'Quero participar'}
       </button>
       <p className="ev-forma-rodape">
         É de graça e não precisa criar conta. Só uso seu email para falar deste encontro e dos próximos,
@@ -345,7 +356,8 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
   // Falar exige estar dentro: aluno que reservou ou convidado que se inscreveu.
   // Ler é de todos. É a mesma linha que separa quem está na sala de quem passou
   // na porta — e é ela que impede o chat de virar caixa de entrada aberta.
-  const podeFalarNoChat = (ev.logado && reservado) || (!ev.logado && inscrito)
+  // Quem conduz nunca precisa se inscrever no próprio encontro para responder.
+  const podeFalarNoChat = ev.ehDaCasa || (ev.logado && reservado) || (!ev.logado && inscrito)
   const iniciais = ev.apresentadorNome?.split(' ').map(p => p[0]).join('').slice(0, 2)
 
   return (

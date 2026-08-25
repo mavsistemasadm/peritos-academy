@@ -6716,3 +6716,10 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 .pagina-admin .pnl-opcao-select select{
   width:100%;max-width:360px;margin:6px 0 4px;font:inherit;font-size:13.5px;
 }
+
+/* Durante a transmissão o formulário é um degrau, não uma seção: dois campos,
+   um botão, e sai da frente. A atenção da página no ao vivo é o vídeo, o chat
+   e, no fim, o convite ao ecossistema. */
+.pagina-evento .ev-forma.no-ar{max-width:380px;padding:var(--s-3)}
+.pagina-evento .ev-forma.no-ar .ev-forma-cab{font-size:13.5px;margin-bottom:var(--s-2)}
+.pagina-evento .ev-forma.no-ar .ev-forma-rodape{font-size:11.5px}

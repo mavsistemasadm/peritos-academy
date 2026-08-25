@@ -78,6 +78,14 @@ export type EventoPublico = {
   /** Live aberta: quem não tem conta pode se inscrever e assistir. */
   abertoAoPublico: boolean
   reservado: boolean
+  /**
+   * Admin com permissão de agenda, ou quem criou o evento.
+   *
+   * ⚠️ Existe porque sem isto o apresentador precisaria RESERVAR o próprio
+   * encontro para conseguir responder no chat — e ele não reserva, ele
+   * conduz. O primeiro sintoma seria ele mudo na própria live.
+   */
+  ehDaCasa: boolean
   /** Convidado sem conta que já se inscreveu nesta live (cookie assinado). */
   inscritoComoConvidado: boolean
   logado: boolean
@@ -146,7 +154,14 @@ export async function carregarEventoPublico(slug: string): Promise<EventoPublico
     chat: ev.chat_modo === 'proprio' ? await carregarChatEvento(ev.id) : [],
     abertoAoPublico,
     reservado: !!reserva?.data,
-    inscritoComoConvidado: await jaInscritoComoConvidado(ev.id),
+    ehDaCasa: logado && (
+      ev.criado_por === auth!.user!.id
+      || (await supabase.rpc('is_admin_papel', {
+           uid: auth!.user!.id,
+           papeis: ['super_admin', 'moderador', 'conteudo'],
+         })).data === true
+    ),
+    inscritoComoConvidado: await jaInscritoComoConvidado(supabase, ev.id),
     logado,
     nomePlataforma: config?.nome_plataforma ?? 'Peritos Academy',
     logoUrl: config?.logo_url ?? null,
@@ -183,10 +198,29 @@ function estadoDoEvento(iniciaEm: string | null, duracaoSeg: number, gravacaoUrl
  * chega por email de qualquer forma. É conveniência, não credencial, e por
  * isso não precisa (nem deve) ser mais forte que isso.
  */
-async function jaInscritoComoConvidado(eventoId: string): Promise<boolean> {
+async function jaInscritoComoConvidado(
+  supabase: Awaited<ReturnType<typeof criarClienteServidor>>,
+  eventoId: string,
+): Promise<boolean> {
   const jar = await cookies()
   const token = jar.get(nomeDoCookieDeInscricao(eventoId))?.value
-  return !!token && !!verificarTokenEmail(token)
+  const email = token ? verificarTokenEmail(token) : null
+  if (!email) return false
+
+  // ⚠️ O cookie não basta, e a diferença importa desde que existe chat: ele
+  // sobrevive à inscrição ser removida, e a tela passaria a oferecer o campo
+  // de mensagem para alguém que a server action vai recusar. Digitar uma
+  // pergunta no meio da live e receber "inscreva-se" é pior do que não ter
+  // tido o campo.
+  //
+  // A leitura passa pela RLS de `evento_inscricoes`, que só admin lê — então
+  // devolve vazio para o próprio inscrito. Por isso a checagem é por contagem
+  // via RPC própria, e não por select direto.
+  const { data } = await supabase.rpc('inscricao_existe', {
+    p_evento: eventoId,
+    p_email: email,
+  })
+  return data === true
 }
 
 export function nomeDoCookieDeInscricao(eventoId: string) {

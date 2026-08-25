@@ -192,9 +192,10 @@ export async function enviarMensagemEvento(
 
   if (!ev || !ev.publicado) return { ok: false, erro: 'Este encontro não está disponível.' }
   if (ev.chat_modo !== 'proprio') return { ok: false, erro: 'O chat deste encontro está desligado.' }
-  if (!janelaDoChatAberta(ev.inicia_em, ev.duracao_seg)) {
-    return { ok: false, erro: 'O chat deste encontro já foi encerrado.' }
-  }
+  // A janela do chat é conferida depois de identificar quem fala: quem é da
+  // casa responde pergunta atrasada dias depois, e trancar isso não protege
+  // nada.
+  const foraDaJanela = !janelaDoChatAberta(ev.inicia_em, ev.duracao_seg)
 
   // ── quem está falando ──
   const servidor = await criarClienteServidor()
@@ -204,10 +205,19 @@ export async function enviarMensagemEvento(
   let inscricaoId: string | null = null
   let autorNome: string | null = null
 
+  let ehDaCasa = false
+
   if (auth?.user) {
-    const { data: perfil } = await supabase.from('perfis').select('nome').eq('id', auth.user.id).maybeSingle()
+    const [{ data: perfil }, { data: admin }] = await Promise.all([
+      supabase.from('perfis').select('nome').eq('id', auth.user.id).maybeSingle(),
+      supabase.rpc('is_admin_papel', {
+        uid: auth.user.id,
+        papeis: ['super_admin', 'moderador', 'conteudo'],
+      }),
+    ])
     usuarioId = auth.user.id
     autorNome = perfil?.nome?.trim() || 'Perito'
+    ehDaCasa = admin === true || auth.user.id === ev.criado_por
   } else {
     const jar = await cookies()
     const token = jar.get(nomeDoCookieDeInscricao(eventoId))?.value
@@ -226,6 +236,10 @@ export async function enviarMensagemEvento(
     autorNome = insc.nome?.trim() || 'Convidado'
   }
 
+  if (foraDaJanela && !ehDaCasa) {
+    return { ok: false, erro: 'O chat deste encontro já foi encerrado.' }
+  }
+
   // ── vazão ──
   const desde = new Date(Date.now() - JANELA_MS).toISOString()
   const consulta = supabase
@@ -237,14 +251,21 @@ export async function enviarMensagemEvento(
     ? await consulta.eq('usuario_id', usuarioId)
     : await consulta.eq('inscricao_id', inscricaoId!)
 
-  if ((count ?? 0) >= MAX_POR_JANELA) {
+  if (!ehDaCasa && (count ?? 0) >= MAX_POR_JANELA) {
     return { ok: false, erro: 'Calma: espere alguns segundos antes de mandar de novo.' }
   }
 
-  // Quem conduz ganha marca visual. Comparar pelo id de quem criou o evento, e
-  // não pelo nome, porque nome se repete e é justamente o que um impostor
-  // usaria.
-  const ehApresentador = !!usuarioId && usuarioId === ev.criado_por
+  // ── a marca de quem conduz ──
+  //
+  // Compara id, nunca nome: nome se repete, e é exatamente o que um impostor
+  // usaria no meio de uma live, que é o momento em que ninguém está
+  // conferindo.
+  //
+  // Vale para quem criou o evento E para admin com papel de agenda. A
+  // distinção entre "criou a linha no banco" e "está respondendo pela casa" é
+  // interna; para quem lê o chat as duas são a mesma coisa, e o que ele
+  // precisa é achar de relance a resposta que tem autoridade.
+  const ehApresentador = ehDaCasa
 
   const { data: nova, error } = await supabase
     .from('evento_mensagens')
