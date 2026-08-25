@@ -31,6 +31,9 @@
 import { clienteServico, carregarEnv } from './migration/supabase.mjs'
 
 const EXECUTAR = process.argv.includes('--executar')
+// Ensaio: reenvia só N antes de soltar o resto. Um erro de contrato na rota
+// interna custa 1 email errado, e não 99.
+const LIMITE = Number(process.argv.find(a => a.startsWith('--limite='))?.split('=')[1] ?? 0)
 const TIPOS = ['carta_pessoal', 'curso_concluido']
 const INICIO_DO_APAGAO = '2026-08-06'
 
@@ -49,7 +52,15 @@ const { data: linhas, error } = await supabase
   .from('email_enviados')
   .select('id, usuario_id, tipo, ref_id, criado_em')
   .in('tipo', TIPOS)
-  .eq('estado', 'aceito')
+  // Inclui `falhou` de propósito. Quem já foi marcado numa passagem anterior e
+  // não saiu (o teto de 1 celebração por dia derrubou 12 na primeira rodada)
+  // precisa ser alcançável de novo no dia seguinte; filtrar só por `aceito`
+  // deixaria essas pessoas presas para sempre.
+  //
+  // Reexecutar é seguro: enviarEmail() checa o dedupe antes de mandar e
+  // devolve `duplicado` para quem já recebeu, e o índice parcial garante isso
+  // no banco mesmo se a checagem falhasse.
+  .in('estado', ['aceito', 'falhou'])
   .gte('criado_em', INICIO_DO_APAGAO)
   .order('criado_em')
 
@@ -58,20 +69,38 @@ if (error) {
   process.exit(1)
 }
 
+// Tira da fila quem JÁ recebeu numa passagem anterior. A linha antiga fica
+// marcada `falhou` para sempre (é o registro do apagão), então sem este filtro
+// ela reapareceria em toda execução — o envio seria recusado pelo dedupe, mas
+// depois de já ter custado uma chamada e uma linha de "pulado" na saída, o que
+// esconde os que realmente faltam.
+const { data: bemSucedidos } = await supabase
+  .from('email_enviados')
+  .select('usuario_id, tipo, ref_id')
+  .in('tipo', TIPOS)
+  .neq('estado', 'falhou')
+
+const chave = r => `${r.usuario_id}|${r.tipo}|${r.ref_id ?? ''}`
+const jaEntregues = new Set((bemSucedidos ?? []).map(chave))
+const pendentes = linhas.filter(l => !jaEntregues.has(chave(l)))
+
 const porTipo = {}
-for (const l of linhas) porTipo[l.tipo] = (porTipo[l.tipo] ?? 0) + 1
+for (const l of pendentes) porTipo[l.tipo] = (porTipo[l.tipo] ?? 0) + 1
 
 console.log(`\nlinhas do apagão elegíveis a reenvio (desde ${INICIO_DO_APAGAO}):`)
 for (const [tipo, n] of Object.entries(porTipo)) console.log(`  ${tipo.padEnd(18)} ${n}`)
-console.log(`  ${'TOTAL'.padEnd(18)} ${linhas.length}`)
+console.log(`  ${'TOTAL'.padEnd(18)} ${pendentes.length}`)
 
 if (!EXECUTAR) {
   console.log('\nSIMULAÇÃO. Nada foi enviado. Use --executar para reenviar de verdade.\n')
   process.exit(0)
 }
 
+const alvo = LIMITE > 0 ? pendentes.slice(0, LIMITE) : pendentes
+if (LIMITE > 0) console.log(`\nensaio: só os ${alvo.length} primeiros`)
+
 let reenviados = 0, pulados = 0
-for (const l of linhas) {
+for (const l of alvo) {
   // Marcar como `falhou` ANTES de tentar é o que libera a vaga no índice
   // parcial de dedupe; sem isso o novo registro estouraria o índice depois de
   // o email já ter saído, deixando um envio sem registro.
