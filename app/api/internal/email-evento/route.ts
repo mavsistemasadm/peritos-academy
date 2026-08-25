@@ -11,6 +11,7 @@ import { enviarEmail, type TipoEmail } from "@/lib/email/enviar";
 import { emailBoasVindas } from "@/lib/email/templates/boasVindas";
 import { emailNivelUp } from "@/lib/email/templates/nivelUp";
 import { emailCertificado } from "@/lib/email/templates/certificado";
+import { emailCartaPessoal } from "@/lib/email/templates/cartaPessoal";
 import { emailCursoConcluido } from "@/lib/email/templates/cursoConcluido";
 
 function primeiroNome(nome: string): string {
@@ -236,6 +237,23 @@ export async function POST(request: NextRequest) {
         usuarioId,
         tipo: "curso_concluido" as TipoEmail,
         refId: cursoId,
+        assunto,
+        html,
+        remetente: "pessoal",
+      });
+      return NextResponse.json(resultado);
+    }
+
+    // A carta pessoal normalmente sai do cron, que seleciona quem criou conta
+    // há 48h. Ela entra aqui para poder ser REENVIADA a quem ficou sem ela no
+    // apagão de agosto de 2026: aquela janela de 48h já passou para essas
+    // pessoas, e o cron nunca mais vai selecioná-las. Sem esta porta, marcar a
+    // linha como `falhou` não faria efeito nenhum.
+    if (tipo === "carta_pessoal") {
+      const { assunto, html } = emailCartaPessoal({ primeiroNome: nomePrimeiro });
+      const resultado = await enviarEmail({
+        usuarioId,
+        tipo: "carta_pessoal" as TipoEmail,
         assunto,
         html,
         remetente: "pessoal",
