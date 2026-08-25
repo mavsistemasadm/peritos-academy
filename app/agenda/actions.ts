@@ -6,7 +6,12 @@ import { revalidatePath } from 'next/cache'
 import { criarClienteServidor } from '@/lib/supabase/server'
 
 // ---------- RESERVAR MEU LUGAR ----------
-export async function reservarLugar(eventoId: string) {
+// Chamada de dois lugares: da agenda (aluno navegando) e da página pública do
+// evento (link de divulgação). É uma função só de propósito — reservar é o
+// mesmo ato nos dois lugares, e duas cópias divergiriam no primeiro ajuste.
+// `slugEvento` só existe para revalidar a página pública, que tem endereço
+// próprio e não seria alcançada por revalidatePath('/agenda').
+export async function reservarLugar(eventoId: string, slugEvento?: string) {
   const supabase = await criarClienteServidor()
   const { data: auth } = await supabase.auth.getUser()
   if (!auth?.user) return { ok: false, erro: 'É preciso entrar para reservar.' }
@@ -19,6 +24,7 @@ export async function reservarLugar(eventoId: string) {
   if (error && error.code !== '23505') return { ok: false, erro: error.message }
 
   revalidatePath('/agenda')
+  if (slugEvento) revalidatePath(`/evento/${slugEvento}`)
   return { ok: true }
 }
 

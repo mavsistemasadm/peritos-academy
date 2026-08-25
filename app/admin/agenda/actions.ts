@@ -39,6 +39,11 @@ function montarCampos(formData: FormData) {
     gravar: formData.get('gravar') === 'on',
     lembrete: formData.get('lembrete') === 'on',
     publicar_feed: formData.get('publicar_feed') === 'on',
+    // Live aberta a quem não é aluno. Nasce desligada e é ligada evento a
+    // evento — abrir por engano entrega de graça o que se vende, e ninguém
+    // percebe uma sala aberta demais.
+    aberto_ao_publico: formData.get('aberto_ao_publico') === 'on',
+    chat_ao_vivo: formData.get('chat_ao_vivo') === 'on',
   }
 }
 

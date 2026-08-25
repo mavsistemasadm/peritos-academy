@@ -5,7 +5,7 @@
 // precisa funcionar mesmo com o site em manutenção ou a conta suspensa
 // (middleware.ts trata /email/cancelar como rota neutra).
 import type { Metadata } from "next";
-import { verificarTokenCancelamento } from "@/lib/email/token";
+import { verificarTokenCancelamento, verificarTokenEmail } from "@/lib/email/token";
 import { criarClienteServico } from "@/lib/supabase/servico";
 import { IconeCheck, IconeAlertTriangle } from "@/components/Icones";
 
@@ -21,10 +21,25 @@ export default async function PaginaCancelarEmail({
   searchParams: Promise<{ token?: string }>;
 }) {
   const { token } = await searchParams;
-  const usuarioId = token ? verificarTokenCancelamento(token) : null;
+
+  // Dois tipos de link caem aqui, e o descadastro precisa funcionar nos dois.
+  // O do aluno carrega o uuid e desliga a preferência do perfil. O do
+  // convidado de uma live aberta carrega o próprio endereço — ele não tem
+  // conta para ter preferência, então o desligamento é por email.
+  // O prefixo do token distingue um do outro (ver lib/email/token.ts); a
+  // ordem aqui checa o de email PRIMEIRO porque o de usuário aceita qualquer
+  // payload assinado e engoliria o outro, gravando um uuid inexistente.
+  const emailConvidado = token ? verificarTokenEmail(token) : null;
+  const usuarioId = !emailConvidado && token ? verificarTokenCancelamento(token) : null;
 
   let sucesso = false;
-  if (usuarioId) {
+  if (emailConvidado) {
+    const supabase = criarClienteServico();
+    const { error } = await supabase
+      .from("email_optout_publico")
+      .upsert({ email: emailConvidado.toLowerCase() }, { onConflict: "email" });
+    sucesso = !error;
+  } else if (usuarioId) {
     const supabase = criarClienteServico();
     const { error } = await supabase
       .from("email_preferencias")
@@ -42,8 +57,17 @@ export default async function PaginaCancelarEmail({
                 <IconeCheck size={28} strokeWidth={2} />
               </span>
               <h1>Inscrição cancelada</h1>
-              <p>Você não receberá mais emails da Peritos Academy. Se mudar de ideia, reative nas configurações do seu perfil.</p>
-              <a className="btn btn-primario" href="/perfil">Ir para meu perfil</a>
+              {emailConvidado ? (
+                <>
+                  <p>Não vou mais escrever para <b>{emailConvidado}</b>. Se um dia quiser voltar a receber convites de encontros ao vivo, é só se inscrever de novo em qualquer um deles.</p>
+                  <a className="btn btn-primario" href="/">Conhecer a Peritos Academy</a>
+                </>
+              ) : (
+                <>
+                  <p>Você não receberá mais emails da Peritos Academy. Se mudar de ideia, reative nas configurações do seu perfil.</p>
+                  <a className="btn btn-primario" href="/perfil">Ir para meu perfil</a>
+                </>
+              )}
             </>
           ) : (
             <>

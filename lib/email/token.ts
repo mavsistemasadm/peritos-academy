@@ -11,6 +11,7 @@ function assinar(payload: string): string {
 }
 
 export function gerarTokenCancelamento(usuarioId: string): string {
+  // Ver PREFIXO_EMAIL no fim do arquivo: id de usuário nunca leva prefixo.
   const payload = Buffer.from(usuarioId, 'utf8').toString('base64url')
   return `${payload}.${assinar(payload)}`
 }
@@ -39,4 +40,29 @@ export function verificarTokenCancelamento(token: string): string | null {
   } catch {
     return null
   }
+}
+
+// ── TOKENS DE ENDEREÇO (convidado de live aberta) ────────────────
+//
+// O convidado de uma live pública não tem conta, então não há uuid para
+// assinar: o que o identifica é o email. Mesmo HMAC, mesma chave, sem
+// expiração — o link de cancelar precisa valer para sempre.
+//
+// ⚠️ O prefixo 'e:' existe para que um token de email NUNCA seja aceito onde
+// se espera um id de usuário, e vice-versa. Sem ele, os dois formatos seriam
+// indistinguíveis depois de verificados, e um token de descadastro de
+// convidado passaria por token de usuário — apontando para um uuid que não
+// existe, silenciosamente, sem nada falhando.
+const PREFIXO_EMAIL = 'e:'
+
+export function gerarTokenEmail(email: string): string {
+  const payload = Buffer.from(PREFIXO_EMAIL + email.trim().toLowerCase(), 'utf8').toString('base64url')
+  return `${payload}.${assinar(payload)}`
+}
+
+/** Retorna o email se o token for válido e for de email, ou null. */
+export function verificarTokenEmail(token: string): string | null {
+  const bruto = verificarTokenCancelamento(token)
+  if (!bruto || !bruto.startsWith(PREFIXO_EMAIL)) return null
+  return bruto.slice(PREFIXO_EMAIL.length)
 }

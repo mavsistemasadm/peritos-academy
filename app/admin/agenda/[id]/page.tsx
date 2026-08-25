@@ -5,6 +5,7 @@ import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
 import { carregarEventoAdmin } from '@/lib/queries/admin-agenda'
 import { carregarCursosParaPicker } from '@/lib/queries/admin-trilhas'
 import AdminEventoEditorContent from '@/components/AdminEventoEditorContent'
+import { carregarConfigPlataforma } from '@/lib/queries/config-plataforma'
 
 export const metadata: Metadata = {
   title: 'Editar evento · Admin Peritos Academy',
@@ -21,5 +22,8 @@ export default async function PaginaAdminEventoEditor({ params }: { params: Prom
   if (!evento) notFound()
 
   const cursos = await carregarCursosParaPicker()
-  return <AdminEventoEditorContent evento={evento} cursos={cursos} />
+  // A imagem padrão entra aqui só para o card de divulgação poder dizer, com
+  // certeza, se a prévia do WhatsApp vai sair com figura ou só com texto.
+  const config = await carregarConfigPlataforma()
+  return <AdminEventoEditorContent evento={evento} cursos={cursos} ogImagePadrao={config.ogImageUrl} />
 }
