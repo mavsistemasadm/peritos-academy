@@ -20,9 +20,17 @@ export type TipoEmail =
   | "inatividade_7"
   | "inatividade_21";
 
+// ⚠️ O ENVIO SAI DE `mkt.peritosacademy.com.br`, E NÃO DO DOMÍNIO RAIZ.
+// Ver o comentário longo em lib/email/enviarConvidado.ts: em 25/08/2026 a raiz
+// passou a recusar 100% dos envios no Resend, com o DNS verificado e sem
+// explicação pela API, e foi isso que deixou 624 emails sem chegar a ninguém
+// entre 06/08 e 25/08.
+//
+// O `replyTo` fica na raiz de propósito: quem responde cai na caixa de
+// verdade. Só o caminho de SAÍDA mudou.
 const REMETENTES: Record<"pessoal" | "automatico", { from: string; replyTo: string }> = {
-  pessoal: { from: "Marlos Henrique <marlos@peritosacademy.com.br>", replyTo: "marlos@peritosacademy.com.br" },
-  automatico: { from: "Peritos Academy <noreply@peritosacademy.com.br>", replyTo: "marlos@peritosacademy.com.br" },
+  pessoal: { from: "Marlos Henrique <marlos@mkt.peritosacademy.com.br>", replyTo: "marlos@peritosacademy.com.br" },
+  automatico: { from: "Peritos Academy <noreply@mkt.peritosacademy.com.br>", replyTo: "marlos@peritosacademy.com.br" },
 };
 
 // Prioridade — índice menor = mais prioritário. Só esses tipos entram na

@@ -41,20 +41,24 @@ type Entrada = {
 type Resultado = { enviado: boolean; motivo?: string }
 
 /**
- * O remetente dos avisos de agenda é a Academy, por decisão do dono do
- * produto em 25/08/2026. Chegou a ser cogitado `nexuspericial.com.br`, com o
- * raciocínio de que quem recebe é convidado de live aberta e o que se
- * apresenta a ele é o ecossistema; a decisão foi outra, e é a mais defensável:
- * quem convida para o encontro é quem organiza o encontro.
+ * ⚠️ O ENVIO SAI DE `mkt.peritosacademy.com.br`, E NÃO DO DOMÍNIO RAIZ.
  *
- * ⚠️ Não é uma linha livre para trocar. A chave do Resend deste projeto é
- * **restrita por domínio** e só alcança `peritosacademy.com.br` — conferido em
- * 25/08/2026, quando `nexuspericial.com.br` (verificado na conta, e escrito
- * com a grafia certa) voltou 403 "This API key is not authorized to send
- * emails from". Mudar este endereço sem uma chave nova não muda o remetente:
- * apaga o email.
+ * Não é preferência: em 25/08/2026 o `peritosacademy.com.br` passou a recusar
+ * 100% dos envios no Resend, com os três registros de DNS marcados como
+ * verificados e nenhuma explicação visível pela API. Medido no mesmo minuto,
+ * com a mesma chave e o mesmo destinatário: `mhcalculos.com.br`,
+ * `nexuspericial.com.br` e `mkt.mhcalculos.com.br` entregaram;
+ * `peritosacademy.com.br` falhou, inclusive para o endereço de teste do
+ * próprio Resend. Re-verificar não resolveu.
+ *
+ * O subdomínio é identidade separada, e é o padrão que esta conta já usava nas
+ * outras duas marcas. Vale manter mesmo depois de a raiz voltar: reputação de
+ * envio em massa fica longe do domínio que também recebe email.
+ *
+ * O `replyTo` continua na raiz de propósito — quem responde cai na caixa de
+ * verdade, que é onde ela sempre esteve.
  */
-const REMETENTE = 'Peritos Academy <noreply@peritosacademy.com.br>'
+const REMETENTE = 'Peritos Academy <noreply@mkt.peritosacademy.com.br>'
 
 /** A frase exata do rodapé do template. Se ela mudar lá, muda aqui. */
 const FRASE_DESCADASTRO = 'Não quero mais receber estes e-mails'
