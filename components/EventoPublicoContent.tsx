@@ -18,6 +18,7 @@ import { reservarLugar } from '@/app/agenda/actions'
 import type { EventoPublico } from '@/lib/queries/evento-publico'
 import { inscreverNoEvento } from '@/app/evento/[slug]/actions'
 import { urlEmbedYoutube } from '@/lib/video/youtube'
+import ChatDoEvento from '@/components/ChatDoEvento'
 import { IconeCalendarPlus, IconeCheck, IconePlay, IconeStar, IconeChevronRight, IconeLock, IconeMessageCircle } from '@/components/Icones'
 import { AoVivo } from '@/components/Emblemas'
 
@@ -114,9 +115,10 @@ function Contagem({ alvoIso }: { alvoIso: string }) {
 // renderizariam um retângulo em branco — por isso idDoYoutube() devolve null
 // para eles e a página cai no botão "Entrar na sala".
 // ══════════════════════════════════════════════════════════════════
-function Transmissao({ youtubeId, aoVivo, comChat, titulo }: {
-  youtubeId: string; aoVivo: boolean; comChat: boolean; titulo: string
+function Transmissao({ ev, youtubeId, aoVivo, podeFalarNoChat }: {
+  ev: EventoPublico; youtubeId: string; aoVivo: boolean; podeFalarNoChat: boolean
 }) {
+  const comChat = ev.chatModo !== 'nenhum'
   // O chat do YouTube exige saber em que domínio está sendo embutido, e o
   // domínio precisa bater com o de verdade — daí ser lido do navegador em vez
   // de vir do servidor: assim vale igual em produção, em preview e em
@@ -124,19 +126,33 @@ function Transmissao({ youtubeId, aoVivo, comChat, titulo }: {
   const [dominio, setDominio] = useState<string | null>(null)
   useEffect(() => { setDominio(window.location.hostname) }, [])
 
-  const mostraChat = aoVivo && comChat && !!dominio
+  // O chat do YouTube só existe durante a transmissão; o nosso vale também
+  // para quem chega na gravação e quer perguntar.
+  const mostraChat = comChat && (ev.chatModo === 'proprio' || (aoVivo && !!dominio))
 
   return (
     <div className={`ev-transmissao${mostraChat ? ' com-chat' : ''}`}>
       <div className="ev-player">
         <iframe
           src={urlEmbedYoutube(youtubeId, { autoplay: aoVivo })}
-          title={titulo}
+          title={ev.titulo}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
         />
       </div>
-      {mostraChat && (
+
+      {mostraChat && ev.chatModo === 'proprio' && (
+        <ChatDoEvento
+          eventoId={ev.id}
+          inicial={ev.chat}
+          podeFalar={podeFalarNoChat}
+          motivoBloqueio={ev.logado
+            ? 'Reserve seu lugar acima para falar no chat.'
+            : 'Deixe seu nome e email acima para falar no chat.'}
+        />
+      )}
+
+      {mostraChat && ev.chatModo === 'youtube' && dominio && (
         <div className="ev-chat">
           <div className="ev-chat-cab"><IconeMessageCircle size={13} strokeWidth={2} /> Chat da transmissão</div>
           <iframe
@@ -326,6 +342,10 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
   // A contagem regressiva só existe antes da hora; sem ela o cartão vira uma
   // coluna só, em vez de deixar um vão de 40% da largura ao lado do texto.
   const temLateral = ev.estado === 'agendado' && !!ev.iniciaEm
+  // Falar exige estar dentro: aluno que reservou ou convidado que se inscreveu.
+  // Ler é de todos. É a mesma linha que separa quem está na sala de quem passou
+  // na porta — e é ela que impede o chat de virar caixa de entrada aberta.
+  const podeFalarNoChat = (ev.logado && reservado) || (!ev.logado && inscrito)
   const iniciais = ev.apresentadorNome?.split(' ').map(p => p[0]).join('').slice(0, 2)
 
   return (
@@ -351,7 +371,7 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
         <div className="ev-wrap">
           <article className={`ev-cartao${vivo ? ' vivo' : ''}${temLateral ? ' com-lateral' : ''}`}>
             {mostraTransmissao ? (
-              <Transmissao youtubeId={ev.youtubeId!} aoVivo={vivo} comChat={ev.chatAoVivo} titulo={ev.titulo} />
+              <Transmissao ev={ev} youtubeId={ev.youtubeId!} aoVivo={vivo} podeFalarNoChat={podeFalarNoChat} />
             ) : ev.imagemUrl ? (
               <div className="ev-capa" style={{ backgroundImage: `url(${ev.imagemUrl})` }} aria-hidden="true" />
             ) : null}

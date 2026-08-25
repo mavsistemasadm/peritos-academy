@@ -26,6 +26,7 @@ import { cookies } from 'next/headers'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { idDoYoutube } from '@/lib/video/youtube'
 import { verificarTokenEmail } from '@/lib/email/token'
+import { carregarChatEvento, type MensagemEvento } from '@/lib/queries/evento-chat'
 
 /**
  * Onde o convite ao Nexus desta página aterrissa.
@@ -70,8 +71,10 @@ export type EventoPublico = {
   /** Id do vídeo quando a transmissão (ou a gravação) é do YouTube — vira o
    *  player embutido na própria página. Null para Zoom, Meet e afins. */
   youtubeId: string | null
-  /** Embute o chat do YouTube ao lado do player. */
-  chatAoVivo: boolean
+  /** 'nenhum' · 'youtube' (exige conta do Google) · 'proprio' (qualquer participante fala). */
+  chatModo: 'nenhum' | 'youtube' | 'proprio'
+  /** O que já foi dito. Vazio quando o chat não é o nosso. */
+  chat: MensagemEvento[]
   /** Live aberta: quem não tem conta pode se inscrever e assistir. */
   abertoAoPublico: boolean
   reservado: boolean
@@ -139,7 +142,8 @@ export async function carregarEventoPublico(slug: string): Promise<EventoPublico
     linkTransmissao: podeVerTransmissao ? ev.link_transmissao : null,
     gravacaoUrl: podeVerTransmissao ? ev.gravacao_url : null,
     youtubeId: podeVerTransmissao ? idDoYoutube(ev.gravacao_url ?? ev.link_transmissao) : null,
-    chatAoVivo: !!ev.chat_ao_vivo,
+    chatModo: (ev.chat_modo ?? 'proprio') as EventoPublico['chatModo'],
+    chat: ev.chat_modo === 'proprio' ? await carregarChatEvento(ev.id) : [],
     abertoAoPublico,
     reservado: !!reserva?.data,
     inscritoComoConvidado: await jaInscritoComoConvidado(ev.id),

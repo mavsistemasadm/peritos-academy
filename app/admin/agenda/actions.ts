@@ -47,7 +47,9 @@ function montarCampos(formData: FormData) {
     // evento — abrir por engano entrega de graça o que se vende, e ninguém
     // percebe uma sala aberta demais.
     aberto_ao_publico: formData.get('aberto_ao_publico') === 'on',
-    chat_ao_vivo: formData.get('chat_ao_vivo') === 'on',
+    chat_modo: ['nenhum', 'youtube', 'proprio'].includes(String(formData.get('chat_modo')))
+      ? String(formData.get('chat_modo'))
+      : 'proprio',
   }
 }
 

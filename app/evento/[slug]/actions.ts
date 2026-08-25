@@ -12,7 +12,8 @@
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { criarClienteServico } from '@/lib/supabase/servico'
-import { gerarTokenEmail } from '@/lib/email/token'
+import { criarClienteServidor } from '@/lib/supabase/server'
+import { gerarTokenEmail, verificarTokenEmail } from '@/lib/email/token'
 import { enviarEmailConvidado } from '@/lib/email/enviarConvidado'
 import { emailEvento } from '@/lib/email/templates/evento'
 import { nomeDoCookieDeInscricao } from '@/lib/queries/evento-publico'
@@ -140,4 +141,136 @@ export async function inscreverNoEvento(entrada: {
 
   revalidatePath(`/evento/${ev.slug}`)
   return { ok: true }
+}
+
+
+// ══════════════════════════════════════════════════════════════════
+// FALAR NO CHAT DA TRANSMISSÃO
+//
+// Único caminho de escrita em `evento_mensagens`: a tabela não tem policy de
+// INSERT para ninguém. A chave publicável vai no HTML de toda página, então
+// uma policy aberta para `anon` viraria um formulário na internet capaz de
+// despejar mensagem em nome de qualquer nome, em laço, durante a transmissão.
+//
+// ── COMO CADA UM É IDENTIFICADO ──
+//
+//   aluno    → pela sessão. O nome vem do perfil, não do que ele digitar.
+//   convidado → pelo cookie assinado gravado na inscrição. O nome vem da linha
+//               de `evento_inscricoes`, também não do que ele digitar.
+//
+// ⚠️ Em nenhum dos dois casos o autor manda o próprio nome. Se mandasse,
+// qualquer pessoa assinaria como o apresentador no meio da live — e a live é
+// exatamente o momento em que ninguém está conferindo.
+// ══════════════════════════════════════════════════════════════════
+
+export type ResultadoMensagem =
+  | { ok: true; id: string; autorNome: string; ehApresentador: boolean }
+  | { ok: false; erro: string }
+
+const TAMANHO_MAXIMO = 500
+/** Vazão por autor. Segura o dedo nervoso sem atrapalhar conversa de verdade. */
+const MAX_POR_JANELA = 5
+const JANELA_MS = 30_000
+
+export async function enviarMensagemEvento(
+  eventoId: string,
+  textoBruto: string,
+): Promise<ResultadoMensagem> {
+  const texto = textoBruto.replace(/\s+/g, ' ').trim()
+  if (!texto) return { ok: false, erro: 'Escreva alguma coisa.' }
+  if (texto.length > TAMANHO_MAXIMO) {
+    return { ok: false, erro: `Máximo de ${TAMANHO_MAXIMO} caracteres.` }
+  }
+
+  const supabase = criarClienteServico()
+
+  const { data: ev } = await supabase
+    .from('eventos')
+    .select('id, publicado, chat_modo, apresentador_nome, criado_por, inicia_em, duracao_seg')
+    .eq('id', eventoId)
+    .maybeSingle()
+
+  if (!ev || !ev.publicado) return { ok: false, erro: 'Este encontro não está disponível.' }
+  if (ev.chat_modo !== 'proprio') return { ok: false, erro: 'O chat deste encontro está desligado.' }
+  if (!janelaDoChatAberta(ev.inicia_em, ev.duracao_seg)) {
+    return { ok: false, erro: 'O chat deste encontro já foi encerrado.' }
+  }
+
+  // ── quem está falando ──
+  const servidor = await criarClienteServidor()
+  const { data: auth } = await servidor.auth.getUser()
+
+  let usuarioId: string | null = null
+  let inscricaoId: string | null = null
+  let autorNome: string | null = null
+
+  if (auth?.user) {
+    const { data: perfil } = await supabase.from('perfis').select('nome').eq('id', auth.user.id).maybeSingle()
+    usuarioId = auth.user.id
+    autorNome = perfil?.nome?.trim() || 'Perito'
+  } else {
+    const jar = await cookies()
+    const token = jar.get(nomeDoCookieDeInscricao(eventoId))?.value
+    const email = token ? verificarTokenEmail(token) : null
+    if (!email) {
+      return { ok: false, erro: 'Inscreva-se no encontro para poder falar no chat.' }
+    }
+    const { data: insc } = await supabase
+      .from('evento_inscricoes')
+      .select('id, nome')
+      .eq('evento_id', eventoId)
+      .ilike('email', email)
+      .maybeSingle()
+    if (!insc) return { ok: false, erro: 'Inscreva-se no encontro para poder falar no chat.' }
+    inscricaoId = insc.id
+    autorNome = insc.nome?.trim() || 'Convidado'
+  }
+
+  // ── vazão ──
+  const desde = new Date(Date.now() - JANELA_MS).toISOString()
+  const consulta = supabase
+    .from('evento_mensagens')
+    .select('id', { count: 'exact', head: true })
+    .eq('evento_id', eventoId)
+    .gte('criado_em', desde)
+  const { count } = usuarioId
+    ? await consulta.eq('usuario_id', usuarioId)
+    : await consulta.eq('inscricao_id', inscricaoId!)
+
+  if ((count ?? 0) >= MAX_POR_JANELA) {
+    return { ok: false, erro: 'Calma: espere alguns segundos antes de mandar de novo.' }
+  }
+
+  // Quem conduz ganha marca visual. Comparar pelo id de quem criou o evento, e
+  // não pelo nome, porque nome se repete e é justamente o que um impostor
+  // usaria.
+  const ehApresentador = !!usuarioId && usuarioId === ev.criado_por
+
+  const { data: nova, error } = await supabase
+    .from('evento_mensagens')
+    .insert({ evento_id: eventoId, usuario_id: usuarioId, inscricao_id: inscricaoId, autor_nome: autorNome, eh_apresentador: ehApresentador, texto })
+    .select('id')
+    .single()
+
+  if (error) {
+    console.error('[chat evento] falhou:', error)
+    return { ok: false, erro: 'Não consegui enviar agora. Tente de novo.' }
+  }
+
+  return { ok: true, id: nova.id, autorNome: autorNome!, ehApresentador }
+}
+
+/**
+ * O chat abre uma hora antes e fecha seis horas depois do fim.
+ *
+ * Antes: dá para a sala encher antes de começar, que é metade da graça de uma
+ * live. Depois: quem assiste à gravação no dia seguinte ainda comenta, mas o
+ * chat de um evento de três meses atrás não fica aberto para sempre virando
+ * caixa de spam sem ninguém olhando.
+ */
+function janelaDoChatAberta(iniciaEm: string | null, duracaoSeg: number): boolean {
+  if (!iniciaEm) return false
+  const inicio = +new Date(iniciaEm)
+  const agora = Date.now()
+  return agora >= inicio - 60 * 60_000 && agora <= inicio + duracaoSeg * 1000 + 6 * 60 * 60_000
 }

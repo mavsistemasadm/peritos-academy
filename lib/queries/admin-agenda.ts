@@ -26,7 +26,7 @@ export type EventoAdmin = {
   publicado: boolean
   /** Live aberta: quem não tem conta se inscreve pela página pública. */
   abertoAoPublico: boolean
-  chatAoVivo: boolean
+  chatModo: 'nenhum' | 'youtube' | 'proprio'
   totalReservas: number
   /** Convidados sem conta. Vazio na listagem; preenchido na ficha do evento. */
   inscricoes: InscricaoEvento[]
@@ -62,7 +62,7 @@ export async function carregarEventosAdmin(): Promise<EventoAdmin[]> {
     apresentadorCargo: e.apresentador_cargo, metaExtra: e.meta_extra, cursoId: e.curso_id,
     alvoRotulo: e.alvo_rotulo, visibilidade: e.visibilidade, gravar: e.gravar, lembrete: e.lembrete,
     publicarFeed: e.publicar_feed, publicado: e.publicado,
-    abertoAoPublico: !!e.aberto_ao_publico, chatAoVivo: !!e.chat_ao_vivo,
+    abertoAoPublico: !!e.aberto_ao_publico, chatModo: (e.chat_modo ?? 'proprio') as EventoAdmin['chatModo'],
     totalReservas: reservasPorEvento.get(e.id) ?? 0,
     inscricoes: [],
   }))
@@ -92,7 +92,7 @@ export async function carregarEventoAdmin(id: string): Promise<EventoAdmin | nul
     apresentadorCargo: e.apresentador_cargo, metaExtra: e.meta_extra, cursoId: e.curso_id,
     alvoRotulo: e.alvo_rotulo, visibilidade: e.visibilidade, gravar: e.gravar, lembrete: e.lembrete,
     publicarFeed: e.publicar_feed, publicado: e.publicado,
-    abertoAoPublico: !!e.aberto_ao_publico, chatAoVivo: !!e.chat_ao_vivo,
+    abertoAoPublico: !!e.aberto_ao_publico, chatModo: (e.chat_modo ?? 'proprio') as EventoAdmin['chatModo'],
     totalReservas: count ?? 0,
     inscricoes: (inscritos ?? []).map(i => ({
       nome: i.nome, email: i.email, whatsapp: i.whatsapp,

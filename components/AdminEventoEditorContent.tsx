@@ -556,13 +556,22 @@ export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao
                 </span>
               </label>
 
-              <label className="pnl-opcao">
-                <input type="checkbox" name="chat_ao_vivo" defaultChecked={evento.chatAoVivo} />
+              {/* Não é checkbox porque não são duas respostas. O do YouTube
+                  continua disponível para quem quiser a conversa acontecendo
+                  lá, mas deixou de ser o padrão: nele, escrever exige conta do
+                  Google, e o convidado que só deixou email fica calado. */}
+              <label className="pnl-opcao pnl-opcao-select">
                 <span>
-                  <b>Embutir o chat do YouTube</b>
+                  <b>Chat da transmissão</b>
+                  <select name="chat_modo" defaultValue={evento.chatModo}>
+                    <option value="proprio">Chat da Peritos Academy (recomendado)</option>
+                    <option value="youtube">Chat do YouTube</option>
+                    <option value="nenhum">Sem chat</option>
+                  </select>
                   <small>
-                    Mostra o chat ao lado do vídeo. Desligue quando a transmissão não tiver chat,
-                    senão aparece uma caixa de aviso do YouTube dentro da página.
+                    No nosso, fala qualquer pessoa inscrita no encontro, com ou sem conta, e as
+                    perguntas ficam guardadas depois. No do YouTube, só quem estiver logado numa
+                    conta do Google consegue escrever.
                   </small>
                 </span>
               </label>

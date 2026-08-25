@@ -6519,7 +6519,8 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 .pagina-evento .ev-player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .pagina-evento .ev-chat{
   display:flex;flex-direction:column;border-radius:18px;overflow:hidden;
-  border:1px solid var(--linha);background:rgba(255,255,255,.03);min-height:320px;
+  border:1px solid var(--linha);background:rgba(255,255,255,.03);
+  min-height:320px;max-height:min(70vh,560px);
 }
 .pagina-evento .ev-chat-cab{
   display:flex;align-items:center;gap:8px;padding:10px 14px;
@@ -6651,4 +6652,67 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 /* Dica sob um campo de texto do formulário do admin. */
 .pagina-admin .pnl-form label > small{
   display:block;margin-top:5px;font-size:12px;line-height:1.45;color:var(--cinza);
+}
+
+/* ---------- chat da casa (substitui o iframe do YouTube) ----------
+   O do YouTube era um iframe branco que a gente não controlava. Este é nosso,
+   então segue o tema da página e a conversa cabe na coluna sem o retângulo
+   claro no meio do carvão. */
+.pagina-evento .ev-chat-n{
+  margin-left:auto;font-size:11px;color:var(--cinza);
+  background:rgba(255,255,255,.06);border-radius:var(--r-pill);padding:1px 8px;
+}
+.pagina-evento .ev-chat-lista{
+  flex:1;overflow-y:auto;padding:var(--s-2) var(--s-3);
+  display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth;
+}
+.pagina-evento .ev-chat-vazio{font-size:13px;color:var(--cinza);margin:auto;text-align:center}
+.pagina-evento .ev-msg{display:flex;flex-direction:column;gap:2px}
+.pagina-evento .ev-msg-quem{
+  display:flex;align-items:center;gap:7px;
+  font-size:11.5px;font-weight:650;color:var(--cinza-claro);
+}
+.pagina-evento .ev-msg-quem time{font-weight:500;color:#6C736D;font-size:10.5px}
+/* Quem conduz precisa ser reconhecível de relance no meio da rolagem: numa
+   live, a resposta do apresentador é a única que todo mundo está procurando. */
+.pagina-evento .ev-msg-quem i{
+  font-style:normal;font-size:9.5px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--carvao);background:var(--grad-marca);
+  border-radius:5px;padding:1px 6px;
+}
+.pagina-evento .ev-msg-texto{
+  font-size:13.5px;line-height:1.5;color:var(--creme);
+  overflow-wrap:anywhere;   /* link colado sem espaço não estoura a coluna */
+}
+.pagina-evento .ev-msg.apresentador .ev-msg-texto{color:#EAFBF4}
+.pagina-evento .ev-msg.minha .ev-msg-quem{color:var(--verde)}
+.pagina-evento .ev-chat-forma{
+  display:flex;gap:8px;padding:var(--s-2);border-top:1px solid var(--linha-suave);
+}
+.pagina-evento .ev-chat-forma input{
+  flex:1;font:inherit;font-size:13.5px;color:var(--creme);
+  background:rgba(0,0,0,.35);border:1px solid var(--linha);border-radius:var(--r-pill);
+  padding:9px 14px;outline:none;transition:border-color .2s;
+}
+.pagina-evento .ev-chat-forma input::placeholder{color:#6C736D}
+.pagina-evento .ev-chat-forma input:focus{border-color:rgba(32,217,166,.5)}
+.pagina-evento .ev-chat-forma button{
+  flex-shrink:0;width:38px;height:38px;border-radius:50%;
+  display:grid;place-items:center;background:var(--creme);color:var(--carvao);
+  transition:opacity .2s,transform .2s var(--suave);
+}
+.pagina-evento .ev-chat-forma button:hover:not(:disabled){transform:scale(1.05)}
+.pagina-evento .ev-chat-forma button:disabled{opacity:.35;cursor:not-allowed}
+.pagina-evento .ev-chat-bloqueio,
+.pagina-evento .ev-chat-erro{
+  padding:10px var(--s-3);font-size:12.5px;line-height:1.45;
+  border-top:1px solid var(--linha-suave);color:var(--cinza);
+}
+.pagina-evento .ev-chat-erro{color:#FF9E9E;border-top:none;padding-top:0}
+
+/* Opção do admin que é um select, e não um interruptor: três respostas não
+   cabem numa caixinha. */
+.pagina-admin .pnl-opcao-select{cursor:default;grid-column:1 / -1}
+.pagina-admin .pnl-opcao-select select{
+  width:100%;max-width:360px;margin:6px 0 4px;font:inherit;font-size:13.5px;
 }
