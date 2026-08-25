@@ -80,11 +80,16 @@ export async function enviarEmail(input: EnviarEmailInput): Promise<ResultadoEnv
       .maybeSingle();
     if (pref && pref.receber_emails === false) return { enviado: false, motivo: "preferencia_desligada" };
 
+    // ⚠️ `neq('estado','falhou')` não é detalhe: sem ele, um email que o
+    // Resend recusou continua contando como enviado e nunca mais é tentado.
+    // Foi assim que 624 emails viraram perda permanente em agosto de 2026 —
+    // ver a migração 20260825_email_entrega_confirmada.sql.
     let queryDuplicata = supabase
       .from("email_enviados")
       .select("id")
       .eq("usuario_id", input.usuarioId)
-      .eq("tipo", input.tipo);
+      .eq("tipo", input.tipo)
+      .neq("estado", "falhou");
     queryDuplicata = input.refId ? queryDuplicata.eq("ref_id", input.refId) : queryDuplicata.is("ref_id", null);
     const { data: existente } = await queryDuplicata.maybeSingle();
     if (existente) return { enviado: false, motivo: "duplicado" };
@@ -123,11 +128,15 @@ export async function enviarEmail(input: EnviarEmailInput): Promise<ResultadoEnv
       return { enviado: false, motivo: "falha_resend" };
     }
 
+    // "aceito", e não "entregue": o Resend responde 200 antes de saber se vai
+    // conseguir. Quem escreve `entregue` ou `falhou` é /api/webhooks/resend.
     await supabase.from("email_enviados").insert({
       usuario_id: input.usuarioId,
       tipo: input.tipo,
       ref_id: input.refId ?? null,
       assunto: input.assunto,
+      resend_id: envio.id ?? null,
+      estado: "aceito",
     });
 
     return { enviado: true };

@@ -41,25 +41,18 @@ type Entrada = {
 type Resultado = { enviado: boolean; motivo?: string }
 
 /**
- * ⚠️ O REMETENTE QUERIDO É `noreply@nexuspericia.com.br`, E ELE AINDA NÃO
- * PODE SER USADO. Conferido contra a API do Resend em 25/08/2026:
+ * O remetente dos avisos de agenda é a Academy, por decisão do dono do
+ * produto em 25/08/2026. Chegou a ser cogitado `nexuspericial.com.br`, com o
+ * raciocínio de que quem recebe é convidado de live aberta e o que se
+ * apresenta a ele é o ecossistema; a decisão foi outra, e é a mais defensável:
+ * quem convida para o encontro é quem organiza o encontro.
  *
- *   403 · "This API key is not authorized to send emails from nexuspericia.com.br"
- *
- * Enquanto isso valer, o remetente é o da Academy, que está autorizado (e foi
- * usado no envio de teste que passou). Deixar o de Nexus assim mesmo seria o
- * pior dos mundos: este arquivo nunca lança, então TODO email de convidado
- * falharia em silêncio, e o sintoma seria "os lembretes não chegaram",
- * descoberto depois da live, sem nada em log nenhum acusando.
- *
- * Para trocar: verificar `nexuspericia.com.br` em resend.com/domains (DNS de
- * SPF/DKIM) e trocar esta linha. É uma linha, e o teste é reenviar para
- * `delivered@resend.dev`. Nada mais no código depende disso.
- *
- * O motivo de querer o de Nexus continua de pé: quem recebe estes emails é
- * convidado de live aberta, gente que ainda não é aluna, e o que se apresenta
- * a ela é o ecossistema, não o endereço de uma plataforma em que ela ainda
- * não entrou.
+ * ⚠️ Não é uma linha livre para trocar. A chave do Resend deste projeto é
+ * **restrita por domínio** e só alcança `peritosacademy.com.br` — conferido em
+ * 25/08/2026, quando `nexuspericial.com.br` (verificado na conta, e escrito
+ * com a grafia certa) voltou 403 "This API key is not authorized to send
+ * emails from". Mudar este endereço sem uma chave nova não muda o remetente:
+ * apaga o email.
  */
 const REMETENTE = 'Peritos Academy <noreply@peritosacademy.com.br>'
 
@@ -139,11 +132,16 @@ export async function enviarEmailConvidado(entrada: Entrada): Promise<Resultado>
       if (pref && pref.receber_emails === false) return { enviado: false, motivo: 'preferencia_desligada' }
     }
 
+    // ⚠️ `neq('estado','falhou')` não é detalhe: sem ele, um email que o
+    // Resend recusou continua contando como enviado e nunca mais é tentado.
+    // Foi assim que 624 emails viraram perda permanente em agosto de 2026 —
+    // ver a migração 20260825_email_entrega_confirmada.sql.
     let dup = supabase
       .from('email_convidados_enviados')
       .select('id')
       .ilike('email', email)
       .eq('tipo', entrada.tipo)
+      .neq('estado', 'falhou')
     dup = entrada.refId ? dup.eq('ref_id', entrada.refId) : dup.is('ref_id', null)
     const { data: existente } = await dup.maybeSingle()
     if (existente) return { enviado: false, motivo: 'duplicado' }
@@ -155,7 +153,7 @@ export async function enviarEmailConvidado(entrada: Entrada): Promise<Resultado>
     }
 
     const resend = new Resend(chave)
-    const { error } = await resend.emails.send({
+    const { data: aceito, error } = await resend.emails.send({
       from: REMETENTE,
       replyTo: 'marlos@peritosacademy.com.br',
       to: email,
@@ -168,11 +166,15 @@ export async function enviarEmailConvidado(entrada: Entrada): Promise<Resultado>
       return { enviado: false, motivo: 'resend_erro' }
     }
 
+    // "aceito", e não "entregue": o Resend responde 200 antes de saber se vai
+    // conseguir. Quem escreve `entregue` ou `falhou` é /api/webhooks/resend.
     await supabase.from('email_convidados_enviados').insert({
       email,
       tipo: entrada.tipo,
       ref_id: entrada.refId ?? null,
       assunto: entrada.assunto,
+      resend_id: aceito?.id ?? null,
+      estado: 'aceito',
     })
 
     return { enviado: true }
