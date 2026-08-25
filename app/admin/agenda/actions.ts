@@ -197,9 +197,12 @@ export async function anunciarEvento(id: string): Promise<ResultadoAnuncio> {
       ok: false,
       erro: ev.visibilidade === 'todos'
         ? 'Não encontrei nenhum aluno ativo para avisar.'
-        : `Não dá para saber quem é o público de um evento com visibilidade "${ev.visibilidade}": `
-          + 'o rótulo do alvo é texto livre e não aponta para ninguém no banco. '
-          + 'Use "Todos" ou "Alunos do curso" com um curso escolhido.',
+        : ev.visibilidade === 'turma'
+          ? 'Turma ainda não existe no banco: o rótulo é texto livre e não seleciona ninguém. '
+            + 'Escolha outra visibilidade para poder anunciar.'
+          : ev.visibilidade === 'curso'
+            ? 'Escolha o curso vinculado: sem ele não dá para saber quem são os alunos dele.'
+            : 'Não encontrei ninguém neste segmento.',
     }
   }
 

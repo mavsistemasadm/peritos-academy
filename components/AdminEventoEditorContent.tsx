@@ -302,6 +302,82 @@ function AnunciarBloco({ evento, toast }: {
   )
 }
 
+
+// ══════════════════════════════════════════════════════════════════
+// PARA QUEM É ESTE EVENTO
+//
+// `alvo_rotulo` era um campo de texto livre onde alguém digitava "Premium" à
+// mão. Ele aparecia no card como "Exclusivo · Premium" e não apontava para
+// ninguém no banco: era decoração. Agora que o evento gera email, decoração
+// não serve — não dá para mandar uma mensagem para uma string.
+//
+// Com visibilidade "Assinantes", o campo vira uma lista de segmentos que o
+// banco sabe responder, e cada opção diz o tamanho para quem escolhe.
+//
+// ⚠️ Os números vêm da mesma regra que abre a plataforma (concessão de escopo
+// `total` vigente), e não da tabela `assinaturas` — que tem uma linha só, de
+// cortesia, porque o Asaas nunca foi ligado. Procurar assinante lá não acha
+// ninguém.
+// ══════════════════════════════════════════════════════════════════
+const SEGMENTOS_DE_ASSINANTE = [
+  { chave: 'completo', rotulo: 'Todos os assinantes', ajuda: 'Quem tem a plataforma inteira aberta, por qualquer origem' },
+  { chave: 'nexus', rotulo: 'Assinantes do Nexus Pericial', ajuda: 'Quem entrou pela assinatura do Nexus' },
+  { chave: 'vitalicio', rotulo: 'Acesso vitalício', ajuda: 'Sem data de fim: migração e concessões de admin' },
+  { chave: 'com_prazo', rotulo: 'Com prazo para renovar', ajuda: 'Tem data de fim. É a lista de retenção.' },
+]
+
+function AlvoDoEvento({ evento }: { evento: EventoAdmin }) {
+  const [visibilidade, setVisibilidade] = useState(evento.visibilidade)
+
+  // O select de visibilidade é do form, não deste componente; ouvir a mudança
+  // no próprio form evita subir o estado inteiro do formulário para cá só por
+  // causa de um campo.
+  useEffect(() => {
+    const alvo = document.querySelector<HTMLSelectElement>('select[name="visibilidade"]')
+    if (!alvo) return
+    const ao = () => setVisibilidade(alvo.value)
+    alvo.addEventListener('change', ao)
+    return () => alvo.removeEventListener('change', ao)
+  }, [])
+
+  if (visibilidade === 'assinatura') {
+    const atual = SEGMENTOS_DE_ASSINANTE.some(s => s.chave === evento.alvoRotulo)
+      ? evento.alvoRotulo!
+      : 'completo'
+    return (
+      <label>Qual grupo de assinantes
+        <select name="alvo_rotulo" defaultValue={atual}>
+          {SEGMENTOS_DE_ASSINANTE.map(s => (
+            <option key={s.chave} value={s.chave}>{s.rotulo}</option>
+          ))}
+        </select>
+        <small>
+          {SEGMENTOS_DE_ASSINANTE.map(s => `${s.rotulo}: ${s.ajuda}.`).join(' ')}
+        </small>
+      </label>
+    )
+  }
+
+  if (visibilidade === 'turma') {
+    return (
+      <label>Rótulo do alvo
+        <input name="alvo_rotulo" defaultValue={evento.alvoRotulo ?? ''} placeholder="Ex.: Kit Bancário 2026" />
+        <small>
+          ⚠️ Turma ainda não existe no banco: este texto aparece no card do evento, mas não seleciona
+          ninguém. O evento não poderá ser anunciado por email enquanto a visibilidade for esta.
+        </small>
+      </label>
+    )
+  }
+
+  return (
+    <label>Rótulo do alvo
+      <input name="alvo_rotulo" defaultValue={evento.alvoRotulo ?? ''} placeholder="Ex.: Turma de Perícia Bancária" />
+      <small>Texto que aparece no selo &quot;Exclusivo · …&quot; do card. Só decorativo nesta visibilidade.</small>
+    </label>
+  )
+}
+
 export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao }: {
   evento: EventoAdmin; cursos: CursoPicker[]; ogImagePadrao: string | null
 }) {
@@ -438,9 +514,7 @@ export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao
                   {cursos.map(c => <option key={c.id} value={c.id}>{c.titulo}</option>)}
                 </select>
               </label>
-              <label>Rótulo do alvo
-                <input name="alvo_rotulo" defaultValue={evento.alvoRotulo ?? ''} placeholder="Ex.: Turma de Perícia Bancária" />
-              </label>
+              <AlvoDoEvento evento={evento} />
             </div>
             <label>Recado curto
               <input name="meta_extra" defaultValue={evento.metaExtra ?? ''} placeholder="Ex.: Traga um extrato seu" />
