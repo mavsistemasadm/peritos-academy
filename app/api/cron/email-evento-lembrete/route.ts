@@ -82,6 +82,18 @@ export async function GET(request: NextRequest) {
           html,
         })
         if (r.enviado) enviados++
+
+        // Quem tem conta recebe o mesmo aviso no sino. Independe do email ter
+        // saído: são dois canais, e o de dentro da plataforma não deve deixar
+        // de existir porque o de fora falhou — foi justamente isso que deixou
+        // três semanas de silêncio passarem sem ninguém notar.
+        if (pessoa.usuarioId) {
+          await supabase.rpc('notificar_lembrete_evento', {
+            p_usuario: pessoa.usuarioId,
+            p_evento: ev.id,
+            p_momento: janela.momento,
+          })
+        }
       }
     }
     resumo[janela.momento] = enviados
@@ -90,7 +102,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ ok: true, ...resumo })
 }
 
-type Pessoa = { nome: string; email: string }
+type Pessoa = { nome: string; email: string; usuarioId: string | null }
 
 /** A lista de quem espera por este encontro, sem repetir ninguém. */
 async function destinatarios(
@@ -103,7 +115,7 @@ async function destinatarios(
     .eq('evento_id', eventoId)
     .is('cancelado_em', null)
 
-  const lista: Pessoa[] = (inscricoes ?? []).map(i => ({ nome: i.nome, email: i.email }))
+  const lista: Pessoa[] = (inscricoes ?? []).map(i => ({ nome: i.nome, email: i.email, usuarioId: i.usuario_id }))
   const jaCobertos = new Set(
     (inscricoes ?? []).map(i => i.usuario_id).filter((id): id is string => !!id),
   )
@@ -121,8 +133,8 @@ async function destinatarios(
     // O endereço do aluno mora em auth.users, fora do alcance do PostgREST —
     // ver emails_de_usuarios() na migração.
     const { data: perfis } = await supabase.rpc('emails_de_usuarios', { p_ids: idsDeAlunos })
-    for (const p of (perfis ?? []) as { nome: string | null; email: string }[]) {
-      if (p.email) lista.push({ nome: p.nome ?? 'Perito', email: p.email })
+    for (const p of (perfis ?? []) as { id: string; nome: string | null; email: string }[]) {
+      if (p.email) lista.push({ nome: p.nome ?? 'Perito', email: p.email, usuarioId: p.id })
     }
   }
 

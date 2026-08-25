@@ -448,10 +448,29 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
                 <FormaInscricao eventoId={ev.id} aoVivo={vivo} aoInscrever={() => setInscrito(true)} />
               )}
 
-              {!ev.logado && inscrito && ev.abertoAoPublico && ev.estado === 'agendado' && (
+              {/* ══════════════════════════════════════════════════
+                  O QUE ESPERAR, DITO NA HORA EM QUE A PESSOA SE COMPROMETE
+
+                  Sem isto, o botão vira "Reservado" e o assunto morre ali: a
+                  pessoa não sabe se vai ser lembrada, por onde, nem se
+                  precisa anotar em algum lugar. O texto é diferente para quem
+                  tem conta e para quem não tem porque os canais são
+                  diferentes, e prometer o sino a quem não tem login seria
+                  prometer uma tela que ela não vai abrir.
+                  ══════════════════════════════════════════════════ */}
+              {inscrito && !ev.logado && ev.abertoAoPublico && ev.estado === 'agendado' && (
                 <p className="ev-nota">
-                  Confirmação enviada para o seu email. Você recebe um lembrete na véspera e outro quando
-                  estivermos começando. É só voltar a esta página na hora.
+                  <b>Confirmação enviada para o seu email.</b> Fique de olho na caixa de entrada:
+                  eu aviso amanhã, na manhã do dia, uma hora antes e quando estivermos entrando no ar.
+                  Se não achar, olhe em promoções ou spam e marque como &quot;não é spam&quot;.
+                </p>
+              )}
+
+              {reservado && ev.logado && ev.estado === 'agendado' && (
+                <p className="ev-nota">
+                  <b>Seu lugar está guardado.</b> Você recebe os lembretes por email e também aqui na
+                  plataforma, no sino: um dia antes, na manhã do dia, uma hora antes e quando a
+                  transmissão entrar no ar.
                 </p>
               )}
 
