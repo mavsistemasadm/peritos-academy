@@ -41,18 +41,27 @@ type Entrada = {
 type Resultado = { enviado: boolean; motivo?: string }
 
 /**
- * ⚠️ O domínio precisa estar VERIFICADO no Resend, senão todo envio daqui é
- * recusado — e a recusa é silenciosa por desenho (este arquivo nunca lança),
- * então o sintoma seria "os lembretes não chegam" sem nada aparecendo em
- * lugar nenhum. Conferir em resend.com/domains antes de acreditar que
- * funcionou; a chave deste projeto é restrita a envio e não consegue
- * consultar a lista de domínios.
+ * ⚠️ O REMETENTE QUERIDO É `noreply@nexuspericia.com.br`, E ELE AINDA NÃO
+ * PODE SER USADO. Conferido contra a API do Resend em 25/08/2026:
  *
- * Nexus e não Academy de propósito: quem recebe estes emails é convidado de
- * live aberta, gente que ainda não é aluna, e o que se apresenta a ela é o
- * ecossistema — não um endereço de uma plataforma em que ela ainda não entrou.
+ *   403 · "This API key is not authorized to send emails from nexuspericia.com.br"
+ *
+ * Enquanto isso valer, o remetente é o da Academy, que está autorizado (e foi
+ * usado no envio de teste que passou). Deixar o de Nexus assim mesmo seria o
+ * pior dos mundos: este arquivo nunca lança, então TODO email de convidado
+ * falharia em silêncio, e o sintoma seria "os lembretes não chegaram",
+ * descoberto depois da live, sem nada em log nenhum acusando.
+ *
+ * Para trocar: verificar `nexuspericia.com.br` em resend.com/domains (DNS de
+ * SPF/DKIM) e trocar esta linha. É uma linha, e o teste é reenviar para
+ * `delivered@resend.dev`. Nada mais no código depende disso.
+ *
+ * O motivo de querer o de Nexus continua de pé: quem recebe estes emails é
+ * convidado de live aberta, gente que ainda não é aluna, e o que se apresenta
+ * a ela é o ecossistema, não o endereço de uma plataforma em que ela ainda
+ * não entrou.
  */
-const REMETENTE = 'Nexus Pericial <noreply@nexuspericia.com.br>'
+const REMETENTE = 'Peritos Academy <noreply@peritosacademy.com.br>'
 
 function injetarDescadastro(html: string, email: string): string {
   const url = `${SITE_URL}/email/cancelar?token=${gerarTokenEmail(email)}`
