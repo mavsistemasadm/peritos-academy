@@ -493,6 +493,143 @@ Conferido sobre os 73 cursos publicados: 6 alunos → 6 conjuntos diferentes, e 
 
 ⚠️ Sem teste automatizado: o repositório não tem runner (só `lint` e `build`), e instalar um às pressas era decisão maior que o conserto. A regra do teto está centralizada em `tenta()` justamente para não depender de teste.
 
+## O evento tem endereço próprio, e a live abre para quem não é aluno — 2026-08-25/26
+
+**Regra permanente.** Todo evento tem `/evento/{slug}`, público, sem login. O
+slug **nasce com o evento e não muda quando o título é editado**: o link já foi
+colado em grupo de WhatsApp, e corrigir uma vírgula dias depois transformaria
+toda mensagem enviada num 404 sem avisar ninguém. Para forçar endereço novo,
+gravar `slug = null` — o trigger recalcula.
+
+Antes disso existia `/agenda` e nada mais: não havia link para UM evento, e
+`/agenda` exige acesso completo, então o convite batia no cadeado justamente
+para quem é candidato a assinar.
+
+### A live aberta
+`eventos.aberto_ao_publico` (nasce desligada, opt-in por evento) libera
+inscrição de quem não tem conta: nome e email, sem criar conta. Ela não vira
+conta e não ganha acesso a nada — é o que permite divulgar em qualquer lugar.
+O convidado é reconhecido depois por **cookie assinado** (`evt_{id}`, HMAC do
+email), que é conveniência e não credencial: perder o cookie não perde a
+inscrição.
+
+⚠️ `jaInscritoComoConvidado` confere a inscrição **no banco**, não só o cookie:
+o cookie sobrevive à linha ser removida, e a tela ofereceria o chat para quem a
+action vai recusar.
+
+### Transmissão e chat dentro da página
+`link_transmissao` do YouTube (qualquer formato — `idDoYoutube` resolve) toca
+embutido. O OBS e a chave de transmissão não mudam; muda onde se assiste.
+
+`eventos.chat_modo`: `nenhum` · `youtube` · `proprio` (padrão). O do YouTube
+**exige conta do Google para escrever**, e dentro de iframe esse login costuma
+nem funcionar — o convidado lia e não falava, que numa live de conversão é o
+pior resultado possível.
+
+O chat próprio (`evento_mensagens`) é o **primeiro uso de Realtime deste
+projeto** (a publicação `supabase_realtime` existia vazia). Assina INSERT e
+UPDATE; o UPDATE é por causa da moderação, e `replica identity full` é o que
+faz ele chegar com a linha inteira. Moderação **esconde, não apaga**.
+
+⚠️ **Sem policy de INSERT, para ninguém.** A escrita passa por server action
+com service role. E **o autor nunca manda o próprio nome** — vem do perfil ou
+da inscrição; se viesse do cliente, qualquer um assinaria como o apresentador
+no meio da live. Quem conduz (criador ou admin de agenda) fala sem se
+inscrever, sem teto de vazão e fora da janela de tempo.
+
+### Anúncio e visibilidade
+Publicar um evento não avisava ninguém, e `visibilidade` **não filtrava nada**:
+`/agenda` listava tudo para todos, e "Exclusivo · Turma X" era só texto.
+
+Agora existe "Anunciar para os alunos" (botão, não automático na publicação:
+`publicado` liga e desliga, e uma correção de vírgula viraria uma leva para 544
+pessoas). `evento_audiencia` resolve `todos` e `curso`; `assinatura` resolve por
+**chave de segmento** escolhida numa lista (`completo` 500 · `vitalicio` 328 ·
+`com_prazo` 189 · `nexus` 94, medidos em 26/08). `turma` **recusa**: não é
+conceito deste schema.
+
+⚠️ "Assinante" **não é a tabela `assinaturas`** — ela tem uma linha, de
+cortesia, porque o Asaas nunca foi ligado. É concessão de escopo `total`
+vigente em `acessos_conteudo`, a mesma regra de `carregarResumoAcesso`.
+
+⚠️ `perfis.nexus_status='active'` marca **44** pessoas e as concessões
+`origem='nexus'` vigentes são **94**. A flag é manual e ficou para trás; o
+segmento lê a concessão.
+
+⚠️ `evento_audiencia` e `evento_visivel_para` divergem de propósito em `turma`:
+**a tela mostra e o email não sai.** Errar para mais na tela custa um card;
+errar para mais no email é irreversível.
+
+### Emails e sino do evento
+Seis momentos, todos em `lib/email/templates/evento.ts` no esqueleto dos
+templates do Nexus: **anúncio · confirmação · véspera · manhã do dia · uma hora
+antes · ao vivo**. As janelas são conta de tempo pura em
+`lib/evento/janelas.ts` (32 asserções em `scripts/testarJanelasEvento.mts`),
+fora do route porque **erram por uma hora sem dar erro nenhum**: o cron roda em
+UTC, o evento é marcado em Brasília.
+
+Os mesmos momentos vão para o sino do aluno, mais a confirmação de reserva
+(trigger em `evento_reservas`). Nenhum é `celebracao`: toast de tela cheia
+continua sendo só de conquista.
+
+### Contatos
+`contatos` (com `tags`) guarda quem se inscreveu numa live e não tem conta. A
+linha de `evento_inscricoes` morre com o evento; esta é a única parte que, não
+sendo gravada na hora, não tem como ser recuperada depois. `registrar_contato`
+**soma tags e nunca apaga campo cheio com campo vazio**; `origem` só é gravada
+no nascimento. ⚠️ A tag `nao-aluno` é fotografia da captura, não verdade
+permanente — cruzar com `usuario_id` antes de usar em campanha.
+
+## 🔴 Incidente: 624 emails gravados como enviados sem terem sido entregues — 2026-08-25
+
+Entre 06/08 e 25/08 **nenhum email desta plataforma chegou a ninguém**. O painel
+do Resend marcava "Failed" em tudo, e nada aqui dentro tinha como saber.
+
+**Causa:** o domínio `peritosacademy.com.br` passou a recusar 100% dos envios,
+com os três registros de DNS marcados como verificados e sem explicação pela
+API. Medido no mesmo minuto, mesma chave, mesmo destinatário, mudando só o
+remetente: `mhcalculos.com.br`, `nexuspericial.com.br` e `mkt.mhcalculos.com.br`
+entregaram; `peritosacademy.com.br` falhou até para `delivered@resend.dev`.
+Re-verificar não resolveu.
+
+⚠️ **O envio sai de `mkt.peritosacademy.com.br`.** Subdomínio é identidade
+separada, e é o padrão que a conta já usava nas outras duas marcas. Vale manter
+mesmo depois de a raiz voltar: reputação de envio em massa fica longe do
+domínio que também recebe email. O `replyTo` fica na raiz.
+
+**Por que ficou invisível por três semanas:** a API do Resend responde 200 com
+um id no ato e só descobre o problema depois, de forma assíncrona.
+`enviarEmail()` olhava só o campo `error`, via 200 e gravava o dedupe. **E o
+dedupe transformou a falha em permanente:** o índice único garantia que aqueles
+emails nunca mais fossem tentados.
+
+**Lição que vale para qualquer envio:** *"o provedor aceitou" nunca é "chegou".*
+A linha agora diz `aceito` · `entregue` · `falhou`, as consultas de dedupe
+ignoram `falhou` **e os índices únicos são parciais** (`where estado <>
+'falhou'`) — meio conserto aqui seria pior que nenhum, porque a consulta
+liberaria o envio e o INSERT estouraria depois de o email já ter saído.
+`/api/webhooks/resend` é quem escreve o desfecho, e ele **recusa em voz alta**
+sem `RESEND_WEBHOOK_SECRET`: a rota apaga marcação de dedupe, e aberta viraria
+um botão público de "reenviar tudo".
+
+⚠️ Marcar tudo como `falhou` **não reenvia nada**: os crons selecionam por
+janela de tempo (48h do cadastro, 7 dias de inatividade) e essas janelas já
+passaram. Quem reenvia é `scripts/reenviarApagao.mjs`, simulação por padrão.
+
+⚠️ E **não eram 624, eram 99**. `primeira_semana`, `resumo_quinzenal` e
+`inatividade` apodreceram — chegando hoje, cada um diz uma coisa falsa.
+Reenviado só o que continua verdadeiro fora da data: `carta_pessoal` e
+`curso_concluido`. 86 saíram; 13 ficaram presos no teto de uma celebração por
+dia, que **não foi contornado de propósito**.
+
+⚠️ **A chave do Resend é restrita por domínio.** A que estava no `env.local`
+alcançava só `peritosacademy.com.br` e era a que falhava. Conferir o escopo
+antes de culpar o código.
+
+⚠️ **`env.local` e `.env.local` eram duas cópias do mesmo segredo e
+divergiram** (o Next lê o segundo, os scripts leem o primeiro). Agora
+`.env.local` é link simbólico para `env.local`.
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários; `tour_visto_em` timestamptz nullable — ver seção Tour guiado; `migrado_de`/`migrado_em`/`boas_vindas_migrado_em` — aluno importado em lote, ver seção Migração de alunos da Ensinio)
 - `cursos`, `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)
@@ -500,7 +637,7 @@ Conferido sobre os 73 cursos publicados: 6 alunos → 6 conjuntos diferentes, e 
 - `avaliacoes`, `avaliacao_questoes`, `avaliacao_opcoes`, `avaliacao_tentativas`, `avaliacao_respostas` (+ views `_publicas`)
 - `desafios`, `desafio_categorias`, `desafio_entregas` (nota_minima, arquivo_path)
 - `certificados`, `perfil_insignias`, `perfil_estudo_dias`, `perfil_atividades`
-- `eventos`, `evento_reservas` (agenda), `comunidade_*` (feed/ranking, ver Bloco 2)
+- `eventos` (com `slug`, `aberto_ao_publico`, `chat_modo`), `evento_reservas`, `evento_inscricoes` (convidado sem conta), `evento_mensagens` (chat próprio, primeira tabela em Realtime) — ver "O evento tem endereço próprio", `comunidade_*` (feed/ranking, ver Bloco 2)
 - `novidades`, `novidade_leituras` (avisos/banners institucionais — diferente de `notificacoes`, ver Sistema de Notificações)
 - `notificacoes` (notificações pessoais/sino), `admin_usuarios` (papéis do admin)
 - `config_gamificacao`, `gamificacao_gatilhos`, `gamificacao_niveis`, `gamificacao_extrato` (ledger de XP/moedas, ver seção Gamificação)
@@ -508,6 +645,7 @@ Conferido sobre os 73 cursos publicados: 6 alunos → 6 conjuntos diferentes, e 
 - `nexus_cta_config`, `nexus_cta_copies`, `nexus_cta_bloqueio`, `nexus_cta_interactions` (sugestões do MH Nexus — ver seção própria; `perfis.nexus_status` é flag manual, não há sync com o Nexus)
 - `acessos_conteudo`, `acessos_excecoes` (concessões de acesso por curso/trilha/biblioteca com vigência — **o gate de conteúdo não é mais só `assinaturas`**, ver seção Migração de alunos da Ensinio), `migracao_alunos` (histórico da importação, uma linha por aluno × produto)
 - `admin_log_acoes_usuario` (log unificado de ações administrativas sobre um aluno — suspender/reativar/banir/resetar senha/ajuste de gamificação/certificado manual, ver seção Usuários)
+- `contatos` (base de contatos com tags, alimentada pelas lives), `email_convidados_enviados`, `email_optout_publico` (email para quem não tem conta)
 - `config_plataforma` (registro único — identidade, contato, textos institucionais, comportamento, SEO; leitura pública `using (true)`, ver seção Configurações)
 - Bucket Storage `planilhas` (privado, uploads de aluno/documentos), `capas` (público, imagens de capa), `capas-cursos` (público, capas horizontais/verticais de curso + thumbnails de aula — criado na migração Ensinio, ver seção da migração), `materiais-aulas` (privado, anexos de aula — ver seção Materiais complementares)
 - Tabelas duplicadas/legadas — nunca usadas pelo app, não construir em cima: `posts`/`post_comentarios`/`post_reacoes` (substituídas por `comunidade_*`), `duvidas`/`duvida_respostas` (substituídas por `aula_duvidas`), `questoes`/`tentativas`/`materiais`/`progresso_aulas`, `planos` (feature dormente "meu plano de estudo" do aluno, sem leitura/escrita em código), `matriculas` (resquício de modelo antigo, sem leitura/escrita em código — o gate de acesso atual é por assinatura **ou** por concessão em `acessos_conteudo`, ver seções Financeiro e Migração de alunos da Ensinio)

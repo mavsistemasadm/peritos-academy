@@ -295,3 +295,63 @@ function janelaDoChatAberta(iniciaEm: string | null, duracaoSeg: number): boolea
   const agora = Date.now()
   return agora >= inicio - 60 * 60_000 && agora <= inicio + duracaoSeg * 1000 + 6 * 60 * 60_000
 }
+
+
+// ══════════════════════════════════════════════════════════════════
+// ESCONDER UMA MENSAGEM
+//
+// Um chat aberto a quem não tem conta, numa página que circula por WhatsApp,
+// sem botão de remover, é um problema esperando a primeira live cheia. Até
+// aqui isso só existia por SQL — ou seja, não existia: ninguém abre o SQL
+// Editor no meio de uma transmissão.
+//
+// ⚠️ ESCONDE, NÃO APAGA. `oculta_em` some da tela e a linha fica, com quem
+// escondeu. Um chat de live é registro do que foi perguntado; apagar por
+// engano no meio de uma transmissão movimentada não teria volta, e a moderação
+// precisa poder ser revista depois.
+//
+// A remoção da tela de quem JÁ ESTÁ ASSISTINDO vem do Realtime: o componente
+// assina UPDATE justamente por isto. Sem essa parte, a mensagem sumiria só
+// para quem recarregasse — que não é a pessoa de quem se quis esconder.
+// ══════════════════════════════════════════════════════════════════
+export async function ocultarMensagemEvento(
+  mensagemId: string,
+): Promise<{ ok: true } | { ok: false; erro: string }> {
+  const servidor = await criarClienteServidor()
+  const { data: auth } = await servidor.auth.getUser()
+  if (!auth?.user) return { ok: false, erro: 'Entre para moderar.' }
+
+  const supabase = criarClienteServico()
+
+  const { data: msg } = await supabase
+    .from('evento_mensagens')
+    .select('id, evento_id')
+    .eq('id', mensagemId)
+    .maybeSingle()
+  if (!msg) return { ok: false, erro: 'Mensagem não encontrada.' }
+
+  const [{ data: admin }, { data: ev }] = await Promise.all([
+    supabase.rpc('is_admin_papel', {
+      uid: auth.user.id,
+      papeis: ['super_admin', 'moderador', 'conteudo'],
+    }),
+    supabase.from('eventos').select('criado_por, slug').eq('id', msg.evento_id).maybeSingle(),
+  ])
+
+  if (admin !== true && ev?.criado_por !== auth.user.id) {
+    return { ok: false, erro: 'Sem permissão para moderar este chat.' }
+  }
+
+  const { error } = await supabase
+    .from('evento_mensagens')
+    .update({ oculta_em: new Date().toISOString(), oculta_por: auth.user.id })
+    .eq('id', mensagemId)
+
+  if (error) {
+    console.error('[chat evento] falha ao ocultar:', error)
+    return { ok: false, erro: 'Não consegui esconder agora.' }
+  }
+
+  if (ev?.slug) revalidatePath(`/evento/${ev.slug}`)
+  return { ok: true }
+}

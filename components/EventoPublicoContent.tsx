@@ -146,6 +146,7 @@ function Transmissao({ ev, youtubeId, aoVivo, podeFalarNoChat }: {
           eventoId={ev.id}
           inicial={ev.chat}
           podeFalar={podeFalarNoChat}
+          podeModerar={ev.ehDaCasa}
           motivoBloqueio={ev.logado
             ? 'Reserve seu lugar acima para falar no chat.'
             : 'Deixe seu nome e email acima para falar no chat.'}

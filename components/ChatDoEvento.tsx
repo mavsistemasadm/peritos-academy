@@ -24,9 +24,9 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { criarClienteBrowser } from '@/lib/supabase/client'
-import { enviarMensagemEvento } from '@/app/evento/[slug]/actions'
+import { enviarMensagemEvento, ocultarMensagemEvento } from '@/app/evento/[slug]/actions'
 import type { MensagemEvento } from '@/lib/queries/evento-chat'
-import { IconeMessageCircle, IconeSend } from '@/components/Icones'
+import { IconeMessageCircle, IconeSend, IconeEye } from '@/components/Icones'
 
 const fmtHora = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit',
@@ -39,9 +39,11 @@ type Props = {
   podeFalar: boolean
   /** O que dizer a quem não pode falar. */
   motivoBloqueio: string
+  /** Quem conduz vê o botão de esconder em cada mensagem. */
+  podeModerar: boolean
 }
 
-export default function ChatDoEvento({ eventoId, inicial, podeFalar, motivoBloqueio }: Props) {
+export default function ChatDoEvento({ eventoId, inicial, podeFalar, motivoBloqueio, podeModerar }: Props) {
   const [mensagens, setMensagens] = useState<MensagemEvento[]>(inicial)
   const [texto, setTexto] = useState('')
   const [erro, setErro] = useState('')
@@ -137,6 +139,24 @@ export default function ChatDoEvento({ eventoId, inicial, podeFalar, motivoBloqu
               <time>{fmtHora.format(new Date(m.criadoEm))}</time>
             </span>
             <span className="ev-msg-texto">{m.texto}</span>
+            {podeModerar && (
+              <button
+                type="button"
+                className="ev-msg-ocultar"
+                title="Esconder esta mensagem de todo mundo"
+                onClick={() => {
+                  // Some da tela de quem moderou na hora; para o resto da sala
+                  // quem tira é o Realtime, ao ver o UPDATE.
+                  setMensagens(atual => atual.filter(x => x.id !== m.id))
+                  ocultarMensagemEvento(m.id).then(r => {
+                    if (!r.ok) { setErro(r.erro); setMensagens(atual => [...atual, m].sort(
+                      (a, b) => +new Date(a.criadoEm) - +new Date(b.criadoEm))) }
+                  })
+                }}
+              >
+                <IconeEye size={12} strokeWidth={2} /> esconder
+              </button>
+            )}
           </div>
         ))}
         <div ref={fim} />

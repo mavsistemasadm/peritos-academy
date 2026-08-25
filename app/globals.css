@@ -6723,3 +6723,18 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 .pagina-evento .ev-forma.no-ar{max-width:380px;padding:var(--s-3)}
 .pagina-evento .ev-forma.no-ar .ev-forma-cab{font-size:13.5px;margin-bottom:var(--s-2)}
 .pagina-evento .ev-forma.no-ar .ev-forma-rodape{font-size:11.5px}
+
+/* Botão de esconder mensagem: só quem conduz vê, e ele fica discreto até o
+   mouse passar. Numa live movimentada, um botão vermelho por mensagem
+   transformaria o chat numa lista de alertas. */
+.pagina-evento .ev-msg-ocultar{
+  align-self:flex-start;display:inline-flex;align-items:center;gap:4px;
+  margin-top:2px;padding:1px 6px;border-radius:6px;
+  font-size:10.5px;font-weight:600;color:#6C736D;
+  opacity:0;transition:opacity .18s,color .18s,background .18s;
+}
+.pagina-evento .ev-msg:hover .ev-msg-ocultar,
+.pagina-evento .ev-msg-ocultar:focus-visible{opacity:1}
+.pagina-evento .ev-msg-ocultar:hover{color:#FF9E9E;background:rgba(255,90,90,.12)}
+/* Sem hover (toque), fica sempre visível: esconder no dedo é o único jeito. */
+@media(hover:none){.pagina-evento .ev-msg-ocultar{opacity:.65}}
