@@ -52,6 +52,21 @@ export type Janela = {
 
 export const JANELAS: Janela[] = [
   {
+    momento: 'vespera',
+    tipo: 'evento_vespera',
+    // Mesma hora do "é hoje", 24 horas antes. Sair na mesma faixa do dia é o
+    // que evita o lembrete da véspera cair às três da manhã só porque o
+    // encontro é às três da manhã do dia seguinte.
+    faixa: agora => {
+      const sp = new Date(agora - OFFSET_BRASILIA)
+      const horaSp = sp.getUTCHours()
+      if (horaSp < MANHA_DE || horaSp > MANHA_ATE) return null
+      const inicioDeAmanha = Date.UTC(sp.getUTCFullYear(), sp.getUTCMonth(), sp.getUTCDate() + 1, 0, 0, 0) + OFFSET_BRASILIA
+      const fimDeAmanha = Date.UTC(sp.getUTCFullYear(), sp.getUTCMonth(), sp.getUTCDate() + 2, 0, 0, 0) + OFFSET_BRASILIA
+      return { de: inicioDeAmanha - agora, ate: fimDeAmanha - agora }
+    },
+  },
+  {
     momento: 'hoje',
     tipo: 'evento_hoje',
     // Depende da HORA DO DIA, e não de uma distância até o evento: o que se

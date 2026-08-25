@@ -62,6 +62,19 @@ console.log('\n── "é hoje": só de manhã, e só com folga ──')
     !pega('hoje', manha8UltimoDia, brasilia(2027, 1, 1, 0, 30)))
 }
 
+console.log('\n── "é amanhã": só de manhã, e só para o dia seguinte ──')
+{
+  const manha8 = brasilia(2026, 9, 5, 8)
+  checar('live de amanhã às 20h entra', pega('vespera', manha8, brasilia(2026, 9, 6, 20)))
+  checar('live de amanhã às 00h30 entra', pega('vespera', manha8, brasilia(2026, 9, 6, 0, 30)))
+  checar('live de HOJE às 20h NÃO entra', !pega('vespera', manha8, brasilia(2026, 9, 5, 20)))
+  checar('live de depois de amanhã NÃO entra', !pega('vespera', manha8, brasilia(2026, 9, 7, 20)))
+  checar('às 12h a janela está fechada', janela('vespera').faixa(brasilia(2026, 9, 5, 12)) === null)
+  // Virada de mês: 31 de agosto avisa do dia 1 de setembro.
+  checar('vira do mês: em 31/08 avisa da live de 01/09',
+    pega('vespera', brasilia(2026, 8, 31, 8), brasilia(2026, 9, 1, 20)))
+}
+
 console.log('\n── "daqui a uma hora" ──')
 {
   const agora = brasilia(2026, 9, 5, 19)

@@ -2,14 +2,21 @@
 // lib/email/templates/evento.ts — OS QUATRO EMAILS DE UM ENCONTRO
 //
 //   1. confirmação  · na hora em que a pessoa se inscreve
-//   2. hoje         · na manhã do dia do evento
-//   3. comecando    · uma hora antes
-//   4. ao_vivo      · quando entra no ar
+//   2. vespera      · na manhã do dia anterior
+//   3. hoje         · na manhã do dia do evento
+//   4. comecando    · uma hora antes
+//   5. ao_vivo      · quando entra no ar
 //
-// Quatro momentos, um arquivo, porque são a mesma peça em quatro tempos: você
-// está dentro · é hoje · daqui a uma hora · estamos no ar. O que muda entre
-// eles é a urgência e o que o botão faz, e ver os quatro lado a lado é o que
-// impede o último de nascer com o tom do primeiro.
+// Cinco momentos, um arquivo, porque são a mesma peça em cinco tempos: você
+// está dentro · é amanhã · é hoje · daqui a uma hora · estamos no ar. O que
+// muda entre eles é a urgência e o que o botão faz, e ver os cinco lado a lado
+// é o que impede o último de nascer com o tom do primeiro.
+//
+// ⚠️ O da véspera e o da manhã saem com 24 horas de diferença e no mesmo
+// horário. Se os dois dissessem a mesma coisa, o segundo viraria ruído e
+// ensinaria a pessoa a ignorar os próximos. Por isso o da véspera fala do
+// CALENDÁRIO (reserve o horário, avise quem precisa) e o da manhã fala do DIA
+// (é hoje, deixa o link à mão).
 //
 // ── O ESQUELETO É O DOS EMAILS DO NEXUS ──
 //
@@ -56,7 +63,7 @@ export type DadosEmailEvento = {
   linkCalendario: string | null
 }
 
-export type MomentoEvento = 'confirmacao' | 'hoje' | 'comecando' | 'ao_vivo'
+export type MomentoEvento = 'confirmacao' | 'vespera' | 'hoje' | 'comecando' | 'ao_vivo'
 
 const COPY: Record<MomentoEvento, {
   etiqueta: string
@@ -77,6 +84,18 @@ const COPY: Record<MomentoEvento, {
       + (d.apresentador ? ` Quem conduz é ${d.apresentador}.` : ''),
       'Vou te lembrar na manhã do dia, uma hora antes e quando estivermos entrando no ar. '
       + 'Você não precisa se preocupar em anotar.',
+    ],
+    botao: 'Ver a página do encontro',
+  },
+  vespera: {
+    etiqueta: 'É amanhã',
+    preheader: d => `Amanhã, ${d.dia.split(',')[0].toLowerCase()}, às ${d.horario}.`,
+    assunto: d => `Amanhã às ${d.horario}: ${cortar(d.titulo, 38)}`,
+    corpo: d => [
+      `É amanhã, ${d.dia.split(',')[0].toLowerCase()}, às ${d.horario}.`,
+      `Avisando com um dia para você conseguir segurar o horário. São ${d.duracao}, e vale mais estar `
+      + 'inteiro nesse tempo do que dividido com outra coisa.',
+      'Se depender de alguém para ficar livre nesse horário, hoje ainda dá tempo de combinar.',
     ],
     botao: 'Ver a página do encontro',
   },

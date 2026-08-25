@@ -61,7 +61,9 @@ const dados = {
   linkCalendario: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Sala+de+an%C3%A1lise',
 }
 
-const MOMENTOS: MomentoEvento[] = ['confirmacao', 'hoje', 'comecando', 'ao_vivo']
+const MOMENTOS: MomentoEvento[] = ['confirmacao', 'vespera', 'hoje', 'comecando', 'ao_vivo']
+
+const ids: [string, string][] = []
 
 for (const momento of MOMENTOS) {
   const { assunto, html } = emailEvento(momento, dados)
@@ -69,16 +71,29 @@ for (const momento of MOMENTOS) {
     method: 'POST',
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      from: 'Peritos Academy <noreply@peritosacademy.com.br>',
+      from: 'Peritos Academy <noreply@mkt.peritosacademy.com.br>',
       replyTo: 'marlos@peritosacademy.com.br',
       to: destino,
-      subject: `[${momento}] ${assunto}`,
+      subject: assunto,
       html: injetarDescadastro(html, destino),
     }),
   })
   const corpo = await r.json() as { id?: string; message?: string }
-  console.log(`${momento.padEnd(12)} ${r.ok ? 'enviado  ' + corpo.id : 'FALHOU · ' + corpo.message}`)
+  console.log(`${momento.padEnd(12)} ${r.ok ? corpo.id : 'FALHOU · ' + corpo.message}`)
+  if (corpo.id) ids.push([momento, corpo.id])
   // O Resend limita a 2 requisições por segundo; sem a pausa, o terceiro
   // e o quarto voltam 429 e o teste "passa" com dois emails a menos.
   await new Promise(r => setTimeout(r, 700))
+}
+
+// Confirma a ENTREGA, e não só o aceite: o Resend responde 200 antes de saber
+// se vai conseguir, e foi exatamente isso que escondeu três semanas de falha.
+console.log('\naguardando a confirmação de entrega de cada um…')
+await new Promise(r => setTimeout(r, 12_000))
+for (const [momento, id] of ids) {
+  const r = await fetch(`https://api.resend.com/emails/${id}`, {
+    headers: { Authorization: `Bearer ${env.RESEND_API_KEY}` },
+  })
+  const d = await r.json() as { last_event?: string }
+  console.log(`${momento.padEnd(12)} ${d.last_event}`)
 }
