@@ -25,6 +25,7 @@ import { SITE_URL } from '@/lib/site'
 import { gerarTokenEmail } from './token'
 
 export type TipoEmailConvidado =
+  | 'evento_anuncio'
   | 'evento_confirmacao'
   | 'evento_vespera'
   | 'evento_hoje'

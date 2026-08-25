@@ -1,13 +1,13 @@
 // components/AdminEventoEditorContent.tsx
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import type { FormEvent, ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import type { EventoAdmin } from '@/lib/queries/admin-agenda'
 import type { CursoPicker } from '@/lib/queries/admin-trilhas'
-import { atualizarEvento, uploadThumbEvento, alternarPublicacaoEvento, excluirEvento } from '@/app/admin/agenda/actions'
-import { IconeChevronLeft, IconeLink, IconeSend, IconeEye, IconeDownload } from '@/components/Icones'
+import { atualizarEvento, uploadThumbEvento, alternarPublicacaoEvento, excluirEvento, anunciarEvento, contarAudienciaEvento } from '@/app/admin/agenda/actions'
+import { IconeChevronLeft, IconeLink, IconeSend, IconeEye, IconeDownload, IconeMegaphone } from '@/components/Icones'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 import { SITE_URL } from '@/lib/site'
 
@@ -227,6 +227,81 @@ function Inscritos({ evento }: { evento: EventoAdmin }) {
   )
 }
 
+
+// ══════════════════════════════════════════════════════════════════
+// ANUNCIAR PARA OS ALUNOS
+//
+// Até aqui, publicar um evento não avisava ninguém: o card aparecia em
+// /agenda e quem não passasse por lá naquela semana nunca ficava sabendo.
+//
+// ⚠️ A contagem do público aparece ANTES do clique, e o `confirm()` repete o
+// número. Email não tem desfazer, e a diferença entre 30 e 544 destinatários
+// precisa estar na frente de quem aperta, não escondida atrás de um rótulo
+// como "Todos" — que é o que a tela de visibilidade mostra hoje.
+// ══════════════════════════════════════════════════════════════════
+function AnunciarBloco({ evento, toast }: {
+  evento: EventoAdmin
+  toast: ReturnType<typeof useAdminToast>
+}) {
+  const [publico, setPublico] = useState<number | null>(null)
+  const [pendente, start] = useTransition()
+
+  useEffect(() => {
+    if (!evento.publicado) return
+    contarAudienciaEvento(evento.id).then(setPublico).catch(() => setPublico(null))
+  }, [evento.id, evento.publicado])
+
+  function onAnunciar() {
+    const quantos = publico ?? 0
+    if (!confirm(
+      `Enviar o anúncio de "${evento.titulo}" para ${quantos} aluno${quantos === 1 ? '' : 's'}?\n\n`
+      + 'Cada um recebe um email e uma notificação no sino. Email não tem desfazer.',
+    )) return
+
+    start(async () => {
+      const r = await anunciarEvento(evento.id)
+      if (!r.ok) toast.erro(r.erro)
+      else toast.sucesso(`Anúncio enviado para ${r.enviados} de ${r.total} alunos.`)
+    })
+  }
+
+  if (!evento.publicado) {
+    return (
+      <section className="pnl-card">
+        <h2>Anunciar para os alunos</h2>
+        <p className="pnl-sub">
+          Publique o evento primeiro. Um anúncio de evento em rascunho levaria todo mundo para um 404.
+        </p>
+      </section>
+    )
+  }
+
+  const semPublico = publico === 0
+  return (
+    <section className="pnl-card">
+      <h2>Anunciar para os alunos</h2>
+      <p className="pnl-sub">
+        {publico === null
+          ? 'Contando quantos alunos receberiam…'
+          : semPublico
+            ? 'Não consegui descobrir quem é o público deste evento. Com visibilidade "Assinantes" ou "Turma", '
+              + 'o rótulo do alvo é texto livre e não aponta para ninguém no banco: use "Todos" ou '
+              + '"Alunos do curso" com um curso escolhido.'
+            : `${publico} aluno${publico === 1 ? '' : 's'} ${publico === 1 ? 'receberia' : 'receberiam'} `
+              + 'um email e uma notificação no sino, com o link para reservar. Quem já desligou os emails no '
+              + 'perfil fica de fora.'}
+      </p>
+      {!semPublico && (
+        <div className="pnl-editor-cab-acoes" style={{ marginTop: 12 }}>
+          <button type="button" className="pnl-btn-primario" disabled={pendente || publico === null} onClick={onAnunciar}>
+            <IconeMegaphone size={14} /> {pendente ? 'Enviando…' : 'Enviar anúncio'}
+          </button>
+        </div>
+      )}
+    </section>
+  )
+}
+
 export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao }: {
   evento: EventoAdmin; cursos: CursoPicker[]; ogImagePadrao: string | null
 }) {
@@ -291,6 +366,8 @@ export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao
       </div>
 
       <LinkDeDivulgacao evento={evento} toast={toast} ogImagePadrao={ogImagePadrao} />
+
+      <AnunciarBloco evento={evento} toast={toast} />
 
       <div className="pnl-editor-grid">
         <section className="pnl-card">

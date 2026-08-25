@@ -60,7 +60,27 @@ export async function carregarAgenda(): Promise<DadosAgenda> {
   }
 
   const agora = Date.now()
-  const brutos = (eventos ?? []) as Omit<Evento, 'confirmados' | 'reservado'>[]
+
+  // ⚠️ `visibilidade` existia desde o Bloco 2 e não filtrava nada: o rótulo
+  // "Exclusivo · Turma X" no card era só texto, e a mentoria fechada de uma
+  // turma aparecia para a base inteira. Ninguém ganhava acesso indevido com
+  // isso (a sala é outro portão), mas a tela prometia uma coisa e fazia outra.
+  //
+  // A regra mora em `evento_visivel_para` e é a mesma que decide o público de
+  // um anúncio por email — com uma diferença deliberada, documentada lá:
+  // quando não se sabe (assinatura, turma), a tela MOSTRA e o email NÃO SAI.
+  // Errar para mais aqui custa um card que a pessoa não podia ver; errar para
+  // mais no email é irreversível.
+  const visiveis: typeof eventos = []
+  for (const ev of eventos ?? []) {
+    const { data: pode } = await supabase.rpc('evento_visivel_para', {
+      p_evento: ev.id,
+      p_usuario: usuario?.id ?? null,
+    })
+    if (pode !== false) visiveis.push(ev)
+  }
+
+  const brutos = visiveis as Omit<Evento, 'confirmados' | 'reservado'>[]
 
   const aoVivoBruto: typeof brutos = []
   const proximosBruto: typeof brutos = []

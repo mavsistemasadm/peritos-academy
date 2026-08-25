@@ -3,6 +3,10 @@
 import { revalidatePath } from 'next/cache'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
+import { criarClienteServico } from '@/lib/supabase/servico'
+import { enviarEmailConvidado } from '@/lib/email/enviarConvidado'
+import { emailEvento } from '@/lib/email/templates/evento'
+import { dadosDoEmail, type EventoParaEmail } from '@/lib/evento/email'
 
 type Resultado = { ok: true; id?: string } | { ok: false; erro: string }
 
@@ -122,4 +126,104 @@ export async function uploadThumbEvento(id: string, formData: FormData): Promise
   if (error) return { ok: false, erro: error.message }
   revalidar(id)
   return { ok: true, thumbUrl }
+}
+
+
+// ══════════════════════════════════════════════════════════════════
+// ANUNCIAR UM EVENTO PARA OS ALUNOS
+//
+// Publicar um evento não avisava ninguém: a linha entrava em `eventos`, o card
+// aparecia em `/agenda`, e quem não passasse por lá naquela semana nunca ficava
+// sabendo. Esta é a porta que faltava.
+//
+// ── POR QUE É UM BOTÃO, E NÃO AUTOMÁTICO NA PUBLICAÇÃO ──
+//
+// `publicado` é um interruptor que se liga e desliga: para revisar o horário,
+// para corrigir o título, para tirar do ar por um minuto. Anunciar
+// automaticamente nessa transição significa que despublicar e republicar
+// manda o email de novo, e que uma correção de vírgula às onze da noite vira
+// uma leva para a base inteira.
+//
+// Email não tem desfazer. Um gesto explícito, com a contagem do público na
+// frente antes de confirmar, é a única forma de a pessoa que aperta saber para
+// quantos está mandando.
+//
+// ⚠️ RECUSA em vez de adivinhar. Se `evento_audiencia` devolver ninguém — o
+// que acontece com `visibilidade` de assinatura ou turma, que não têm do que
+// derivar o público — a ação para e explica. Mandar para todos "porque não
+// souberam para quem" é entregar ao público geral o que foi marcado como
+// exclusivo, e isso não tem volta.
+// ══════════════════════════════════════════════════════════════════
+
+type ResultadoAnuncio =
+  | { ok: true; enviados: number; total: number }
+  | { ok: false; erro: string }
+
+type Pessoa = { usuario_id: string; nome: string | null; email: string }
+
+/** Só conta o público, sem mandar nada. É o número que o botão mostra antes. */
+export async function contarAudienciaEvento(id: string): Promise<number> {
+  if (!(await checarPermissao())) return 0
+  const supabase = criarClienteServico()
+  const { data } = await supabase.rpc('evento_audiencia', { p_evento: id })
+  return (data as Pessoa[] | null)?.length ?? 0
+}
+
+export async function anunciarEvento(id: string): Promise<ResultadoAnuncio> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+
+  const supabase = criarClienteServico()
+
+  const { data: ev } = await supabase
+    .from('eventos')
+    .select('id, slug, titulo, tipo, descricao, inicia_em, duracao_seg, apresentador_nome, publicado, visibilidade')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (!ev) return { ok: false, erro: 'Evento não encontrado.' }
+  if (!ev.publicado) {
+    return { ok: false, erro: 'Publique o evento antes de anunciar: o link do anúncio responderia 404.' }
+  }
+  if (!ev.inicia_em) {
+    return { ok: false, erro: 'Defina a data e a hora antes de anunciar.' }
+  }
+
+  const { data: audienciaRaw, error: erroAud } = await supabase.rpc('evento_audiencia', { p_evento: id })
+  if (erroAud) return { ok: false, erro: erroAud.message }
+
+  const audiencia = (audienciaRaw as Pessoa[] | null) ?? []
+  if (audiencia.length === 0) {
+    return {
+      ok: false,
+      erro: ev.visibilidade === 'todos'
+        ? 'Não encontrei nenhum aluno ativo para avisar.'
+        : `Não dá para saber quem é o público de um evento com visibilidade "${ev.visibilidade}": `
+          + 'o rótulo do alvo é texto livre e não aponta para ninguém no banco. '
+          + 'Use "Todos" ou "Alunos do curso" com um curso escolhido.',
+    }
+  }
+
+  let enviados = 0
+  for (const pessoa of audiencia) {
+    const { assunto, html } = emailEvento('anuncio', dadosDoEmail(ev as EventoParaEmail, pessoa.nome ?? 'Perito'))
+    const r = await enviarEmailConvidado({
+      para: pessoa.email,
+      tipo: 'evento_anuncio',
+      refId: ev.id,
+      assunto,
+      html,
+    })
+    if (r.enviado) enviados++
+
+    // O sino junto com o email, pelo mesmo motivo dos lembretes: são dois
+    // canais, e o de dentro não deve depender do de fora ter funcionado.
+    await supabase.rpc('notificar_anuncio_evento', { p_usuario: pessoa.usuario_id, p_evento: ev.id })
+
+    // O Resend aceita 2 por segundo. Sem a pausa, uma base de 544 devolve
+    // metade em 429 e o anúncio "termina" tendo alcançado metade.
+    await new Promise(res => setTimeout(res, 600))
+  }
+
+  revalidar(id)
+  return { ok: true, enviados, total: audiencia.length }
 }

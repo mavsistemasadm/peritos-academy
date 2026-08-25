@@ -1,13 +1,14 @@
 // ══════════════════════════════════════════════════════════════════
 // lib/email/templates/evento.ts — OS QUATRO EMAILS DE UM ENCONTRO
 //
+//   0. anuncio      · quando o encontro entra na agenda
 //   1. confirmação  · na hora em que a pessoa se inscreve
 //   2. vespera      · na manhã do dia anterior
 //   3. hoje         · na manhã do dia do evento
 //   4. comecando    · uma hora antes
 //   5. ao_vivo      · quando entra no ar
 //
-// Cinco momentos, um arquivo, porque são a mesma peça em cinco tempos: você
+// Seis momentos, um arquivo, porque são a mesma peça em cinco tempos: você
 // está dentro · é amanhã · é hoje · daqui a uma hora · estamos no ar. O que
 // muda entre eles é a urgência e o que o botão faz, e ver os cinco lado a lado
 // é o que impede o último de nascer com o tom do primeiro.
@@ -48,6 +49,10 @@
 
 export type DadosEmailEvento = {
   primeiroNome: string
+  /** Só o anúncio usa. É o que responde "por que isto está na minha caixa". */
+  descricao?: string | null
+  /** "Sala de análise", "Aula ao vivo"… Só o anúncio usa. */
+  tipoRotulo?: string | null
   titulo: string
   /** "Sábado, 5 de setembro · 20h00, horário de Brasília" */
   quando: string
@@ -63,7 +68,7 @@ export type DadosEmailEvento = {
   linkCalendario: string | null
 }
 
-export type MomentoEvento = 'confirmacao' | 'vespera' | 'hoje' | 'comecando' | 'ao_vivo'
+export type MomentoEvento = 'anuncio' | 'confirmacao' | 'vespera' | 'hoje' | 'comecando' | 'ao_vivo'
 
 const COPY: Record<MomentoEvento, {
   etiqueta: string
@@ -73,6 +78,19 @@ const COPY: Record<MomentoEvento, {
   corpo: (d: DadosEmailEvento) => string[]
   botao: string
 }> = {
+  anuncio: {
+    etiqueta: 'Novo na agenda',
+    preheader: d => `${d.dia}, às ${d.horario}. Reserve seu lugar.`,
+    assunto: d => `${d.tipoRotulo ?? 'Novo encontro'}: ${cortar(d.titulo, 42)}`,
+    corpo: d => [
+      `Marquei um encontro novo, e queria que você soubesse antes de ver na agenda.`,
+      d.descricao?.trim()
+        || (d.apresentador ? `Quem conduz é ${d.apresentador}.` : 'Detalhes na página do encontro.'),
+      `É ${d.dia.toLowerCase()}, às ${d.horario}, e dura ${d.duracao}. `
+      + 'Reservar leva um minuto e garante que eu te lembre na véspera, na manhã do dia e na hora.',
+    ],
+    botao: 'Reservar meu lugar',
+  },
   confirmacao: {
     etiqueta: 'Inscrição confirmada',
     preheader: d => `Seu lugar está garantido. ${d.dia}, às ${d.horario}.`,

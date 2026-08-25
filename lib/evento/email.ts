@@ -23,6 +23,17 @@ export type EventoParaEmail = {
   id: string; slug: string; titulo: string
   inicia_em: string | null; duracao_seg: number
   descricao: string | null; apresentador_nome: string | null
+  tipo?: string | null
+}
+
+/** Os mesmos rótulos da tela. Um evento não pode se chamar "sala_analise" no
+ *  assunto de um email. */
+const TIPO_ROTULO: Record<string, string> = {
+  sala_analise: 'Sala de análise',
+  aula_ao_vivo: 'Aula ao vivo',
+  plantao: 'Plantão de dúvidas',
+  mentoria: 'Mentoria de turma',
+  lancamento: 'Lançamento',
 }
 
 export function dadosDoEmail(ev: EventoParaEmail, nome: string): DadosEmailEvento {
@@ -34,6 +45,8 @@ export function dadosDoEmail(ev: EventoParaEmail, nome: string): DadosEmailEvent
     horario: horario(ev.inicia_em),
     duracao: duracaoCurta(ev.duracao_seg),
     apresentador: ev.apresentador_nome,
+    descricao: ev.descricao,
+    tipoRotulo: ev.tipo ? TIPO_ROTULO[ev.tipo] ?? null : null,
     url: `${SITE_URL}/evento/${ev.slug}`,
     linkCalendario: linkCalendario(ev),
   }
