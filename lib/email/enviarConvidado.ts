@@ -26,7 +26,7 @@ import { gerarTokenEmail } from './token'
 
 export type TipoEmailConvidado =
   | 'evento_confirmacao'
-  | 'evento_vespera'
+  | 'evento_hoje'
   | 'evento_comecando'
   | 'evento_ao_vivo'
 

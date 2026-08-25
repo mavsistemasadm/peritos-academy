@@ -365,36 +365,76 @@ export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao
                 <input name="alvo_rotulo" defaultValue={evento.alvoRotulo ?? ''} placeholder="Ex.: Turma de Perícia Bancária" />
               </label>
             </div>
-            <label>Observação extra
-              <input name="meta_extra" defaultValue={evento.metaExtra ?? ''} />
+            <label>Recado curto
+              <input name="meta_extra" defaultValue={evento.metaExtra ?? ''} placeholder="Ex.: Traga um extrato seu" />
+              <small>Uma linha que aparece no card do evento, abaixo do apresentador. Deixe vazio se não tiver.</small>
             </label>
-            <div className="pnl-form-linha">
-              <label className="pnl-checkbox-linha">
-                <input type="checkbox" name="gravar" defaultChecked={evento.gravar} />
-                Gravar
-              </label>
-              <label className="pnl-checkbox-linha">
-                <input type="checkbox" name="lembrete" defaultChecked={evento.lembrete} />
-                Enviar lembrete
-              </label>
-              <label className="pnl-checkbox-linha">
-                <input type="checkbox" name="publicar_feed" defaultChecked={evento.publicarFeed} />
-                Publicar no feed da comunidade
-              </label>
-            </div>
-            {/* Live aberta: quem não é aluno se inscreve com nome e email pela
-                página pública e recebe os lembretes. Fica separada dos três
-                acima porque não é um detalhe de produção — é quem pode entrar. */}
-            <div className="pnl-form-linha">
-              <label className="pnl-checkbox-linha">
+
+            {/* ══════════════════════════════════════════════════
+                Estes cinco interruptores estavam espalhados em duas fileiras
+                iguais às dos campos de texto, o que os esticava pela largura
+                toda e não dizia o que nenhum deles fazia. Agora são cartões,
+                cada um com uma linha explicando a consequência de ligar.
+
+                "Aberto a quem não é aluno" vem primeiro porque é o único que
+                muda quem pode entrar; os outros quatro são detalhes de
+                produção.
+                ══════════════════════════════════════════════════ */}
+            <fieldset className="pnl-opcoes">
+              <legend>Como este encontro funciona</legend>
+
+              <label className="pnl-opcao pnl-opcao-destaque">
                 <input type="checkbox" name="aberto_ao_publico" defaultChecked={evento.abertoAoPublico} />
-                Aberto a quem não é aluno
+                <span>
+                  <b>Aberto a quem não é aluno</b>
+                  <small>
+                    A página pública passa a pedir nome e email de quem não tem conta, confirma por
+                    email e manda os lembretes. Use nas lives de divulgação.
+                  </small>
+                </span>
               </label>
-              <label className="pnl-checkbox-linha">
+
+              <label className="pnl-opcao">
+                <input type="checkbox" name="lembrete" defaultChecked={evento.lembrete} />
+                <span>
+                  <b>Enviar lembretes por email</b>
+                  <small>
+                    Três emails para quem se inscreveu: na manhã do dia, uma hora antes e quando
+                    a transmissão entra no ar.
+                  </small>
+                </span>
+              </label>
+
+              <label className="pnl-opcao">
                 <input type="checkbox" name="chat_ao_vivo" defaultChecked={evento.chatAoVivo} />
-                Embutir o chat do YouTube
+                <span>
+                  <b>Embutir o chat do YouTube</b>
+                  <small>
+                    Mostra o chat ao lado do vídeo. Desligue quando a transmissão não tiver chat,
+                    senão aparece uma caixa de aviso do YouTube dentro da página.
+                  </small>
+                </span>
               </label>
-            </div>
+
+              <label className="pnl-opcao">
+                <input type="checkbox" name="gravar" defaultChecked={evento.gravar} />
+                <span>
+                  <b>Vai ser gravado</b>
+                  <small>
+                    Só anota a intenção. A gravação em si é o link que você cola em
+                    &quot;Link da gravação&quot;, depois do encontro.
+                  </small>
+                </span>
+              </label>
+
+              <label className="pnl-opcao">
+                <input type="checkbox" name="publicar_feed" defaultChecked={evento.publicarFeed} />
+                <span>
+                  <b>Publicar no feed da comunidade</b>
+                  <small>Anuncia o encontro para os alunos dentro da Comunidade.</small>
+                </span>
+              </label>
+            </fieldset>
             <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar evento'}</button>
           </form>
         </section>

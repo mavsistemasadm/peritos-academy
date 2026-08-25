@@ -6616,3 +6616,39 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 }
 .pagina-evento .ev-nexus-grade span{display:block;font-size:12.5px;color:var(--cinza);line-height:1.45}
 .pagina-evento .ev-nexus-acao{display:flex;gap:var(--s-2);flex-wrap:wrap}
+
+/* ---------- opções de um evento (admin) ----------
+   Eram checkboxes soltos dentro de .pnl-form-linha, que é um flex de colunas
+   iguais: cada caixinha ganhava um terço da largura da tela e o rótulo ficava
+   boiando longe da seguinte. Cartão com a explicação embaixo resolve as duas
+   coisas de uma vez: alinha e diz o que o interruptor faz. */
+.pagina-admin .pnl-opcoes{
+  border:1px solid var(--linha);border-radius:14px;
+  padding:var(--s-3) var(--s-3) var(--s-2);margin:var(--s-3) 0 0;
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;
+}
+@media(max-width:900px){.pagina-admin .pnl-opcoes{grid-template-columns:1fr}}
+.pagina-admin .pnl-opcoes legend{
+  padding:0 8px;font-size:11px;font-weight:660;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--cinza);
+}
+.pagina-admin .pnl-opcao{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:12px 14px;border:1px solid var(--linha-suave);border-radius:12px;
+  background:rgba(255,255,255,.02);cursor:pointer;
+  transition:border-color .2s,background .2s;
+}
+.pagina-admin .pnl-opcao:hover{background:rgba(255,255,255,.045)}
+.pagina-admin .pnl-opcao:has(input:checked){border-color:rgba(32,217,166,.4)}
+.pagina-admin .pnl-opcao input{margin-top:2px;flex-shrink:0;accent-color:var(--verde)}
+.pagina-admin .pnl-opcao b{display:block;font-size:13.5px;font-weight:600;margin-bottom:3px}
+.pagina-admin .pnl-opcao small{display:block;font-size:12px;line-height:1.45;color:var(--cinza)}
+/* O que decide quem entra ocupa a linha inteira, acima dos detalhes de produção. */
+.pagina-admin .pnl-opcao-destaque{grid-column:1 / -1}
+.pagina-admin .pnl-opcao-destaque:has(input:checked){
+  background:linear-gradient(120deg,rgba(32,217,166,.10),rgba(255,255,255,.02));
+}
+/* Dica sob um campo de texto do formulário do admin. */
+.pagina-admin .pnl-form label > small{
+  display:block;margin-top:5px;font-size:12px;line-height:1.45;color:var(--cinza);
+}
