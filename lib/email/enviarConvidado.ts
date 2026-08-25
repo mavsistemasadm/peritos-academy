@@ -63,12 +63,53 @@ type Resultado = { enviado: boolean; motivo?: string }
  */
 const REMETENTE = 'Peritos Academy <noreply@peritosacademy.com.br>'
 
+/** A frase exata do rodapé do template. Se ela mudar lá, muda aqui. */
+const FRASE_DESCADASTRO = 'Não quero mais receber estes e-mails'
+
+function urlDescadastro(email: string) {
+  return `${SITE_URL}/api/email/descadastrar?token=${gerarTokenEmail(email)}`
+}
+
+/**
+ * ⚠️ Já quebrou uma vez, exatamente como o comentário do template avisava que
+ * quebraria: o texto do rodapé mudou e este replace continuou procurando a
+ * frase antiga. Não deu erro, não apareceu em log nenhum, e os emails saíram
+ * com a frase em texto morto, sem link. Descadastro que não descadastra é
+ * denúncia de spam esperando acontecer.
+ *
+ * Por isso a frase agora é uma constante e a função avisa quando não acha.
+ */
 function injetarDescadastro(html: string, email: string): string {
-  const url = `${SITE_URL}/email/cancelar?token=${gerarTokenEmail(email)}`
+  if (!html.includes(FRASE_DESCADASTRO)) {
+    console.error(
+      `[email convidado] rodapé sem "${FRASE_DESCADASTRO}": o email vai sair sem link de descadastro. `
+      + 'Alguém mudou o texto do template sem mudar FRASE_DESCADASTRO.',
+    )
+    return html
+  }
   return html.replace(
-    'Cancelar inscrição',
-    `<a href="${url}" style="color:#b4bac6;text-decoration:underline;">Cancelar inscrição</a>`,
+    FRASE_DESCADASTRO,
+    `<a href="${urlDescadastro(email)}" style="color:#A3ABA6;text-decoration:underline;">${FRASE_DESCADASTRO}</a>`,
   )
+}
+
+/**
+ * O QUE FAZ ESTE EMAIL SER ENTREGUE, E NÃO SÓ ACEITO.
+ *
+ * Gmail e Yahoo exigem descadastro de um clique de quem manda em volume desde
+ * fevereiro de 2024. Sem estes dois cabeçalhos a mensagem não é recusada: ela
+ * é despriorizada, cai na aba de promoções ou em spam. O Resend responde
+ * "enviado", o log concorda, e ninguém lê.
+ *
+ * `List-Unsubscribe-Post` é o que promete o clique único, e a rota
+ * /api/email/descadastrar é quem cumpre. Prometer sem cumprir é pior que não
+ * prometer: o provedor chama a rota sozinho e anota quem não atende.
+ */
+function cabecalhosDeLista(email: string) {
+  return {
+    'List-Unsubscribe': `<${urlDescadastro(email)}>, <mailto:suporte@peritosacademy.com.br?subject=unsubscribe>`,
+    'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+  }
 }
 
 export async function enviarEmailConvidado(entrada: Entrada): Promise<Resultado> {
@@ -120,6 +161,7 @@ export async function enviarEmailConvidado(entrada: Entrada): Promise<Resultado>
       to: email,
       subject: entrada.assunto,
       html: injetarDescadastro(entrada.html, email),
+      headers: cabecalhosDeLista(email),
     })
     if (error) {
       console.error('[email convidado] Resend recusou:', error)
