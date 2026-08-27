@@ -580,6 +580,48 @@ sendo gravada na hora, não tem como ser recuperada depois. `registrar_contato`
 no nascimento. ⚠️ A tag `nao-aluno` é fotografia da captura, não verdade
 permanente — cruzar com `usuario_id` antes de usar em campanha.
 
+## 🔴 Incidente: nenhuma avaliação da plataforma podia ser enviada — 2026-08-27
+
+**Desde 12/07/2026, o botão "Emitir laudo" nunca funcionou para ninguém.** Zero
+linhas em `avaliacao_tentativas` na plataforma inteira, com 37 avaliações
+publicadas e 297 questões. Chegou como três relatos de alunas (casos 0403, 0424
+e 0428, em três cursos diferentes) — não eram três bugs, era um só, e valia para
+toda avaliação e toda prova.
+
+**Causa:** a server action `submeter` era declarada **dentro** do componente em
+`app/curso/[slug]/avaliacao/[avaliacaoId]/page.tsx`, com `"use server"` no corpo
+da função. Nessa forma o Next **não leva junto as variáveis do escopo em volta**:
+o flight serializava a ação com `"bound":null` e, no servidor,
+`avaliacaoId is not defined` derrubava a chamada antes da RPC. Nada era gravado,
+então nem rastro ficava.
+
+⚠️ **O erro é invisível de fora.** Em produção o Next troca a mensagem por
+"An error occurred in the Server Components render. The specific message is
+omitted in production builds" — a mesma frase para qualquer falha de action. Foi
+preciso reproduzir localmente (dev devolve a mensagem real) para ver o
+`ReferenceError`.
+
+**Correção:** a action mora em `actions.ts` próprio, no padrão do resto do
+projeto, e o id chega por `submeterAvaliacao.bind(null, avaliacaoId)` — que o
+Next serializa cifrado, então o cliente continua sem escolher qual avaliação
+corrige. Regra que fica: **`"use server"` só no topo de um arquivo, nunca dentro
+de um componente.** Era o único lugar do projeto que fazia isso.
+
+⚠️ Dois defeitos que só apareceram porque este caminho nunca tinha rodado:
+
+- O feedback por IA lia `sb.from("questoes")`, tabela **legada e vazia** (a real
+  é `avaliacao_questoes`) — a Claude receberia "Quesito" no lugar do enunciado em
+  todo erro corrigido.
+- A correção com muitos erros leva **~13s** (uma chamada à Haiku por submissão),
+  acima do teto padrão da Vercel. `export const maxDuration = 60` na rota. Sem
+  isso o estouro derrubaria a resposta **depois** de a tentativa já estar
+  gravada, que é o pior desfecho: o aluno vê erro e a nota fica lançada.
+
+**Do lado do banco não havia nada errado** — a RPC `submeter_avaliacao` foi
+exercitada por SQL direto e por PostgREST com JWT real de usuário descartável
+(nota, XP, gabarito e gate de sequência corretos), e as tentativas de teste foram
+apagadas.
+
 ## 🔴 Incidente: 624 emails gravados como enviados sem terem sido entregues — 2026-08-25
 
 Entre 06/08 e 25/08 **nenhum email desta plataforma chegou a ninguém**. O painel
