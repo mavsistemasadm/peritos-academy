@@ -49,6 +49,29 @@ export async function GET(request: NextRequest) {
       (extrato ?? []).map((e) => new Date(e.criado_em).toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" }))
     ).size;
 
+    // ══════════════════════════════════════════════════════
+    // ⚠️ QUEM NÃO ASSISTIU NADA NÃO RECEBE ESTE E-MAIL — 31/08/2026
+    // ══════════════════════════════════════════════════════
+    // Este e-mail é uma CELEBRAÇÃO, e o texto dele afirma coisas: "olha o que
+    // já aconteceu", "Turista cria a conta e some. Você criou a conta e ficou",
+    // "A primeira semana é onde se separa quem veio ficar de quem só veio
+    // olhar. Você ficou."
+    //
+    // Sem esta guarda, ele saía com "0 aulas concluídas · 1 dias ativos" logo
+    // abaixo dessas frases. Aconteceu, e está medido: o comprador do PJe-Calc
+    // de 15/08 recebeu "Sua primeira semana" tendo feito um login e nenhuma
+    // aula. A pessoa que MENOS deveria receber um parabéns é justamente quem o
+    // recebeu.
+    //
+    // Não é perda de contato: quem não assistiu nada é alcançado pela régua de
+    // inatividade, que existe para isso e diz a coisa certa ("faz 7 dias,
+    // volta?"). Um parabéns falso queima a régua inteira — depois dele, o
+    // "volta?" chega para alguém que já aprendeu que estes e-mails não olham
+    // para o que ele fez.
+    if (!aulasConcluidas) {
+      continue;
+    }
+
     const { assunto, html } = emailPrimeiraSemana({
       primeiroNome: primeiroNome(c.nome),
       xpTotal: c.xp ?? 0,
