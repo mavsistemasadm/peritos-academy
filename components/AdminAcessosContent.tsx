@@ -7,8 +7,10 @@ import { useRouter } from 'next/navigation'
 import type { AcessoLinha, CursoOpcao, Escopo } from '@/lib/queries/admin-acessos'
 import {
   concederAcesso, alterarPrazoAcesso, revogarAcesso, reativarAcesso,
-  enviarEmailDeAcesso, linkDeEntrada,
+  enviarEmailDeAcesso, linkDeEntrada, concederAcessoEmLote,
 } from '@/app/admin/acessos/actions'
+import type { LinhaLote } from '@/app/admin/acessos/actions'
+import { separarEmails } from '@/lib/acessos/conceder'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 type Filtros = { busca?: string; escopo?: string; curso?: string; status?: string; pagina?: string }
@@ -58,7 +60,9 @@ export default function AdminAcessosContent({
   const toast = useAdminToast()
   const [pendente, startTransition] = useTransition()
   const [abrirForm, setAbrirForm] = useState(false)
+  const [abrirLote, setAbrirLote] = useState(false)
   const [recem, setRecem] = useState<Recem | null>(null)
+  const [lote, setLote] = useState<{ linhas: LinhaLote[]; concedidos: number; cursoTitulo: string } | null>(null)
 
   const totalPaginas = Math.max(1, Math.ceil(total / porPagina))
 
@@ -85,9 +89,14 @@ export default function AdminAcessosContent({
             Serve para quem comprou por fora da assinatura — inclusive quem ainda nem tem login aqui.
           </p>
         </div>
-        <button type="button" className="pnl-btn-primario" onClick={() => { setAbrirForm(v => !v); setRecem(null) }}>
-          {abrirForm ? 'Fechar' : '+ Conceder acesso'}
-        </button>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button type="button" className="pnl-btn-secundario" onClick={() => { setAbrirLote(v => !v); setAbrirForm(false); setRecem(null); setLote(null) }}>
+            {abrirLote ? 'Fechar' : 'Matricular turma'}
+          </button>
+          <button type="button" className="pnl-btn-primario" onClick={() => { setAbrirForm(v => !v); setAbrirLote(false); setRecem(null); setLote(null) }}>
+            {abrirForm ? 'Fechar' : '+ Conceder acesso'}
+          </button>
+        </div>
       </div>
 
       {abrirForm && (
@@ -99,6 +108,18 @@ export default function AdminAcessosContent({
           startTransition={startTransition}
         />
       )}
+
+      {abrirLote && (
+        <FormLote
+          cursos={cursos}
+          pendente={pendente}
+          onErro={toast.erro}
+          onPronto={(r) => { setLote(r); setAbrirLote(false); router.refresh() }}
+          startTransition={startTransition}
+        />
+      )}
+
+      {lote && <PainelLote lote={lote} onFechar={() => setLote(null)} />}
 
       {recem && <PainelRecem recem={recem} onErro={toast.erro} onSucesso={toast.sucesso} onFechar={() => setRecem(null)} />}
 
@@ -285,6 +306,181 @@ function FormConcessao({
     </section>
   )
 }
+
+// ============================================================
+// Matricular uma turma
+// ============================================================
+// A tela nasceu para cadastrar um comprador antigo por vez. Turma de mentoria é
+// outra coisa: uma lista pronta, colada de algum lugar, que precisa entrar
+// inteira e mostrar o que aconteceu com CADA linha — não um "sucesso" verde que
+// esconde as três que ficaram de fora.
+function FormLote({
+  cursos, pendente, onErro, onPronto, startTransition,
+}: {
+  cursos: CursoOpcao[]
+  pendente: boolean
+  onErro: (e: string) => void
+  onPronto: (r: { linhas: LinhaLote[]; concedidos: number; cursoTitulo: string }) => void
+  startTransition: (cb: () => void) => void
+}) {
+  const [emails, setEmails] = useState('')
+  const [vitalicio, setVitalicio] = useState(true)
+  const [cursoId, setCursoId] = useState('')
+
+  // A contagem aparece enquanto se cola, e já sem as repetidas. Uma lista de
+  // WhatsApp quase sempre tem o mesmo endereço duas vezes, e descobrir isso
+  // depois de gravar é tarde.
+  const quantos = separarEmails(emails).length
+
+  function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    const expiraEm = vitalicio ? null : String(fd.get('expira') ?? '') || null
+    const curso = cursos.find(c => c.id === cursoId)
+    if (!curso) { onErro('Escolha o curso.'); return }
+
+    if (!confirm(
+      `Matricular ${quantos} pessoa${quantos === 1 ? '' : 's'} em "${curso.titulo}"?\n\n`
+      + 'Ninguém é avisado: nenhum email sai, e nenhuma conta nova é criada. '
+      + 'Quem não tiver conta aqui aparece na lista para você resolver.',
+    )) return
+
+    startTransition(async () => {
+      const r = await concederAcessoEmLote({
+        emails,
+        cursoId,
+        vitalicio,
+        expiraEm,
+        observacao: String(fd.get('observacao') ?? ''),
+      })
+      if (!r.ok) { onErro(r.erro); return }
+      onPronto({ linhas: r.linhas, concedidos: r.concedidos, cursoTitulo: curso.titulo })
+    })
+  }
+
+  return (
+    <section className="pnl-card">
+      <h2>Matricular turma</h2>
+      <p className="pnl-sub">
+        Cole os emails da turma, um por linha. Serve para mentoria e qualquer curso de grupo fechado.
+        Se o curso estiver marcado como turma fechada no editor dele, quem não estiver nesta lista não
+        vê o curso no catálogo nem os eventos dele na agenda.
+      </p>
+
+      <form onSubmit={onSubmit} className="pnl-form">
+        <label>Emails da turma
+          <textarea
+            value={emails}
+            onChange={e => setEmails(e.target.value)}
+            rows={8}
+            required
+            placeholder={'pessoa1@email.com\npessoa2@email.com\npessoa3@email.com'}
+          />
+          <small>
+            {quantos === 0
+              ? 'Um por linha. Vírgula e ponto e vírgula também servem.'
+              : `${quantos} email${quantos === 1 ? '' : 's'} distinto${quantos === 1 ? '' : 's'} na lista.`}
+          </small>
+        </label>
+
+        <div className="pnl-form-linha">
+          <label style={{ flex: 2 }}>Curso
+            <select value={cursoId} onChange={e => setCursoId(e.target.value)} required>
+              <option value="" disabled>Escolha o curso</option>
+              {cursos.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.titulo}{c.publicado ? '' : ' (não publicado)'}{c.restrito ? ' · turma fechada' : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="pnl-form-linha" style={{ alignItems: 'flex-end' }}>
+          <label style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input type="checkbox" checked={vitalicio} onChange={e => setVitalicio(e.target.checked)} style={{ width: 'auto' }} />
+            Acesso vitalício
+          </label>
+          {!vitalicio && (
+            <label>Acesso até
+              <input name="expira" type="date" required />
+            </label>
+          )}
+        </div>
+
+        <label>Observação (opcional)
+          <input name="observacao" placeholder="Ex.: Mentoria turma de setembro/2026" autoComplete="off" />
+        </label>
+
+        <button type="submit" className="pnl-btn-primario" disabled={pendente || quantos === 0 || !cursoId}>
+          {pendente ? 'Matriculando...' : `Matricular ${quantos || ''}`.trim()}
+        </button>
+      </form>
+    </section>
+  )
+}
+
+const ROTULO_LOTE: Record<LinhaLote['situacao'], { texto: string; cor: string }> = {
+  concedido: { texto: 'matriculado', cor: '#20D9A6' },
+  ja_tinha: { texto: 'já tinha', cor: '#B9BFB8' },
+  sem_conta: { texto: 'sem conta aqui', cor: '#F5A623' },
+  erro: { texto: 'não entrou', cor: '#F03434' },
+}
+
+// O relatório fica na tela até ser fechado, e as linhas que não entraram vêm
+// primeiro. Um lote de 60 com 3 problemas no meio da lista, ordenado por email,
+// é um lote em que ninguém percebe os 3.
+function PainelLote({
+  lote, onFechar,
+}: {
+  lote: { linhas: LinhaLote[]; concedidos: number; cursoTitulo: string }
+  onFechar: () => void
+}) {
+  const peso: Record<LinhaLote['situacao'], number> = { erro: 0, sem_conta: 1, ja_tinha: 2, concedido: 3 }
+  const ordenadas = [...lote.linhas].sort((a, b) => peso[a.situacao] - peso[b.situacao])
+  const pendencias = lote.linhas.filter(l => l.situacao === 'sem_conta' || l.situacao === 'erro').length
+
+  return (
+    <section className="pnl-card">
+      <h2>Turma matriculada</h2>
+      <p style={{ margin: '0 0 6px' }}>
+        <strong>{lote.concedidos}</strong> de {lote.linhas.length} entraram agora em &quot;{lote.cursoTitulo}&quot;.
+      </p>
+      {pendencias > 0 && (
+        <p className="pnl-sub" style={{ margin: '0 0 6px', color: '#F5A623', fontWeight: 600 }}>
+          {pendencias} não {pendencias === 1 ? 'entrou' : 'entraram'}. Quem aparece como &quot;sem conta aqui&quot;
+          precisa ser cadastrado um a um em &quot;Conceder acesso&quot;, que é onde a conta é criada.
+        </p>
+      )}
+      <p className="pnl-sub" style={{ margin: '0 0 12px' }}>
+        <strong>Ninguém foi avisado.</strong> Nenhum email saiu.
+      </p>
+
+      <table className="pnl-tabela">
+        <thead>
+          <tr><th>Email</th><th>Nome</th><th>Situação</th></tr>
+        </thead>
+        <tbody>
+          {ordenadas.map(l => (
+            <tr key={l.email}>
+              <td>{l.email}</td>
+              <td className="pnl-sub">{l.nome || '—'}</td>
+              <td style={{ color: ROTULO_LOTE[l.situacao].cor, fontWeight: 600 }}>
+                {ROTULO_LOTE[l.situacao].texto}
+                {l.detalhe && <span className="pnl-sub" style={{ display: 'block', fontWeight: 400 }}>{l.detalhe}</span>}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div style={{ marginTop: 12 }}>
+        <button type="button" className="pnl-btn-secundario" onClick={onFechar}>Fechar</button>
+      </div>
+    </section>
+  )
+}
+
 
 // ============================================================
 // Depois de conceder — a pessoa ainda não sabe

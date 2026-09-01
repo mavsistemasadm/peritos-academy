@@ -61,6 +61,7 @@ divergiram e têm nomes parecidos: cuidado ao mexer numa achando que é a outra.
 | `/anamnese`, `/meu-plano` (Rota do Perito) | acesso completo |
 | `/gamificacao` | acesso completo |
 | `/cursos` (catálogo) | só login — **de propósito**, ver o que existe é o que dá vontade de comprar |
+| Curso com `restrito` | matrícula nominal — ver "Turma fechada" |
 | Certificado | concluir o curso; não olha tipo de acesso |
 
 As cinco linhas de Jornada, Rota do Perito e Gamificação **não tinham portão
@@ -672,9 +673,119 @@ antes de culpar o código.
 divergiram** (o Next lê o segundo, os scripts leem o primeiro). Agora
 `.env.local` é link simbólico para `env.local`.
 
+## Turma fechada: o curso restrito — 2026-09-01
+
+**Regra permanente.** `cursos.restrito` é o curso **publicado e mesmo assim
+invisível** para quem não foi matriculado nominalmente. É a terceira posição
+que faltava entre "publicado" (todo mundo vê) e "rascunho" (ninguém vê,
+**inclusive quem pagou** — `buscarCurso` e `getAula` exigem `publicado=true`).
+
+Nasceu da mentoria de 60 pessoas: não havia como ter um curso que aparecesse
+no catálogo só para elas.
+
+### A armadilha que isto desarma
+
+⚠️ **"Pode abrir este curso" e "foi matriculado neste curso" não são a mesma
+pergunta.** `tem_acesso_curso` responde a primeira, e é larga de propósito:
+passa quem tem assinatura Asaas e passa quem tem concessão de escopo `total` —
+**571 concessões totais vigentes numa base de 546 perfis**, medido em
+01/09/2026. Construir turma fechada em cima dela daria uma turma de 571.
+
+Por isso existe **`matriculado_no_curso(usuario, curso)`**, que só aceita a
+linha nominal em `acessos_conteudo` (escopo `curso`, aquele curso, vigente).
+Admin passa (`is_admin_papel` sem filtro de papel, mesmo bypass de
+`concluir_aula`) — quem monta a mentoria precisa conferi-la antes de matricular
+alguém. É a terceira dupla de nomes parecidos desta base, junto de
+`tem_acesso_plataforma` × `tem_acesso_curso`: **cuidado ao mexer numa achando
+que é a outra.**
+
+### Uma regra só, aplicada por herança
+
+O desvio mora **dentro de `tem_acesso_curso`**: curso restrito responde pela
+regra estreita, curso normal responde exatamente como antes. Tudo que já
+chamava a função apertou junto, sem uma linha a mais:
+
+| Chamador | Efeito |
+|---|---|
+| `verificarAcessoCurso` (curso, aula, avaliação) | 404 para quem não é da turma |
+| RLS de `aula_materiais` e do bucket | material da mentoria só para a turma |
+| `evento_visivel_para` | o evento some da agenda dos outros |
+| `evento_audiencia` | o email de anúncio não sai para os outros |
+
+⚠️ **Escrever a regra de novo em qualquer um desses lugares é o erro a evitar.**
+Duas cópias divergem no dia em que uma ganhar uma exceção que a outra não tem, e
+o sintoma seria o email alcançando quem a tela esconde. As listagens
+(`cursos-biblioteca`, vitrine da `home`, `jornada` nos dois pontos) perguntam ao
+banco por **`cursos_restritos_visiveis()`** — uma chamada por página, não uma
+por card — e filtram com `lib/acesso/restritos.ts`.
+
+⚠️ **Assinatura não abre curso restrito, e isso é a decisão.** Turma fechada que
+abre para quem assina não é turma fechada. Para vender a mentoria dentro do
+plano, é só não marcá-la como restrita.
+
+⚠️ **Curso restrito dá 404, nunca a tela de assinatura.** `AssinaturaNecessaria`
+diria "assine para ter acesso", e assinar não abre turma fechada: seria vender
+uma promessa que a plataforma não cumpre. Por isso `verificarAcessoCurso`
+devolve `restrito` junto — o campo existe pela MENSAGEM, não pelo portão.
+
+⚠️ **O anúncio do evento alcança a turma + os admins ativos** (2 em 01/09/2026),
+porque o bypass de admin vale igual nos quatro chamadores. Uma turma de 60
+aparece como 62 no contador de "Anunciar para os alunos". Preferi isso a fazer
+`evento_audiencia` divergir de `evento_visivel_para` para poupar dois emails.
+
+### Defeito antigo corrigido de carona
+
+`tem_acesso_curso(<alguém com escopo total>, 'curso-que-nunca-existiu')`
+respondia **`true`**. A cláusula do escopo `total` não menciona `p_curso_id` a
+não ser dentro do `not exists` das exceções, então curso inexistente a tornava
+simplesmente verdadeira. Nada explorava isso (as três páginas dão 404 antes de
+perguntar, e a RLS sempre chega com o id vindo de um join), mas a sobrecarga por
+slug transforma qualquer digitação errada nesse caso. Agora `null` é recusado na
+primeira linha.
+
+### Agenda: o "Curso vinculado" nunca restringiu nada sozinho
+
+Quem filtra é o campo **Visibilidade**; `curso_id` com visibilidade "Todos"
+manda o evento para a base inteira, e a tela não dizia isso. Dois campos
+vizinhos, um parecendo implicar o outro. `AvisoVinculoCurso` agora avisa no
+momento da escolha, com o botão que conserta, e explica o alcance real:
+curso restrito nomeia a turma, curso normal avisa que inclui assinantes.
+
+### Matricular turma em lote (`/admin/acessos` → "Matricular turma")
+
+Cola a lista, um email por linha (vírgula e ponto e vírgula também), escolhe
+curso e prazo, e recebe **uma linha de relatório por pessoa** — matriculado, já
+tinha, sem conta aqui, não entrou —, com as pendências no topo. Teto de 300.
+
+⚠️ **O lote NÃO cria conta e NÃO fala com o Nexus**, ao contrário do formulário
+de uma pessoa. Criar conta em lote transforma dois erros de digitação em duas
+contas fantasmas permanentes; e a conta do Nexus existe para o comprador de
+curso avulso, que entra por lá — turma de mentoria já é aluna daqui. Gravação em
+série de propósito: concorrente, sessenta escritas disputam a checagem de "já
+tem" e gravam linha duplicada.
+
+⚠️ **Nenhum email sai**, como em toda esta tela, desde os 3 e-mails de
+boas-vindas disparados por engano no ensaio da migração.
+
+`separarEmails` e as opções `permitirCriarConta` / `contaConhecida` moram no
+núcleo (`lib/acessos/conceder.ts`), que continua sendo o dono único da regra —
+o lote pula a BUSCA da conta (uma varredura do Auth para os N emails, não N
+varreduras), nunca uma checagem.
+
+### Testado
+14 asserções em SQL com rollback: escopo total não abre restrito, matrícula
+nominal abre, admin abre, total segue abrindo curso normal, curso inexistente
+recusa, usuário nulo recusa, agenda mostra para o matriculado e esconde de quem
+tem total, e o anúncio encolhe junto. Mais `cursos_restritos_visiveis` e
+`tem_acesso_curso` pelo PostgREST com a chave anon (lista vazia e `false`), e
+`npm run build`. **Não testado em navegador.**
+
+⚠️ "Mentoria Peritos Academy" já está com `restrito = true`, ainda em rascunho e
+com zero matriculados — publicar e colar a lista é o que falta.
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários; `tour_visto_em` timestamptz nullable — ver seção Tour guiado; `migrado_de`/`migrado_em`/`boas_vindas_migrado_em` — aluno importado em lote, ver seção Migração de alunos da Ensinio)
-- `cursos`, `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)
+- `cursos` (com `restrito` — turma fechada, ver seção própria), `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)
 - `trilhas`, `etapas`, `curso_trilha` (com trilha_nome, trilha_slug, etapa_nome)
 - `avaliacoes`, `avaliacao_questoes`, `avaliacao_opcoes`, `avaliacao_tentativas`, `avaliacao_respostas` (+ views `_publicas`)
 - `desafios`, `desafio_categorias`, `desafio_entregas` (nota_minima, arquivo_path)

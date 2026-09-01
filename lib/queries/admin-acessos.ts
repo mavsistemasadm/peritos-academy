@@ -35,7 +35,7 @@ export type AcessoLinha = {
   criadoEm: string
 }
 
-export type CursoOpcao = { id: string; titulo: string; slug: string; publicado: boolean }
+export type CursoOpcao = { id: string; titulo: string; slug: string; publicado: boolean; restrito: boolean }
 
 export const acessosPorPagina = 25
 
@@ -199,8 +199,10 @@ export async function listarCursosParaAcesso(): Promise<CursoOpcao[]> {
   const supabase = criarClienteServico()
   const { data, error } = await supabase
     .from('cursos')
-    .select('id, titulo, slug, publicado')
+    .select('id, titulo, slug, publicado, restrito')
     .order('titulo')
   if (error) throw new Error(error.message)
-  return (data ?? []).map(c => ({ id: c.id, titulo: c.titulo, slug: c.slug, publicado: c.publicado }))
+  return (data ?? []).map(c => ({
+    id: c.id, titulo: c.titulo, slug: c.slug, publicado: c.publicado, restrito: c.restrito === true,
+  }))
 }

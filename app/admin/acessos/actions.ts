@@ -24,7 +24,7 @@ import { criarClienteServidor } from '@/lib/supabase/server'
 import { criarClienteServico } from '@/lib/supabase/servico'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
 import { hojeDoGate, type Escopo } from '@/lib/queries/admin-acessos'
-import { concederAcessoNaAcademy } from '@/lib/acessos/conceder'
+import { concederAcessoNaAcademy, separarEmails } from '@/lib/acessos/conceder'
 
 type Resultado = { ok: true; aviso?: string } | { ok: false; erro: string }
 
@@ -289,4 +289,122 @@ export async function linkDeEntrada(): Promise<string> {
 function formatarBR(iso: string): string {
   const [a, m, d] = iso.split('-')
   return `${d}/${m}/${a}`
+}
+
+// ============================================================
+// Matricular uma turma inteira
+// ============================================================
+// Nasceu da mentoria: 60 pessoas, um formulário de uma pessoa por vez. Sessenta
+// idas ao mesmo formulário não é só chato — é onde alguém perde a conta de quem
+// já cadastrou e descobre no dia da aula que faltaram três.
+//
+// ⚠️ **O lote NÃO cria conta, e NÃO fala com o Nexus.** As duas coisas são
+// deliberadas e diferentes do formulário de uma pessoa:
+//
+//   · Criar conta em lote transforma dois erros de digitação em duas contas
+//     fantasmas permanentes, que ninguém vai procurar depois. E-mail sem conta
+//     vira uma linha "sem conta" no relatório, para quem operou decidir.
+//   · A conta do Nexus existe para o COMPRADOR DE CURSO AVULSO, que entra por
+//     lá. Turma de mentoria é gente que já é aluna daqui e já tem por onde
+//     entrar; criar sessenta contas de vitrine seria um efeito que ninguém
+//     pediu.
+//
+// E, como sempre nesta tela, **nenhum e-mail sai**. O lote grava o acesso e
+// para. Avisar é outro botão, e é assim desde os 3 e-mails de boas-vindas
+// disparados por engano no ensaio da migração.
+export type LinhaLote = {
+  email: string
+  /** `concedido` · `ja_tinha` · `sem_conta` · `erro` */
+  situacao: 'concedido' | 'ja_tinha' | 'sem_conta' | 'erro'
+  nome?: string
+  detalhe?: string
+}
+
+export type ResultadoLote =
+  | { ok: true; linhas: LinhaLote[]; concedidos: number }
+  | { ok: false; erro: string }
+
+export async function concederAcessoEmLote(entrada: {
+  emails: string
+  cursoId: string
+  vitalicio: boolean
+  expiraEm: string | null
+  observacao: string
+}): Promise<ResultadoLote> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+
+  const emails = separarEmails(entrada.emails)
+  if (emails.length === 0) return { ok: false, erro: 'Cole ao menos um e-mail.' }
+  // Teto de sanidade: acima disto o que se quer é um script com relatório em
+  // arquivo, não uma tela que fica dez minutos girando e morre no timeout.
+  if (emails.length > 300) return { ok: false, erro: `São ${emails.length} e-mails. O lote vai até 300 por vez.` }
+  if (!entrada.cursoId) return { ok: false, erro: 'Escolha o curso.' }
+
+  // Uma varredura do Auth para os N e-mails, em vez de N varreduras. Ver o
+  // comentário de `contaConhecida` em lib/acessos/conceder.ts.
+  const servico = criarClienteServico()
+  const contas = new Map<string, { id: string; nome: string }>()
+  for (let pagina = 1; pagina <= 50; pagina++) {
+    const { data, error } = await servico.auth.admin.listUsers({ page: pagina, perPage: 1000 })
+    if (error) return { ok: false, erro: `Não consegui ler a base de contas: ${error.message}` }
+    for (const u of data?.users ?? []) {
+      const e = (u.email ?? '').toLowerCase()
+      if (e) contas.set(e, { id: u.id, nome: (u.user_metadata?.nome as string) ?? '' })
+    }
+    if ((data?.users ?? []).length < 1000) break
+  }
+
+  // O nome do perfil, para o relatório dizer quem é cada linha em vez de repetir
+  // o e-mail. Uma consulta para o lote todo.
+  const ids = emails.map(e => contas.get(e)?.id).filter(Boolean) as string[]
+  if (ids.length) {
+    const { data: perfis } = await servico.from('perfis').select('id, nome').in('id', ids)
+    const nomePorId = new Map((perfis ?? []).map(p => [p.id, p.nome as string]))
+    for (const [email, c] of contas) {
+      const nome = nomePorId.get(c.id)
+      if (nome) contas.set(email, { ...c, nome })
+    }
+  }
+
+  const quem = await emailDoAdmin()
+  const observacao = assinar(entrada.observacao, quem)
+  const linhas: LinhaLote[] = []
+
+  // Em série, de propósito: sessenta gravações concorrentes na mesma tabela
+  // disputam a checagem de "já tem" e podem gravar duas linhas para a mesma
+  // pessoa. O lote é de dezenas, não de milhares — a lentidão é aceitável, a
+  // duplicata não.
+  for (const email of emails) {
+    const conta = contas.get(email) ?? null
+    const r = await concederAcessoNaAcademy({
+      email,
+      nome: conta?.nome ?? '',
+      escopo: 'curso',
+      cursoId: entrada.cursoId,
+      vitalicio: entrada.vitalicio,
+      expiraEm: entrada.expiraEm,
+      observacao,
+      permitirCriarConta: false,
+      contaConhecida: conta,
+    })
+
+    if (!r.ok) {
+      linhas.push({
+        email,
+        situacao: r.motivo === 'sem_conta' ? 'sem_conta' : 'erro',
+        detalhe: r.erro,
+        nome: conta?.nome,
+      })
+      continue
+    }
+    linhas.push({
+      email,
+      situacao: r.jaTinha ? 'ja_tinha' : 'concedido',
+      nome: r.nome,
+      detalhe: r.jaTinha ? `já vigente (${r.ate})` : undefined,
+    })
+  }
+
+  revalidar()
+  return { ok: true, linhas, concedidos: linhas.filter(l => l.situacao === 'concedido').length }
 }

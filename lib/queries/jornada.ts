@@ -4,6 +4,7 @@
 // pelo admin), sem seed/mock. Nenhuma trilha é travada: "estado" é só
 // narrativo (feita/atual/pendente), nunca bloqueia acesso.
 import { criarClienteServidor } from '@/lib/supabase/server'
+import { cursosRestritosVisiveis, semRestritosOcultos } from '@/lib/acesso/restritos'
 
 export type Marco = {
   id: string
@@ -92,10 +93,13 @@ export async function carregarJornada(): Promise<DadosJornada> {
   const cursoIds = [...new Set(missoes.map(m => m.curso_id))]
 
   const [{ data: cursosRaw }, { data: modulosRaw }] = await Promise.all([
-    cursoIds.length ? supabase.from('cursos').select('id, titulo, slug, capa_url').in('id', cursoIds) : Promise.resolve({ data: [] as any[] }),
+    cursoIds.length ? supabase.from('cursos').select('id, titulo, slug, capa_url, restrito').in('id', cursoIds) : Promise.resolve({ data: [] as any[] }),
     cursoIds.length ? supabase.from('modulos').select('id, curso_id, ordem').in('curso_id', cursoIds).order('ordem', { ascending: true }) : Promise.resolve({ data: [] as any[] }),
   ])
-  const cursosRawList = cursosRaw ?? []
+  // Curso de turma fechada pendurado numa trilha não vira missão de quem não
+  // está na turma: apareceria no trilho da jornada como etapa obrigatória e
+  // levaria a um 404. Ver lib/acesso/restritos.ts.
+  const cursosRawList = semRestritosOcultos(cursosRaw ?? [], await cursosRestritosVisiveis(supabase))
   const modulos = modulosRaw ?? []
   const moduloIds = modulos.map(m => m.id)
 
@@ -479,10 +483,13 @@ export async function carregarTrilhaPorSlug(slug: string): Promise<TrilhaDetalhe
   const cursoIds = [...new Set(missoes.map(m => m.curso_id))]
 
   const [{ data: cursosRaw }, { data: modulosRaw }] = await Promise.all([
-    cursoIds.length ? supabase.from('cursos').select('id, titulo, slug, capa_url, capa_vertical_url').in('id', cursoIds) : Promise.resolve({ data: [] as any[] }),
+    cursoIds.length ? supabase.from('cursos').select('id, titulo, slug, capa_url, capa_vertical_url, restrito').in('id', cursoIds) : Promise.resolve({ data: [] as any[] }),
     cursoIds.length ? supabase.from('modulos').select('id, curso_id, ordem').in('curso_id', cursoIds) : Promise.resolve({ data: [] as any[] }),
   ])
-  const cursosRawList = cursosRaw ?? []
+  // Curso de turma fechada pendurado numa trilha não vira missão de quem não
+  // está na turma: apareceria no trilho da jornada como etapa obrigatória e
+  // levaria a um 404. Ver lib/acesso/restritos.ts.
+  const cursosRawList = semRestritosOcultos(cursosRaw ?? [], await cursosRestritosVisiveis(supabase))
   const modulos = modulosRaw ?? []
   const moduloIds = modulos.map(m => m.id)
 

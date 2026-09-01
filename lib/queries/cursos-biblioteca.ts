@@ -1,6 +1,7 @@
 // lib/queries/cursos-biblioteca.ts
 // Vitrine editorial de cursos: hero em destaque, continuação de progresso e seções por trilha.
 import { criarClienteServidor } from '@/lib/supabase/server'
+import { cursosRestritosVisiveis, semRestritosOcultos } from '@/lib/acesso/restritos'
 
 export type CursoCard = {
   id: string
@@ -40,12 +41,17 @@ export async function carregarBibliotecaCursos(): Promise<DadosBibliotecaCursos>
     { data: modulosRaw },
   ] = await Promise.all([
     supabase.from('curso_trilha').select('curso_id, trilha_nome, trilha_slug, etapa_nome, ordem'),
-    supabase.from('cursos').select('id, slug, titulo, subtitulo, capa_url, capa_horizontal_url, nivel, publicado, destaque'),
+    supabase.from('cursos').select('id, slug, titulo, subtitulo, capa_url, capa_horizontal_url, nivel, publicado, destaque, restrito'),
     supabase.from('trilhas').select('nome, slug, descricao, ordem').order('ordem', { ascending: true }),
     supabase.from('modulos').select('id, curso_id'),
   ])
 
-  const cursosPublicados = (cursosRaw ?? []).filter(c => c.publicado)
+  // ⚠️ Publicado deixou de ser suficiente para aparecer aqui. O curso de turma
+  // fechada (`restrito`, 2026-09-01) é publicado de propósito — é o que faz ele
+  // abrir para os matriculados —, e some do catálogo para todo o resto, mesmo
+  // para quem tem a plataforma inteira. Ver lib/acesso/restritos.ts.
+  const restritosVisiveis = await cursosRestritosVisiveis(supabase)
+  const cursosPublicados = semRestritosOcultos((cursosRaw ?? []).filter(c => c.publicado), restritosVisiveis)
   const cursosMap = new Map(cursosPublicados.map(c => [c.id, c]))
 
   // aulas: conta + soma de duração por curso (via módulo -> curso)

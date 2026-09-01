@@ -29,12 +29,48 @@ export type EntradaConcessao = {
   vitalicio: boolean
   expiraEm: string | null
   observacao: string
+  /**
+   * Deixar `false` proíbe criar conta: e-mail sem conta vira recusa
+   * `motivo: 'sem_conta'` em vez de um cadastro novo.
+   *
+   * Existe para a matrícula em lote. Colar sessenta e-mails e ganhar contas
+   * novas por causa de dois erros de digitação é o tipo de efeito que ninguém
+   * pede e ninguém percebe — e cada conta fantasma dessas fica na base para
+   * sempre, contando como aluno. Nas portas de uma pessoa só (a tela e o
+   * webhook de venda), criar é o comportamento certo e continua sendo o padrão.
+   */
+  permitirCriarConta?: boolean
+  /**
+   * A conta já resolvida por quem chama, para pular a varredura do Auth.
+   *
+   * O lote resolve os sessenta e-mails numa passada só sobre `listUsers`; sem
+   * isto seriam sessenta varreduras da base inteira, e o lote estouraria o
+   * tempo da requisição antes de gravar a metade. As regras abaixo não mudam:
+   * o que se pula é a BUSCA, não nenhuma checagem.
+   */
+  contaConhecida?: { id: string; nome: string } | null
 }
 
 export type ResultadoConcessao =
   | { ok: true; usuarioId: string; nome: string; contaCriada: boolean; redundante: boolean; jaTinha: false }
   | { ok: true; usuarioId: string; nome: string; contaCriada: boolean; redundante: false; jaTinha: true; ate: string }
-  | { ok: false; erro: string }
+  | { ok: false; erro: string; motivo?: 'sem_conta' }
+
+/**
+ * Um e-mail por linha, por vírgula ou por ponto e vírgula.
+ *
+ * Cola de planilha, cola de grupo de WhatsApp e lista escrita à mão chegam nos
+ * três formatos, e exigir um deles só faz o operador limpar a lista no Bloco de
+ * Notas antes. Duplicata sai fora aqui: dois "concedido" para a mesma pessoa
+ * seria um relatório que conta 61 numa turma de 60.
+ */
+export function separarEmails(texto: string): string[] {
+  const brutos = texto
+    .split(/[\s,;]+/)
+    .map(e => e.trim().toLowerCase())
+    .filter(Boolean)
+  return [...new Set(brutos)]
+}
 
 export function formatarBR(iso: string): string {
   const [a, m, d] = iso.split('-')
@@ -96,12 +132,17 @@ export async function concederAcessoNaAcademy(entrada: EntradaConcessao): Promis
   }
 
   const servico = criarClienteServico()
-  let conta = await acharPorEmail(email)
+  let conta: { id: string } | null = entrada.contaConhecida
+    ? { id: entrada.contaConhecida.id }
+    : await acharPorEmail(email)
   let contaCriada = false
-  let nome = entrada.nome.trim()
+  let nome = entrada.contaConhecida?.nome?.trim() || entrada.nome.trim()
 
   if (!conta) {
-    if (!nome) return { ok: false, erro: 'Esse e-mail ainda não tem conta. Informe o nome para criá-la.' }
+    if (entrada.permitirCriarConta === false) {
+      return { ok: false, erro: 'Esse e-mail não tem conta na plataforma.', motivo: 'sem_conta' }
+    }
+    if (!nome) return { ok: false, erro: 'Esse e-mail ainda não tem conta. Informe o nome para criá-la.', motivo: 'sem_conta' }
 
     // Senha aleatória e desconhecida: a entrada é pelo convite do Nexus.
     // `migrado_de` é o que segura o e-mail automático de boas-vindas — o
@@ -120,9 +161,11 @@ export async function concederAcessoNaAcademy(entrada: EntradaConcessao): Promis
     }
     conta = criado.user
     contaCriada = true
-  } else {
+  } else if (!entrada.contaConhecida) {
     const { data: perfil } = await servico.from('perfis').select('nome').eq('id', conta.id).maybeSingle()
     nome = perfil?.nome || nome || email.split('@')[0]
+  } else {
+    nome = nome || email.split('@')[0]
   }
 
   // Concessão vigente igual já existente vira DUAS linhas para o mesmo direito

@@ -37,7 +37,7 @@ export type TrilhaDetalheAdmin = {
   etapas: EtapaAdmin[]
 }
 
-export type CursoPicker = { id: string; titulo: string; slug: string; outraTrilhaNome: string | null }
+export type CursoPicker = { id: string; titulo: string; slug: string; outraTrilhaNome: string | null; restrito: boolean }
 
 export async function carregarTrilhasAdmin(): Promise<TrilhaListaItem[]> {
   const supabase = await criarClienteServidor()
@@ -135,12 +135,12 @@ export async function carregarCursosParaPicker(trilhaAtualId?: string): Promise<
   const supabase = await criarClienteServidor()
 
   if (!trilhaAtualId) {
-    const { data: cursos } = await supabase.from('cursos').select('id, titulo, slug').order('titulo', { ascending: true })
-    return (cursos ?? []).map(c => ({ id: c.id, titulo: c.titulo, slug: c.slug, outraTrilhaNome: null }))
+    const { data: cursos } = await supabase.from('cursos').select('id, titulo, slug, restrito').order('titulo', { ascending: true })
+    return (cursos ?? []).map(c => ({ id: c.id, titulo: c.titulo, slug: c.slug, outraTrilhaNome: null, restrito: c.restrito === true }))
   }
 
   const [{ data: cursos }, { data: vinculos }] = await Promise.all([
-    supabase.from('cursos').select('id, titulo, slug').order('titulo', { ascending: true }),
+    supabase.from('cursos').select('id, titulo, slug, restrito').order('titulo', { ascending: true }),
     supabase.from('etapa_missoes').select('curso_id, etapas!inner(trilha_id, trilhas!inner(nome))'),
   ])
   if (!cursos) return []
@@ -158,6 +158,6 @@ export async function carregarCursosParaPicker(trilhaAtualId?: string): Promise<
     .filter(c => !(vinculosPorCurso.get(c.id) ?? []).some(v => v.trilhaId === trilhaAtualId))
     .map(c => {
       const outra = (vinculosPorCurso.get(c.id) ?? []).find(v => v.trilhaId !== trilhaAtualId)
-      return { id: c.id, titulo: c.titulo, slug: c.slug, outraTrilhaNome: outra?.trilhaNome ?? null }
+      return { id: c.id, titulo: c.titulo, slug: c.slug, outraTrilhaNome: outra?.trilhaNome ?? null, restrito: c.restrito === true }
     })
 }

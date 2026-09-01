@@ -24,6 +24,8 @@ export default async function AvaliacaoPage({ params, searchParams }: {
   if (!dados) notFound();
 
   const acesso = await verificarAcessoCurso(slug);
+  // Turma fechada dá 404, não paywall — ver a página do curso.
+  if (!acesso.permitido && acesso.restrito) notFound();
   if (!acesso.permitido) {
     const nav = await carregarNav();
     return <AssinaturaNecessaria nav={nav} logado={acesso.logado} alvo={slug} />;

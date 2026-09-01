@@ -115,6 +115,14 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
             <input type="checkbox" checked={curso.publicado} disabled={pendente} onChange={e => onAlternarPublicacao(e.target.checked)} />
             {curso.publicado ? 'Publicado' : 'Rascunho'}
           </label>
+          {/* Lembrete permanente no alto da tela: sem ele, quem abre o editor
+              de um curso de turma fechada não tem como saber que a lista de
+              alunos é o que decide quem enxerga o trabalho todo. */}
+          {curso.restrito && (
+            <a href={`/admin/acessos?escopo=curso&curso=${curso.id}`} className="pnl-btn-secundario">
+              Turma fechada · ver matriculados
+            </a>
+          )}
           <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={onExcluirCurso}>Excluir curso</button>
         </div>
       </div>
@@ -174,6 +182,23 @@ export default function AdminCursoEditorContent({ curso, modulos }: { curso: Cur
                 <input name="carga_horas" type="number" step="0.5" min="0" defaultValue={curso.cargaHoras ?? ''} />
               </label>
             </div>
+            {/* ══════════════════════════════════════════════════
+                TURMA FECHADA
+                Rascunho não servia para isto: esconde o curso de todo mundo,
+                inclusive de quem foi matriculado. Este é o meio-termo que
+                faltava, e ele só faz sentido junto de "Publicado".
+                ══════════════════════════════════════════════════ */}
+            <label className="pnl-checkbox-linha" style={{ alignItems: 'flex-start' }}>
+              <input type="checkbox" name="restrito" defaultChecked={curso.restrito} />
+              <span>
+                Turma fechada
+                <small style={{ display: 'block', marginTop: 4 }}>
+                  Só quem for matriculado nominalmente em Acessos vê este curso. Ele some do catálogo, da
+                  vitrine da home e da jornada para todo o resto, e nem assinatura nem acesso vitalício o
+                  abrem. Quem tentar pelo link direto recebe 404. Você, como admin, continua vendo.
+                </small>
+              </span>
+            </label>
             <label>Contexto do certificado (email de conclusão)
               <textarea
                 name="contexto_certificado"

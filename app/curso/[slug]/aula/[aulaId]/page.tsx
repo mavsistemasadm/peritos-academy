@@ -20,6 +20,8 @@ export default async function AulaPage({ params, searchParams }: {
   if (!dados) notFound();
 
   const acesso = await verificarAcessoCurso(slug);
+  // Turma fechada dá 404, não paywall — ver a página do curso.
+  if (!acesso.permitido && acesso.restrito) notFound();
   if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} alvo={slug} />;
 
   // acesso direto por URL a uma aula ainda travada → manda pro próximo passo

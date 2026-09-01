@@ -378,6 +378,83 @@ function AlvoDoEvento({ evento }: { evento: EventoAdmin }) {
   )
 }
 
+// ══════════════════════════════════════════════════════════════════
+// O CURSO VINCULADO NÃO RESTRINGE NADA SOZINHO
+//
+// Dois campos vizinhos, um parecendo implicar o outro: escolher "Curso
+// vinculado" e deixar a visibilidade em "Todos" manda o evento para a base
+// inteira, e nada na tela dizia isso. É a pegadinha que produziu a pergunta
+// que originou esta feature — quem monta uma mentoria de turma escolhe o
+// curso e acredita que acabou.
+//
+// O aviso mora aqui e não num `alert` ao salvar porque ele precisa aparecer no
+// momento da escolha, não depois. E traz o botão que conserta, em vez de
+// mandar a pessoa procurar o outro campo.
+// ══════════════════════════════════════════════════════════════════
+function AvisoVinculoCurso({ evento, cursos }: { evento: EventoAdmin; cursos: CursoPicker[] }) {
+  const [visibilidade, setVisibilidade] = useState(evento.visibilidade)
+  const [cursoId, setCursoId] = useState(evento.cursoId ?? '')
+
+  useEffect(() => {
+    const sVis = document.querySelector<HTMLSelectElement>('select[name="visibilidade"]')
+    const sCurso = document.querySelector<HTMLSelectElement>('select[name="curso_id"]')
+    const aoVis = () => setVisibilidade(sVis!.value)
+    const aoCurso = () => setCursoId(sCurso!.value)
+    sVis?.addEventListener('change', aoVis)
+    sCurso?.addEventListener('change', aoCurso)
+    return () => { sVis?.removeEventListener('change', aoVis); sCurso?.removeEventListener('change', aoCurso) }
+  }, [])
+
+  function restringir() {
+    const sVis = document.querySelector<HTMLSelectElement>('select[name="visibilidade"]')
+    if (!sVis) return
+    sVis.value = 'curso'
+    sVis.dispatchEvent(new Event('change', { bubbles: true }))
+    setVisibilidade('curso')
+  }
+
+  const curso = cursos.find(c => c.id === cursoId)
+
+  if (cursoId && visibilidade === 'todos') {
+    return (
+      <p className="pnl-sub" style={{ margin: '-4px 0 4px', color: '#F5A623' }}>
+        Este evento continua indo para <strong>todos os alunos</strong>. Vincular o curso
+        {curso ? ` "${curso.titulo}"` : ''} não restringe nada sozinho: quem decide é o campo Visibilidade.{' '}
+        <button
+          type="button"
+          onClick={restringir}
+          style={{ background: 'none', border: 'none', padding: 0, color: 'var(--verde)', font: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}
+        >
+          Mostrar só para os alunos deste curso
+        </button>
+      </p>
+    )
+  }
+
+  if (visibilidade === 'curso' && !cursoId) {
+    return (
+      <p className="pnl-sub" style={{ margin: '-4px 0 4px', color: '#F03434' }}>
+        Visibilidade &quot;Alunos do curso&quot; sem curso escolhido não seleciona ninguém: o evento não pode
+        ser anunciado por email e some da agenda de todo mundo. Escolha o curso ao lado.
+      </p>
+    )
+  }
+
+  if (visibilidade === 'curso' && curso) {
+    return (
+      <p className="pnl-sub" style={{ margin: '-4px 0 4px' }}>
+        {curso.restrito
+          ? `"${curso.titulo}" é turma fechada: só quem está matriculado nele vê este evento na agenda e recebe o anúncio. Mais ninguém, nem assinante.`
+          : `Vai para quem pode abrir "${curso.titulo}", o que inclui quem tem assinatura ou acesso total à plataforma. Para limitar à turma, marque o curso como turma fechada no editor dele.`}
+        {' '}O número exato aparece no bloco &quot;Anunciar para os alunos&quot;.
+      </p>
+    )
+  }
+
+  return null
+}
+
+
 export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao }: {
   evento: EventoAdmin; cursos: CursoPicker[]; ogImagePadrao: string | null
 }) {
@@ -516,6 +593,7 @@ export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao
               </label>
               <AlvoDoEvento evento={evento} />
             </div>
+            <AvisoVinculoCurso evento={evento} cursos={cursos} />
             <label>Recado curto
               <input name="meta_extra" defaultValue={evento.metaExtra ?? ''} placeholder="Ex.: Traga um extrato seu" />
               <small>Uma linha que aparece no card do evento, abaixo do apresentador. Deixe vazio se não tiver.</small>

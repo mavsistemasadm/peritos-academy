@@ -16,6 +16,9 @@ export default async function PaginaCurso({
   if (!dados) notFound();
 
   const acesso = await verificarAcessoCurso(slug);
+  // Turma fechada não tem paywall: quem não está na turma vê 404, porque
+  // assinar não abriria este curso e a tela de assinatura prometeria isso.
+  if (!acesso.permitido && acesso.restrito) notFound();
   if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} alvo={slug} />;
 
   return (

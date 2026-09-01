@@ -4,6 +4,7 @@
 // Nenhum dado inventado — o que não existe ainda mostra estado vazio.
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { carregarResumoAcesso } from '@/lib/acesso/verificar'
+import { cursosRestritosVisiveis, semRestritosOcultos } from '@/lib/acesso/restritos'
 import { carregarJornada } from '@/lib/queries/jornada'
 import { getPlanoVivo } from '@/lib/queries/meuPlano'
 import { carregarAgenda } from '@/lib/queries/agenda'
@@ -179,7 +180,7 @@ export async function carregarHome(): Promise<DadosHome | null> {
     plano,
   ] = await Promise.all([
     supabase.from('perfis').select('nome, tour_visto_em, migrado_de, boas_vindas_migrado_em').eq('id', uid).single(),
-    supabase.from('cursos').select('id, slug, titulo, capa_url, capa_vertical_url, capa_horizontal_url, atualizado_em').eq('publicado', true).order('atualizado_em', { ascending: false }),
+    supabase.from('cursos').select('id, slug, titulo, capa_url, capa_vertical_url, capa_horizontal_url, atualizado_em, restrito').eq('publicado', true).order('atualizado_em', { ascending: false }),
     supabase.from('modulos').select('id, curso_id, ordem').order('ordem', { ascending: true }),
     // Vínculo curso→trilha, para a afinidade do último nível da régua. A view
     // é DISTINCT ON (curso_id), ou seja, no máximo UMA trilha por curso — o
@@ -242,11 +243,17 @@ export async function carregarHome(): Promise<DadosHome | null> {
     }
   }
 
-  const cursos = (cursosRaw ?? []).map(montaCard)
+  // ⚠️ A vitrine e a régua de "Escolhido para o seu momento" varrem o catálogo
+  // publicado inteiro. Curso de turma fechada (`restrito`, 2026-09-01) sai daqui
+  // para quem não foi matriculado: ele não pode ser recomendado, nem entrar na
+  // rotação semanal de descoberta, nem contar como afinidade de trilha.
+  const cursosVisiveis = semRestritosOcultos(cursosRaw ?? [], await cursosRestritosVisiveis(supabase))
+
+  const cursos = cursosVisiveis.map(montaCard)
   const cursoPorSlug = new Map(cursos.map(c => [c.slug, c]))
 
   // slug do curso -> trilhas dele, para a afinidade da régua.
-  const slugPorId = new Map((cursosRaw ?? []).map(c => [c.id, c.slug]))
+  const slugPorId = new Map(cursosVisiveis.map(c => [c.id, c.slug]))
   const trilhasPorCursoSlug = new Map<string, string[]>()
   for (const ct of cursoTrilhaRaw ?? []) {
     const slug = slugPorId.get(ct.curso_id)
