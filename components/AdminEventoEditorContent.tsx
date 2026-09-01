@@ -1,7 +1,7 @@
 // components/AdminEventoEditorContent.tsx
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useCallback, useEffect, useState, useTransition } from 'react'
 import type { FormEvent, ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import type { EventoAdmin } from '@/lib/queries/admin-agenda'
@@ -9,6 +9,7 @@ import type { CursoPicker } from '@/lib/queries/admin-trilhas'
 import { atualizarEvento, uploadThumbEvento, alternarPublicacaoEvento, excluirEvento, anunciarEvento, contarAudienciaEvento } from '@/app/admin/agenda/actions'
 import { IconeChevronLeft, IconeLink, IconeSend, IconeEye, IconeDownload, IconeMegaphone } from '@/components/Icones'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
+import AdminConfirmacao from '@/components/AdminConfirmacao'
 import { SITE_URL } from '@/lib/site'
 
 function paraDatetimeLocal(iso: string | null) {
@@ -461,8 +462,29 @@ export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao
   const router = useRouter()
   const toast = useAdminToast()
   const [pendente, startTransition] = useTransition()
+  // O título vem do formulário, não das props: quem acabou de renomear o evento
+  // veria o nome ANTIGO na confirmação do próprio rename, que é o momento em
+  // que mais se duvida se salvou.
+  const [salvo, setSalvo] = useState<string | null>(null)
 
   function refresh() { router.refresh() }
+
+  // ⚠️ Salvar o evento SAI desta tela e volta para a lista da agenda.
+  //
+  // O editor é onde se monta o evento; a agenda é onde se trabalha. Ficar na
+  // tela recém-salva fazia o operador ter de achar o "Agenda" do topo toda vez,
+  // e, pior, fazia parecer que nada tinha acontecido: o toast do canto some em
+  // três segundos e a página continua idêntica, com os mesmos campos
+  // preenchidos. A dúvida termina em salvar de novo.
+  //
+  // Por isso a confirmação é centralizada: ela é a resposta ao clique, e o
+  // caminho de volta sai dela. Só o formulário principal navega — publicar,
+  // trocar a thumbnail e anunciar continuam com o toast, porque essas três a
+  // pessoa faz olhando o efeito na própria tela.
+  const voltarParaAgenda = useCallback(() => {
+    router.push('/admin/agenda')
+    router.refresh()
+  }, [router])
 
   function onSalvar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -470,7 +492,7 @@ export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao
     startTransition(async () => {
       const r = await atualizarEvento(evento.id, fd)
       if (!r.ok) toast.erro(r.erro)
-      else { toast.sucesso('Evento salvo com sucesso'); refresh() }
+      else setSalvo(String(fd.get('titulo') ?? '').trim() || evento.titulo)
     })
   }
 
@@ -506,6 +528,14 @@ export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao
   return (
     <div className="pnl-curso-editor">
       <AdminToastContainer toasts={toast.toasts} remover={toast.remover} />
+      {salvo && (
+        <AdminConfirmacao
+          titulo="Evento salvo"
+          detalhe={salvo}
+          rotuloAcao="Ver a agenda"
+          aoConcluir={voltarParaAgenda}
+        />
+      )}
       <a href="/admin/agenda" className="pnl-voltar"><IconeChevronLeft size={14} /> Agenda</a>
       <div className="pnl-editor-cab">
         <h1>{evento.titulo}</h1>

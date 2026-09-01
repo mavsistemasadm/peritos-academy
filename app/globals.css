@@ -6738,3 +6738,47 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 .pagina-evento .ev-msg-ocultar:hover{color:#FF9E9E;background:rgba(255,90,90,.12)}
 /* Sem hover (toque), fica sempre visível: esconder no dedo é o único jeito. */
 @media(hover:none){.pagina-evento .ev-msg-ocultar{opacity:.65}}
+
+/* ============================================================
+   ADMIN — CONFIRMAÇÃO CENTRALIZADA (components/AdminConfirmacao.tsx)
+   Para a ação que troca de página logo depois de salvar: o toast do canto
+   sairia junto com a tela e o operador ficaria sem resposta ao próprio clique.
+   ============================================================ */
+.pagina-admin .pnl-confirma{
+  position:fixed;inset:0;z-index:600;
+  display:grid;place-items:center;
+  background:rgba(7,9,8,.72);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  animation:pnlConfirmaFundo .18s ease-out both;
+}
+.pagina-admin .pnl-confirma-caixa{
+  width:min(360px,calc(100vw - 40px));
+  text-align:center;padding:28px 26px 24px;
+  background:var(--preto-elev);
+  border:1px solid var(--linha);
+  border-radius:var(--r-card);
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+  animation:pnlConfirmaSobe .26s var(--suave) both;
+}
+.pagina-admin .pnl-confirma-selo{
+  display:grid;place-items:center;
+  width:52px;height:52px;margin:0 auto 14px;
+  border-radius:50%;
+  color:var(--carvao);
+  background:linear-gradient(140deg,var(--verde),var(--ciano));
+}
+.pagina-admin .pnl-confirma-caixa strong{
+  display:block;font-size:17px;font-weight:640;letter-spacing:-.02em;
+}
+.pagina-admin .pnl-confirma-caixa p{
+  margin:6px 0 0;font-size:13.5px;line-height:1.45;color:var(--cinza-claro);
+}
+.pagina-admin .pnl-confirma-caixa .pnl-btn-primario{margin-top:18px;width:100%;justify-content:center}
+
+@keyframes pnlConfirmaFundo{from{opacity:0}to{opacity:1}}
+@keyframes pnlConfirmaSobe{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  .pagina-admin .pnl-confirma,
+  .pagina-admin .pnl-confirma-caixa{animation:none}
+}

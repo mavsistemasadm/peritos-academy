@@ -673,6 +673,27 @@ antes de culpar o código.
 divergiram** (o Next lê o segundo, os scripts leem o primeiro). Agora
 `.env.local` é link simbólico para `env.local`.
 
+## Salvar o evento volta para a agenda — 2026-09-01
+
+**Regra permanente.** Ação de admin que **troca de página** logo depois confirma
+no **centro da tela** (`components/AdminConfirmacao.tsx`, `.pnl-confirma`), não
+no canto. O toast do canto sai junto com a tela que some, e o operador fica sem
+resposta ao próprio clique.
+
+Salvar no editor de evento agora leva de volta a `/admin/agenda`. Antes ficava
+na tela recém-salva, idêntica, com os mesmos campos preenchidos e um toast que
+sumia em três segundos — parecia que nada tinha acontecido, e a dúvida termina
+em salvar de novo. O editor é onde se monta o evento; a agenda é onde se
+trabalha.
+
+A confirmação sai sozinha em 1,3s, e tem botão e ESC para quem lê rápido. Só o
+formulário principal navega: **publicar, trocar a thumbnail e anunciar continuam
+com o toast**, porque nessas três a pessoa está olhando o efeito na própria tela.
+
+⚠️ O detalhe da caixa vem do **formulário**, não das props: quem acabou de
+renomear o evento veria o nome antigo na confirmação do próprio rename, que é o
+momento em que mais se duvida se salvou.
+
 ## Turma fechada: o curso restrito — 2026-09-01
 
 **Regra permanente.** `cursos.restrito` é o curso **publicado e mesmo assim
