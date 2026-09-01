@@ -673,6 +673,48 @@ antes de culpar o código.
 divergiram** (o Next lê o segundo, os scripts leem o primeiro). Agora
 `.env.local` é link simbólico para `env.local`.
 
+## 🔴 A hora do evento andava três horas a cada salvamento — 2026-09-01
+
+**Regra permanente.** O que se digita no admin é **hora de Brasília, sempre** —
+não a hora do navegador de quem edita. O produto inteiro anuncia "horário de
+Brasília" ao aluno, e um admin viajando não pode mover a live de todo mundo sem
+tocar em nada. A conversão nos dois sentidos mora em **`lib/evento/relogio.ts`**.
+
+**Causa:** `<input type="datetime-local">` entrega um relógio de parede sem
+fuso (`"2026-10-06T19:00"`), e `montarCampos` fazia `new Date(...).toISOString()`
+— que interpreta no fuso de **quem executa**. No Mac do dev isso é Brasília e
+parecia certo; na Vercel é UTC. "19:00" virava `19:00Z`, ou seja, 16:00 em
+Brasília.
+
+⚠️ **E não era um erro só, era um erro por salvamento.** O editor lia o valor de
+volta com o relógio do NAVEGADOR, mostrando 16:00 no campo; salvar de novo
+gravava `16:00Z`, e a tela passava a mostrar 13:00. Dois relógios diferentes nas
+duas pontas do mesmo campo, **andando três horas para trás a cada vez, em
+silêncio**. Medido em 01/09/2026: as horas guardadas dos 5 eventos eram 19, 16,
+16, 13 e 10 — todas descendo de três em três a partir do mesmo 19h digitado.
+
+**O que ficou:** `deBrasiliaParaISO` e `deISOParaBrasilia` são um par exato, e
+`formatarEmBrasilia` é o que a lista do admin usa. O campo agora diz em voz alta
+que é horário de Brasília.
+
+⚠️ **O desvio é MEDIDO por data, não assumido como -3.** O Brasil não tem
+horário de verão desde 2019, mas isso é lei, não física: uma constante fixa
+moveria a agenda inteira em uma hora no dia em que voltasse, sem nada acusando.
+`lib/evento/janelas.ts` ainda usa a constante fixa `OFFSET_BRASILIA` — lá ela
+calcula janelas relativas de cron, onde uma hora de folga não muda o resultado;
+aqui mudaria. **Se o horário de verão voltar, janelas.ts é o próximo lugar a
+olhar.**
+
+⚠️ As telas do ALUNO nunca tiveram esse defeito: `AgendaContent`,
+`EventoPublicoContent` e os emails já formatavam com `timeZone:
+'America/Sao_Paulo'`. O defeito era só na ESCRITA do admin e na lista dele — o
+que é pior, não melhor: o aluno via com precisão a hora errada.
+
+**Dados corrigidos:** as 4 mentorias futuras foram devolvidas para 19:00 de
+Brasília (`22:00Z`). A Aula Inaugural de 18/08 ficou como estava — é evento
+passado e não dá para saber se os `16:00Z` dela eram o digitado ou já uma
+derrapagem.
+
 ## Salvar o evento volta para a agenda — 2026-09-01
 
 **Regra permanente.** Ação de admin que **troca de página** logo depois confirma

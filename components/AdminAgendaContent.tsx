@@ -5,6 +5,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { EventoAdmin } from '@/lib/queries/admin-agenda'
 import { criarEvento, alternarPublicacaoEvento, excluirEvento } from '@/app/admin/agenda/actions'
+import { formatarEmBrasilia } from '@/lib/evento/relogio'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 const NOME_TIPO: Record<string, string> = {
@@ -86,7 +87,7 @@ export default function AdminAgendaContent({ eventos }: { eventos: EventoAdmin[]
               <div>
                 <a href={`/admin/agenda/${e.id}`}><b>{e.titulo}</b></a>
                 <span className="pnl-admin-slug">
-                  {NOME_TIPO[e.tipo] ?? e.tipo} · {e.iniciaEm ? new Date(e.iniciaEm).toLocaleString('pt-BR') : 'sem data'} · {e.totalReservas} reserva{e.totalReservas === 1 ? '' : 's'}
+                  {NOME_TIPO[e.tipo] ?? e.tipo} · {formatarEmBrasilia(e.iniciaEm)} · {e.totalReservas} reserva{e.totalReservas === 1 ? '' : 's'}
                 </span>
               </div>
             </div>

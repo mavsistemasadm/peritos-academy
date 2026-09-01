@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
 import { criarClienteServico } from '@/lib/supabase/servico'
+import { deBrasiliaParaISO } from '@/lib/evento/relogio'
 import { enviarEmailConvidado } from '@/lib/email/enviarConvidado'
 import { emailEvento } from '@/lib/email/templates/evento'
 import { dadosDoEmail, type EventoParaEmail } from '@/lib/evento/email'
@@ -30,7 +31,11 @@ function montarCampos(formData: FormData) {
     titulo: (formData.get('titulo') as string)?.trim(),
     tipo: (formData.get('tipo') as string)?.trim(),
     descricao: (formData.get('descricao') as string)?.trim() || null,
-    inicia_em: iniciaEmRaw ? new Date(iniciaEmRaw).toISOString() : null,
+    // ⚠️ O campo entrega um relógio de parede sem fuso ("2026-10-06T19:00").
+    // `new Date()` o interpretaria no fuso de quem executa, que na Vercel é
+    // UTC: o evento nascia três horas mais cedo, e cada salvamento seguinte
+    // andava mais três. Ver lib/evento/relogio.ts.
+    inicia_em: deBrasiliaParaISO(iniciaEmRaw),
     duracao_seg: Number((formData.get('duracao_seg') as string) || 3600),
     link_transmissao: (formData.get('link_transmissao') as string)?.trim() || null,
     gravacao_url: (formData.get('gravacao_url') as string)?.trim() || null,

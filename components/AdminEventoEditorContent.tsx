@@ -11,13 +11,12 @@ import { IconeChevronLeft, IconeLink, IconeSend, IconeEye, IconeDownload, IconeM
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 import AdminConfirmacao from '@/components/AdminConfirmacao'
 import { SITE_URL } from '@/lib/site'
+import { deISOParaBrasilia } from '@/lib/evento/relogio'
 
-function paraDatetimeLocal(iso: string | null) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
+// ⚠️ Lia com o relógio do NAVEGADOR, e o servidor gravava com o relógio DELE.
+// Dois relógios diferentes nas duas pontas do mesmo campo: o valor andava a
+// cada salvamento. Agora as duas pontas falam Brasília. Ver lib/evento/relogio.ts.
+const paraDatetimeLocal = deISOParaBrasilia
 
 
 // ══════════════════════════════════════════════════════════════════
@@ -595,6 +594,7 @@ export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao
             <div className="pnl-form-linha">
               <label>Data e hora de início
                 <input name="inicia_em" type="datetime-local" defaultValue={paraDatetimeLocal(evento.iniciaEm)} />
+                <small>Horário de Brasília, seja qual for o fuso do seu computador. É o horário que o aluno vê.</small>
               </label>
               <label>Duração (segundos)
                 <input name="duracao_seg" type="number" min="0" defaultValue={evento.duracaoSeg} />
