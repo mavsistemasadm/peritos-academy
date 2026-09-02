@@ -311,7 +311,9 @@ function FormaInscricao({ eventoId, aoVivo, aoInscrever, nexusLink }: {
 // o erro que a própria plataforma já documentou ao decidir o que sai da home
 // do acesso parcial — o que ele clica fica, o que o interrompe na porta sai.
 //
-// Some para quem já está logado: aluno não precisa que expliquem a casa.
+// ⚠️ Some para quem JÁ ASSINA, e não para quem está logado. O aluno da Academy
+// tem conta e não tem o ecossistema: era dele que este bloco estava sendo
+// escondido, e é ele quem tem mais motivo para lê-lo.
 // ══════════════════════════════════════════════════════════════════
 /**
  * Os seis produtos, com o nome, a logo e a cor que cada um já tem na casa.
@@ -350,15 +352,25 @@ const FERRAMENTAS: { nome: string; dor: string; logo: string; cor: string }[] = 
 // Esta faixa é a mesma oferta no momento em que ela é dita em voz alta. Fica
 // logo abaixo do player, no fio do olho.
 //
-// ⚠️ SÓ APARECE PARA QUEM JÁ ESTÁ INSCRITO. Quem ainda não entrou está vendo o
-// formulário, e formulário e oferta na mesma tela não somam: dividem, e a
-// pessoa abre sempre o que pede menos dela — perdendo a inscrição, que é o
-// único dado que sobrevive ao fim da live.
+// ⚠️ SÓ APARECE PARA QUEM JÁ ESTÁ DENTRO — inscrito, se for visitante;
+// reservado, se tiver conta. Quem ainda não entrou está vendo o botão ou o
+// formulário, e duas perguntas na mesma tela não somam: dividem, e a pessoa
+// responde sempre a que pede menos dela — perdendo a inscrição, que é o único
+// dado que sobrevive ao fim da live.
 //
-// ⚠️ E SÓ PARA QUEM NÃO ESTÁ LOGADO, pela mesma regra do ConviteNexus: aluno
-// não precisa que expliquem a casa, e assinante vendo a própria compra
+// ⚠️ QUEM CALA A OFERTA É `ehAssinanteNexus`, NUNCA `logado`.
+//
+// A regra era "some para quem está logado", com o argumento de que aluno não
+// precisa que expliquem a casa. O argumento caiu junto com o fato: a Peritos
+// Academy tem 425 alunos logados que NÃO têm o ecossistema — têm um sexto
+// dele — e são o melhor público de venda da base. A regra antiga silenciava a
+// oferta exatamente para eles, dentro da sala em que a venda é feita em voz
+// alta.
+//
+// O que continua valendo é o outro lado: assinante vendo a própria compra
 // anunciada como condição de entrada é o jeito mais rápido de azedar quem já
-// está dentro.
+// está dentro. Por isso o portão é "já paga?", e ele casa por duas chaves —
+// ver `ehAssinanteNexus` em lib/queries/evento-publico.ts.
 // ══════════════════════════════════════════════════════════════════
 function OfertaAoVivo({ link }: { link: string }) {
   return (
@@ -458,6 +470,10 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
   // na porta — e é ela que impede o chat de virar caixa de entrada aberta.
   // Quem conduz nunca precisa se inscrever no próprio encontro para responder.
   const podeFalarNoChat = ev.ehDaCasa || (ev.logado && reservado) || (!ev.logado && inscrito)
+  // "Já entrou": reservou (com conta) ou se inscreveu (sem conta). É o que
+  // libera a oferta — antes disso a tela ainda está pedindo a inscrição, e ela
+  // vale mais que o clique na venda.
+  const jaEstaDentro = ev.logado ? reservado : inscrito
   const iniciais = ev.apresentadorNome?.split(' ').map(p => p[0]).join('').slice(0, 2)
 
   return (
@@ -600,7 +616,7 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
 
               {/* A oferta no meio da live, para quem já entrou. Ver o cabeçalho
                   de OfertaAoVivo para as duas condições e o porquê de cada uma. */}
-              {vivo && !ev.logado && inscrito && <OfertaAoVivo link={ev.nexusLink} />}
+              {vivo && !ev.ehAssinanteNexus && jaEstaDentro && <OfertaAoVivo link={ev.nexusLink} />}
 
               {/* ══════════════════════════════════════════════════
                   O QUE ESPERAR, DITO NA HORA EM QUE A PESSOA SE COMPROMETE
@@ -657,7 +673,7 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
             )}
           </article>
 
-          {!ev.logado && <ConviteNexus link={ev.nexusLink} nomePlataforma={ev.nomePlataforma} />}
+          {!ev.ehAssinanteNexus && <ConviteNexus link={ev.nexusLink} nomePlataforma={ev.nomePlataforma} />}
         </div>
       </main>
     </div>

@@ -93,6 +93,18 @@ export type EventoPublico = {
   logoUrl: string | null
   /** Para onde o convite ao Nexus aponta nesta tela — ver LINK_NEXUS. */
   nexusLink: string
+  /**
+   * Esta pessoa JÁ ASSINA o Nexxus?
+   *
+   * É a única coisa que cala a oferta na página. `logado` não serve para isso:
+   * a Peritos Academy tem 425 alunos que estão logados e NÃO têm o ecossistema
+   * — são um sexto dele. Eles são o melhor público de venda que existe na base
+   * (já compraram, já confiam, e veem o Nexxus em modo vitrine todo dia), e
+   * eram exatamente quem a regra antiga silenciava.
+   *
+   * Visitante deslogado é sempre `false`: ele não tem como estar pagando.
+   */
+  ehAssinanteNexus: boolean
 }
 
 export async function carregarEventoPublico(slug: string): Promise<EventoPublico | null> {
@@ -121,6 +133,37 @@ export async function carregarEventoPublico(slug: string): Promise<EventoPublico
   // existe para convencer. Num evento normal continua valendo a regra de
   // sempre — só quem tem sessão.
   const podeVerTransmissao = logado || abertoAoPublico
+
+  // ── ELE JÁ PAGA? DUAS CHAVES, PORQUE UMA SÓ ERRA ──
+  //
+  // ⚠️ `perfis.nexus_status` sozinho NÃO serve. Ele só é escrito quando alguém
+  // entra por SSO vindo do Nexxus, e por isso marca 54 pessoas quando existem
+  // 117 assinantes: os outros ~63 seriam tratados como não-assinantes e veriam
+  // "condição de entrada" para o produto que acabaram de comprar — o jeito mais
+  // rápido de azedar quem já está dentro.
+  //
+  // A segunda chave é a concessão que o batimento diário do Nexxus escreve
+  // aqui, `acessos_conteudo` com `origem = 'nexus'`: 93 linhas, e é a marca de
+  // assinante que existe deste lado do ecossistema.
+  //
+  // Casar por mais de uma chave é a regra que este ecossistema já aprendeu três
+  // vezes com número — no Asaas, na migração da Academy e na supressão de
+  // esteira. Na dúvida, o portão falha CALANDO a oferta: mostrar demais custa
+  // um cliente irritado, esconder custa uma venda que volta na semana seguinte.
+  const ehAssinanteNexus = logado
+    ? await (async () => {
+        const [{ data: perfil }, { data: concessoes }] = await Promise.all([
+          supabase.from('perfis').select('nexus_status').eq('id', auth!.user!.id).maybeSingle(),
+          supabase.from('acessos_conteudo')
+            .select('id')
+            .eq('usuario_id', auth!.user!.id)
+            .eq('origem', 'nexus')
+            .eq('ativo', true)
+            .limit(1),
+        ])
+        return perfil?.nexus_status === 'active' || (concessoes?.length ?? 0) > 0
+      })()
+    : false
 
   const [{ data: contagem }, reserva] = await Promise.all([
     supabase.rpc('contar_confirmados', { p_evento: ev.id }),
@@ -166,6 +209,7 @@ export async function carregarEventoPublico(slug: string): Promise<EventoPublico
     nomePlataforma: config?.nome_plataforma ?? 'Peritos Academy',
     logoUrl: config?.logo_url ?? null,
     nexusLink: LINK_NEXUS,
+    ehAssinanteNexus,
   }
 }
 
