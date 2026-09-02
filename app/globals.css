@@ -6618,6 +6618,20 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 .pagina-evento .ev-nexus-grade span{display:block;font-size:12.5px;color:var(--cinza);line-height:1.45}
 .pagina-evento .ev-nexus-acao{display:flex;gap:var(--s-2);flex-wrap:wrap}
 
+/* ---------- o interruptor de quem conduz a live ----------
+   Cor de PALCO, e nao a verde da oferta: e um controle do apresentador no meio
+   de uma pagina que e do publico. Se parecesse com o resto, ele o perderia de
+   vista justamente no minuto em que precisa dele. */
+.pagina-evento .ev-palco{
+  margin-top:var(--s-4);padding:var(--s-3) var(--s-4);
+  display:flex;align-items:center;justify-content:space-between;gap:var(--s-3);flex-wrap:wrap;
+  border:1px dashed rgba(221,247,132,.40);border-radius:14px;
+  background:rgba(221,247,132,.05);
+}
+.pagina-evento .ev-palco b{display:block;font-size:14px;color:var(--lima);margin-bottom:2px}
+.pagina-evento .ev-palco small{display:block;font-size:12px;line-height:1.45;color:var(--cinza);max-width:52ch}
+.pagina-evento .ev-palco .btn{flex-shrink:0}
+
 /* ---------- a oferta enquanto a live acontece ----------
    Faixa horizontal, e nao cartao: ela divide espaco com o player e o chat, e um
    cartao ali empurraria a transmissao para fora da primeira tela — que e o

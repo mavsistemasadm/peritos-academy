@@ -105,6 +105,8 @@ export type EventoPublico = {
    * Visitante deslogado é sempre `false`: ele não tem como estar pagando.
    */
   ehAssinanteNexus: boolean
+  /** O apresentador já liberou a oferta nesta transmissão? */
+  ofertaLiberada: boolean
 }
 
 export async function carregarEventoPublico(slug: string): Promise<EventoPublico | null> {
@@ -210,6 +212,7 @@ export async function carregarEventoPublico(slug: string): Promise<EventoPublico
     logoUrl: config?.logo_url ?? null,
     nexusLink: LINK_NEXUS,
     ehAssinanteNexus,
+    ofertaLiberada: !!ev.oferta_liberada,
   }
 }
 

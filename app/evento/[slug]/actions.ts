@@ -444,6 +444,60 @@ function janelaDoChatAberta(iniciaEm: string | null, duracaoSeg: number): boolea
 // assina UPDATE justamente por isto. Sem essa parte, a mensagem sumiria só
 // para quem recarregasse — que não é a pessoa de quem se quis esconder.
 // ══════════════════════════════════════════════════════════════════
+/**
+ * ══════════════════════════════════════════════════════════════════
+ * O APRESENTADOR LIBERA A OFERTA NA HORA DO PITCH
+ *
+ * A faixa de venda ficava visível a live inteira. Quem entra às 11h e encontra
+ * a oferta já na tela lê a aula como um infomercial de uma hora — e a promessa
+ * desta live é o contrário: uma hora resolvendo o problema da pessoa, sem
+ * pauta fechada. A oferta vale mais dita uma vez, na hora certa, do que
+ * exposta sessenta minutos até virar paisagem.
+ *
+ * ⚠️ MESMA PERMISSÃO DA MODERAÇÃO DO CHAT, e não uma nova: quem pode esconder
+ * a mensagem de alguém na frente da sala é quem conduz. Uma segunda régua para
+ * o mesmo poder é a que fica desatualizada.
+ *
+ * ⚠️ NÃO CHAMA `revalidatePath`. Quem propaga é o Realtime, e revalidar aqui
+ * não faria a página de ninguém que já está na sala mudar — o que ele faria é
+ * dar a impressão, para quem lê o código, de que faz.
+ * ══════════════════════════════════════════════════════════════════
+ */
+export async function alternarOfertaDoEvento(
+  eventoId: string,
+  liberada: boolean,
+): Promise<{ ok: true } | { ok: false; erro: string }> {
+  const servidor = await criarClienteServidor()
+  const { data: auth } = await servidor.auth.getUser()
+  if (!auth?.user) return { ok: false, erro: 'Entre para conduzir este encontro.' }
+
+  const supabase = criarClienteServico()
+
+  const [{ data: admin }, { data: ev }] = await Promise.all([
+    supabase.rpc('is_admin_papel', {
+      uid: auth.user.id,
+      papeis: ['super_admin', 'moderador', 'conteudo'],
+    }),
+    supabase.from('eventos').select('criado_por').eq('id', eventoId).maybeSingle(),
+  ])
+
+  if (!ev) return { ok: false, erro: 'Encontro não encontrado.' }
+  if (admin !== true && ev.criado_por !== auth.user.id) {
+    return { ok: false, erro: 'Sem permissão para conduzir este encontro.' }
+  }
+
+  const { error } = await supabase
+    .from('eventos')
+    .update({ oferta_liberada: liberada })
+    .eq('id', eventoId)
+
+  if (error) {
+    console.error('[oferta ao vivo] falha ao alternar:', error)
+    return { ok: false, erro: 'Não consegui agora. Tente de novo.' }
+  }
+  return { ok: true }
+}
+
 export async function ocultarMensagemEvento(
   mensagemId: string,
 ): Promise<{ ok: true } | { ok: false; erro: string }> {

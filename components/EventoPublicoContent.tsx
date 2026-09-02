@@ -16,8 +16,9 @@
 import { useEffect, useState, useTransition } from 'react'
 import { reservarLugar } from '@/app/agenda/actions'
 import type { EventoPublico } from '@/lib/queries/evento-publico'
-import { inscreverNoEvento } from '@/app/evento/[slug]/actions'
+import { inscreverNoEvento, alternarOfertaDoEvento } from '@/app/evento/[slug]/actions'
 import { urlEmbedYoutube } from '@/lib/video/youtube'
+import { criarClienteBrowser } from '@/lib/supabase/client'
 import ChatDoEvento from '@/components/ChatDoEvento'
 import { IconeCalendarPlus, IconeCheck, IconePlay, IconeStar, IconeChevronRight, IconeLock, IconeMessageCircle } from '@/components/Icones'
 import { AoVivo } from '@/components/Emblemas'
@@ -474,6 +475,34 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
   // libera a oferta — antes disso a tela ainda está pedindo a inscrição, e ela
   // vale mais que o clique na venda.
   const jaEstaDentro = ev.logado ? reservado : inscrito
+
+  // ── A OFERTA LIBERADA, E O CANAL QUE A PROPAGA ──
+  //
+  // ⚠️ O REALTIME É A METADE QUE FAZ O RECURSO EXISTIR. Sem ele a faixa só
+  // apareceria para quem desse F5 — e ninguém recarrega a página no meio de
+  // uma transmissão. O apresentador clicaria, veria a oferta na PRÓPRIA tela e
+  // concluiria que funcionou, com a sala inteira sem ver nada.
+  //
+  // Mesmo padrão do chat: canal por evento, e o navegador de quem não tem
+  // conta consegue assinar porque a policy de leitura de `eventos` é pública
+  // para evento publicado.
+  const [ofertaLiberada, setOfertaLiberada] = useState(ev.ofertaLiberada)
+  const [alternando, alternar] = useTransition()
+
+  useEffect(() => {
+    const supabase = criarClienteBrowser()
+    const canal = supabase
+      .channel(`evento-oferta-${ev.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'eventos', filter: `id=eq.${ev.id}` },
+        (payload: { new: Record<string, unknown> }) => {
+          setOfertaLiberada(!!payload.new?.oferta_liberada)
+        },
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(canal) }
+  }, [ev.id])
   const iniciais = ev.apresentadorNome?.split(' ').map(p => p[0]).join('').slice(0, 2)
 
   return (
@@ -616,7 +645,46 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
 
               {/* A oferta no meio da live, para quem já entrou. Ver o cabeçalho
                   de OfertaAoVivo para as duas condições e o porquê de cada uma. */}
-              {vivo && !ev.ehAssinanteNexus && jaEstaDentro && <OfertaAoVivo link={ev.nexusLink} />}
+              {vivo && ofertaLiberada && !ev.ehAssinanteNexus && jaEstaDentro && (
+                <OfertaAoVivo link={ev.nexusLink} />
+              )}
+
+              {/* ── O INTERRUPTOR DE QUEM CONDUZ ──
+                  Fica na página do encontro, e não no /admin: durante a live é
+                  esta a tela aberta, e mandar o apresentador abrir outra aba no
+                  meio do pitch é o mesmo que não ter o botão.
+
+                  Só aparece enquanto está no ar — fora disso não há pitch a
+                  liberar, e um interruptor visível sem função ensina a ignorar
+                  aquele canto da tela. */}
+              {ev.ehDaCasa && vivo && (
+                <div className="ev-palco">
+                  <span>
+                    <b>{ofertaLiberada ? 'A oferta está na tela' : 'A oferta está escondida'}</b>
+                    <small>
+                      {ofertaLiberada
+                        ? 'Todo mundo na sala que ainda não assina está vendo a faixa agora.'
+                        : 'Libere quando começar o pitch. Aparece na hora, sem ninguém recarregar.'}
+                    </small>
+                  </span>
+                  <button
+                    type="button"
+                    className={`btn ${ofertaLiberada ? 'btn-fantasma' : 'btn-primario'}`}
+                    disabled={alternando}
+                    onClick={() => alternar(async () => {
+                      const alvo = !ofertaLiberada
+                      // Otimista: o apresentador precisa ver a resposta no
+                      // clique. O Realtime confirma logo atrás, e um erro
+                      // devolve o estado — ver o catch.
+                      setOfertaLiberada(alvo)
+                      const r = await alternarOfertaDoEvento(ev.id, alvo)
+                      if (!r.ok) { setOfertaLiberada(!alvo); setErro(r.erro) }
+                    })}
+                  >
+                    {alternando ? 'Um instante…' : ofertaLiberada ? 'Esconder a oferta' : 'Liberar a oferta agora'}
+                  </button>
+                </div>
+              )}
 
               {/* ══════════════════════════════════════════════════
                   O QUE ESPERAR, DITO NA HORA EM QUE A PESSOA SE COMPROMETE

@@ -123,6 +123,10 @@ export async function atualizarEvento(id: string, formData: FormData): Promise<R
  *                      encontro anunciada como o desta semana.
  *   visualizacoes      contador do encontro anterior.
  *   confirmados_base   idem.
+ *   oferta_liberada    ⚠️ o interruptor do pitch da semana passada. Herdado, a
+ *                      live nova abriria com a faixa de venda já na tela às
+ *                      11h — exatamente o infomercial de uma hora que o
+ *                      interruptor existe para evitar.
  *
  * ⚠️ `gravacao_thumb_url` FICA, apesar do nome. Ela não é a miniatura da
  * gravação: é a CAPA do encontro — `evento-publico.ts` a expõe como
@@ -155,6 +159,7 @@ export async function repetirEvento(id: string, semanas = 1): Promise<Resultado>
     id: _id, criado_em: _criadoEm, slug: _slug, publicado: _publicado,
     link_transmissao: _link, gravacao_url: _gravacao,
     visualizacoes: _views, confirmados_base: _confirmados,
+    oferta_liberada: _oferta,
     ...conteudo
   } = original as Record<string, unknown>
 
@@ -167,6 +172,7 @@ export async function repetirEvento(id: string, semanas = 1): Promise<Resultado>
       slug: null,
       link_transmissao: null,
       gravacao_url: null,
+      oferta_liberada: false,
       criado_por: admin?.usuarioId ?? null,
     })
     .select('id')
