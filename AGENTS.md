@@ -178,3 +178,54 @@ mediu três vezes: assinante que é aluno sob outro endereço.
    com o mesmo valor de `ACESSO_STATUS_KEY` e `INTEGRACAO_CONTATO_KEY` do Nexus.
    Sem a primeira, ninguém é barrado (falha aberta). Sem a segunda, **o lead da
    live não chega à base de marketing** — a live acontece e não capta nada.
+
+## Não existe evento recorrente, e não pode existir
+
+⚠️ **Um registro servindo várias quartas quebraria tudo que pendura nele:**
+`evento_inscricoes` é por `evento_id`, os três lembretes são por evento, e a
+porta da aula única conta ENCONTROS DISTINTOS. Com um registro só, a pessoa se
+inscreveria uma vez e viria para sempre — o oposto exato da regra.
+
+Então cada quarta é um registro, e o que se automatiza é a **cópia**:
+`repetirEvento(id, semanas)` em `app/admin/agenda/actions.ts`, com o botão
+"Repetir +7 dias" na lista da agenda. A cópia nasce **rascunho** e a tela leva
+direto ao editor dela — quem repetiu ainda precisa colar o link da transmissão,
+e devolver a pessoa para a lista deixaria um rascunho invisível que ela
+descobriria na quarta-feira.
+
+⚠️ **A cópia NÃO leva o `link_transmissao` nem o `gravacao_url`.** Campo
+preenchido não pede para ser revisto: os inscritos da semana que vem cairiam
+numa transmissão encerrada, e a gravação de outro encontro seria anunciada como
+a desta semana.
+
+⚠️ **Mas `gravacao_thumb_url` FICA, apesar do nome.** Ela não é a miniatura da
+gravação: é a CAPA do encontro — `evento-publico.ts` a expõe como `imagemUrl`, e
+é ela que vira a imagem do cartão do WhatsApp, que o `generateMetadata` do
+`/evento/[slug]` chama de "a metade do recurso". A arte da série é a mesma toda
+semana; perdê-la seria perder metade do convite sete dias por vez.
+
+⚠️ **`somarSemanasEmBrasilia` e nunca `+ 7 * 24 * 60 * 60 * 1000`.** Somar
+milissegundos preserva o instante em UTC, não o relógio de parede. O Brasil não
+tem horário de verão desde 2019 — mas isso é lei, não física, e no dia em que
+voltar a aula das 11h nasceria às 10h uma vez só, sem nada acusando. É a mesma
+razão pela qual `lib/evento/relogio.ts` existe.
+
+## `/aula` — o endereço que não muda
+
+Cada semana tem slug próprio, e um e-mail, um anúncio ou a bio do Instagram não
+podem depender de alguém trocar a URL sete dias por vez.
+`evolua.peritosacademy.com.br/aula` leva sempre ao **próximo encontro aberto**.
+
+⚠️ **A live EM ANDAMENTO vence a próxima.** Quem clica às 11h05 precisa cair na
+sala que está no ar, não na da semana que vem — por isso a busca do que está
+acontecendo agora é uma consulta separada e vem primeiro.
+
+⚠️ **Sem próxima marcada, ele NÃO cai no encontro passado.** A página de um
+evento encerrado não mostra o formulário de reserva: quem veio pelo e-mail de
+hoje encontraria um convite de duas semanas atrás, sem nada para clicar, e
+concluiria que a live acabou para sempre. A tela diz a verdade e oferece um
+caminho.
+
+⚠️ **`robots: noindex`.** O conteúdo da URL muda toda semana; indexada, o Google
+guardaria o resumo de agosto e o mostraria em outubro. Quem entra no índice é
+`/evento/<slug>`, que descreve um encontro e não muda mais.

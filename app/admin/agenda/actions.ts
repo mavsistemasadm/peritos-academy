@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
 import { criarClienteServico } from '@/lib/supabase/servico'
-import { deBrasiliaParaISO } from '@/lib/evento/relogio'
+import { deBrasiliaParaISO, somarSemanasEmBrasilia } from '@/lib/evento/relogio'
 import { enviarEmailConvidado } from '@/lib/email/enviarConvidado'
 import { emailEvento } from '@/lib/email/templates/evento'
 import { dadosDoEmail, type EventoParaEmail } from '@/lib/evento/email'
@@ -92,6 +92,89 @@ export async function atualizarEvento(id: string, formData: FormData): Promise<R
   if (error) return { ok: false, erro: error.message }
   revalidar(id)
   return { ok: true }
+}
+
+/**
+ * ══════════════════════════════════════════════════════════════════
+ * REPETIR O ENCONTRO NA SEMANA SEGUINTE
+ *
+ * A aula ao vivo é semanal, e não existe — nem deve existir — evento
+ * recorrente neste banco. ⚠️ UM registro servindo várias quartas quebraria
+ * tudo que pendura nele: `evento_inscricoes` é por `evento_id`, os três
+ * lembretes são por evento, e a porta da aula única CONTA ENCONTROS
+ * DISTINTOS. Com um registro só, a pessoa se inscreveria uma vez e viria para
+ * sempre — o oposto exato da regra.
+ *
+ * Então cada quarta é um registro, e o que se automatiza é a cópia.
+ * ══════════════════════════════════════════════════════════════════
+ *
+ * O que a cópia NÃO leva, e cada omissão tem motivo:
+ *
+ *   publicado          nasce rascunho, como todo evento criado por aqui. O
+ *                      link de divulgação não pode existir antes de alguém
+ *                      conferir a data.
+ *   slug               é o ENDEREÇO, e endereço não se duplica. Deixado nulo,
+ *                      o trigger gera um livre a partir do título.
+ *   link_transmissao   ⚠️ a sala da semana passada. Copiá-lo mandaria os
+ *                      inscritos da quarta que vem para uma transmissão
+ *                      encerrada, e o campo preenchido não pede para ser
+ *                      revisto — ninguém troca o que parece pronto.
+ *   gravacao_url       pelo mesmo motivo, e pior: seria a gravação de OUTRO
+ *                      encontro anunciada como o desta semana.
+ *   visualizacoes      contador do encontro anterior.
+ *   confirmados_base   idem.
+ *
+ * ⚠️ `gravacao_thumb_url` FICA, apesar do nome. Ela não é a miniatura da
+ * gravação: é a CAPA do encontro — `evento-publico.ts` a expõe como
+ * `imagemUrl`, e é ela que vira a imagem do cartão que o WhatsApp monta para o
+ * link. O `generateMetadata` do `/evento/[slug]` chama esse cartão de "a
+ * metade do recurso", e uma série semanal sem capa perderia a metade toda
+ * semana. Herdá-la é o certo justamente porque a arte da série é a mesma.
+ *
+ * As inscrições e reservas ficam onde estão: são de quem veio naquele dia.
+ */
+export async function repetirEvento(id: string, semanas = 1): Promise<Resultado> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  const admin = await obterAdminAtual()
+  const supabase = await criarClienteServidor()
+
+  const { data: original, error: erroLeitura } = await supabase
+    .from('eventos')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (erroLeitura) return { ok: false, erro: erroLeitura.message }
+  if (!original) return { ok: false, erro: 'Encontro não encontrado.' }
+  if (!original.inicia_em) return { ok: false, erro: 'O encontro original não tem data para repetir.' }
+
+  const novaData = somarSemanasEmBrasilia(original.inicia_em, semanas)
+  if (!novaData) return { ok: false, erro: 'Não consegui calcular a data da próxima semana.' }
+
+  const {
+    id: _id, criado_em: _criadoEm, slug: _slug, publicado: _publicado,
+    link_transmissao: _link, gravacao_url: _gravacao,
+    visualizacoes: _views, confirmados_base: _confirmados,
+    ...conteudo
+  } = original as Record<string, unknown>
+
+  const { data, error } = await supabase
+    .from('eventos')
+    .insert({
+      ...conteudo,
+      inicia_em: novaData,
+      publicado: false,
+      slug: null,
+      link_transmissao: null,
+      gravacao_url: null,
+      criado_por: admin?.usuarioId ?? null,
+    })
+    .select('id')
+    .single()
+
+  if (error) return { ok: false, erro: error.message }
+  revalidar(data.id)
+  return { ok: true, id: data.id }
 }
 
 export async function alternarPublicacaoEvento(id: string, publicado: boolean): Promise<Resultado> {

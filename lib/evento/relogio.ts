@@ -105,3 +105,25 @@ export function formatarEmBrasilia(iso: string | null | undefined): string {
     hour: '2-digit', minute: '2-digit',
   }).format(d)
 }
+
+/**
+ * `iso` + N semanas, PRESERVANDO A HORA DE PAREDE de Brasília.
+ *
+ * ⚠️ Somar `7 * 24 * 60 * 60 * 1000` seria mais curto e está errado por um
+ * motivo que este arquivo já explica em cima: somar milissegundos preserva o
+ * INSTANTE relativo a UTC, não o relógio. O Brasil não tem horário de verão
+ * desde 2019 — mas isso é lei, não física, e no dia em que voltar a aula das
+ * 11h passaria a nascer às 10h ou às 12h, uma vez só, sem nada acusando. Ir e
+ * voltar pelo par de conversões deste arquivo põe 11:00 em 11:00 sempre.
+ */
+export function somarSemanasEmBrasilia(iso: string | null | undefined, semanas: number): string | null {
+  const parede = deISOParaBrasilia(iso)
+  if (!parede) return null
+  const [data, hora] = parede.split('T')
+  const [ano, mes, dia] = data.split('-').map(Number)
+  // Date.UTC aqui é só aritmética de calendário sobre a DATA — a hora de
+  // parede volta intocada na linha seguinte. Não é um instante.
+  const d = new Date(Date.UTC(ano, mes - 1, dia + semanas * 7))
+  const nova = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
+  return deBrasiliaParaISO(`${nova}T${hora}`)
+}

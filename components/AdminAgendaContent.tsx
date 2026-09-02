@@ -4,7 +4,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import type { EventoAdmin } from '@/lib/queries/admin-agenda'
-import { criarEvento, alternarPublicacaoEvento, excluirEvento } from '@/app/admin/agenda/actions'
+import { criarEvento, alternarPublicacaoEvento, excluirEvento, repetirEvento } from '@/app/admin/agenda/actions'
 import { formatarEmBrasilia } from '@/lib/evento/relogio'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
@@ -39,6 +39,19 @@ export default function AdminAgendaContent({ eventos }: { eventos: EventoAdmin[]
       const r = await alternarPublicacaoEvento(id, publicado)
       if (!r.ok) toast.erro(r.erro)
       else { toast.sucesso(publicado ? 'Evento publicado com sucesso' : 'Evento voltou a rascunho'); router.refresh() }
+    })
+  }
+
+  // A cópia da semana seguinte nasce RASCUNHO, e por isso o router leva direto
+  // ao editor dela: quem repetiu ainda precisa colar o link da transmissão e
+  // publicar. Devolver a pessoa para a lista deixaria um rascunho invisível no
+  // meio de eventos publicados, e ela descobriria na quarta-feira.
+  function onRepetir(id: string) {
+    startTransition(async () => {
+      const r = await repetirEvento(id, 1)
+      if (!r.ok) { toast.erro(r.erro); return }
+      toast.sucesso('Cópia criada para a próxima semana, como rascunho.')
+      if (r.id) router.push(`/admin/agenda/${r.id}`)
     })
   }
 
@@ -97,6 +110,11 @@ export default function AdminAgendaContent({ eventos }: { eventos: EventoAdmin[]
                 {e.publicado ? 'Publicado' : 'Rascunho'}
               </label>
               <a href={`/admin/agenda/${e.id}`} className="pnl-btn-secundario">Editar</a>
+              {e.iniciaEm && (
+                <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => onRepetir(e.id)} title="Cria uma cópia deste encontro sete dias depois, como rascunho">
+                  Repetir +7 dias
+                </button>
+              )}
               <button type="button" className="pnl-btn-perigo" disabled={pendente} onClick={() => onExcluir(e.id, e.titulo)}>Excluir</button>
             </div>
           </div>
