@@ -119,8 +119,23 @@ function LinhaEvento({ ev, vivo }: { ev: Evento; vivo: boolean }) {
         </p>
       </div>
       <div className="ev-acao">
+        {/* ⚠️ "ENTRAR AGORA" VAI PARA A PÁGINA DO ENCONTRO, NUNCA PARA O YOUTUBE.
+
+            Mandar direto para o link da transmissão parece o caminho curto e é
+            o caminho que esvazia a sala: no YouTube não existe o chat da casa
+            (que é onde as perguntas acontecem, e onde só entra quem reservou),
+            não existe a oferta ao vivo, e não existe a inscrição — a pessoa sai
+            da plataforma e a live vira um vídeo assistido por um anônimo.
+
+            A página do encontro tem o player embutido: quem clica aqui vê a
+            transmissão do mesmo jeito, e vê com o resto em volta.
+
+            O link cru continua sendo o fallback para o encontro que ainda não
+            tem slug — e para Zoom/Meet, que não embutem. */}
         {vivo
-          ? <a className="btn btn-primario" href={ev.link_transmissao ?? '#'} target="_blank" rel="noreferrer">Entrar agora</a>
+          ? (ev.slug
+              ? <a className="btn btn-primario" href={`/evento/${ev.slug}`}>Entrar agora</a>
+              : <a className="btn btn-primario" href={ev.link_transmissao ?? '#'} target="_blank" rel="noreferrer">Entrar agora</a>)
           : <BotaoReservar ev={ev} />}
       </div>
     </div>
@@ -129,26 +144,34 @@ function LinhaEvento({ ev, vivo }: { ev: Evento; vivo: boolean }) {
 
 // ---------- contagem regressiva ----------
 function Contagem({ alvoIso }: { alvoIso: string }) {
-  const [txt, setTxt] = useState({ h: '--', m: '--', s: '--' })
+  // `d` vazio antes de montar: servidor e navegador nunca leem o mesmo segundo,
+  // e decidir ali se mostra dias daria erro de hidratacao. Mesmo par de blocos
+  // de EventoPublicoContent, para os dois contadores contarem igual.
+  const [txt, setTxt] = useState({ d: '', h: '--', m: '--', s: '--' })
   useEffect(() => {
     const alvo = +new Date(alvoIso)
     const tick = () => {
-      const d = Math.max(0, Math.floor((alvo - Date.now()) / 1000))
+      const total = Math.max(0, Math.floor((alvo - Date.now()) / 1000))
       setTxt({
-        h: String(Math.floor(d / 3600)).padStart(2, '0'),
-        m: String(Math.floor((d % 3600) / 60)).padStart(2, '0'),
-        s: String(d % 60).padStart(2, '0'),
+        d: String(Math.floor(total / 86400)),
+        h: String(Math.floor((total % 86400) / 3600)).padStart(2, '0'),
+        m: String(Math.floor((total % 3600) / 60)).padStart(2, '0'),
+        s: String(total % 60).padStart(2, '0'),
       })
     }
     tick()
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
   }, [alvoIso])
+
+  // Faltando mais de um dia, o segundo e ruido: entra o bloco de dias no lugar.
+  const mostraDias = txt.d !== '' && txt.d !== '0'
   return (
     <div className="conta-grid num" aria-live="off">
+      {mostraDias && <div className="conta-b"><span className="v">{txt.d}</span><span className="r">{txt.d === '1' ? 'dia' : 'dias'}</span></div>}
       <div className="conta-b"><span className="v">{txt.h}</span><span className="r">horas</span></div>
       <div className="conta-b"><span className="v">{txt.m}</span><span className="r">min</span></div>
-      <div className="conta-b"><span className="v">{txt.s}</span><span className="r">seg</span></div>
+      {!mostraDias && <div className="conta-b"><span className="v">{txt.s}</span><span className="r">seg</span></div>}
     </div>
   )
 }
@@ -328,6 +351,7 @@ export default function AgendaContent({ dados, nav }: { dados: DadosAgenda; nav:
   const raiz = useRef<HTMLDivElement>(null)
 
   const heroEv = proximos[0] ?? null
+  const heroQuando = heroEv ? rotuloDia(heroEv.inicia_em) : null
   const iniciais = (usuarioNome ?? 'PA').split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 
   // reveals (igual ao template)
@@ -423,7 +447,7 @@ export default function AgendaContent({ dados, nav }: { dados: DadosAgenda; nav:
                 <span className="rot">Começa em</span>
                 <Contagem alvoIso={heroEv.inicia_em} />
                 <p className="quando num">
-                  {rotuloDia(heroEv.inicia_em).b} · {hora(heroEv.inicia_em)} - {hora(new Date(+new Date(heroEv.inicia_em) + heroEv.duracao_seg * 1000).toISOString())}
+                  {heroQuando!.b} · {heroQuando!.resto} · {hora(heroEv.inicia_em)} - {hora(new Date(+new Date(heroEv.inicia_em) + heroEv.duracao_seg * 1000).toISOString())}
                 </p>
                 <p className="confirmados num"><b>{heroEv.confirmados}</b> colegas confirmados{heroEv.reservado && ' · você está dentro'}</p>
               </div>

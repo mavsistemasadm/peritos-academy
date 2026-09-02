@@ -5,6 +5,9 @@ import { carregarMetricasComunidade } from '@/lib/queries/comunidade-metricas'
 
 export type Evento = {
   id: string
+  // O endereço da página do encontro. `select('*')` já o trazia; faltava no
+  // tipo, e por isso a agenda não tinha como linkar para lá.
+  slug: string | null
   titulo: string
   descricao: string | null
   tipo: 'sala_analise' | 'aula_ao_vivo' | 'plantao' | 'mentoria' | 'lancamento'
