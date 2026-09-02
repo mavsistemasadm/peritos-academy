@@ -339,6 +339,45 @@ const FERRAMENTAS: { nome: string; dor: string; logo: string; cor: string }[] = 
   { nome: 'Ache um Perito', dor: 'O juiz encontra você antes do concorrente', logo: '/nexus/logo-ache-um-perito.png', cor: '#8B4BE0' },
 ]
 
+// ══════════════════════════════════════════════════════════════════
+// A OFERTA ENQUANTO A LIVE ACONTECE
+//
+// O `ConviteNexus` mora no PÉ da página: ele fecha a visita de quem chegou pelo
+// convite e ainda não decidiu nada. Durante a transmissão isso não alcança
+// ninguém — a pessoa está com o vídeo aberto, olhando para o meio da tela, e
+// não vai rolar até o rodapé enquanto você fala.
+//
+// Esta faixa é a mesma oferta no momento em que ela é dita em voz alta. Fica
+// logo abaixo do player, no fio do olho.
+//
+// ⚠️ SÓ APARECE PARA QUEM JÁ ESTÁ INSCRITO. Quem ainda não entrou está vendo o
+// formulário, e formulário e oferta na mesma tela não somam: dividem, e a
+// pessoa abre sempre o que pede menos dela — perdendo a inscrição, que é o
+// único dado que sobrevive ao fim da live.
+//
+// ⚠️ E SÓ PARA QUEM NÃO ESTÁ LOGADO, pela mesma regra do ConviteNexus: aluno
+// não precisa que expliquem a casa, e assinante vendo a própria compra
+// anunciada como condição de entrada é o jeito mais rápido de azedar quem já
+// está dentro.
+// ══════════════════════════════════════════════════════════════════
+function OfertaAoVivo({ link }: { link: string }) {
+  return (
+    <aside className="ev-oferta-vivo">
+      <div>
+        <span className="ev-oferta-eyebrow">Enquanto você assiste</span>
+        <b>Este encontro é uma hora. O ecossistema é o ano inteiro.</b>
+        <span className="ev-oferta-linha">
+          Peritos Academy completa, Opera para o comercial, Financeiro, agentes de IA,
+          MH Ponto e Ache um Perito — a partir de 12x de R$124,83.
+        </span>
+      </div>
+      <a className="btn btn-primario" href={link} target="_blank" rel="noreferrer">
+        Ver a condição de entrada <IconeChevronRight size={13} strokeWidth={2.4} />
+      </a>
+    </aside>
+  )
+}
+
 function ConviteNexus({ link, nomePlataforma }: { link: string; nomePlataforma: string }) {
   return (
     <section className="ev-nexus">
@@ -558,6 +597,10 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
               {convidadoPendente && ev.estado !== 'encerrado' && (
                 <FormaInscricao eventoId={ev.id} aoVivo={vivo} aoInscrever={() => setInscrito(true)} nexusLink={ev.nexusLink} />
               )}
+
+              {/* A oferta no meio da live, para quem já entrou. Ver o cabeçalho
+                  de OfertaAoVivo para as duas condições e o porquê de cada uma. */}
+              {vivo && !ev.logado && inscrito && <OfertaAoVivo link={ev.nexusLink} />}
 
               {/* ══════════════════════════════════════════════════
                   O QUE ESPERAR, DITO NA HORA EM QUE A PESSOA SE COMPROMETE

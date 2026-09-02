@@ -6618,6 +6618,24 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 .pagina-evento .ev-nexus-grade span{display:block;font-size:12.5px;color:var(--cinza);line-height:1.45}
 .pagina-evento .ev-nexus-acao{display:flex;gap:var(--s-2);flex-wrap:wrap}
 
+/* ---------- a oferta enquanto a live acontece ----------
+   Faixa horizontal, e nao cartao: ela divide espaco com o player e o chat, e um
+   cartao ali empurraria a transmissao para fora da primeira tela — que e o
+   contrario do que a pagina esta fazendo naquele minuto. */
+.pagina-evento .ev-oferta-vivo{
+  margin-top:var(--s-4);padding:var(--s-3) var(--s-4);
+  display:flex;align-items:center;justify-content:space-between;gap:var(--s-4);flex-wrap:wrap;
+  border:1px solid rgba(32,217,166,.28);border-radius:16px;
+  background:linear-gradient(120deg,rgba(32,217,166,.10),rgba(54,220,209,.05),rgba(221,247,132,.05));
+}
+.pagina-evento .ev-oferta-eyebrow{
+  display:block;font-size:10.5px;letter-spacing:.10em;text-transform:uppercase;
+  font-weight:700;color:var(--verde);margin-bottom:6px;
+}
+.pagina-evento .ev-oferta-vivo b{display:block;font-size:16px;line-height:1.3;margin-bottom:4px}
+.pagina-evento .ev-oferta-linha{display:block;font-size:12.5px;line-height:1.5;color:var(--cinza-claro);max-width:56ch}
+.pagina-evento .ev-oferta-vivo .btn{flex-shrink:0}
+
 /* ---------- a segunda inscrição de quem não é da casa ----------
    Ocupa o lugar exato do formulário (.ev-forma), e por isso herda a largura e
    o respiro dele em vez de inventar uma caixa nova ao lado.
