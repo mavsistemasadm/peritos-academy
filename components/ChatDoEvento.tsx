@@ -22,11 +22,27 @@
 // ══════════════════════════════════════════════════════════════════
 'use client'
 
+
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { criarClienteBrowser } from '@/lib/supabase/client'
 import { enviarMensagemEvento, ocultarMensagemEvento } from '@/app/evento/[slug]/actions'
 import type { MensagemEvento } from '@/lib/queries/evento-chat'
 import { IconeMessageCircle, IconeSend, IconeEye } from '@/components/Icones'
+
+/**
+ * A paleta é uma LISTA CURTA E FIXA, e não um seletor completo.
+ *
+ * Um seletor de verdade (busca, categorias, tons de pele) é uma dependência de
+ * centenas de KB carregada por todo mundo que abre a página — inclusive quem só
+ * veio assistir. Num chat de uma hora, o que se usa é reação: concordar,
+ * agradecer, marcar dúvida. Vinte e quatro cobrem isso.
+ */
+const EMOJIS = [
+  '👍', '👏', '🙏', '🔥', '✅', '❤️',
+  '😂', '😅', '🤔', '😮', '👀', '💪',
+  '💡', '🎯', '📌', '📝', '📊', '⚖️',
+  '❓', '⏰', '🚀', '🙌', '✋', '🎉',
+] as const
 
 const fmtHora = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit',
@@ -47,6 +63,38 @@ export default function ChatDoEvento({ eventoId, inicial, podeFalar, motivoBloqu
   const [mensagens, setMensagens] = useState<MensagemEvento[]>(inicial)
   const [texto, setTexto] = useState('')
   const [erro, setErro] = useState('')
+  const [paleta, setPaleta] = useState(false)
+  const campo = useRef<HTMLInputElement>(null)
+
+  /**
+   * Insere no CURSOR, e não no fim.
+   *
+   * Quem escreveu "não entendi a parte do índice" e quer um 🤔 no meio da frase
+   * teria o emoji jogado no fim — e a alternativa, reescrever a mensagem, é o
+   * que faz ninguém usar a paleta uma segunda vez.
+   *
+   * ⚠️ O `maxLength` do input NÃO vale aqui: ele barra digitação, não escrita
+   * por código. Emoji custa 2 unidades UTF-16 (alguns, mais), então sem esta
+   * guarda a mensagem passaria dos 500 e o servidor a recusaria depois de a
+   * pessoa ter escrito tudo.
+   */
+  function inserirEmoji(emoji: string) {
+    const el = campo.current
+    const ini = el?.selectionStart ?? texto.length
+    const fimSel = el?.selectionEnd ?? texto.length
+    const novo = texto.slice(0, ini) + emoji + texto.slice(fimSel)
+    if (novo.length > 500) return
+    setTexto(novo)
+    setPaleta(false)
+    // O foco volta para onde a pessoa estava escrevendo; sem isto ela clica no
+    // campo de novo antes de continuar a frase.
+    requestAnimationFrame(() => {
+      el?.focus()
+      const pos = ini + emoji.length
+      el?.setSelectionRange(pos, pos)
+    })
+  }
+
   const [pendente, start] = useTransition()
   const fim = useRef<HTMLDivElement>(null)
   const lista = useRef<HTMLDivElement>(null)
@@ -164,7 +212,30 @@ export default function ChatDoEvento({ eventoId, inicial, podeFalar, motivoBloqu
 
       {podeFalar ? (
         <form className="ev-chat-forma" onSubmit={enviar}>
+          {/* ⚠️ A paleta fica FORA do <input>, e o clique nela não pode
+              submeter o formulário: botão dentro de <form> é `type="submit"`
+              por padrão, e sem o `type="button"` escolher um emoji mandaria a
+              mensagem pela metade. */}
+          <button
+            type="button"
+            className={`ev-chat-emoji-btn${paleta ? ' aberta' : ''}`}
+            onClick={() => setPaleta(v => !v)}
+            aria-label="Inserir emoji"
+            aria-expanded={paleta}
+          >
+            <span aria-hidden="true">🙂</span>
+          </button>
+          {paleta && (
+            <div className="ev-chat-paleta" role="listbox" aria-label="Emojis">
+              {EMOJIS.map(e => (
+                <button key={e} type="button" onClick={() => inserirEmoji(e)} aria-label={e}>
+                  <span aria-hidden="true">{e}</span>
+                </button>
+              ))}
+            </div>
+          )}
           <input
+            ref={campo}
             value={texto}
             onChange={e => setTexto(e.target.value)}
             placeholder="Escreva sua pergunta"
