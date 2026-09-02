@@ -470,9 +470,27 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
 
               {ev.metaExtra && <p className="ev-extra">{ev.metaExtra}</p>}
 
-              {/* ---------- AÇÃO ---------- */}
+              {/* ---------- AÇÃO ----------
+
+                  ⚠️ RESERVAR CONTINUA POSSÍVEL DEPOIS QUE A LIVE COMEÇA.
+
+                  Este bloco inteiro vivia dentro de `estado === 'agendado'`, e
+                  o efeito só aparecia na hora do encontro: às 11h05 o botão
+                  sumia da tela, para todo mundo. O convidado ainda tinha o
+                  formulário (ele fica fora desta fila), mas o ALUNO LOGADO que
+                  não reservou antes ficava sem caminho nenhum — enquanto o
+                  rodapé do chat continuava dizendo "Reserve seu lugar acima
+                  para falar no chat", apontando para um botão que não existia
+                  mais. Ele lia, procurava, e não achava.
+
+                  É a hora em que mais gente chega, e falar no chat É o produto
+                  desta live: sem pauta fechada, quem não pergunta não participa.
+
+                  O que continua preso a `agendado` é só o "Adicionar ao
+                  calendário": marcar na agenda um encontro que já começou não
+                  serve para nada. */}
               <div className="ev-acoes">
-                {ev.estado === 'agendado' && (
+                {(ev.estado === 'agendado' || vivo) && (
                   <>
                     {/* Aluno logado: reserva com um clique, como na agenda. */}
                     {ev.logado && reservado && (
@@ -480,7 +498,7 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
                     )}
                     {ev.logado && !reservado && (
                       <button className="btn btn-primario" onClick={reservar} disabled={pendente}>
-                        {pendente ? 'Reservando…' : 'Reservar meu lugar'}
+                        {pendente ? 'Reservando…' : vivo ? 'Entrar e falar no chat' : 'Reservar meu lugar'}
                       </button>
                     )}
 
@@ -496,7 +514,7 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
                       </a>
                     )}
 
-                    {!convidadoPendente && (
+                    {!convidadoPendente && ev.estado === 'agendado' && (
                       <a className="btn btn-fantasma" href={linkCalendario(ev)} target="_blank" rel="noreferrer">
                         <IconeCalendarPlus size={14} strokeWidth={2} /> Adicionar ao calendário
                       </a>
