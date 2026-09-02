@@ -110,11 +110,24 @@ já usou sua aula gratuita" pagando R$1.497,90 por ano.
 casa, e isso é escolha: ele é exatamente quem queremos de volta, e a aula aberta
 é a melhor conversa que existe com ele.
 
-⚠️ **As duas consultas de "é da casa" falham dizendo QUE SIM.** O erro é
+⚠️ **As consultas de "é da casa" falham dizendo QUE SIM.** O erro é
 assimétrico: deixar entrar um visitante a mais custa uma cadeira numa sala que
 já ia acontecer; barrar um aluno custa o cliente. Vale para a leitura de
-`acessos_conteudo`, para o Nexus fora do ar e para `NEXUS_ACESSO_KEY` ausente —
-env que ninguém criou na Vercel não pode passar a barrar assinante em silêncio.
+`acessos_conteudo` e para o Nexus fora do ar.
+
+⚠️ **`NEXUS_ACESSO_KEY` AUSENTE é a exceção, e falha para o outro lado.** Env
+que ninguém criou não é indisponibilidade: é configuração, e ela não se
+conserta sozinha. Abrindo, toda pessoa vira assinante e **a porta nunca fecha
+para ninguém** — a regra existiria no papel e não no produto, que é o preço que
+o batimento da Academy já cobrou uma vez neste ecossistema.
+
+Fechar é seguro por causa de uma garantia do outro lado: o cron
+`academy-acesso` do Nexus dá concessão em `acessos_conteudo` a todo assinante
+válido, e ela é verificada ANTES da chamada HTTP, no mesmo banco — o assinante
+em dia nunca chega lá. ⚠️ É um **acoplamento declarado**: com o batimento
+desligado E a chave ausente ao mesmo tempo, um assinante sem concessão levaria
+a recusa. Ele lê na própria tela que provavelmente usou outro e-mail e que
+basta entrar pela conta.
 
 ⚠️ **E-mail desconhecido NÃO volta 404 do `/api/acesso/status`.** Ele responde
 200 com `encontrado: false` e `estado: 'liberado'`, porque "quem não é do Nexus

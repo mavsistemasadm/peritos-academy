@@ -42,17 +42,41 @@ async function comTempoLimite(url: string, init: RequestInit): Promise<Response 
  * É a mesma régua que o próprio `/api/acesso/status` do Nexus aplica aos cinco
  * produtos: indisponibilidade nossa não pode virar apagão para quem paga.
  *
- * Chave ausente também devolve `true` pelo mesmo motivo: env que ninguém criou
- * na Vercel não pode passar a barrar assinante em silêncio.
+ * ⚠️ CHAVE AUSENTE É A EXCEÇÃO, E FALHA PARA O OUTRO LADO.
+ *
+ * Env que ninguém criou na Vercel não é indisponibilidade: é configuração, e
+ * ela não se conserta sozinha. Devolvendo `true` aqui, TODA pessoa vira
+ * assinante e a porta da aula única nunca fecha para ninguém — a feature
+ * nasceria morta e sem avisar, que é o preço que o batimento da Academy já
+ * cobrou uma vez neste ecossistema.
+ *
+ * Fechar é seguro por causa de uma garantia que existe do outro lado: o cron
+ * `academy-acesso` do Nexus dá concessão em `acessos_conteudo` a TODO
+ * assinante válido, e essa concessão é verificada ANTES desta chamada, no
+ * mesmo banco. Ou seja, o assinante em dia já passou pela primeira porta e
+ * nunca chega aqui.
+ *
+ * ⚠️ Isso é um ACOPLAMENTO declarado: se o batimento for desligado
+ * (`ACADEMY_BATIMENTO_ATIVO=0`) E a chave sumir ao mesmo tempo, um assinante
+ * sem concessão levaria a recusa. Ele lê, na própria tela, que provavelmente
+ * usou outro e-mail e que basta entrar pela conta — é recuperável, e é o
+ * preço de a regra existir de verdade em vez de existir no papel.
  */
 export async function ehAssinanteDoNexus(email: string): Promise<boolean> {
   const chave = process.env.NEXUS_ACESSO_KEY?.trim()
   if (!chave) {
-    console.error('[nexus] NEXUS_ACESSO_KEY ausente: tratando como assinante (falha aberta)')
-    return true
+    console.error(
+      '[nexus] NEXUS_ACESSO_KEY ausente. A porta da aula unica passa a decidir ' +
+      'so pelo acesso vigente nesta plataforma. Crie a env na Vercel com o ' +
+      'mesmo valor de ACESSO_STATUS_KEY do Nexus.',
+    )
+    return false
   }
 
   const url = `${NEXUS_URL}/api/acesso/status?email=${encodeURIComponent(email)}&app=academy`
+  // Daqui para baixo a chave existe, então tudo que der errado é o Nexus não
+  // ter respondido — indisponibilidade, e não configuração. Aí sim vale a
+  // regra de sempre: uma queda nossa não pode barrar quem paga.
   const r = await comTempoLimite(url, { headers: { 'x-acesso-key': chave } })
   if (!r) return true
 
