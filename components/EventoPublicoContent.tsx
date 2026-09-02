@@ -333,7 +333,7 @@ function ConviteNexus({ link, nomePlataforma }: { link: string; nomePlataforma: 
         <h2>O trabalho do perito não acaba<br /><span className="grad-txt">quando o laudo começa.</span></h2>
         <p>
           Cálculo que não fecha, prazo que aparece do nada, honorário que ninguém cobra, nomeação que não
-          chega. O <b>Nexus Pericial</b> é o conjunto de ferramentas que resolve cada uma dessas partes,
+          chega. O <b>Nexxus Pericial</b> é o conjunto de ferramentas que resolve cada uma dessas partes,
           e a <b>{nomePlataforma}</b> é uma delas.
         </p>
       </div>
@@ -354,7 +354,7 @@ function ConviteNexus({ link, nomePlataforma }: { link: string; nomePlataforma: 
 
       <div className="ev-nexus-acao">
         <a className="btn btn-primario" href={link} target="_blank" rel="noreferrer">
-          Conhecer o Nexus Pericial <IconeChevronRight size={13} strokeWidth={2.4} />
+          Conhecer o Nexxus Pericial <IconeChevronRight size={13} strokeWidth={2.4} />
         </a>
         <a className="btn btn-fantasma" href="/login">Já sou aluno, quero entrar</a>
       </div>
