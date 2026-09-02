@@ -169,13 +169,23 @@ function Transmissao({ ev, youtubeId, aoVivo, podeFalarNoChat }: {
 // ══════════════════════════════════════════════════════════════════
 // INSCRIÇÃO DE QUEM NÃO É ALUNO
 //
-// Aparece só em live marcada como aberta ao público. Pede nome e email — e
-// para aí. Cada campo a mais é gente a menos: quem chegou por um link de
-// WhatsApp e encontra um cadastro não se cadastra, fecha.
+// Aparece só em live marcada como aberta ao público.
 //
-// O WhatsApp fica opcional e assumido como opcional na tela, e não com um
-// asterisco escondido: pedir telefone obrigatório para assistir uma live é o
-// tipo de troca que a pessoa recusa em silêncio.
+// ⚠️ O WHATSAPP É OBRIGATÓRIO NA INSCRIÇÃO ANTECIPADA, e isso mudou em
+// 02/09/2026 por decisão do dono. Ele era opcional pelo argumento de que cada
+// campo a mais é gente a menos — verdade que continua valendo, e é por isso
+// que o custo está escrito aqui: alguma inscrição se perde.
+//
+// O que ele compra é maior. O telefone é a SEGUNDA CHAVE da porta da aula
+// única (ver lib/evento/porta.ts): sem ele sobra só o e-mail, e criar e-mail
+// novo é grátis — a regra viraria enfeite na segunda semana. E é o telefone
+// que vira `contatos.telefone` na base do Nexus, onde a operação inteira fala
+// por WhatsApp.
+//
+// ⚠️ DURANTE A TRANSMISSÃO ELE CONTINUA FORA DA TELA, e a exceção é
+// deliberada: ali a pessoa quer perguntar AGORA, e o terceiro campo é o que a
+// faz desistir. Quem entra no meio da live já está dentro — o custo de perdê-la
+// na porta é maior que o de ficar sem a segunda chave dela.
 // ══════════════════════════════════════════════════════════════════
 // ══════════════════════════════════════════════════════════════════
 // A SEGUNDA VEZ — a recusa que vende
@@ -229,6 +239,12 @@ function FormaInscricao({ eventoId, aoVivo, aoInscrever, nexusLink }: {
   function enviar(e: React.FormEvent) {
     e.preventDefault()
     setErro('')
+    // `required` no input já barra o vazio; esta guarda é para o número curto
+    // demais para ser telefone, que o navegador aceita e a base não usa.
+    if (!aoVivo && whatsapp.replace(/[^0-9]/g, '').length < 10) {
+      setErro('Confira o WhatsApp: faltam dígitos. Use DDD e número.')
+      return
+    }
     start(async () => {
       const r = await inscreverNoEvento({ eventoId, nome, email, whatsapp })
       if (r.ok) { aoInscrever(); return }
@@ -263,13 +279,11 @@ function FormaInscricao({ eventoId, aoVivo, aoInscrever, nexusLink }: {
         <input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" placeholder="voce@email.com" />
       </label>
       {/* Durante a transmissão, o terceiro campo é o que faz a pessoa desistir:
-          ela quer perguntar agora, não preencher cadastro. O telefone continua
-          sendo pedido quando ela se inscreve com antecedência, que é quando ela
-          tem paciência para dar. */}
+          ela quer perguntar agora, não preencher cadastro. Ver o cabeçalho. */}
       {!aoVivo && (
         <label className="ev-campo">
-          <span>WhatsApp <i>(opcional)</i></span>
-          <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} autoComplete="tel" placeholder="(00) 00000-0000" inputMode="tel" />
+          <span>Seu WhatsApp</span>
+          <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} required autoComplete="tel" placeholder="(00) 00000-0000" inputMode="tel" />
         </label>
       )}
       {erro && <p className="ev-erro" role="alert">{erro}</p>}
@@ -277,8 +291,8 @@ function FormaInscricao({ eventoId, aoVivo, aoInscrever, nexusLink }: {
         {pendente ? 'Confirmando…' : aoVivo ? 'Entrar no chat' : 'Quero participar'}
       </button>
       <p className="ev-forma-rodape">
-        É de graça e não precisa criar conta. Só uso seu email para falar deste encontro e dos próximos,
-        e todo email tem link de descadastro.
+        É de graça e não precisa criar conta. Uso seu email e seu WhatsApp para avisar deste encontro
+        e dos próximos, e todo email tem link de descadastro.
       </p>
     </form>
   )

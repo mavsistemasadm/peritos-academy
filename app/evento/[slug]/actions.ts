@@ -64,7 +64,22 @@ export async function inscreverNoEvento(entrada: {
     return { ok: false, erro: 'Este encontro não está aberto para inscrição.' }
   }
 
+  // ⚠️ O WHATSAPP É OBRIGATÓRIO ANTES DA LIVE, E NÃO DURANTE.
+  //
+  // A tela já pede — mas validação que só existe no cliente é validação que o
+  // próximo chamador não tem. E a condição não pode ser "sempre": quem entra no
+  // meio da transmissão preenche um formulário de dois campos, de propósito
+  // (ver o cabeçalho de FormaInscricao), e exigir o terceiro ali derrubaria a
+  // inscrição de quem já está na sala querendo perguntar.
+  //
+  // Quem responde "estamos no ar?" é o relógio contra `inicia_em`, e não uma
+  // flag mandada pela tela: flag vinda do cliente é justamente o que um
+  // chamador esperto omitiria para pular a exigência.
+  const jaComecou = !!ev.inicia_em && Date.now() >= +new Date(ev.inicia_em)
   const whatsappNorm = normalizarTelefone(whatsapp)
+  if (!jaComecou && !whatsappNorm) {
+    return { ok: false, erro: 'Confira o WhatsApp: use DDD e número.' }
+  }
 
   // ══════════════════════════════════════════════════════════════
   // A PORTA: quem não é da casa assiste UMA aula.
