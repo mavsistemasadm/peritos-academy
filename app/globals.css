@@ -6618,6 +6618,28 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 .pagina-evento .ev-nexus-grade span{display:block;font-size:12.5px;color:var(--cinza);line-height:1.45}
 .pagina-evento .ev-nexus-acao{display:flex;gap:var(--s-2);flex-wrap:wrap}
 
+/* ---------- a segunda inscrição de quem não é da casa ----------
+   Ocupa o lugar exato do formulário (.ev-forma), e por isso herda a largura e
+   o respiro dele em vez de inventar uma caixa nova ao lado.
+
+   ⚠️ A borda NÃO é a de erro. Quem chega aqui não errou nada: a regra
+   funcionou. Vermelho leria como "seu cadastro falhou" e produziria um chamado
+   de suporte no lugar de uma venda. */
+.pagina-evento .ev-porta{
+  margin-top:var(--s-4);padding:var(--s-4);
+  border:1px solid rgba(32,217,166,.28);border-radius:20px;
+  background:linear-gradient(160deg,rgba(32,217,166,.07),rgba(255,255,255,.015));
+  max-width:440px;
+}
+.pagina-evento .ev-porta-eyebrow{
+  display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  font-weight:650;color:var(--cinza);margin-bottom:var(--s-2);
+}
+.pagina-evento .ev-porta h3{font-size:21px;line-height:1.25;font-weight:650;margin:0 0 var(--s-2)}
+.pagina-evento .ev-porta p{font-size:13.5px;line-height:1.55;color:var(--cinza-claro);margin:0 0 var(--s-3)}
+.pagina-evento .ev-porta-acao{display:flex;gap:var(--s-2);flex-wrap:wrap}
+.pagina-evento .ev-porta-nota{margin-top:var(--s-3);margin-bottom:0;font-size:12px;line-height:1.5;color:var(--cinza)}
+
 /* ---------- opções de um evento (admin) ----------
    Eram checkboxes soltos dentro de .pnl-form-linha, que é um flex de colunas
    iguais: cada caixinha ganhava um terço da largura da tela e o rótulo ficava

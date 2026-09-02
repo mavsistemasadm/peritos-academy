@@ -69,3 +69,112 @@ um SSO que "funciona" e devolve a tela de login, sem erro em lugar nenhum.
 assinante — é a integração que `20260805_nexus_status_admin` antecipava. Só
 sobe, nunca desce: um SSO vê quem apareceu, não quem cancelou, e escrever
 'cancelled' daqui apagaria a marcação feita à mão pelo admin.
+
+# A aula ao vivo semanal, e a porta de UMA aula (02/09/2026)
+
+**A estratégia, em uma frase:** a aula aberta de toda quarta é a isca que
+aquece a base inteira do Nexus e transforma quem não é aluno em aluno. Ela
+acontece de qualquer jeito — tira-dúvidas de cálculo e de negócio pericial —, o
+e-mail vai para toda a base, e quem não é da casa encontra a oferta na própria
+página do encontro.
+
+O ciclo:
+
+1. e-mail para a base com o link de `/evento/<slug>`;
+2. a pessoa **reserva** (nome, e-mail, WhatsApp) e passa a receber os lembretes;
+3. o contato atravessa para a base de marketing do Nexus com a tag
+   `live-inscrito`;
+4. na página, quem não está logado vê `ConviteNexus` — os seis produtos e o
+   botão para `/inicio`;
+5. **a segunda inscrição de quem não é da casa encontra a oferta no lugar do
+   formulário.**
+
+## O que conta é a INSCRIÇÃO, nunca a presença
+
+Decisão do dono: *"se ela se inscreveu e não veio, é problema dela, que perdeu a
+oportunidade."*
+
+E é a única régua que se sustenta: a transmissão é do YouTube e esta plataforma
+não sabe quem entrou na sala. Contar presença criaria a brecha que se descobre
+em uma semana — reservar, faltar, e reservar de novo alegando que não gastou
+nada. Inscrição é fato que este banco tem e que a própria pessoa produziu.
+
+## `lib/evento/porta.ts` responde, e ninguém mais
+
+⚠️ **"Da casa" são os DOIS lados**: acesso vigente aqui **ou** assinatura do
+Nexus, perguntada por `/api/acesso/status`. Só o lado de cá não bastaria — um
+assinante do Nexus que nunca abriu a Academy não tem conta aqui, e levaria "você
+já usou sua aula gratuita" pagando R$1.497,90 por ano.
+
+⚠️ **Acesso VIGENTE, e não "tem conta".** Ex-aluno com acesso vencido não é da
+casa, e isso é escolha: ele é exatamente quem queremos de volta, e a aula aberta
+é a melhor conversa que existe com ele.
+
+⚠️ **As duas consultas de "é da casa" falham dizendo QUE SIM.** O erro é
+assimétrico: deixar entrar um visitante a mais custa uma cadeira numa sala que
+já ia acontecer; barrar um aluno custa o cliente. Vale para a leitura de
+`acessos_conteudo`, para o Nexus fora do ar e para `NEXUS_ACESSO_KEY` ausente —
+env que ninguém criou na Vercel não pode passar a barrar assinante em silêncio.
+
+⚠️ **E-mail desconhecido NÃO volta 404 do `/api/acesso/status`.** Ele responde
+200 com `encontrado: false` e `estado: 'liberado'`, porque "quem não é do Nexus
+não é bloqueado pelo Nexus". Lendo só o estado, todo visitante do mundo seria
+assinante e a porta nunca fecharia para ninguém.
+
+⚠️ **`neq('evento_id')` separa "voltou na semana seguinte" de "corrigiu o
+telefone".** Sem ele, o segundo submit do MESMO encontro seria recusado e a
+pessoa levaria porta na cara por ter acertado um dado.
+
+⚠️ **`eq` e nunca `ilike` no e-mail.** `_` é comum em endereço e é CORINGA no
+like do Postgres: com `ilike`, `joao_silva@x.com` casaria `joaoXsilva@x.com` e
+barraria um estranho.
+
+## As duas chaves, e o que elas de fato alcançam
+
+E-mail é a primeira; telefone é a segunda, com a mesma régua de
+`lib/sequencias/identidade.ts` do Nexus — copiada de propósito, porque são dois
+repositórios que não compilam juntos e o mesmo número é comparado dos dois lados.
+
+⚠️ **`whatsapp_norm` NULO nunca entra na comparação.** Com o telefone vazio, um
+`whatsapp_norm.is.null` casaria esta pessoa com todo mundo que também não deu
+telefone, e a porta fecharia para a base inteira na segunda semana. O índice é
+parcial para deixar isso explícito.
+
+⚠️ **A coluna é escrita pela APLICAÇÃO, nunca por trigger.** Normalizar telefone
+é regra, e ela já existe em duas cópias declaradas; uma terceira em plpgsql
+seria a que diverge primeiro, porque ninguém a lê ao mudar a regra.
+
+⚠️ **NOME NUNCA ENTRA.** Homônimo é comum, e a consequência de casar errado aqui
+é dizer "você já usou sua aula" a quem nunca assistiu nenhuma — uma acusação, na
+porta, para um lead que acabou de chegar.
+
+⚠️ **O telefone é OPCIONAL no formulário e nem é pedido durante a transmissão.**
+Então a porta fecha para quem se cadastrou direito e continua contornável por
+quem digitar um endereço novo. Isso é **aceito**: exigir telefone para assistir
+uma aula gratuita custa inscrições de verdade, e quem cria e-mail novo toda
+semana também não estava perto de comprar.
+
+## A recusa é a melhor tela de venda deste funil
+
+`PortaFechada`, em `components/EventoPublicoContent.tsx`. Quem chega nela já
+assistiu um encontro inteiro e voltou para pedir o próximo.
+
+⚠️ **Não é erro de formulário, e por isso não é vermelho.** A borda é a mesma do
+`.ev-forma` — pintá-la de erro leria como "seu cadastro falhou" e produziria um
+chamado de suporte no lugar de uma venda. O texto não acusa: a pessoa fez
+exatamente o que foi convidada a fazer.
+
+Ela também diz o que fazer quando o motivo é outro e-mail — "entre pela sua
+conta e o lugar já estará reservado" —, que é o caso que a régua do Nexus já
+mediu três vezes: assinante que é aluno sob outro endereço.
+
+## As duas coisas que precisam ser LIGADAS
+
+1. ⚠️ **`aberto_ao_publico = true` no evento.** Sem ela a inscrição é recusada e
+   o `ConviteNexus` **nem renderiza**. Medido em 02/09/2026: os cinco eventos
+   existentes estão todos com a flag desligada, e `evento_inscricoes` tem zero
+   linhas em toda a história — este caminho nunca rodou.
+2. ⚠️ **`NEXUS_ACESSO_KEY` e `NEXUS_CONTATO_KEY` na Vercel desta plataforma**,
+   com o mesmo valor de `ACESSO_STATUS_KEY` e `INTEGRACAO_CONTATO_KEY` do Nexus.
+   Sem a primeira, ninguém é barrado (falha aberta). Sem a segunda, **o lead da
+   live não chega à base de marketing** — a live acontece e não capta nada.

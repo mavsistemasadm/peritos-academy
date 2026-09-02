@@ -177,13 +177,53 @@ function Transmissao({ ev, youtubeId, aoVivo, podeFalarNoChat }: {
 // asterisco escondido: pedir telefone obrigatório para assistir uma live é o
 // tipo de troca que a pessoa recusa em silêncio.
 // ══════════════════════════════════════════════════════════════════
-function FormaInscricao({ eventoId, aoVivo, aoInscrever }: {
-  eventoId: string; aoVivo: boolean; aoInscrever: () => void
+// ══════════════════════════════════════════════════════════════════
+// A SEGUNDA VEZ — a recusa que vende
+//
+// Quem chega aqui já assistiu um encontro inteiro e voltou para pedir o
+// próximo. É o lead mais quente que esta página produz, e por isso a recusa
+// nunca é um "não" seco: ela DIZ A VERDADE sobre por que a porta fechou e
+// mostra, ali mesmo, como continuar entrando.
+//
+// ⚠️ A frase não acusa e não insinua abuso. A pessoa fez exatamente o que foi
+// convidada a fazer.
+// ══════════════════════════════════════════════════════════════════
+function PortaFechada({ nome, nexusLink }: { nome: string; nexusLink: string }) {
+  const primeiro = nome.trim().split(' ')[0]
+  return (
+    <div className="ev-porta" role="status">
+      <span className="ev-porta-eyebrow">Sua aula aberta já foi usada</span>
+      <h3>
+        {primeiro ? `${primeiro}, você já esteve ` : 'Você já esteve '}
+        <span className="grad-txt">em um destes encontros.</span>
+      </h3>
+      <p>
+        O primeiro é aberto para qualquer pessoa. Os seguintes acontecem toda semana e são
+        para quem é aluno da Peritos Academy ou assinante do Nexxus Pericial — junto com os
+        cursos, as ferramentas e o acervo inteiro.
+      </p>
+      <div className="ev-porta-acao">
+        <a className="btn btn-primario" href={nexusLink} target="_blank" rel="noreferrer">
+          Ver como entrar <IconeChevronRight size={13} strokeWidth={2.4} />
+        </a>
+        <a className="btn btn-fantasma" href="/login">Já sou aluno, quero entrar</a>
+      </div>
+      <p className="ev-porta-nota">
+        Se você já é aluno ou assinante e caiu aqui, provavelmente usou outro email.
+        Entre pela sua conta e o lugar já estará reservado.
+      </p>
+    </div>
+  )
+}
+
+function FormaInscricao({ eventoId, aoVivo, aoInscrever, nexusLink }: {
+  eventoId: string; aoVivo: boolean; aoInscrever: () => void; nexusLink: string
 }) {
   const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
   const [erro, setErro] = useState('')
+  const [portaFechada, setPortaFechada] = useState(false)
   const [pendente, start] = useTransition()
 
   function enviar(e: React.FormEvent) {
@@ -191,10 +231,16 @@ function FormaInscricao({ eventoId, aoVivo, aoInscrever }: {
     setErro('')
     start(async () => {
       const r = await inscreverNoEvento({ eventoId, nome, email, whatsapp })
-      if (r.ok) aoInscrever()
-      else setErro(r.erro)
+      if (r.ok) { aoInscrever(); return }
+      // ⚠️ "Já usou a aula gratuita" NÃO é erro de formulário. Pintá-lo de
+      // vermelho ao lado do botão trata como engano o que é a regra
+      // funcionando — e joga fora a melhor conversa de venda deste funil.
+      if (r.motivo === 'aula_gratuita_usada') { setPortaFechada(true); return }
+      setErro(r.erro)
     })
   }
+
+  if (portaFechada) return <PortaFechada nome={nome} nexusLink={nexusLink} />
 
   return (
     <form className={`ev-forma${aoVivo ? ' no-ar' : ''}`} onSubmit={enviar}>
@@ -478,7 +524,7 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
               {/* A inscrição do convidado fica FORA da fila de botões: é um
                   formulário, e um formulário espremido entre pílulas some. */}
               {convidadoPendente && ev.estado !== 'encerrado' && (
-                <FormaInscricao eventoId={ev.id} aoVivo={vivo} aoInscrever={() => setInscrito(true)} />
+                <FormaInscricao eventoId={ev.id} aoVivo={vivo} aoInscrever={() => setInscrito(true)} nexusLink={ev.nexusLink} />
               )}
 
               {/* ══════════════════════════════════════════════════

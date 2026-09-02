@@ -18,8 +18,20 @@ import { enviarEmailConvidado } from '@/lib/email/enviarConvidado'
 import { emailEvento } from '@/lib/email/templates/evento'
 import { nomeDoCookieDeInscricao } from '@/lib/queries/evento-publico'
 import { dadosDoEmail } from '@/lib/evento/email'
+import { avaliarPorta, normalizarTelefone } from '@/lib/evento/porta'
+import { ehAssinanteDoNexus, registrarContatoNoNexus } from '@/lib/integracoes/nexus'
 
-export type ResultadoInscricao = { ok: true } | { ok: false; erro: string }
+/**
+ * ⚠️ `motivo` existe para a TELA, não para o log.
+ *
+ * "Você já usou sua aula gratuita" não é um erro do formulário e não pode ser
+ * pintado de vermelho ao lado do botão: é a melhor conversa de venda que este
+ * funil tem, com alguém que acabou de assistir uma aula inteira e voltou para
+ * pedir a segunda. A UI troca o formulário pela oferta quando lê este campo.
+ */
+export type ResultadoInscricao =
+  | { ok: true }
+  | { ok: false; erro: string; motivo?: 'aula_gratuita_usada' }
 
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
@@ -52,6 +64,58 @@ export async function inscreverNoEvento(entrada: {
     return { ok: false, erro: 'Este encontro não está aberto para inscrição.' }
   }
 
+  const whatsappNorm = normalizarTelefone(whatsapp)
+
+  // ══════════════════════════════════════════════════════════════
+  // A PORTA: quem não é da casa assiste UMA aula.
+  //
+  // A ordem é barata de propósito. A pergunta local ("já se inscreveu antes?")
+  // vem primeiro porque a resposta é NÃO na esmagadora maioria das vezes — é a
+  // pessoa nova, que é quem a live existe para alcançar — e nesse caso não há
+  // nada a perguntar a ninguém: nem à Academy, nem ao Nexus pela rede.
+  //
+  // ⚠️ `neq('evento_id')` é o que separa "voltou na semana seguinte" de
+  // "corrigiu o telefone e reenviou". Sem ele, o segundo submit do MESMO
+  // encontro seria recusado, e a pessoa levaria uma porta na cara por ter
+  // acertado um dado.
+  // ══════════════════════════════════════════════════════════════
+  let anteriores = supabase
+    .from('evento_inscricoes')
+    .select('id')
+    .neq('evento_id', ev.id)
+    .is('cancelado_em', null)
+
+  // ⚠️ CHAVE NULA NUNCA ENTRA NA COMPARAÇÃO. Com o telefone vazio, um
+  // `whatsapp_norm.is.null` casaria esta pessoa com todo mundo que também não
+  // deu telefone — e a porta fecharia para a base inteira na segunda semana.
+  // ⚠️ `eq` e nunca `ilike`: `_` é caractere comum em e-mail e é CORINGA no
+  // like do Postgres. Com ilike, "joao_silva@x.com" casaria "joaoXsilva@x.com"
+  // e barraria um estranho. O e-mail já chega em minúsculas, e a coluna também
+  // é gravada assim desde sempre — igualdade basta e não inventa parentesco.
+  anteriores = whatsappNorm
+    ? anteriores.or(`email.eq."${email}",whatsapp_norm.eq.${whatsappNorm}`)
+    : anteriores.eq('email', email)
+
+  const { data: jaVeio, error: erroAnteriores } = await anteriores.limit(1)
+
+  // Erro de leitura não fecha a porta: barrar por não ter conseguido perguntar
+  // acusa de reincidência quem talvez nunca tenha vindo. Fica o log.
+  if (erroAnteriores) console.error('[inscricao evento] histórico não lido:', erroAnteriores)
+
+  if (jaVeio && jaVeio.length > 0) {
+    const porta = avaliarPorta({
+      ehDaCasa: await ehDaCasa(supabase, email),
+      jaSeInscreveuAntes: true,
+    })
+    if (!porta.liberado) {
+      return {
+        ok: false,
+        motivo: 'aula_gratuita_usada',
+        erro: 'Você já participou de um encontro aberto. Os próximos são para alunos e assinantes.',
+      }
+    }
+  }
+
   // Se o endereço já é de um aluno, a inscrição fica amarrada nele. Não
   // concede nada — serve para o admin não contar como lead novo quem já está
   // dentro, e para o lembrete não sair duas vezes para quem também reservou
@@ -66,6 +130,7 @@ export async function inscreverNoEvento(entrada: {
         nome,
         email,
         whatsapp,
+        whatsapp_norm: whatsappNorm,
         usuario_id: usuarioId ?? null,
         cancelado_em: null,
       },
@@ -85,11 +150,11 @@ export async function inscreverNoEvento(entrada: {
 
     if (jaTem) {
       await supabase.from('evento_inscricoes')
-        .update({ nome, whatsapp, usuario_id: usuarioId ?? null, cancelado_em: null })
+        .update({ nome, whatsapp, whatsapp_norm: whatsappNorm, usuario_id: usuarioId ?? null, cancelado_em: null })
         .eq('id', jaTem.id)
     } else {
       const { error: erroInsert } = await supabase.from('evento_inscricoes').insert({
-        evento_id: ev.id, nome, email, whatsapp, usuario_id: usuarioId ?? null,
+        evento_id: ev.id, nome, email, whatsapp, whatsapp_norm: whatsappNorm, usuario_id: usuarioId ?? null,
       })
       if (erroInsert) {
         console.error('[inscricao evento] falhou:', erroInsert)
@@ -122,6 +187,16 @@ export async function inscreverNoEvento(entrada: {
   // deu certo por causa do CRM seria mentira na cara dela. Fica o log.
   if (erroContato) console.error('[inscricao evento] contato não registrado:', erroContato)
 
+  // ── A PONTE PARA A BASE DE MARKETING ──
+  //
+  // `contatos` daqui responde "quem veio às nossas lives". A base que manda
+  // e-mail, roda esteira e segmenta por tag é a do NEXUS, outro projeto
+  // Supabase — e sem esta linha o lead da live não existe para nenhuma delas.
+  // É a diferença entre uma lista que morre com o encontro e captação de fato.
+  //
+  // Não bloqueia e não desfaz nada: ver o comentário da função.
+  await registrarContatoNoNexus({ nome, email, whatsapp, slugEvento: ev.slug })
+
   // O cookie é só para a página reconhecer quem volta — ver
   // jaInscritoComoConvidado(). Não dá acesso a nada.
   const jar = await cookies()
@@ -143,6 +218,46 @@ export async function inscreverNoEvento(entrada: {
   return { ok: true }
 }
 
+
+/**
+ * A pessoa é da casa — aluno com acesso vigente OU assinante do Nexus?
+ *
+ * ⚠️ A ORDEM É DE CUSTO, e não de importância: a Academy responde no mesmo
+ * banco, o Nexus responde pela rede. Perguntar primeiro ao lado barato evita a
+ * chamada HTTP para a maioria dos casos que chegam até aqui.
+ *
+ * ⚠️ ACESSO VIGENTE, e não "tem conta". Ex-aluno cujo acesso venceu NÃO é da
+ * casa, e isso é escolha: ele é exatamente quem queremos de volta, e a aula
+ * aberta é a melhor conversa que existe com ele. Ele entra uma vez, como
+ * qualquer outro visitante.
+ */
+async function ehDaCasa(supabase: ReturnType<typeof criarClienteServico>, email: string): Promise<boolean> {
+  const { data: usuarioId } = await supabase.rpc('usuario_id_por_email', { p_email: email })
+
+  if (usuarioId) {
+    const hoje = new Date().toISOString().slice(0, 10)
+    const { data: acessos, error } = await supabase
+      .from('acessos_conteudo')
+      .select('vitalicio, expira_em')
+      .eq('usuario_id', usuarioId)
+      .eq('ativo', true)
+
+    // Falha de leitura trata como da casa: a assimetria do erro é a mesma da
+    // consulta ao Nexus — barrar um aluno é caro, deixar entrar um visitante
+    // a mais custa uma cadeira numa sala que já ia acontecer.
+    if (error) {
+      console.error('[inscricao evento] acesso não lido:', error)
+      return true
+    }
+    const vigente = (acessos || []).some(
+      (a: { vitalicio: boolean | null; expira_em: string | null }) =>
+        a.vitalicio === true || (a.expira_em !== null && a.expira_em >= hoje),
+    )
+    if (vigente) return true
+  }
+
+  return ehAssinanteDoNexus(email)
+}
 
 // ══════════════════════════════════════════════════════════════════
 // FALAR NO CHAT DA TRANSMISSÃO
