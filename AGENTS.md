@@ -242,3 +242,151 @@ caminho.
 ⚠️ **`robots: noindex`.** O conteúdo da URL muda toda semana; indexada, o Google
 guardaria o resumo de agosto e o mostraria em outubro. Quem entra no índice é
 `/evento/<slug>`, que descreve um encontro e não muda mais.
+
+# A sala de venda: o que a página do encontro faz enquanto a live acontece (02/09/2026)
+
+A live é onde o pitch é feito em voz alta. Estas cinco decisões existem para que
+a tela acompanhe a fala — e nenhuma delas é cosmética.
+
+## O apresentador LIBERA a oferta; ela não fica ligada
+
+`eventos.oferta_liberada`, alternada por `alternarOfertaDoEvento` num botão que
+mora **na própria página do encontro**, visível só para `ehDaCasa` e só
+enquanto está no ar.
+
+A faixa ficava visível a live inteira. Quem entra às 11h e encontra a oferta já
+na tela lê a aula como um infomercial de uma hora — e a promessa desta live é o
+contrário: uma hora resolvendo o problema da pessoa, sem pauta fechada. A
+oferta vale mais dita uma vez, na hora certa, do que exposta sessenta minutos
+até virar paisagem.
+
+⚠️ **O botão não fica no `/admin`.** Durante a transmissão a tela aberta é esta;
+mandar o apresentador abrir outra aba no meio do pitch é o mesmo que não ter o
+botão.
+
+⚠️ **O REALTIME É A METADE QUE FAZ O RECURSO EXISTIR.** Sem ele a faixa só
+apareceria para quem desse F5 — e ninguém recarrega a página no meio de uma
+transmissão. O apresentador clicaria, veria a oferta na PRÓPRIA tela e
+concluiria que funcionou, com a sala inteira sem ver nada: a "falha que
+funciona". `eventos` entrou na publicação `supabase_realtime` e ganhou
+`replica identity full`, senão o payload do UPDATE chega sem as colunas que não
+mudaram e o cliente não sabe de qual evento é a linha.
+
+⚠️ **A cópia da semana seguinte NÃO herda o interruptor** (`repetirEvento`).
+Herdado, a live nova abriria com a faixa na tela às 11h — exatamente o que ele
+existe para evitar.
+
+⚠️ **Mesma permissão da moderação do chat**, e não uma nova: quem pode esconder
+a mensagem de alguém na frente da sala é quem conduz. Segunda régua para o mesmo
+poder é a que fica desatualizada.
+
+## Quem cala a oferta é "JÁ ASSINA", nunca "está logado"
+
+`EventoPublico.ehAssinanteNexus`. A regra era `!logado`, com o argumento de que
+aluno não precisa que expliquem a casa. O argumento caiu junto com o fato: a
+Academy tem **425 alunos logados que não têm o ecossistema** — têm um sexto
+dele — e são o melhor público de venda da base, o mesmo que o e-mail B do plano
+mensal já trata como "a peça que deve vender". A regra antiga silenciava a
+oferta exatamente para eles, dentro da sala em que a venda é feita.
+
+⚠️ **Duas chaves, porque uma só erra.** `perfis.nexus_status` marca 54 pessoas
+quando existem 117 assinantes: ele só é escrito quando alguém entra por SSO. A
+segunda é `acessos_conteudo` com `origem = 'nexus'`, a concessão que o batimento
+diário do Nexxus escreve aqui — 93 linhas. Na dúvida o portão falha **calando**:
+mostrar demais custa um cliente irritado; esconder custa uma venda que volta.
+
+Vale para as duas peças — a faixa da live e o `ConviteNexus` do rodapé.
+
+## A faixa só aparece para quem já está DENTRO
+
+`jaEstaDentro` = reservado (com conta) ou inscrito (sem conta). Quem ainda não
+entrou está vendo o botão ou o formulário, e duas perguntas na mesma tela não
+somam: dividem, e a pessoa responde sempre a que pede menos dela — perdendo a
+inscrição, que é o único dado que sobrevive ao fim da live.
+
+## Dá para reservar DEPOIS que a live começa
+
+O bloco de ação inteiro vivia dentro de `estado === 'agendado'`, e o efeito só
+aparecia na hora: às 11h05 o botão sumia da tela. O convidado ainda tinha o
+formulário (ele fica fora daquela fila), mas o **aluno logado que não reservou
+antes ficava sem caminho nenhum** — enquanto o rodapé do chat continuava dizendo
+"Reserve seu lugar acima para falar no chat", apontando para um botão que já não
+existia. É a hora em que mais gente chega, e falar no chat É o produto desta
+live.
+
+Só o "Adicionar ao calendário" continua preso a `agendado`.
+
+## "Entrar agora" da agenda vai para a PÁGINA, nunca para o YouTube
+
+Mandar direto para o link da transmissão parece o caminho curto e é o que
+esvazia a sala: no YouTube não existe o chat da casa, não existe a oferta ao
+vivo e não existe a inscrição — a pessoa sai da plataforma e a live vira um
+vídeo assistido por um anônimo. A página tem o player embutido: quem clica vê a
+transmissão do mesmo jeito, com o resto em volta.
+
+O link cru continua sendo o fallback do encontro sem slug e do Zoom/Meet.
+
+## O WhatsApp é obrigatório ANTES da live, e não durante
+
+Ele era opcional pelo argumento de que cada campo a mais é gente a menos —
+verdade que continua valendo, e o custo está escrito no fonte. O que ele compra
+é maior: o telefone é a **segunda chave** da porta da aula única, e sem ele
+sobra só o e-mail, que é grátis de criar. É também o que vira
+`contatos.telefone` na base do Nexxus, onde a operação fala por WhatsApp.
+
+⚠️ **Durante a transmissão ele continua fora da tela**: ali a pessoa quer
+perguntar agora, e o terceiro campo é o que a faz desistir. Quem entra no meio
+da live já está dentro.
+
+⚠️ A exigência roda no **servidor** também, e quem responde "estamos no ar?" é o
+relógio contra `inicia_em` — nunca uma flag mandada pela tela, que é justamente
+o que um chamador omitiria para pular a regra.
+
+## A capa: 1200×630, com o conteúdo nos 240 px centrais
+
+`gravacao_thumb_url` serve dois recortes muito diferentes, e é por isso que uma
+arte "grande o bastante" ainda sai cortada:
+
+| onde | proporção | o que aparece |
+|---|---|---|
+| cartão do WhatsApp (`og:image`) | 1,91:1 | quase tudo |
+| `.ev-capa` na página | **1048 × 210**, ~5:1 | só os **240 px centrais** |
+
+Medido no DOM em produção. Logo e texto fora dessa faixa são cortados sem nada
+avisar — foi o que aconteceu com a primeira arte, que tinha o play em cima e o
+horário embaixo.
+
+## O chat tem emoji, e a paleta é curta de propósito
+
+24 fixos, sem dependência: um seletor de verdade são centenas de KB carregados
+por todo mundo que abre a página, inclusive quem só veio assistir. Num chat de
+uma hora o que se usa é reação.
+
+⚠️ Insere no **cursor**, não no fim — quem quer um emoji no meio da frase teria
+de reescrever a mensagem, e é isso que faz ninguém usar a paleta uma segunda
+vez. ⚠️ O `maxLength` do input **não vale para escrita por código** (emoji custa
+2 unidades UTF-16), então a guarda dos 500 é explícita. ⚠️ E os 25 botões são
+`type="button"`: botão dentro de `<form>` é submit por padrão, e escolher um
+emoji mandaria a mensagem pela metade.
+
+⚠️ As regras de CSS da paleta existem para **vencer `.ev-chat-forma button`**,
+que pinta todo botão do formulário como o círculo creme do enviar — sem elas, a
+paleta vira 25 botões de enviar lado a lado. É a mesma família de "classe de CSS
+inventada não dá erro em lugar nenhum": aqui a classe existe e a especificidade
+é que estava errada.
+
+# ⚠️ Push que não vira deploy não avisa ninguém (02/09/2026)
+
+Aconteceu nesta data: o push de um commit para `main` **não gerou build na
+Vercel**. Sem erro, sem e-mail, sem nada — o código no GitHub e a produção
+seguindo com o comportamento antigo. O sintoma foi eu procurar na página um
+recurso que "já tinha subido" e não achar.
+
+O sinal é `vercel ls` não mostrar um deployment novo depois do push. O
+desempate é um commit vazio, que reenfileira na hora.
+
+⚠️ **E cuidado com a verificação por `curl`**: quase tudo que se acrescenta
+nesta página é gateado por sessão (`ehDaCasa`, `logado`, `inscrito`). Procurar o
+texto novo no HTML de fora dá "não subiu" para código que subiu — foi o que me
+custou três esperas nesta sessão. Confira pelo id do deployment, ou logado no
+navegador.
