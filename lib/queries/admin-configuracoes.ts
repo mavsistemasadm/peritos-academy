@@ -77,6 +77,8 @@ export type MetricaNexus = {
   exibidas: number
   clicadas: number
   dispensadas: number
+  /** conversões atribuídas a este app (último clicado antes de assinar) */
+  assinou: number
 }
 
 export async function carregarConfigNexus(): Promise<ConfigNexus> {
@@ -111,10 +113,11 @@ export async function carregarMetricasNexus(): Promise<MetricaNexus[]> {
   const { data } = await supabase.from('nexus_cta_interactions').select('app, acao')
   const mapa = new Map<string, MetricaNexus>()
   for (const i of data ?? []) {
-    const m = mapa.get(i.app) ?? { app: i.app, exibidas: 0, clicadas: 0, dispensadas: 0 }
+    const m = mapa.get(i.app) ?? { app: i.app, exibidas: 0, clicadas: 0, dispensadas: 0, assinou: 0 }
     if (i.acao === 'exibida') m.exibidas++
     else if (i.acao === 'clicada') m.clicadas++
     else if (i.acao === 'dispensada') m.dispensadas++
+    else if (i.acao === 'assinou') m.assinou++
     mapa.set(i.app, m)
   }
   return [...mapa.values()].sort((a, b) => b.exibidas - a.exibidas)

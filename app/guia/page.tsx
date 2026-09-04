@@ -15,5 +15,5 @@ export const dynamic = 'force-dynamic'
 export default async function PaginaGuia() {
   const [nav, dados] = await Promise.all([carregarNav(), carregarGuia()])
   if (!nav.logado) redirect('/login')
-  return <GuiaContent dados={dados} nav={nav} />
+  return <GuiaContent dados={dados} nav={nav} />  
 }

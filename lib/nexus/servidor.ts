@@ -90,16 +90,25 @@ export async function escolherSugestaoNexus(
 
   const { data: perfil } = await supabase
     .from('perfis')
-    .select('nexus_status')
+    .select('nexus_status, nexus_cancelado_em')
     .eq('id', uid)
-    .maybeSingle<{ nexus_status: string }>()
+    .maybeSingle<{ nexus_status: string; nexus_cancelado_em: string | null }>()
   // Assinante ativo não vê sugestão nenhuma, em nenhum lugar.
   if (perfil?.nexus_status === 'active') return null
   const publico = perfil?.nexus_status === 'cancelled' ? 'ex' : 'novo'
 
   // Histórico recente do aluno: serve pro teto do sino, pra pausa por
   // dispensas e pra não repetir app/variação. Uma leitura só.
-  const desde = new Date(Date.now() - Math.max(config.dias_pausa_dismissal, 7) * 864e5).toISOString()
+  const janela = new Date(Date.now() - Math.max(config.dias_pausa_dismissal, 7) * 864e5)
+  // Ex-assinante começa de novo: a spec pede que a contagem de dispensas
+  // resete ao cancelar, pra ele não voltar já penalizado por ter dispensado
+  // sugestões antes de assinar. Em vez de APAGAR as interações (perderia o
+  // histórico de métricas), corta a janela na data do cancelamento.
+  const corte =
+    publico === 'ex' && perfil?.nexus_cancelado_em
+      ? new Date(Math.max(+janela, +new Date(perfil.nexus_cancelado_em)))
+      : janela
+  const desde = corte.toISOString()
   const { data: interacoes } = await supabase
     .from('nexus_cta_interactions')
     .select('app, placement, copy_chave, acao, criado_em')

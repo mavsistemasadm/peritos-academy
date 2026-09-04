@@ -480,7 +480,7 @@ function NexusAba({ config, metricas, onErro, onSucesso }: {
         ) : (
           <table className="pnl-tabela">
             <thead>
-              <tr><th>App</th><th>Exibidas</th><th>Cliques</th><th>Dispensas</th><th>Taxa de clique</th></tr>
+              <tr><th>App</th><th>Exibidas</th><th>Cliques</th><th>Dispensas</th><th>Taxa de clique</th><th>Assinaturas</th><th>Conversão</th></tr>
             </thead>
             <tbody>
               {metricas.map(m => (
@@ -490,6 +490,8 @@ function NexusAba({ config, metricas, onErro, onSucesso }: {
                   <td className="num">{m.clicadas}</td>
                   <td className="num">{m.dispensadas}</td>
                   <td className="num">{m.exibidas > 0 ? `${Math.round((m.clicadas / m.exibidas) * 100)}%` : '—'}</td>
+                  <td className="num">{m.assinou}</td>
+                  <td className="num">{m.clicadas > 0 ? `${Math.round((m.assinou / m.clicadas) * 100)}%` : '—'}</td>
                 </tr>
               ))}
             </tbody>
