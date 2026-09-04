@@ -11,7 +11,23 @@ export type StatusAcesso = { logado: boolean; permitido: boolean }
  * restrito que a pessoa não pode ver responde 404, como todo conteúdo que não
  * é dela.
  */
-export type StatusAcessoCurso = StatusAcesso & { restrito: boolean }
+export type StatusAcessoCurso = StatusAcesso & {
+  restrito: boolean
+  /**
+   * O curso que precisa ser concluído antes deste.
+   *
+   * ⚠️ **É UM TERCEIRO ESTADO, e não uma variação de `permitido`.** A pessoa
+   * TEM direito a este curso — ela assinou, ou recebeu a concessão. O que falta
+   * é a PROGRESSÃO: o selo de qualidade exige que a Formação Pericial venha
+   * antes, e em ordem.
+   *
+   * Recusar isso com a tela de "assine para ter acesso" seria mentira para quem
+   * acabou de pagar — a mesma armadilha que a turma fechada já ensinou aqui. Por
+   * isso o campo carrega o NOME do curso pendente: sem ele, a trava é recusa sem
+   * caminho.
+   */
+  pendente: { titulo: string; slug: string } | null
+}
 
 /** O que a pessoa tem hoje — usado para gatear E para a tela de bloqueio dizer o que ela tem. */
 export type ResumoAcesso = {
@@ -121,16 +137,56 @@ export async function verificarAcessoCurso(slugCurso: string): Promise<StatusAce
   // `restrito` é lido para todo mundo, inclusive deslogado: é ele que decide se
   // a recusa vira 404 ou paywall, e essa escolha não depende de quem está
   // olhando. `cursos` tem leitura pública, então não precisa de sessão.
-  const { data: curso } = await supabase.from('cursos').select('restrito').eq('slug', slugCurso).maybeSingle()
+  const { data: curso } = await supabase
+    .from('cursos').select('id, restrito').eq('slug', slugCurso).maybeSingle()
   const restrito = curso?.restrito === true
 
-  if (!auth?.user) return { logado: false, permitido: false, restrito }
+  if (!auth?.user) return { logado: false, permitido: false, restrito, pendente: null }
 
   const { data } = await supabase.rpc('tem_acesso_curso', {
     p_usuario_id: auth.user.id,
     p_curso_slug: slugCurso,
   })
-  return { logado: true, permitido: data === true, restrito }
+  const permitido = data === true
+
+  // ⚠️ **A PROGRESSÃO SÓ É PERGUNTADA DEPOIS DO DIREITO**, e a ordem importa:
+  // quem NÃO comprou não deve ver "conclua a Formação Pericial" — deve ver o
+  // convite para assinar. Dizer a um visitante que ele precisa concluir uma
+  // trilha que ele nem pode abrir é conselho para uma porta que não é a dele.
+  if (!permitido || !curso?.id) {
+    return { logado: true, permitido, restrito, pendente: null }
+  }
+
+  const { data: liberou } = await supabase.rpc('formacao_liberou_curso', {
+    p_usuario: auth.user.id,
+    p_curso_id: curso.id,
+  })
+
+  // ⚠️ **FALHA ABERTA.** RPC que não responde devolve `undefined`, e aqui isso
+  // libera. A trava é o selo de qualidade, não uma fechadura de acesso: barrar
+  // por um erro de leitura tiraria de quem pagou um curso que ele tem direito
+  // de abrir. Errar para o lado de destravar custa uma ordem quebrada; errar
+  // para o outro custa o acesso.
+  if (liberou !== false) {
+    return { logado: true, permitido: true, restrito, pendente: null }
+  }
+
+  const { data: falta } = await supabase.rpc('formacao_curso_pendente', {
+    p_usuario: auth.user.id,
+    p_curso_id: curso.id,
+  })
+  const primeiro = Array.isArray(falta) ? falta[0] : falta
+
+  return {
+    logado: true,
+    permitido: false,
+    restrito,
+    // Sem o nome do curso pendente, a tela só sabe dizer "ainda não liberado" —
+    // que é a recusa sem caminho. O nome é o que transforma trava em sequência.
+    pendente: primeiro?.titulo
+      ? { titulo: String(primeiro.titulo), slug: String(primeiro.slug) }
+      : { titulo: 'a Formação Pericial de Alta Performance', slug: '' },
+  }
 }
 
 /** Acesso à Biblioteca de Planilhas (flag do perfil ou concessão vigente). */

@@ -6,6 +6,7 @@ import AulaContent from "@/components/AulaContent";
 import { criarClienteServidor } from "@/lib/supabase/server";
 import { verificarAcessoCurso } from "@/lib/acesso/verificar";
 import AssinaturaNecessaria from "@/components/AssinaturaNecessaria";
+import FormacaoPendente from "@/components/FormacaoPendente";
 
 export default async function AulaPage({ params, searchParams }: {
   params: Promise<{ slug: string; aulaId: string }>;
@@ -22,6 +23,11 @@ export default async function AulaPage({ params, searchParams }: {
   const acesso = await verificarAcessoCurso(slug);
   // Turma fechada dá 404, não paywall — ver a página do curso.
   if (!acesso.permitido && acesso.restrito) notFound();
+  // ⚠️ ANTES DO PAYWALL. Quem tem direito e esbarrou na ORDEM não pode ver
+  // "seu acesso não inclui este conteúdo": ele acabou de pagar por ele.
+  if (!acesso.permitido && acesso.pendente) {
+    return <FormacaoPendente nav={nav} pendente={acesso.pendente} curso={dados?.curso?.titulo ?? null} />;
+  }
   if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} alvo={slug} />;
 
   // acesso direto por URL a uma aula ainda travada → manda pro próximo passo

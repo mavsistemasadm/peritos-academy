@@ -7,6 +7,7 @@ import { criarClienteServidor } from "@/lib/supabase/server";
 import { carregarNav } from "@/lib/queries/nav";
 import { verificarAcessoCurso } from "@/lib/acesso/verificar";
 import AssinaturaNecessaria from "@/components/AssinaturaNecessaria";
+import FormacaoPendente from "@/components/FormacaoPendente";
 
 // A correção chama a Claude Haiku pra personalizar o parecer de cada erro:
 // uma avaliação inteira errada leva mais de 10s, que é o teto padrão da Vercel.
