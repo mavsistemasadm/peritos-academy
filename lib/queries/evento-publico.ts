@@ -35,14 +35,14 @@ import { carregarChatEvento, type MensagemEvento } from '@/lib/queries/evento-ch
  * plataforma usam (hoje `nexusperitosacademy.com.br`), e a diferença é
  * deliberada: lá quem clica é aluno, e o destino é a oferta para aluno; aqui
  * quem clica é alguém que talvez nunca tenha ouvido falar do ecossistema, e o
- * destino é a página de entrada.
+ * destino é a página de entrada, `/perito`.
  *
  * Se um dia os dois tiverem que ser o mesmo, o lugar de decidir isso é o
  * admin (`/admin/configuracoes` → Sugestões do Nexus) — e então esta
  * constante some e volta a ler a config. Enquanto forem dois, ficam os dois
  * escritos, cada um com o motivo ao lado.
  */
-const LINK_NEXUS = 'https://www.nexuspericial.com.br/inicio'
+const LINK_NEXUS = 'https://www.nexuspericial.com.br/perito'
 
 export type EstadoEvento = 'agendado' | 'ao_vivo' | 'gravado' | 'encerrado'
 
