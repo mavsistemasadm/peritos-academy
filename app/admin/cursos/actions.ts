@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
 import { gerarSlug } from '@/lib/slug'
+import { trocarOrdem } from '@/lib/admin/trocarOrdem'
 
 type Resultado = { ok: true; id?: string } | { ok: false; erro: string }
 
@@ -213,12 +214,8 @@ export async function moverModulo(cursoId: string, id: string, direcao: 'up' | '
   const alvo = direcao === 'up' ? idx - 1 : idx + 1
   if (idx < 0 || alvo < 0 || alvo >= modulos.length) return { ok: true }
 
-  const a = modulos[idx]
-  const b = modulos[alvo]
-  await Promise.all([
-    supabase.from('modulos').update({ ordem: b.ordem }).eq('id', a.id),
-    supabase.from('modulos').update({ ordem: a.ordem }).eq('id', b.id),
-  ])
+  const erro = await trocarOrdem(supabase, 'modulos', modulos[idx], modulos[alvo])
+  if (erro) return { ok: false, erro }
 
   revalidarCurso(cursoId)
   return { ok: true }
@@ -304,12 +301,8 @@ export async function moverAula(moduloId: string, cursoId: string, id: string, d
   const alvo = direcao === 'up' ? idx - 1 : idx + 1
   if (idx < 0 || alvo < 0 || alvo >= aulas.length) return { ok: true }
 
-  const a = aulas[idx]
-  const b = aulas[alvo]
-  await Promise.all([
-    supabase.from('aulas').update({ ordem: b.ordem }).eq('id', a.id),
-    supabase.from('aulas').update({ ordem: a.ordem }).eq('id', b.id),
-  ])
+  const erro = await trocarOrdem(supabase, 'aulas', aulas[idx], aulas[alvo])
+  if (erro) return { ok: false, erro }
 
   revalidarCurso(cursoId)
   return { ok: true }

@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
+import { trocarOrdem } from '@/lib/admin/trocarOrdem'
 
 type Resultado = { ok: true; id?: string } | { ok: false; erro: string }
 
@@ -231,12 +232,8 @@ export async function moverQuestao(avaliacaoId: string, cursoId: string, id: str
   const alvo = direcao === 'up' ? idx - 1 : idx + 1
   if (idx < 0 || alvo < 0 || alvo >= questoes.length) return { ok: true }
 
-  const a = questoes[idx]
-  const b = questoes[alvo]
-  await Promise.all([
-    supabase.from('avaliacao_questoes').update({ ordem: b.ordem }).eq('id', a.id),
-    supabase.from('avaliacao_questoes').update({ ordem: a.ordem }).eq('id', b.id),
-  ])
+  const erro = await trocarOrdem(supabase, 'avaliacao_questoes', questoes[idx], questoes[alvo])
+  if (erro) return { ok: false, erro }
 
   await revalidarAvaliacao(avaliacaoId, cursoId)
   return { ok: true }
