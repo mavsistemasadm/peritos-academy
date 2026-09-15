@@ -10,6 +10,9 @@ export const metadata: Metadata = {
 }
 
 export const dynamic = 'force-dynamic'
+// "Enviar convite por email" manda até 40 emails com pausa de 600ms (limite do
+// Resend): passa do teto padrão de uma function na Vercel.
+export const maxDuration = 60
 
 export default async function PaginaAdminDesafioEditor({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params

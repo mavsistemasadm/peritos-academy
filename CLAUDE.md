@@ -910,8 +910,18 @@ desafio não pode aparecer para a base, e um candidato não pode ver o outro.
   a tela de assinatura, nem o login.
 - **Só quem já tem conta.** `/admin/desafios/[id]` → Convidados: cola emails, e
   cada um volta como Liberado / Já estava na lista / Sem conta aqui / Email
-  inválido. Nada é criado, nenhum email sai; o admin copia o link e manda.
-  Quem é liberado com o desafio já publicado recebe aviso no sino.
+  inválido. Nada é criado, e **liberar não envia email**. Quem é liberado com
+  o desafio já publicado recebe aviso no sino.
+- **Convite por email é um botão à parte** ("Enviar convite por email (N)"),
+  decisão do dono do produto em 15/09/2026: a lista é conferida antes, e email
+  não tem desfazer. Só com o desafio **restrito e publicado** (senão o link dá
+  404), só para quem ainda não recebeu (`adm_listar_convidados_desafio` devolve
+  `convite_enviado_em`, ignorando `estado='falhou'`, e o dedupe de `enviarEmail`
+  segura no banco), tipo `desafio_convite` com `ref_id = desafio_id`, remetente
+  automático da Peritos Academy, sem mencionar contratação. **40 por clique**:
+  com a pausa de 600ms do Resend, mais que isso encosta no `maxDuration = 60`
+  da página; clicar de novo continua. Quem desligou emails no perfil não recebe
+  e fica contado à parte.
 - **Galeria e contagem de participantes somem** no restrito.
 
 ⚠️ **O sigilo mora na RLS, não na tela.** Antes daqui três coisas vazavam, e

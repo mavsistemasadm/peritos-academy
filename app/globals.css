@@ -4636,6 +4636,7 @@ body.teatro .trilho-aulas{display:none}
 .pagina-admin .pnl-convite-link span{font-size:13px;color:var(--creme);word-break:break-all;flex:1;min-width:0}
 .pagina-admin .pnl-convite-relatorio{list-style:none;display:flex;flex-direction:column;gap:6px;margin:12px 0;padding:0}
 .pagina-admin .pnl-convite-relatorio li{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--creme)}
+.pagina-admin .pnl-convite-envio{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
 
 .pagina-admin .pnl-fin-detalhe{padding:14px 10px;border-bottom:1px solid var(--linha-suave);background:rgba(255,255,255,.015)}
 .pagina-admin .pnl-fin-detalhe-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}

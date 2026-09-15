@@ -5,6 +5,9 @@ import { criarClienteServidor } from '@/lib/supabase/server'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
 import { gerarSlug } from '@/lib/slug'
 import { separarEmails } from '@/lib/acessos/conceder'
+import { enviarEmail } from '@/lib/email/enviar'
+import { emailConviteDesafio } from '@/lib/email/templates/desafioConvite'
+import { SITE_URL } from '@/lib/site'
 import type { Documento, Quesito } from '@/lib/queries/admin-desafios'
 
 type Resultado = { ok: true; id?: string } | { ok: false; erro: string }
@@ -383,6 +386,79 @@ export async function removerConvidadoDesafio(desafioId: string, usuarioId: stri
   if (error) return { ok: false, erro: error.message }
   revalidarDesafios(desafioId)
   return { ok: true }
+}
+
+// ---------- Convite por email ----------
+// Sai só por este botão, nunca ao liberar alguém: a lista é conferida antes.
+// Vai apenas para quem ainda não recebeu (o dedupe de enviarEmail garante o
+// mesmo no banco) e só com o desafio publicado, senão o link do email dá 404.
+//
+// Lote de 40 por clique: com a pausa de 600ms que o Resend exige, mais que isso
+// encosta no teto de 60s da function e o envio morre no meio sem avisar a tela.
+// Clicar de novo continua de onde parou, porque quem recebeu sai da fila.
+
+export type ResultadoConvites =
+  | { ok: true; enviados: number; semPreferencia: number; falhas: number; restantes: number }
+  | { ok: false; erro: string }
+
+const CONVITES_POR_CLIQUE = 40
+
+export async function enviarConvitesDesafio(desafioId: string): Promise<ResultadoConvites> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+
+  const supabase = await criarClienteServidor()
+  const { data: d } = await supabase
+    .from('desafios')
+    .select('titulo, slug, numero, prazo_dias, quesitos, publicado, restrito')
+    .eq('id', desafioId)
+    .single()
+  if (!d) return { ok: false, erro: 'Desafio não encontrado.' }
+  if (!d.restrito) return { ok: false, erro: 'O convite por email é para desafio restrito a convidados.' }
+  if (!d.publicado) return { ok: false, erro: 'Publique o desafio antes de convidar: o link do email daria página não encontrada.' }
+
+  const { data: lista, error } = await supabase.rpc('adm_listar_convidados_desafio', { p_desafio_id: desafioId })
+  if (error) return { ok: false, erro: error.message }
+  const pendentes = ((lista ?? []) as { usuario_id: string; nome: string | null; convite_enviado_em: string | null }[])
+    .filter(c => !c.convite_enviado_em)
+  if (pendentes.length === 0) return { ok: false, erro: 'Todos da lista já receberam o convite.' }
+
+  const lote = pendentes.slice(0, CONVITES_POR_CLIQUE)
+  const correcaoManual = !Array.isArray(d.quesitos) || d.quesitos.length === 0
+  const url = `${SITE_URL}/desafios/${d.slug}`
+
+  let enviados = 0
+  let semPreferencia = 0
+  let falhas = 0
+  for (const c of lote) {
+    const { assunto, html } = emailConviteDesafio({
+      primeiroNome: (c.nome ?? '').trim().split(/\s+/)[0] || 'Perito',
+      titulo: d.titulo,
+      numero: d.numero ?? '000',
+      prazoDias: d.prazo_dias,
+      correcaoManual,
+      url,
+    })
+    const r = await enviarEmail({
+      usuarioId: c.usuario_id,
+      tipo: 'desafio_convite',
+      refId: desafioId,
+      assunto,
+      html,
+      remetente: 'automatico',
+    })
+    if (r.enviado) {
+      enviados++
+      // O Resend aceita 2 por segundo, mesma pausa de anunciarEvento.
+      await new Promise(res => setTimeout(res, 600))
+    } else if (r.motivo === 'preferencia_desligada') {
+      semPreferencia++
+    } else if (r.motivo !== 'duplicado') {
+      falhas++
+    }
+  }
+
+  revalidarDesafios(desafioId)
+  return { ok: true, enviados, semPreferencia, falhas, restantes: pendentes.length - lote.length }
 }
 
 // ---------- Gabarito (upload em 'planilhas') ----------

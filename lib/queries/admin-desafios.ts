@@ -165,16 +165,20 @@ export type ConvidadoDesafio = {
   convidadoEm: string
   aceitou: boolean
   entregou: boolean
+  /** Último convite por email que não falhou; null = ainda não recebeu. */
+  conviteEnviadoEm: string | null
 }
 
 export async function carregarConvidadosDesafio(desafioId: string): Promise<ConvidadoDesafio[]> {
   const supabase = await criarClienteServidor()
   const { data } = await supabase.rpc('adm_listar_convidados_desafio', { p_desafio_id: desafioId })
   const linhas = (data ?? []) as {
-    usuario_id: string; nome: string | null; email: string; convidado_em: string; aceitou: boolean; entregou: boolean
+    usuario_id: string; nome: string | null; email: string; convidado_em: string
+    aceitou: boolean; entregou: boolean; convite_enviado_em: string | null
   }[]
   return linhas.map(c => ({
     usuarioId: c.usuario_id, nome: c.nome, email: c.email,
     convidadoEm: c.convidado_em, aceitou: c.aceitou, entregou: c.entregou,
+    conviteEnviadoEm: c.convite_enviado_em,
   }))
 }

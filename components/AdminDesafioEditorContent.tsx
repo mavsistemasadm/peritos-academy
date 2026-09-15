@@ -10,7 +10,7 @@ import {
   adicionarQuesito, atualizarQuesito, excluirQuesito, moverQuesito,
   criarUploadDocumento, confirmarDocumento, excluirDocumento,
   criarUploadGabarito, confirmarGabarito, corrigirEntrega,
-  convidarParaDesafio, removerConvidadoDesafio,
+  convidarParaDesafio, removerConvidadoDesafio, enviarConvitesDesafio,
 } from '@/app/admin/desafios/actions'
 import type { LinhaConvite } from '@/app/admin/desafios/actions'
 import { SITE_URL } from '@/lib/site'
@@ -300,6 +300,7 @@ function ConvidadosDesafio({ desafioId, slug, restrito, publicado, convidados, o
   const [relatorio, setRelatorio] = useState<LinhaConvite[] | null>(null)
   const [pendente, startTransition] = useTransition()
   const link = `${SITE_URL}/desafios/${slug}`
+  const pendentesConvite = convidados.filter(c => !c.conviteEnviadoEm).length
 
   function onConvidar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -329,6 +330,28 @@ function ConvidadosDesafio({ desafioId, slug, restrito, publicado, convidados, o
     catch { onErro('Não foi possível copiar. Selecione o link e copie à mão.') }
   }
 
+  function onEnviarConvites() {
+    // mesmo teto de CONVITES_POR_CLIQUE em enviarConvitesDesafio
+    const n = Math.min(pendentesConvite, 40)
+    const quem = n === 1 ? '1 pessoa' : `${n} pessoas`
+    if (!confirm(`Enviar o convite por email para ${quem} que ainda não recebeu? Email não tem desfazer.`)) return
+    startTransition(async () => {
+      try {
+        const r = await enviarConvitesDesafio(desafioId)
+        if (!r.ok) { onErro(r.erro); return }
+        const partes = [r.enviados === 1 ? '1 convite enviado' : `${r.enviados} convites enviados`]
+        if (r.semPreferencia) partes.push(`${r.semPreferencia} com emails desligados no perfil`)
+        if (r.falhas) partes.push(`${r.falhas} com falha, clique de novo`)
+        if (r.restantes) partes.push(`faltam ${r.restantes}, clique de novo`)
+        if (r.enviados > 0) onSucesso(partes.join(' · '))
+        else onErro(partes.join(' · '))
+        onRefresh()
+      } catch {
+        onErro('O envio foi interrompido. Os que saíram ficam registrados: clique de novo para continuar.')
+      }
+    })
+  }
+
   return (
     <section className="pnl-card">
       <h2>Convidados</h2>
@@ -341,7 +364,7 @@ function ConvidadosDesafio({ desafioId, slug, restrito, publicado, convidados, o
         <button type="button" className="pnl-btn-secundario" onClick={onCopiarLink}>Copiar link</button>
       </div>
       <p className="pnl-vazio-sm">
-        Nenhum email é enviado: mande este link para os candidatos.
+        Liberar não envia email. Para avisar os candidatos, use o botão de convite abaixo da lista ou mande este link.
         {!publicado && ' O link só abre depois que o desafio for publicado.'}
       </p>
 
@@ -366,7 +389,7 @@ function ConvidadosDesafio({ desafioId, slug, restrito, publicado, convidados, o
       {convidados.length === 0 ? <p className="pnl-vazio">Ninguém na lista ainda.</p> : (
         <div className="pnl-tabela-scroll">
           <table className="pnl-tabela">
-            <thead><tr><th>Nome</th><th>Email</th><th>Situação</th><th>Liberado em</th><th></th></tr></thead>
+            <thead><tr><th>Nome</th><th>Email</th><th>Situação</th><th>Liberado em</th><th>Convite</th><th></th></tr></thead>
             <tbody>
               {convidados.map(c => (
                 <tr key={c.usuarioId}>
@@ -378,11 +401,32 @@ function ConvidadosDesafio({ desafioId, slug, restrito, publicado, convidados, o
                     </span>
                   </td>
                   <td>{new Date(c.convidadoEm).toLocaleDateString('pt-BR')}</td>
+                  <td>{c.conviteEnviadoEm ? `Enviado em ${new Date(c.conviteEnviadoEm).toLocaleDateString('pt-BR')}` : 'Não enviado'}</td>
                   <td><button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={() => onRemover(c)} aria-label={`Remover ${c.email}`}><IconeTrash size={13} /></button></td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {convidados.length > 0 && (
+        <div className="pnl-convite-envio">
+          <button
+            type="button"
+            className="pnl-btn-primario"
+            disabled={pendente || !publicado || !restrito || pendentesConvite === 0}
+            onClick={onEnviarConvites}
+          >
+            {pendente ? 'Enviando...' : pendentesConvite === 0 ? 'Todos já receberam o convite' : `Enviar convite por email (${pendentesConvite})`}
+          </button>
+          <span className="pnl-vazio-sm">
+            {!restrito
+              ? 'Disponível quando o desafio for restrito a convidados.'
+              : !publicado
+                ? 'Publique o desafio para liberar o envio.'
+                : 'Vai só para quem ainda não recebeu, em nome da Peritos Academy.'}
+          </span>
         </div>
       )}
     </section>

@@ -18,7 +18,10 @@ export type TipoEmail =
   | "primeira_semana"
   | "resumo_quinzenal"
   | "inatividade_7"
-  | "inatividade_21";
+  | "inatividade_21"
+  // convite para desafio restrito; ref_id = desafio_id. Não entra em PRIORIDADE:
+  // é disparado à mão pelo admin e não pode ser engolido pelo teto de celebração.
+  | "desafio_convite";
 
 // ⚠️ O ENVIO SAI DE `mkt.peritosacademy.com.br`, E NÃO DO DOMÍNIO RAIZ.
 // Ver o comentário longo em lib/email/enviarConvidado.ts: em 25/08/2026 a raiz
