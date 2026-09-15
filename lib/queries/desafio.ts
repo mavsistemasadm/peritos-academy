@@ -20,6 +20,17 @@ export type Quesito = {
   opcoes?: string[] | null
 }
 
+// Desafio sem perguntas: o aluno entrega um laudo e uma planilha, e a nota vem
+// da correção manual do professor (adm_corrigir_desafio_entrega).
+export type TipoArquivoEntrega = 'laudo' | 'planilha'
+
+export type ArquivoEntrega = {
+  tipo: TipoArquivoEntrega
+  path: string
+  nome: string
+  tamanho_kb: number
+}
+
 export type EntregaGaleria = {
   id: string
   usuario_nome: string
@@ -56,6 +67,7 @@ export type DadosDesafio = {
     participantes: number
     nota_minima: number
     gabarito_path: string | null
+    correcao_manual: boolean
   }
   // estado do aluno
   aceito_em: string | null
@@ -65,6 +77,9 @@ export type DadosDesafio = {
   feedbacks: { quesito_ordem: number; nota: number; feedback: string; sugerir_refazer: boolean }[] | null
   nota: number | null
   tempo_seg: number | null
+  arquivos: ArquivoEntrega[]
+  parecer: string | null
+  corrigido_em: string | null
   prazoExpirado: boolean
   tempoRestanteSeg: number | null
   // galeria
@@ -201,6 +216,7 @@ prefixo: q.prefixo,
       participantes: partCount ?? 0,
       nota_minima: d.nota_minima ?? 6,
       gabarito_path: d.gabarito_path,
+      correcao_manual: quesitos.length === 0,
     },
     aceito_em,
     entregue_em: minhaEntrega?.entregue_em ?? null,
@@ -209,6 +225,9 @@ prefixo: q.prefixo,
     feedbacks,
     nota: minhaEntrega?.nota ?? null,
     tempo_seg: minhaEntrega?.tempo_seg ?? null,
+    arquivos: Array.isArray(minhaEntrega?.arquivos) ? minhaEntrega.arquivos : [],
+    parecer: minhaEntrega?.parecer ?? null,
+    corrigido_em: minhaEntrega?.corrigido_em ?? null,
     prazoExpirado,
     tempoRestanteSeg,
     entregas,

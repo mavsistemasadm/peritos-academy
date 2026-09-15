@@ -13,7 +13,7 @@ const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
 function CardDesafio({ d }: { d: DesafioCard }) {
   const statusRotulo = d.jaEntregou
-    ? `Nota ${d.nota?.toFixed(1).replace('.', ',') ?? '—'}`
+    ? d.nota === null ? 'Aguardando correção' : `Nota ${d.nota.toFixed(1).replace('.', ',')}`
     : d.jaAceitou
       ? 'Em andamento'
       : null

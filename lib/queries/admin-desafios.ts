@@ -62,6 +62,9 @@ export type EntregaAdmin = {
   nota: number | null
   tempoSeg: number | null
   arquivoPath: string | null
+  arquivos: import('@/lib/queries/desafio').ArquivoEntrega[]
+  parecer: string | null
+  corrigidoEm: string | null
   aceitoEm: string | null
   entregueEm: string | null
 }
@@ -133,7 +136,7 @@ export async function carregarEntregasDesafio(desafioId: string): Promise<Entreg
   const supabase = await criarClienteServidor()
   const { data: entregas } = await supabase
     .from('desafio_entregas')
-    .select('id, usuario_id, nota, tempo_seg, arquivo_path, aceito_em, entregue_em')
+    .select('id, usuario_id, nota, tempo_seg, arquivo_path, arquivos, parecer, corrigido_em, aceito_em, entregue_em')
     .eq('desafio_id', desafioId)
     .order('entregue_em', { ascending: false, nullsFirst: false })
   if (!entregas || entregas.length === 0) return []
@@ -145,6 +148,8 @@ export async function carregarEntregasDesafio(desafioId: string): Promise<Entreg
   return entregas.map(e => ({
     id: e.id, usuarioId: e.usuario_id, usuarioNome: perfisMap.get(e.usuario_id) ?? 'Perito',
     nota: e.nota === null ? null : Number(e.nota), tempoSeg: e.tempo_seg,
-    arquivoPath: e.arquivo_path, aceitoEm: e.aceito_em, entregueEm: e.entregue_em,
+    arquivoPath: e.arquivo_path, arquivos: Array.isArray(e.arquivos) ? e.arquivos : [],
+    parecer: e.parecer, corrigidoEm: e.corrigido_em,
+    aceitoEm: e.aceito_em, entregueEm: e.entregue_em,
   }))
 }

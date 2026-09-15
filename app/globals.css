@@ -3677,6 +3677,24 @@ body.teatro .trilho-aulas{display:none}
 .pagina-desafio .dsc-perg-btn-protocolar{font-size:15px;font-weight:650;color:var(--carvao);background:var(--grad-marca);border-radius:var(--r-pill);padding:14px 28px;transition:transform .25s var(--suave),opacity .2s}
 .pagina-desafio .dsc-perg-btn-protocolar:hover:not(:disabled){transform:scale(1.02)}
 .pagina-desafio .dsc-perg-btn-protocolar:disabled{opacity:.4;cursor:default}
+/* Desafio sem perguntas: entrega de laudo + planilha para correção manual */
+.pagina-desafio .dsc-entrega{display:flex;flex-direction:column;gap:var(--s-3);padding:var(--s-5);border:1px solid var(--linha);border-radius:var(--r-card);background:radial-gradient(120% 140% at 0% 0%,rgba(32,217,166,.06),transparent 60%),var(--preto-elev)}
+.pagina-desafio .dsc-entrega h3{font-size:22px;font-weight:700;color:var(--creme);letter-spacing:-.01em}
+.pagina-desafio .dsc-entrega-sub{font-size:14px;color:var(--cinza-claro);line-height:1.6;max-width:56ch}
+.pagina-desafio .dsc-entrega-slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--s-3);margin:var(--s-2) 0}
+.pagina-desafio .dsc-entrega-slot{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px dashed var(--linha);border-radius:14px;cursor:pointer;min-width:0;transition:border-color .2s,background .2s}
+.pagina-desafio .dsc-entrega-slot:hover{border-color:rgba(32,217,166,.45);background:rgba(32,217,166,.04)}
+.pagina-desafio .dsc-entrega-slot.enviado{border-style:solid;border-color:rgba(32,217,166,.35);background:rgba(32,217,166,.06)}
+.pagina-desafio .dsc-entrega-ico{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.05);color:var(--cinza-claro);flex-shrink:0}
+.pagina-desafio .dsc-entrega-slot.enviado .dsc-entrega-ico{color:var(--verde);background:rgba(32,217,166,.12)}
+.pagina-desafio .dsc-entrega-txt{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.pagina-desafio .dsc-entrega-txt b{font-size:14px;color:var(--creme)}
+.pagina-desafio .dsc-entrega-txt span{font-size:12.5px;color:var(--cinza);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pagina-desafio .dsc-entrega-acao{font-size:12px;font-weight:650;color:var(--verde);flex-shrink:0}
+.pagina-desafio .dsc-entrega .dsc-perg-btn-protocolar{align-self:flex-start}
+.pagina-desafio .dsc-selo-veredito.aguardando{background:rgba(221,247,132,.1);color:var(--lima);border:1px solid rgba(221,247,132,.3)}
+.pagina-desafio .dsc-parecer{max-width:640px;margin:0 auto var(--s-5);text-align:left;padding:var(--s-4) var(--s-5);border:1px solid var(--linha);border-radius:var(--r-card);background:var(--preto-elev)}
+.pagina-desafio .dsc-parecer p{font-size:14.5px;color:var(--cinza-claro);line-height:1.65;white-space:pre-line;margin-top:var(--s-2)}
 .pagina-desafio .dsc-perg-dica{font-size:12px;color:var(--cinza);text-align:center;margin-top:var(--s-3)}
 .pagina-desafio .dsc-perg-dica kbd{font-family:var(--font);font-size:11px;color:var(--cinza-claro);border:1px solid var(--linha-suave);border-radius:4px;padding:1px 5px}
 .pagina-desafio .dsc-perg-pontos{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
@@ -4609,6 +4627,11 @@ body.teatro .trilho-aulas{display:none}
 .pagina-admin .pnl-status-pill.suspenso{color:#B9BFB8;background:rgba(185,191,184,.12)}
 .pagina-admin .pnl-status-pill.banido{color:#E0776B;background:rgba(224,119,107,.12)}
 .pagina-admin .pnl-status-pill.sem_assinatura{color:#B9BFB8;background:rgba(185,191,184,.12)}
+.pagina-admin .pnl-status-pill.aguardando{color:#E0B96B;background:rgba(224,185,107,.12)}
+.pagina-admin .pnl-status-pill.corrigida{color:#20D9A6;background:rgba(32,217,166,.12)}
+.pagina-admin .pnl-entrega-arquivos{display:flex;gap:6px}
+.pagina-admin .pnl-entrega-correcao td{white-space:normal;background:rgba(255,255,255,.015)}
+.pagina-admin .pnl-entrega-correcao .pnl-form{max-width:640px;padding:6px 0}
 
 .pagina-admin .pnl-fin-detalhe{padding:14px 10px;border-bottom:1px solid var(--linha-suave);background:rgba(255,255,255,.015)}
 .pagina-admin .pnl-fin-detalhe-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}

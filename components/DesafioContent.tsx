@@ -2,18 +2,21 @@
 'use client'
 
 import { useEffect, useRef, useState, useTransition } from 'react'
+import type { ReactNode } from 'react'
 import {
   aceitarDesafio, protocolarLaudo, salvarRespostas,
   baixarDocumento, baixarGabarito, curtirEntrega, explicarQuesito,
-  uploadPlanilha,
+  uploadPlanilha, criarUploadArquivoEntrega, confirmarArquivoEntrega, protocolarEntrega,
 } from '@/app/desafios/actions'
+import { enviarParaSignedUrl } from '@/lib/storage/enviarDireto'
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
-import type { DadosDesafio, EntregaGaleria } from '@/lib/queries/desafio'
+import type { DadosDesafio, EntregaGaleria, ArquivoEntrega, TipoArquivoEntrega } from '@/lib/queries/desafio'
 import {
   IconeClipboard, IconeChevronLeft, IconeChevronRight, IconeCheck, IconeClose,
   IconeUsers, IconeClock, IconeHourglass, IconeDownload, IconePaperclip, IconeUpload,
   IconeSave, IconeBot, IconeAlertTriangle, IconeBookOpen, IconeHeart,
+  IconeFileText, IconeBarChart,
 } from '@/components/Icones'
 import { XP, Moeda } from '@/components/Emblemas'
 
@@ -29,6 +32,12 @@ function tempoGasto(seg: number) {
   if (h > 0) return `${h}h ${m}min`
   return `${m} minutos`
 }
+
+// Desafio sem perguntas: os dois arquivos que o aluno protocola para correção manual.
+const SLOTS_ENTREGA: { tipo: TipoArquivoEntrega; rotulo: string; falta: string; formatos: string; accept: string; icone: ReactNode }[] = [
+  { tipo: 'laudo', rotulo: 'Laudo', falta: 'o laudo', formatos: '.pdf ou .docx · máx 20 MB', accept: '.pdf,.docx', icone: <IconeFileText size={18} /> },
+  { tipo: 'planilha', rotulo: 'Planilha de cálculo', falta: 'a planilha', formatos: '.xlsx, .xls ou .xlsm · máx 20 MB', accept: '.xlsx,.xls,.xlsm', icone: <IconeBarChart size={18} /> },
+]
 
 function mascaraValor(raw: string): string {
   const soDigitos = raw.replace(/\D/g, '')
@@ -135,6 +144,11 @@ export default function DesafioContent({ dados, nav }: { dados: DadosDesafio; na
   const [arquivoNome, setArquivoNome] = useState<string | null>(null)
   const [arquivoPath, setArquivoPath] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [arquivos, setArquivos] = useState<ArquivoEntrega[]>(dados.arquivos)
+  const [enviandoTipo, setEnviandoTipo] = useState<TipoArquivoEntrega | null>(null)
+  const manual = ds.correcao_manual
+  const faltandoManual = SLOTS_ENTREGA.filter(s => !arquivos.some(a => a.tipo === s.tipo))
+  const prontoManual = faltandoManual.length === 0
 
   const nQ = ds.quesitos_total
   const q = ds.quesitos[atual]
@@ -165,6 +179,33 @@ const aprovado = nota !== null && nota >= ds.nota_minima
     setUploading(false)
     if (r.ok) { setArquivoNome(r.nome); setArquivoPath(r.path) }
     else setErro(r.erro ?? 'Erro no upload.')
+  }
+
+  async function enviarArquivoManual(tipo: TipoArquivoEntrega, file: File) {
+    setEnviandoTipo(tipo); setErro(null)
+    try {
+      // duas etapas: o arquivo vai direto pro Storage, ver criarUploadArquivoEntrega
+      const u = await criarUploadArquivoEntrega(ds.id, tipo, file.name, file.size)
+      if (!u.ok) { setErro(u.erro); return }
+      const envio = await enviarParaSignedUrl('planilhas', u.path, u.token, file)
+      if (!envio.ok) { setErro(envio.erro); return }
+      const r = await confirmarArquivoEntrega(ds.id, tipo, u.path, file.name, file.size / 1024)
+      if (r.ok) setArquivos(as => [...as.filter(a => a.tipo !== tipo), r.arquivo])
+      else setErro(r.erro)
+    } catch {
+      setErro('Falha no envio. Tente de novo.')
+    } finally {
+      setEnviandoTipo(null)
+    }
+  }
+
+  async function protocolarManual() {
+    if (!prontoManual || protocolando) return
+    setProtocolando(true); setErro(null)
+    const r = await protocolarEntrega(ds.id)
+    setProtocolando(false)
+    if (!r.ok) { setErro(r.erro ?? 'Erro ao protocolar.'); return }
+    setNota(null); setCena('veredito')
   }
 
   useEffect(() => {
@@ -214,7 +255,7 @@ const aprovado = nota !== null && nota >= ds.nota_minima
           {(cena === 'autos' || cena === 'perguntas') && !prazoExpirado && dados.tempoRestanteSeg !== null && <Contagem seg={dados.tempoRestanteSeg} onExpirou={() => setPrazoExpirado(true)} />}
           {(cena === 'autos' || cena === 'perguntas') && prazoExpirado && <span className="dsc-expirado"><IconeHourglass size={13} /> Prazo expirado</span>}
         </div>
-        <div className="dsc-progresso"><i style={{ width: `${(respondidas / nQ) * 100}%` }}></i></div>
+        <div className="dsc-progresso"><i style={{ width: `${manual ? (arquivos.length / SLOTS_ENTREGA.length) * 100 : (respondidas / nQ) * 100}%` }}></i></div>
       </div>
       {erro && <div className="wrap"><p className="dsc-erro" role="alert">{erro}</p></div>}
 
@@ -228,7 +269,35 @@ const aprovado = nota !== null && nota >= ds.nota_minima
               <h2>Sobre este desafio.</h2>
               {ds.instrucoes.map((p, i) => <p key={i}>{p}</p>)}
             </div>
-            <button className="dsc-btn-comecar" onClick={() => setCena('perguntas')}>Começar as perguntas <IconeChevronRight size={14} strokeWidth={2.4} /></button>
+            {manual ? (
+              <div className="dsc-entrega">
+                <span className="eyebrow">Sua entrega</span>
+                <h3>Laudo e planilha.</h3>
+                <p className="dsc-entrega-sub">Envie os dois arquivos e protocole. A correção é feita pelo professor, e você recebe o aviso no sino quando a nota sair.</p>
+                <div className="dsc-entrega-slots">
+                  {SLOTS_ENTREGA.map(s => {
+                    const enviado = arquivos.find(a => a.tipo === s.tipo)
+                    const enviando = enviandoTipo === s.tipo
+                    return (
+                      <label key={s.tipo} className={`dsc-entrega-slot${enviado ? ' enviado' : ''}`}>
+                        <input type="file" accept={s.accept} hidden disabled={enviandoTipo !== null || prazoExpirado} onChange={e => { const f = e.target.files?.[0]; if (f) enviarArquivoManual(s.tipo, f); e.target.value = '' }} />
+                        <span className="dsc-entrega-ico">{enviando ? <IconeHourglass size={18} /> : enviado ? <IconeCheck size={18} /> : s.icone}</span>
+                        <span className="dsc-entrega-txt">
+                          <b>{s.rotulo}</b>
+                          <span>{enviando ? 'Enviando…' : enviado ? enviado.nome : s.formatos}</span>
+                        </span>
+                        <span className="dsc-entrega-acao">{enviado ? 'Trocar' : 'Enviar'}</span>
+                      </label>
+                    )
+                  })}
+                </div>
+                <button className="dsc-perg-btn-protocolar" disabled={!prontoManual || protocolando || prazoExpirado || enviandoTipo !== null} onClick={protocolarManual}>
+                  {protocolando ? 'Protocolando…' : prazoExpirado ? 'Prazo encerrado' : !prontoManual ? `Falta enviar ${faltandoManual.map(s => s.falta).join(' e ')}` : <>Protocolar entrega <IconeCheck size={13} /></>}
+                </button>
+              </div>
+            ) : (
+              <button className="dsc-btn-comecar" onClick={() => setCena('perguntas')}>Começar as perguntas <IconeChevronRight size={14} strokeWidth={2.4} /></button>
+            )}
           </div>
           <aside className="dsc-lateral">
             <div className="dsc-docs">
@@ -303,9 +372,23 @@ const aprovado = nota !== null && nota >= ds.nota_minima
 
       {cena === 'veredito' && (
         <section className="dsc-cena dsc-veredito"><div className="wrap">
-          <div className={`dsc-selo-veredito${aprovado ? '' : ' reprovado'}`}>{aprovado ? 'Laudo homologado' : 'Diligências complementares'}</div>
-          <div className="dsc-nota-grande grad-txt num"><span ref={notaRef}>0,0</span></div>
-          <p className="dsc-veredito-sub">{aprovado ? 'Parecer sólido: ' : 'O caso continua: '}<b className="num">{feedbacks?.filter(f => f.nota >= 6).length ?? 0} de {nQ}</b> perguntas aprovadas.</p>
+          {manual && nota === null ? (
+            <>
+              <div className="dsc-selo-veredito aguardando">Aguardando correção</div>
+              <p className="dsc-veredito-sub">Seu laudo e sua planilha foram protocolados. O professor vai corrigir, e você recebe o aviso no sino quando a nota sair.</p>
+            </>
+          ) : (
+            <>
+              <div className={`dsc-selo-veredito${aprovado ? '' : ' reprovado'}`}>{aprovado ? 'Laudo homologado' : 'Diligências complementares'}</div>
+              <div className="dsc-nota-grande grad-txt num"><span ref={notaRef}>0,0</span></div>
+              {manual
+                ? <p className="dsc-veredito-sub">{aprovado ? 'Parecer sólido. ' : 'O caso continua. '}Leia a correção do professor abaixo.</p>
+                : <p className="dsc-veredito-sub">{aprovado ? 'Parecer sólido: ' : 'O caso continua: '}<b className="num">{feedbacks?.filter(f => f.nota >= 6).length ?? 0} de {nQ}</b> perguntas aprovadas.</p>}
+            </>
+          )}
+          {manual && nota !== null && dados.parecer && (
+            <div className="dsc-parecer"><span className="eyebrow">Parecer do professor</span><p>{dados.parecer}</p></div>
+          )}
           {(xpGanho > 0 || moedasGanho > 0) && (
             <div className="dsc-ganhos num">
               {xpGanho > 0 && <span className="dsc-ganho"><XP size={14} /> +{fmtNum(xpGanho)} XP creditados</span>}
@@ -347,7 +430,7 @@ const aprovado = nota !== null && nota >= ds.nota_minima
             </div>
           )}
 <div className="dsc-veredito-acoes">
-            {!aprovado && <p className="dsc-veredito-minima num">Nota mínima para aprovação: <b>{ds.nota_minima.toFixed(1).replace('.', ',')}</b></p>}
+            {!aprovado && nota !== null && <p className="dsc-veredito-minima num">Nota mínima para aprovação: <b>{ds.nota_minima.toFixed(1).replace('.', ',')}</b></p>}
             {ds.gabarito_path && aprovado && <button className="dsc-btn-gab" onClick={baixarGab} disabled={baixando === 'gabarito'}>{baixando === 'gabarito' ? 'Gerando link…' : <><IconePaperclip size={13} /> Baixar gabarito do professor</>}</button>}
             <button className="dsc-btn-galeria" onClick={() => setCena('galeria')}><IconeUsers size={13} /> Ver entregas da comunidade</button>
             <a className="dsc-btn-voltar" href="/desafios"><IconeChevronLeft size={12} /> Voltar aos desafios</a>

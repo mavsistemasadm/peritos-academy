@@ -8,9 +8,11 @@ import type { DesafioAdmin, CategoriaAdmin, EntregaAdmin, Quesito } from '@/lib/
 import {
   atualizarDesafio, uploadCapaDesafio, alternarPublicacaoDesafio, excluirDesafio,
   adicionarQuesito, atualizarQuesito, excluirQuesito, moverQuesito,
-  uploadDocumento, excluirDocumento, uploadGabarito,
+  criarUploadDocumento, confirmarDocumento, excluirDocumento,
+  criarUploadGabarito, confirmarGabarito, corrigirEntrega,
 } from '@/app/admin/desafios/actions'
 import { baixarDocumento } from '@/app/desafios/actions'
+import { enviarParaSignedUrl } from '@/lib/storage/enviarDireto'
 import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconeTrash } from '@/components/Icones'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
@@ -207,7 +209,7 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
           <button type="button" className="pnl-btn-primario" disabled={pendente} onClick={onCriarQuesito}>+ Quesito</button>
         </div>
 
-        {desafio.quesitos.length === 0 && <p className="pnl-vazio">Nenhum quesito cadastrado ainda.</p>}
+        {desafio.quesitos.length === 0 && <p className="pnl-vazio">Sem quesitos, a correção é manual: o aluno entrega laudo e planilha, e você dá a nota em "Entregas dos alunos".</p>}
 
         <div className="pnl-modulos-lista">
           {desafio.quesitos.map((q, i) => (
@@ -234,18 +236,20 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
           <div className="pnl-tabela-scroll">
             <table className="pnl-tabela">
               <thead>
-                <tr><th>Aluno</th><th>Nota</th><th>Tempo</th><th>Aceito em</th><th>Entregue em</th><th>Arquivo</th></tr>
+                <tr><th>Aluno</th><th>Situação</th><th>Nota</th><th>Tempo</th><th>Aceito em</th><th>Entregue em</th><th>Arquivos</th><th></th></tr>
               </thead>
               <tbody>
                 {entregas.map(e => (
-                  <tr key={e.id}>
-                    <td>{e.usuarioNome}</td>
-                    <td>{e.nota ?? '—'}</td>
-                    <td>{segParaLabel(e.tempoSeg)}</td>
-                    <td>{e.aceitoEm ? new Date(e.aceitoEm).toLocaleDateString('pt-BR') : '—'}</td>
-                    <td>{e.entregueEm ? new Date(e.entregueEm).toLocaleDateString('pt-BR') : '—'}</td>
-                    <td>{e.arquivoPath ? <button type="button" className="pnl-btn-secundario" onClick={() => onBaixar(e.arquivoPath!)}>Baixar</button> : '—'}</td>
-                  </tr>
+                  <EntregaLinha
+                    key={e.id}
+                    entrega={e}
+                    desafioId={desafio.id}
+                    manual={desafio.quesitos.length === 0}
+                    onBaixar={onBaixar}
+                    onErro={toast.erro}
+                    onSucesso={toast.sucesso}
+                    onRefresh={refresh}
+                  />
                 ))}
               </tbody>
             </table>
@@ -253,6 +257,77 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
         )}
       </section>
     </div>
+  )
+}
+
+function EntregaLinha({ entrega, desafioId, manual, onBaixar, onErro, onSucesso, onRefresh }: {
+  entrega: EntregaAdmin; desafioId: string; manual: boolean
+  onBaixar: (path: string) => void; onErro: (e: string) => void; onSucesso: (m: string) => void; onRefresh: () => void
+}) {
+  const [aberta, setAberta] = useState(false)
+  const [pendente, startTransition] = useTransition()
+
+  // entregas antigas (desafio com perguntas) guardam um arquivo só em arquivo_path
+  const arquivos = entrega.arquivos.length > 0
+    ? entrega.arquivos.map(a => ({ path: a.path, rotulo: a.tipo === 'laudo' ? 'Laudo' : 'Planilha' }))
+    : entrega.arquivoPath ? [{ path: entrega.arquivoPath, rotulo: 'Baixar' }] : []
+
+  const situacao = !entrega.entregueEm
+    ? { rotulo: 'Em andamento', classe: 'pendente' }
+    : entrega.nota === null
+      ? { rotulo: 'Aguardando correção', classe: 'aguardando' }
+      : { rotulo: 'Corrigida', classe: 'corrigida' }
+
+  function onCorrigir(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const fd = new FormData(e.currentTarget)
+    startTransition(async () => {
+      const r = await corrigirEntrega(entrega.id, desafioId, fd)
+      if (!r.ok) onErro(r.erro)
+      else { onSucesso('Correção salva e aluno avisado no sino'); setAberta(false); onRefresh() }
+    })
+  }
+
+  return (
+    <>
+      <tr>
+        <td>{entrega.usuarioNome}</td>
+        <td><span className={`pnl-status-pill ${situacao.classe}`}>{situacao.rotulo}</span></td>
+        <td>{entrega.nota ?? '—'}</td>
+        <td>{segParaLabel(entrega.tempoSeg)}</td>
+        <td>{entrega.aceitoEm ? new Date(entrega.aceitoEm).toLocaleDateString('pt-BR') : '—'}</td>
+        <td>{entrega.entregueEm ? new Date(entrega.entregueEm).toLocaleDateString('pt-BR') : '—'}</td>
+        <td>
+          {arquivos.length === 0 ? '—' : (
+            <div className="pnl-entrega-arquivos">
+              {arquivos.map(a => <button key={a.path} type="button" className="pnl-btn-secundario" onClick={() => onBaixar(a.path)}>{a.rotulo}</button>)}
+            </div>
+          )}
+        </td>
+        <td>
+          {manual && entrega.entregueEm && (
+            <button type="button" className={aberta ? 'pnl-btn-secundario' : 'pnl-btn-primario'} onClick={() => setAberta(!aberta)}>
+              {aberta ? 'Fechar' : entrega.nota === null ? 'Corrigir' : 'Rever correção'}
+            </button>
+          )}
+        </td>
+      </tr>
+      {aberta && (
+        <tr className="pnl-entrega-correcao">
+          <td colSpan={8}>
+            <form onSubmit={onCorrigir} className="pnl-form">
+              <label>Nota (0 a 10)
+                <input name="nota" type="number" step="0.1" min="0" max="10" required defaultValue={entrega.nota ?? ''} />
+              </label>
+              <label>Parecer para o aluno
+                <textarea name="parecer" rows={6} required defaultValue={entrega.parecer ?? ''} placeholder="O que ficou bom, o que faltou e onde o cálculo ou a impugnação erraram." />
+              </label>
+              <button type="submit" className="pnl-btn-primario" disabled={pendente}>{pendente ? 'Salvando...' : 'Salvar correção e avisar o aluno'}</button>
+            </form>
+          </td>
+        </tr>
+      )}
+    </>
   )
 }
 
@@ -352,15 +427,23 @@ function NovoDocumentoForm({ desafioId, onErro, onSucesso, onRefresh }: { desafi
 
   function onEnviar(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
     if (!nome.trim()) { onErro('Informe o nome do documento antes de escolher o arquivo.'); return }
-    const fd = new FormData()
-    fd.set('nome', nome)
-    fd.set('arquivo', file)
+    // duas etapas: o arquivo vai direto pro Storage, ver criarUploadDocumento
     startTransition(async () => {
-      const r = await uploadDocumento(desafioId, fd)
-      if (!r.ok) onErro(r.erro)
-      else { onSucesso('Documento enviado com sucesso'); setNome(''); onRefresh() }
+      try {
+        const u = await criarUploadDocumento(desafioId, file.name, file.size)
+        if (!u.ok) { onErro(u.erro); return }
+        if (!u.path || !u.token) { onErro('Não foi possível preparar o envio.'); return }
+        const envio = await enviarParaSignedUrl('planilhas', u.path, u.token, file)
+        if (!envio.ok) { onErro(envio.erro); return }
+        const r = await confirmarDocumento(desafioId, u.path, nome, file.size / 1024)
+        if (!r.ok) onErro(r.erro)
+        else { onSucesso('Documento enviado com sucesso'); setNome(''); onRefresh() }
+      } catch {
+        onErro('Falha no envio. Tente de novo.')
+      }
     })
   }
 
@@ -392,13 +475,21 @@ function GabaritoForm({ desafioId, onErro, onSucesso, onRefresh }: { desafioId: 
 
   function onEnviar(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
-    const fd = new FormData()
-    fd.set('arquivo', file)
     startTransition(async () => {
-      const r = await uploadGabarito(desafioId, fd)
-      if (!r.ok) onErro(r.erro)
-      else { onSucesso('Gabarito enviado com sucesso'); onRefresh() }
+      try {
+        const u = await criarUploadGabarito(desafioId, file.name, file.size)
+        if (!u.ok) { onErro(u.erro); return }
+        if (!u.path || !u.token) { onErro('Não foi possível preparar o envio.'); return }
+        const envio = await enviarParaSignedUrl('planilhas', u.path, u.token, file)
+        if (!envio.ok) { onErro(envio.erro); return }
+        const r = await confirmarGabarito(desafioId, u.path)
+        if (!r.ok) onErro(r.erro)
+        else { onSucesso('Gabarito enviado com sucesso'); onRefresh() }
+      } catch {
+        onErro('Falha no envio. Tente de novo.')
+      }
     })
   }
 

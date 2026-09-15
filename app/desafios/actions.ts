@@ -3,6 +3,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { criarClienteServidor } from '@/lib/supabase/server'
+import type { ArquivoEntrega, TipoArquivoEntrega } from '@/lib/queries/desafio'
 
 // ---------- ACEITAR A NOMEAÇÃO ----------
 export async function aceitarDesafio(desafioId: string) {
@@ -324,5 +325,123 @@ export async function uploadPlanilha(desafioId: string, formData: FormData) {
   if (dbErr) return { ok: false as const, erro: dbErr.message }
 
   return { ok: true as const, path, nome: arquivo.name, tamanho: arquivo.size }
+}
+
+// ---------- ENTREGA COM CORREÇÃO MANUAL (desafio sem perguntas) ----------
+// O aluno envia laudo e planilha e protocola; a nota e o parecer vêm do admin.
+// Nada aqui grava nota: o trigger desafio_entregas_proteger só deixa a RPC
+// adm_corrigir_desafio_entrega escrevê-la.
+
+const EXTENSOES_ENTREGA: Record<TipoArquivoEntrega, string[]> = {
+  laudo: ['pdf', 'docx'],
+  planilha: ['xlsx', 'xls', 'xlsm'],
+}
+
+const ARTIGO_ENTREGA: Record<TipoArquivoEntrega, string> = {
+  laudo: 'o laudo',
+  planilha: 'a planilha',
+}
+
+// Laudo e planilha sobem em duas etapas (signed upload URL), direto do navegador
+// pro Storage: acima de 4.5MB a Vercel recusa o corpo da function e a página cai.
+const TAMANHO_MAX_ENTREGA = 20 * 1024 * 1024
+
+async function entregaAbertaDoAluno(
+  supabase: Awaited<ReturnType<typeof criarClienteServidor>>,
+  desafioId: string,
+  uid: string,
+) {
+  const [{ data: desafio }, { data: entrega }] = await Promise.all([
+    supabase.from('desafios').select('numero').eq('id', desafioId).single(),
+    supabase.from('desafio_entregas').select('id, aceito_em, entregue_em, arquivos')
+      .eq('desafio_id', desafioId).eq('usuario_id', uid).maybeSingle(),
+  ])
+  if (!entrega?.aceito_em) return { ok: false as const, erro: 'Aceite o desafio antes de enviar arquivos.' }
+  if (entrega.entregue_em) return { ok: false as const, erro: 'Você já protocolou este desafio.' }
+  return {
+    ok: true as const,
+    id: entrega.id as string,
+    arquivos: (Array.isArray(entrega.arquivos) ? entrega.arquivos : []) as ArquivoEntrega[],
+    pasta: `desafios/${desafio?.numero ?? '000'}/entregas/${uid}`,
+  }
+}
+
+export async function criarUploadArquivoEntrega(desafioId: string, tipo: TipoArquivoEntrega, nomeArquivo: string, tamanho: number) {
+  const supabase = await criarClienteServidor()
+  const { data: auth } = await supabase.auth.getUser()
+  if (!auth?.user) return { ok: false as const, erro: 'Faça login.' }
+
+  const permitidos = EXTENSOES_ENTREGA[tipo]
+  if (!permitidos) return { ok: false as const, erro: 'Tipo de arquivo inválido.' }
+  const ext = nomeArquivo.split('.').pop()?.toLowerCase() ?? ''
+  if (!permitidos.includes(ext)) {
+    return { ok: false as const, erro: `Envie ${ARTIGO_ENTREGA[tipo]} em ${permitidos.map(e => '.' + e).join(', ')}.` }
+  }
+  if (tamanho > TAMANHO_MAX_ENTREGA) return { ok: false as const, erro: 'Arquivo muito grande. Máximo 20 MB.' }
+
+  const entrega = await entregaAbertaDoAluno(supabase, desafioId, auth.user.id)
+  if (!entrega.ok) return entrega
+
+  const path = `${entrega.pasta}/${tipo}-${Date.now()}.${ext}`
+  const { data, error } = await supabase.storage.from('planilhas').createSignedUploadUrl(path, { upsert: true })
+  if (error) return { ok: false as const, erro: `Erro ao preparar o envio: ${error.message}` }
+  return { ok: true as const, path: data.path, token: data.token }
+}
+
+export async function confirmarArquivoEntrega(desafioId: string, tipo: TipoArquivoEntrega, path: string, nome: string, tamanhoKb: number) {
+  const supabase = await criarClienteServidor()
+  const { data: auth } = await supabase.auth.getUser()
+  if (!auth?.user) return { ok: false as const, erro: 'Faça login.' }
+  if (!EXTENSOES_ENTREGA[tipo]) return { ok: false as const, erro: 'Tipo de arquivo inválido.' }
+
+  const entrega = await entregaAbertaDoAluno(supabase, desafioId, auth.user.id)
+  if (!entrega.ok) return entrega
+  // só aceita o path que criarUploadArquivoEntrega gerou: pasta do próprio aluno, tipo certo
+  if (!path.startsWith(`${entrega.pasta}/${tipo}-`)) return { ok: false as const, erro: 'Arquivo inválido.' }
+
+  const novo: ArquivoEntrega = { tipo, path, nome: nome.slice(0, 200), tamanho_kb: Math.round(tamanhoKb) }
+  const arquivos = [...entrega.arquivos.filter(a => a.tipo !== tipo), novo]
+
+  const { error } = await supabase.from('desafio_entregas').update({ arquivos }).eq('id', entrega.id)
+  if (error) return { ok: false as const, erro: error.message }
+  return { ok: true as const, arquivo: novo }
+}
+
+export async function protocolarEntrega(desafioId: string) {
+  const supabase = await criarClienteServidor()
+  const { data: auth } = await supabase.auth.getUser()
+  if (!auth?.user) return { ok: false as const, erro: 'Faça login para protocolar.' }
+
+  const [{ data: desafio }, { data: entrega }] = await Promise.all([
+    supabase.from('desafios').select('quesitos, prazo_dias').eq('id', desafioId).single(),
+    supabase.from('desafio_entregas').select('id, aceito_em, entregue_em, arquivos')
+      .eq('desafio_id', desafioId).eq('usuario_id', auth.user.id).maybeSingle(),
+  ])
+  if (!desafio) return { ok: false as const, erro: 'Desafio não encontrado.' }
+  if (Array.isArray(desafio.quesitos) && desafio.quesitos.length > 0) {
+    return { ok: false as const, erro: 'Este desafio é respondido pelas perguntas.' }
+  }
+  if (!entrega?.aceito_em) return { ok: false as const, erro: 'Aceite o desafio antes de protocolar.' }
+  if (entrega.entregue_em) return { ok: false as const, erro: 'Você já protocolou este desafio.' }
+
+  const fimMs = +new Date(entrega.aceito_em) + desafio.prazo_dias * 24 * 60 * 60 * 1000
+  if (Date.now() > fimMs) return { ok: false as const, erro: 'O prazo deste desafio já terminou.' }
+
+  const arquivos = (Array.isArray(entrega.arquivos) ? entrega.arquivos : []) as ArquivoEntrega[]
+  const faltando = (Object.keys(EXTENSOES_ENTREGA) as TipoArquivoEntrega[]).filter(t => !arquivos.some(a => a.tipo === t))
+  if (faltando.length > 0) {
+    return { ok: false as const, erro: `Falta enviar ${faltando.map(t => ARTIGO_ENTREGA[t]).join(' e ')}.` }
+  }
+
+  const { error } = await supabase.from('desafio_entregas')
+    .update({
+      entregue_em: new Date().toISOString(),
+      tempo_seg: Math.floor((Date.now() - +new Date(entrega.aceito_em)) / 1000),
+    })
+    .eq('id', entrega.id)
+  if (error) return { ok: false as const, erro: error.message }
+
+  revalidatePath('/desafios')
+  return { ok: true as const }
 }
 

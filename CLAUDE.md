@@ -846,6 +846,58 @@ tem total, e o anúncio encolhe junto. Mais `cursos_restritos_visiveis` e
 ⚠️ "Mentoria Peritos Academy" já está com `restrito = true`, ainda em rascunho e
 com zero matriculados — publicar e colar a lista é o que falta.
 
+## Desafio sem perguntas: laudo, planilha e correção manual — 2026-09-15
+
+**Regra permanente.** Desafio com `quesitos` vazio é de **correção manual**. Não
+existe flag: `correcao_manual` é derivado de `quesitos.length === 0`. O aluno
+envia um **laudo** (.pdf/.docx) e uma **planilha** (.xlsx/.xls/.xlsm), protocola,
+e a nota e o parecer vêm do admin em `/admin/desafios/[id]` → "Entregas dos alunos".
+
+Antes disso, desafio sem perguntas era um beco: o campo de envio e o botão de
+protocolar só existiam dentro da tela da última pergunta, e com zero perguntas a
+tela ficava em branco. Mesmo protocolando, a correção por IA só lê respostas, e
+nota 0 reprovaria todo mundo.
+
+- `desafio_entregas.arquivos` (jsonb, `[{tipo, path, nome, tamanho_kb}]`, um por
+  tipo, trocar substitui), `parecer`, `corrigido_em`, `corrigido_por`.
+  `arquivo_path` continua sendo o arquivo único do desafio com perguntas.
+- Aluno: `criarUploadArquivoEntrega` → `enviarParaSignedUrl` → `confirmarArquivoEntrega`,
+  e `protocolarEntrega`, em `app/desafios/actions.ts` (prazo conferido no servidor,
+  não só na tela).
+
+⚠️ **Arquivo nunca atravessa uma server action.** A Vercel recusa corpo acima de
+4,5 MB antes do Next (o `bodySizeLimit: '100mb'` do `next.config.ts` não muda
+isso), e a resposta derruba a página inteira em "Application error", sem toast.
+Chegou assim em 15/09/2026: o PDF do processo no admin do desafio. Documento,
+gabarito, laudo e planilha agora geram URL assinada no servidor e o navegador
+sobe direto (`lib/storage/enviarDireto.ts`), o mesmo padrão da capa de curso. A
+confirmação só aceita o `path` que a primeira etapa gerou. Ainda passam pela
+action: `uploadCapaDesafio` (5 MB) e `uploadPlanilha` do desafio com perguntas
+(10 MB), que quebram do mesmo jeito acima de 4,5 MB.
+- Admin: RPC `adm_corrigir_desafio_entrega(entrega, nota, parecer)`, papéis
+  `super_admin`/`conteudo`, avisa o aluno no sino (`tipo='desafio_corrigido'`).
+  Pode ser refeita: "Rever correção" regrava e avisa de novo.
+
+⚠️ **A nota não é do aluno.** A policy `entregas_update` libera a linha inteira
+para o dono. Quem protege é o trigger `trg_desafio_entregas_proteger`: fora da RPC
+(flag `app.correcao_desafio`), parecer nunca muda, nota não muda em desafio
+manual, e **depois de protocolada a entrega congela** (arquivos, respostas, nota,
+`entregue_em`) nos dois modos. O desafio com perguntas continua gravando a nota
+da IA pela sessão do aluno em `protocolarLaudo`, e por isso a trava de nota do
+modo com perguntas só vale **depois** do protocolo: um aluno técnico ainda pode
+forjar nota e `entregue_em` no mesmo UPDATE. Buraco antigo, não fechado aqui.
+
+⚠️ O XP de entrega continua saindo **no protocolo** (`gam_trg_desafio_entrega`),
+não na aprovação. As `moedas` do desafio nunca foram creditadas em modo nenhum:
+`protocolarLaudo` escreve `perfis.moedas` direto e o `trg_gam_proteger_perfis`
+reverte.
+
+Testado em SQL com rollback: aluno inserindo e protocolando com nota forjada
+(fica nula), desfazendo o protocolo (congelado), chamando a RPC (sem permissão),
+admin corrigindo (nota, parecer, autor e notificação), e o desafio com perguntas
+gravando a nota da IA e recusando alteração depois. Mais `npm run build`.
+**Não testado em navegador.**
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários; `tour_visto_em` timestamptz nullable — ver seção Tour guiado; `migrado_de`/`migrado_em`/`boas_vindas_migrado_em` — aluno importado em lote, ver seção Migração de alunos da Ensinio)
 - `cursos` (com `restrito` — turma fechada, ver seção própria), `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)

@@ -252,26 +252,47 @@ export async function moverQuesito(desafioId: string, indice: number, direcao: '
 
 // ---------- Documentos do processo (upload em 'planilhas') ----------
 
-export async function uploadDocumento(desafioId: string, formData: FormData): Promise<Resultado> {
+// Documento e gabarito sobem em duas etapas (signed upload URL): os bytes vão
+// direto do navegador pro Storage. PDF de processo passa fácil dos 4.5MB que a
+// Vercel aceita no corpo de uma function, e acima disso a página inteira caía
+// em "Application error" (ver criarUploadCapaCurso em app/admin/cursos/actions.ts).
+const TAMANHO_MAX_DOC = 50 * 1024 * 1024
+const EXTENSOES_DOC = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'xlsm']
+
+function validarArquivoDoc(nomeArquivo: string, tamanho: number): { ok: true; ext: string } | { ok: false; erro: string } {
+  const ext = nomeArquivo.split('.').pop()?.toLowerCase() ?? ''
+  if (!EXTENSOES_DOC.includes(ext)) return { ok: false, erro: 'Formato não aceito. Use PDF, Word ou Excel.' }
+  if (tamanho > TAMANHO_MAX_DOC) return { ok: false, erro: 'Arquivo muito grande. Máximo 50 MB.' }
+  return { ok: true, ext }
+}
+
+export async function criarUploadDocumento(desafioId: string, nomeArquivo: string, tamanho: number): Promise<Resultado & { path?: string; token?: string }> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
-  const arquivo = formData.get('arquivo') as File | null
-  const nome = (formData.get('nome') as string)?.trim()
-  if (!arquivo || arquivo.size === 0) return { ok: false, erro: 'Selecione um arquivo.' }
-  if (!nome) return { ok: false, erro: 'Nome do documento é obrigatório.' }
-  if (arquivo.size > 10 * 1024 * 1024) return { ok: false, erro: 'Arquivo muito grande. Máximo 10 MB.' }
+  const v = validarArquivoDoc(nomeArquivo, tamanho)
+  if (!v.ok) return v
+
+  const supabase = await criarClienteServidor()
+  const { data: d } = await supabase.from('desafios').select('numero').eq('id', desafioId).single()
+  if (!d) return { ok: false, erro: 'Desafio não encontrado.' }
+
+  const path = `desafios/${d.numero ?? desafioId}/documentos/documento-${Date.now()}.${v.ext}`
+  const { data, error } = await supabase.storage.from('planilhas').createSignedUploadUrl(path, { upsert: true })
+  if (error) return { ok: false, erro: error.message }
+  return { ok: true, path: data.path, token: data.token }
+}
+
+export async function confirmarDocumento(desafioId: string, path: string, nome: string, tamanhoKb: number): Promise<Resultado> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  if (!nome.trim()) return { ok: false, erro: 'Nome do documento é obrigatório.' }
 
   const supabase = await criarClienteServidor()
   const { data: d } = await supabase.from('desafios').select('numero, documentos').eq('id', desafioId).single()
   if (!d) return { ok: false, erro: 'Desafio não encontrado.' }
+  if (!path.startsWith(`desafios/${d.numero ?? desafioId}/documentos/`)) return { ok: false, erro: 'Arquivo inválido.' }
 
-  const ext = arquivo.name.split('.').pop()?.toLowerCase() ?? 'pdf'
-  const path = `desafios/${d.numero ?? desafioId}/documentos/documento-${Date.now()}.${ext}`
-  const buffer = Buffer.from(await arquivo.arrayBuffer())
-  const { error: upErr } = await supabase.storage.from('planilhas').upload(path, buffer, { contentType: arquivo.type, upsert: true })
-  if (upErr) return { ok: false, erro: upErr.message }
-
+  const ext = path.split('.').pop()?.toLowerCase() ?? 'pdf'
   const documentos: Documento[] = Array.isArray(d.documentos) ? d.documentos : []
-  documentos.push({ nome, path, formato: ext, tamanho_kb: Math.round(arquivo.size / 1024) })
+  documentos.push({ nome: nome.trim(), path, formato: ext, tamanho_kb: Math.round(tamanhoKb) })
 
   const { error } = await supabase.from('desafios').update({ documentos }).eq('id', desafioId)
   if (error) return { ok: false, erro: error.message }
@@ -295,23 +316,51 @@ export async function excluirDocumento(desafioId: string, indice: number): Promi
   return { ok: true }
 }
 
+// ---------- Correção manual da entrega (desafio sem perguntas) ----------
+
+export async function corrigirEntrega(entregaId: string, desafioId: string, formData: FormData): Promise<Resultado> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  const notaTxt = String(formData.get('nota') ?? '').trim().replace(',', '.')
+  const nota = Number(notaTxt)
+  const parecer = String(formData.get('parecer') ?? '').trim()
+  if (!notaTxt || !Number.isFinite(nota) || nota < 0 || nota > 10) return { ok: false, erro: 'A nota vai de 0 a 10.' }
+  if (!parecer) return { ok: false, erro: 'Escreva o parecer para o aluno.' }
+
+  const supabase = await criarClienteServidor()
+  const { data, error } = await supabase.rpc('adm_corrigir_desafio_entrega', {
+    p_entrega_id: entregaId, p_nota: nota, p_parecer: parecer,
+  })
+  if (error) return { ok: false, erro: error.message }
+  const r = data as { ok: boolean; erro?: string } | null
+  if (!r?.ok) return { ok: false, erro: r?.erro ?? 'Não foi possível salvar a correção.' }
+  revalidarDesafios(desafioId)
+  return { ok: true }
+}
+
 // ---------- Gabarito (upload em 'planilhas') ----------
 
-export async function uploadGabarito(desafioId: string, formData: FormData): Promise<Resultado> {
+export async function criarUploadGabarito(desafioId: string, nomeArquivo: string, tamanho: number): Promise<Resultado & { path?: string; token?: string }> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
-  const arquivo = formData.get('arquivo') as File | null
-  if (!arquivo || arquivo.size === 0) return { ok: false, erro: 'Selecione um arquivo.' }
-  if (arquivo.size > 10 * 1024 * 1024) return { ok: false, erro: 'Arquivo muito grande. Máximo 10 MB.' }
+  const v = validarArquivoDoc(nomeArquivo, tamanho)
+  if (!v.ok) return v
 
   const supabase = await criarClienteServidor()
   const { data: d } = await supabase.from('desafios').select('numero').eq('id', desafioId).single()
   if (!d) return { ok: false, erro: 'Desafio não encontrado.' }
 
-  const ext = arquivo.name.split('.').pop()?.toLowerCase() ?? 'pdf'
-  const path = `desafios/${d.numero ?? desafioId}/gabarito.${ext}`
-  const buffer = Buffer.from(await arquivo.arrayBuffer())
-  const { error: upErr } = await supabase.storage.from('planilhas').upload(path, buffer, { contentType: arquivo.type, upsert: true })
-  if (upErr) return { ok: false, erro: upErr.message }
+  const path = `desafios/${d.numero ?? desafioId}/gabarito.${v.ext}`
+  const { data, error } = await supabase.storage.from('planilhas').createSignedUploadUrl(path, { upsert: true })
+  if (error) return { ok: false, erro: error.message }
+  return { ok: true, path: data.path, token: data.token }
+}
+
+export async function confirmarGabarito(desafioId: string, path: string): Promise<Resultado> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+
+  const supabase = await criarClienteServidor()
+  const { data: d } = await supabase.from('desafios').select('numero').eq('id', desafioId).single()
+  if (!d) return { ok: false, erro: 'Desafio não encontrado.' }
+  if (!path.startsWith(`desafios/${d.numero ?? desafioId}/gabarito.`)) return { ok: false, erro: 'Arquivo inválido.' }
 
   const { error } = await supabase.from('desafios').update({ gabarito_path: path }).eq('id', desafioId)
   if (error) return { ok: false, erro: error.message }
