@@ -1,4 +1,4 @@
-// app/desafio/[slug]/page.tsx
+// app/desafios/[slug]/page.tsx
 import { notFound, redirect } from 'next/navigation'
 import { carregarDesafio } from '@/lib/queries/desafio'
 import { carregarNav } from '@/lib/queries/nav'
@@ -13,11 +13,19 @@ export default async function PaginaDesafio({ params }: {
 }) {
   const { slug } = await params
   const [dados, nav] = await Promise.all([carregarDesafio(slug), carregarNav()])
-  if (!dados) redirect('/login')
-  if (!dados.desafio) notFound()
+  // carregarDesafio devolve null tanto sem login quanto sem desafio visível. Desafio
+  // restrito para quem não foi convidado some pela RLS: logado, isso é 404, não login.
+  if (!dados) {
+    if (!nav.logado) redirect('/login')
+    notFound()
+  }
 
-  const acesso = await verificarAcessoConteudo()
-  if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} />
+  // No desafio restrito o convite é o acesso: a RLS só entrega a linha a quem está
+  // na lista, e o candidato da seleção não precisa ser assinante.
+  if (!dados.desafio.restrito) {
+    const acesso = await verificarAcessoConteudo()
+    if (!acesso.permitido) return <AssinaturaNecessaria nav={nav} logado={acesso.logado} />
+  }
 
   return <DesafioContent dados={dados} nav={nav} />
 }
@@ -28,8 +36,9 @@ export async function generateMetadata({ params }: {
   const { slug } = await params
   const dados = await carregarDesafio(slug)
   if (!dados?.desafio) return { title: 'Desafio · Peritos Academy' }
+  const entrega = dados.desafio.correcao_manual ? 'laudo e planilha' : `${dados.desafio.quesitos_total} quesitos`
   return {
     title: `Desafio #${dados.desafio.numero} · ${dados.desafio.titulo} · Peritos Academy`,
-    description: `Perícia sob pressão: ${dados.desafio.quesitos_total} quesitos, ${dados.desafio.prazo_dias} dias de prazo.`,
+    description: `Perícia sob pressão: ${entrega}, ${dados.desafio.prazo_dias} dias de prazo.`,
   }
 }

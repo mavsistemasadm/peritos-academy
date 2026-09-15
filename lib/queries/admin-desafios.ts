@@ -53,6 +53,7 @@ export type DesafioAdmin = {
   participantesBase: number
   publicado: boolean
   notaMinima: number
+  restrito: boolean
 }
 
 export type EntregaAdmin = {
@@ -129,6 +130,7 @@ export async function carregarDesafioAdmin(id: string): Promise<DesafioAdmin | n
     prazoDias: d.prazo_dias, xp: d.xp, moedas: d.moedas, plano: d.plano,
     gabaritoPath: d.gabarito_path, participantesBase: d.participantes_base,
     publicado: d.publicado, notaMinima: Number(d.nota_minima),
+    restrito: !!d.restrito,
   }
 }
 
@@ -151,5 +153,28 @@ export async function carregarEntregasDesafio(desafioId: string): Promise<Entreg
     arquivoPath: e.arquivo_path, arquivos: Array.isArray(e.arquivos) ? e.arquivos : [],
     parecer: e.parecer, corrigidoEm: e.corrigido_em,
     aceitoEm: e.aceito_em, entregueEm: e.entregue_em,
+  }))
+}
+
+// Lista de quem pode ver o desafio restrito. Vem de RPC porque o email mora em
+// auth.users, que a sessão do admin não lê.
+export type ConvidadoDesafio = {
+  usuarioId: string
+  nome: string | null
+  email: string
+  convidadoEm: string
+  aceitou: boolean
+  entregou: boolean
+}
+
+export async function carregarConvidadosDesafio(desafioId: string): Promise<ConvidadoDesafio[]> {
+  const supabase = await criarClienteServidor()
+  const { data } = await supabase.rpc('adm_listar_convidados_desafio', { p_desafio_id: desafioId })
+  const linhas = (data ?? []) as {
+    usuario_id: string; nome: string | null; email: string; convidado_em: string; aceitou: boolean; entregou: boolean
+  }[]
+  return linhas.map(c => ({
+    usuarioId: c.usuario_id, nome: c.nome, email: c.email,
+    convidadoEm: c.convidado_em, aceitou: c.aceitou, entregou: c.entregou,
   }))
 }

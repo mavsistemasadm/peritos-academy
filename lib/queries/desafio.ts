@@ -68,6 +68,7 @@ export type DadosDesafio = {
     nota_minima: number
     gabarito_path: string | null
     correcao_manual: boolean
+    restrito: boolean
   }
   // estado do aluno
   aceito_em: string | null
@@ -213,10 +214,12 @@ prefixo: q.prefixo,
       xp: d.xp,
       moedas: d.moedas,
       plano: d.plano ?? 'free',
-      participantes: partCount ?? 0,
+      participantes: d.restrito ? 0 : partCount ?? 0,
       nota_minima: d.nota_minima ?? 6,
       gabarito_path: d.gabarito_path,
       correcao_manual: quesitos.length === 0,
+      // restrito: seleção fechada, um candidato não vê quantos concorrem nem a entrega do outro
+      restrito: !!d.restrito,
     },
     aceito_em,
     entregue_em: minhaEntrega?.entregue_em ?? null,
@@ -230,6 +233,6 @@ prefixo: q.prefixo,
     corrigido_em: minhaEntrega?.corrigido_em ?? null,
     prazoExpirado,
     tempoRestanteSeg,
-    entregas,
+    entregas: d.restrito ? [] : entregas,
   }
 }

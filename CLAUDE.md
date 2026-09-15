@@ -898,6 +898,39 @@ admin corrigindo (nota, parecer, autor e notificação), e o desafio com pergunt
 gravando a nota da IA e recusando alteração depois. Mais `npm run build`.
 **Não testado em navegador.**
 
+## Desafio restrito: seleção fechada por email — 2026-09-15
+
+**Regra permanente.** `desafios.restrito = true` é o desafio que só a lista de
+`desafio_convidados` vê. Nasceu da contratação de peritos da MH Cálculos: o
+desafio não pode aparecer para a base, e um candidato não pode ver o outro.
+
+- **O convite é o acesso.** A página `/desafios/[slug]` pula
+  `verificarAcessoConteudo` quando o desafio é restrito: o candidato não precisa
+  ser assinante. Quem não está na lista recebe 404 (a RLS some com a linha), não
+  a tela de assinatura, nem o login.
+- **Só quem já tem conta.** `/admin/desafios/[id]` → Convidados: cola emails, e
+  cada um volta como Liberado / Já estava na lista / Sem conta aqui / Email
+  inválido. Nada é criado, nenhum email sai; o admin copia o link e manda.
+  Quem é liberado com o desafio já publicado recebe aviso no sino.
+- **Galeria e contagem de participantes somem** no restrito.
+
+⚠️ **O sigilo mora na RLS, não na tela.** Antes daqui três coisas vazavam, e
+continuariam vazando com a tela escondida:
+- `desafios` publicado era legível por qualquer um, anon incluso. Agora
+  `desafios_leitura` exige convite quando restrito.
+- `desafio_entregas` protocolada era legível **por anon** (`entregas_publico`),
+  com nota e caminho do arquivo. Agora a entrega dos outros só aparece em desafio
+  não restrito. `entregas_insert`/`entregas_update` exigem enxergar o desafio:
+  sem convite não se aceita nem pelo console, e convite removido trava o protocolo.
+- O bucket `planilhas` deixava **qualquer conta logada listar e baixar** tudo de
+  `desafios/`: processo, gabarito e laudo dos outros. `planilhas_leitura_autenticado`
+  agora exclui `desafios/%`, e `planilhas_desafios_leitura` libera: admin, a
+  própria entrega, documentos de desafio visível, e gabarito só depois de protocolar.
+
+⚠️ **O resto do bucket `planilhas` continua aberto para qualquer logado**, e é
+onde mora a Biblioteca de Planilhas (pastas por área). O portão da biblioteca é
+só a action. Não mexido aqui.
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários; `tour_visto_em` timestamptz nullable — ver seção Tour guiado; `migrado_de`/`migrado_em`/`boas_vindas_migrado_em` — aluno importado em lote, ver seção Migração de alunos da Ensinio)
 - `cursos` (com `restrito` — turma fechada, ver seção própria), `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)

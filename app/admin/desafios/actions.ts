@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { criarClienteServidor } from '@/lib/supabase/server'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
 import { gerarSlug } from '@/lib/slug'
+import { separarEmails } from '@/lib/acessos/conceder'
 import type { Documento, Quesito } from '@/lib/queries/admin-desafios'
 
 type Resultado = { ok: true; id?: string } | { ok: false; erro: string }
@@ -101,6 +102,7 @@ export async function atualizarDesafio(id: string, formData: FormData): Promise<
     moedas: Number((formData.get('moedas') as string) || 200),
     plano: (formData.get('plano') as string)?.trim() || 'free',
     nota_minima: Number((formData.get('nota_minima') as string) || 6),
+    restrito: formData.get('restrito') === 'on',
   }).eq('id', id)
 
   if (error) return { ok: false, erro: error.message }
@@ -333,6 +335,52 @@ export async function corrigirEntrega(entregaId: string, desafioId: string, form
   if (error) return { ok: false, erro: error.message }
   const r = data as { ok: boolean; erro?: string } | null
   if (!r?.ok) return { ok: false, erro: r?.erro ?? 'Não foi possível salvar a correção.' }
+  revalidarDesafios(desafioId)
+  return { ok: true }
+}
+
+// ---------- Convidados do desafio restrito ----------
+// Só libera quem já tem conta: nada é criado e nenhum email sai daqui.
+
+export type LinhaConvite = {
+  email: string
+  situacao: 'convidado' | 'ja_convidado' | 'sem_conta' | 'invalido'
+  nome: string | null
+}
+
+const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const TETO_CONVITES = 300
+
+export async function convidarParaDesafio(desafioId: string, texto: string): Promise<{ ok: true; relatorio: LinhaConvite[] } | { ok: false; erro: string }> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  const emails = separarEmails(texto)
+  if (emails.length === 0) return { ok: false, erro: 'Cole pelo menos um email.' }
+  if (emails.length > TETO_CONVITES) return { ok: false, erro: `No máximo ${TETO_CONVITES} emails por vez.` }
+
+  const validos = emails.filter(e => EMAIL_VALIDO.test(e))
+  const invalidos: LinhaConvite[] = emails
+    .filter(e => !EMAIL_VALIDO.test(e))
+    .map(email => ({ email, situacao: 'invalido', nome: null }))
+
+  let resolvidos: LinhaConvite[] = []
+  if (validos.length > 0) {
+    const supabase = await criarClienteServidor()
+    const { data, error } = await supabase.rpc('adm_convidar_desafio', { p_desafio_id: desafioId, p_emails: validos })
+    if (error) return { ok: false, erro: error.message }
+    resolvidos = (data ?? []) as LinhaConvite[]
+  }
+
+  revalidarDesafios(desafioId)
+  // pendências no topo: é o que o operador precisa resolver
+  const ordem: Record<LinhaConvite['situacao'], number> = { sem_conta: 0, invalido: 1, convidado: 2, ja_convidado: 3 }
+  return { ok: true, relatorio: [...invalidos, ...resolvidos].sort((a, b) => ordem[a.situacao] - ordem[b.situacao]) }
+}
+
+export async function removerConvidadoDesafio(desafioId: string, usuarioId: string): Promise<Resultado> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  const supabase = await criarClienteServidor()
+  const { error } = await supabase.rpc('adm_remover_convidado_desafio', { p_desafio_id: desafioId, p_usuario_id: usuarioId })
+  if (error) return { ok: false, erro: error.message }
   revalidarDesafios(desafioId)
   return { ok: true }
 }

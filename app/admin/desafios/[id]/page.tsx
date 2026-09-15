@@ -2,7 +2,7 @@
 import type { Metadata } from 'next'
 import { redirect, notFound } from 'next/navigation'
 import { obterAdminAtual, temPermissao } from '@/lib/admin/auth'
-import { carregarDesafioAdmin, carregarCategoriasAdmin, carregarEntregasDesafio } from '@/lib/queries/admin-desafios'
+import { carregarDesafioAdmin, carregarCategoriasAdmin, carregarEntregasDesafio, carregarConvidadosDesafio } from '@/lib/queries/admin-desafios'
 import AdminDesafioEditorContent from '@/components/AdminDesafioEditorContent'
 
 export const metadata: Metadata = {
@@ -19,7 +19,9 @@ export default async function PaginaAdminDesafioEditor({ params }: { params: Pro
   const desafio = await carregarDesafioAdmin(id)
   if (!desafio) notFound()
 
-  const [categorias, entregas] = await Promise.all([carregarCategoriasAdmin(), carregarEntregasDesafio(id)])
+  const [categorias, entregas, convidados] = await Promise.all([
+    carregarCategoriasAdmin(), carregarEntregasDesafio(id), carregarConvidadosDesafio(id),
+  ])
 
-  return <AdminDesafioEditorContent desafio={desafio} categorias={categorias} entregas={entregas} />
+  return <AdminDesafioEditorContent desafio={desafio} categorias={categorias} entregas={entregas} convidados={convidados} />
 }

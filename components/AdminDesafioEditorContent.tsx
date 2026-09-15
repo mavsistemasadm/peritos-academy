@@ -4,13 +4,16 @@
 import { useState, useTransition } from 'react'
 import type { FormEvent, ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import type { DesafioAdmin, CategoriaAdmin, EntregaAdmin, Quesito } from '@/lib/queries/admin-desafios'
+import type { DesafioAdmin, CategoriaAdmin, EntregaAdmin, Quesito, ConvidadoDesafio } from '@/lib/queries/admin-desafios'
 import {
   atualizarDesafio, uploadCapaDesafio, alternarPublicacaoDesafio, excluirDesafio,
   adicionarQuesito, atualizarQuesito, excluirQuesito, moverQuesito,
   criarUploadDocumento, confirmarDocumento, excluirDocumento,
   criarUploadGabarito, confirmarGabarito, corrigirEntrega,
+  convidarParaDesafio, removerConvidadoDesafio,
 } from '@/app/admin/desafios/actions'
+import type { LinhaConvite } from '@/app/admin/desafios/actions'
+import { SITE_URL } from '@/lib/site'
 import { baixarDocumento } from '@/app/desafios/actions'
 import { enviarParaSignedUrl } from '@/lib/storage/enviarDireto'
 import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconeTrash } from '@/components/Icones'
@@ -23,8 +26,8 @@ function segParaLabel(seg: number | null) {
   return `${m}min ${s}s`
 }
 
-export default function AdminDesafioEditorContent({ desafio, categorias, entregas }: {
-  desafio: DesafioAdmin; categorias: CategoriaAdmin[]; entregas: EntregaAdmin[]
+export default function AdminDesafioEditorContent({ desafio, categorias, entregas, convidados }: {
+  desafio: DesafioAdmin; categorias: CategoriaAdmin[]; entregas: EntregaAdmin[]; convidados: ConvidadoDesafio[]
 }) {
   const router = useRouter()
   const toast = useAdminToast()
@@ -149,6 +152,17 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
                 <option value="pro">Assinante</option>
               </select>
             </label>
+            {/* Seleção fechada (ex.: contratação de peritos): a lista de convidados
+                substitui a assinatura como porta de entrada. */}
+            <label className="pnl-checkbox-linha" style={{ alignItems: 'flex-start' }}>
+              <input type="checkbox" name="restrito" defaultChecked={desafio.restrito} />
+              <span>
+                Restrito a convidados
+                <small style={{ display: 'block', marginTop: 4 }}>
+                  Só quem estiver na lista de Convidados vê e entrega este desafio, mesmo sem assinatura. Ninguém vê a entrega do outro.
+                </small>
+              </span>
+            </label>
 
             <h3 className="pnl-form-subtitulo">Intimação</h3>
             <label>Texto da intimação
@@ -229,6 +243,17 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
         </div>
       </section>
 
+      <ConvidadosDesafio
+        desafioId={desafio.id}
+        slug={desafio.slug}
+        restrito={desafio.restrito}
+        publicado={desafio.publicado}
+        convidados={convidados}
+        onErro={toast.erro}
+        onSucesso={toast.sucesso}
+        onRefresh={refresh}
+      />
+
       <section className="pnl-card">
         <h2>Entregas dos alunos</h2>
         {entregas.length === 0 && <p className="pnl-vazio">Nenhuma entrega ainda.</p>}
@@ -257,6 +282,110 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
         )}
       </section>
     </div>
+  )
+}
+
+const ROTULO_CONVITE: Record<LinhaConvite['situacao'], { rotulo: string; classe: string }> = {
+  sem_conta: { rotulo: 'Sem conta aqui', classe: 'cancelada' },
+  invalido: { rotulo: 'Email inválido', classe: 'cancelada' },
+  convidado: { rotulo: 'Liberado', classe: 'ativa' },
+  ja_convidado: { rotulo: 'Já estava na lista', classe: 'pendente' },
+}
+
+function ConvidadosDesafio({ desafioId, slug, restrito, publicado, convidados, onErro, onSucesso, onRefresh }: {
+  desafioId: string; slug: string; restrito: boolean; publicado: boolean; convidados: ConvidadoDesafio[]
+  onErro: (e: string) => void; onSucesso: (m: string) => void; onRefresh: () => void
+}) {
+  const [texto, setTexto] = useState('')
+  const [relatorio, setRelatorio] = useState<LinhaConvite[] | null>(null)
+  const [pendente, startTransition] = useTransition()
+  const link = `${SITE_URL}/desafios/${slug}`
+
+  function onConvidar(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    startTransition(async () => {
+      const r = await convidarParaDesafio(desafioId, texto)
+      if (!r.ok) { onErro(r.erro); return }
+      setRelatorio(r.relatorio)
+      const liberados = r.relatorio.filter(l => l.situacao === 'convidado').length
+      onSucesso(liberados === 1 ? '1 pessoa liberada' : `${liberados} pessoas liberadas`)
+      // com pendência, o texto fica para corrigir o email e reenviar
+      if (r.relatorio.every(l => l.situacao === 'convidado' || l.situacao === 'ja_convidado')) setTexto('')
+      onRefresh()
+    })
+  }
+
+  function onRemover(c: ConvidadoDesafio) {
+    if (!confirm(`Remover ${c.nome ?? c.email} da lista? A pessoa deixa de ver o desafio.`)) return
+    startTransition(async () => {
+      const r = await removerConvidadoDesafio(desafioId, c.usuarioId)
+      if (!r.ok) onErro(r.erro)
+      else { onSucesso('Convidado removido da lista'); onRefresh() }
+    })
+  }
+
+  async function onCopiarLink() {
+    try { await navigator.clipboard.writeText(link); onSucesso('Link copiado') }
+    catch { onErro('Não foi possível copiar. Selecione o link e copie à mão.') }
+  }
+
+  return (
+    <section className="pnl-card">
+      <h2>Convidados</h2>
+      {!restrito && (
+        <p className="pnl-vazio-sm">Este desafio está aberto para todos os assinantes. Marque "Restrito a convidados" nos dados gerais para que só a lista abaixo o veja.</p>
+      )}
+
+      <div className="pnl-convite-link">
+        <span>{link}</span>
+        <button type="button" className="pnl-btn-secundario" onClick={onCopiarLink}>Copiar link</button>
+      </div>
+      <p className="pnl-vazio-sm">
+        Nenhum email é enviado: mande este link para os candidatos.
+        {!publicado && ' O link só abre depois que o desafio for publicado.'}
+      </p>
+
+      <form onSubmit={onConvidar} className="pnl-form">
+        <label>Emails (um por linha, ou separados por vírgula)
+          <textarea rows={4} value={texto} onChange={e => setTexto(e.target.value)} placeholder="candidato@exemplo.com" />
+        </label>
+        <button type="submit" className="pnl-btn-primario" disabled={pendente || !texto.trim()}>{pendente ? 'Liberando...' : 'Liberar para estes emails'}</button>
+      </form>
+
+      {relatorio && relatorio.length > 0 && (
+        <ul className="pnl-convite-relatorio">
+          {relatorio.map(l => (
+            <li key={l.email}>
+              <span className={`pnl-status-pill ${ROTULO_CONVITE[l.situacao].classe}`}>{ROTULO_CONVITE[l.situacao].rotulo}</span>
+              <span>{l.nome ? `${l.nome} · ` : ''}{l.email}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {convidados.length === 0 ? <p className="pnl-vazio">Ninguém na lista ainda.</p> : (
+        <div className="pnl-tabela-scroll">
+          <table className="pnl-tabela">
+            <thead><tr><th>Nome</th><th>Email</th><th>Situação</th><th>Liberado em</th><th></th></tr></thead>
+            <tbody>
+              {convidados.map(c => (
+                <tr key={c.usuarioId}>
+                  <td>{c.nome ?? '—'}</td>
+                  <td>{c.email}</td>
+                  <td>
+                    <span className={`pnl-status-pill ${c.entregou ? 'corrigida' : c.aceitou ? 'aguardando' : 'pendente'}`}>
+                      {c.entregou ? 'Entregou' : c.aceitou ? 'Aceitou' : 'Ainda não aceitou'}
+                    </span>
+                  </td>
+                  <td>{new Date(c.convidadoEm).toLocaleDateString('pt-BR')}</td>
+                  <td><button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={() => onRemover(c)} aria-label={`Remover ${c.email}`}><IconeTrash size={13} /></button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   )
 }
 

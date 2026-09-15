@@ -104,7 +104,7 @@ function IntimacaoAnimada({ ds, onAceitar }: { ds: DadosDesafio['desafio']; onAc
           <div className="dsc-rw"><span className="dsc-rw-ico"><XP size={16} /></span><b>{fmtNum(ds.xp)} XP</b><span>ao protocolar</span></div>
           <div className="dsc-rw"><span className="dsc-rw-ico"><Moeda size={16} /></span><b>{fmtNum(ds.moedas)} moedas</b><span>ao aprovar</span></div>
           <div className="dsc-rw"><span className="dsc-rw-ico"><IconeClock size={16} /></span><b>{ds.prazo_dias} {ds.prazo_dias === 1 ? 'dia' : 'dias'}</b><span>de prazo</span></div>
-          <div className="dsc-rw"><span className="dsc-rw-ico"><IconeUsers size={16} /></span><b>{fmtNum(ds.participantes)}</b><span>participantes</span></div>
+          {!ds.restrito && <div className="dsc-rw"><span className="dsc-rw-ico"><IconeUsers size={16} /></span><b>{fmtNum(ds.participantes)}</b><span>participantes</span></div>}
         </div>
         <div className={`anim-fade${fase >= 6 ? ' visivel' : ''}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--s-3)' }}>
           <button className="dsc-btn-aceitar" onClick={onAceitar}>
@@ -311,7 +311,7 @@ const aprovado = nota !== null && nota >= ds.nota_minima
               ))}
             </div>
             <div className="dsc-resumo num">
-              <div><span>Perguntas</span><b>{nQ}</b></div>
+              {manual ? <div><span>Entrega</span><b>Laudo e planilha</b></div> : <div><span>Perguntas</span><b>{nQ}</b></div>}
               <div><span>Prazo</span><b>{ds.prazo_dias} dias</b></div>
               <div><span>Recompensa</span><b><XP size={13} />{fmtNum(ds.xp)} + <Moeda size={13} />{fmtNum(ds.moedas)}</b></div>
             </div>
@@ -432,7 +432,7 @@ const aprovado = nota !== null && nota >= ds.nota_minima
 <div className="dsc-veredito-acoes">
             {!aprovado && nota !== null && <p className="dsc-veredito-minima num">Nota mínima para aprovação: <b>{ds.nota_minima.toFixed(1).replace('.', ',')}</b></p>}
             {ds.gabarito_path && aprovado && <button className="dsc-btn-gab" onClick={baixarGab} disabled={baixando === 'gabarito'}>{baixando === 'gabarito' ? 'Gerando link…' : <><IconePaperclip size={13} /> Baixar gabarito do professor</>}</button>}
-            <button className="dsc-btn-galeria" onClick={() => setCena('galeria')}><IconeUsers size={13} /> Ver entregas da comunidade</button>
+            {!ds.restrito && <button className="dsc-btn-galeria" onClick={() => setCena('galeria')}><IconeUsers size={13} /> Ver entregas da comunidade</button>}
             <a className="dsc-btn-voltar" href="/desafios"><IconeChevronLeft size={12} /> Voltar aos desafios</a>
           </div>
                   </div></section>
