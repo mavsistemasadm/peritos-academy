@@ -14,19 +14,19 @@ export type StatusAcesso = { logado: boolean; permitido: boolean }
 export type StatusAcessoCurso = StatusAcesso & {
   restrito: boolean
   /**
-   * O curso que precisa ser concluído antes deste.
+   * O curso da Formação Pericial que RECOMENDAMOS antes deste.
    *
-   * ⚠️ **É UM TERCEIRO ESTADO, e não uma variação de `permitido`.** A pessoa
-   * TEM direito a este curso — ela assinou, ou recebeu a concessão. O que falta
-   * é a PROGRESSÃO: o selo de qualidade exige que a Formação Pericial venha
-   * antes, e em ordem.
+   * ⚠️ **NÃO TRAVA NADA desde 29/09/2026.** Até ali isto era a "trava da
+   * Formação": quem tinha `perfis.exige_formacao_base` não abria curso fora da
+   * ordem. Virou recomendação (ver `components/RecomendacaoFormacao.tsx`): o
+   * curso abre sempre, e a página do curso mostra qual vem antes e por quê.
+   * O incentivo para seguir a ordem é o Selo de Excelência, que continua
+   * exigindo a Formação completa.
    *
-   * Recusar isso com a tela de "assine para ter acesso" seria mentira para quem
-   * acabou de pagar — a mesma armadilha que a turma fechada já ensinou aqui. Por
-   * isso o campo carrega o NOME do curso pendente: sem ele, a trava é recusa sem
-   * caminho.
+   * `null` quando não há o que recomendar: a regra não vale para a pessoa, ela
+   * já está em ordem, ou já concluiu todos os obrigatórios.
    */
-  pendente: { titulo: string; slug: string } | null
+  recomendado: { titulo: string; slug: string } | null
 }
 
 /** O que a pessoa tem hoje — usado para gatear E para a tela de bloqueio dizer o que ela tem. */
@@ -129,8 +129,14 @@ export async function verificarAcessoConteudo(): Promise<StatusAcesso> {
  * Continua na RPC: a regra de curso tem exceção por trilha e por curso
  * (`acessos_excecoes`), e reimplementar isso aqui criaria uma segunda fonte da
  * mesma regra, que diverge no dia em que alguém acrescentar uma exceção.
+ *
+ * `recomendar` só é pedido pela página do curso, que é onde a recomendação da
+ * Formação aparece. Aula e avaliação não gastam as duas RPCs a mais.
  */
-export async function verificarAcessoCurso(slugCurso: string): Promise<StatusAcessoCurso> {
+export async function verificarAcessoCurso(
+  slugCurso: string,
+  { recomendar = false }: { recomendar?: boolean } = {},
+): Promise<StatusAcessoCurso> {
   const supabase = await criarClienteServidor()
   const { data: auth } = await supabase.auth.getUser()
 
@@ -141,7 +147,7 @@ export async function verificarAcessoCurso(slugCurso: string): Promise<StatusAce
     .from('cursos').select('id, restrito').eq('slug', slugCurso).maybeSingle()
   const restrito = curso?.restrito === true
 
-  if (!auth?.user) return { logado: false, permitido: false, restrito, pendente: null }
+  if (!auth?.user) return { logado: false, permitido: false, restrito, recomendado: null }
 
   const { data } = await supabase.rpc('tem_acesso_curso', {
     p_usuario_id: auth.user.id,
@@ -149,28 +155,26 @@ export async function verificarAcessoCurso(slugCurso: string): Promise<StatusAce
   })
   const permitido = data === true
 
-  // ⚠️ **A PROGRESSÃO SÓ É PERGUNTADA DEPOIS DO DIREITO**, e a ordem importa:
-  // quem NÃO comprou não deve ver "conclua a Formação Pericial" — deve ver o
-  // convite para assinar. Dizer a um visitante que ele precisa concluir uma
-  // trilha que ele nem pode abrir é conselho para uma porta que não é a dele.
-  if (!permitido || !curso?.id) {
-    return { logado: true, permitido, restrito, pendente: null }
+  // A recomendação só é calculada para quem tem direito ao curso: sugerir a
+  // ordem de estudo a quem nem pode abrir o curso é conselho para a porta errada.
+  if (!permitido || !curso?.id || !recomendar) {
+    return { logado: true, permitido, restrito, recomendado: null }
   }
 
   const { data: liberou } = await supabase.rpc('formacao_liberou_curso', {
     p_usuario: auth.user.id,
     p_curso_id: curso.id,
   })
-
-  // ⚠️ **FALHA ABERTA.** RPC que não responde devolve `undefined`, e aqui isso
-  // libera. A trava é o selo de qualidade, não uma fechadura de acesso: barrar
-  // por um erro de leitura tiraria de quem pagou um curso que ele tem direito
-  // de abrir. Errar para o lado de destravar custa uma ordem quebrada; errar
-  // para o outro custa o acesso.
   if (liberou !== false) {
-    return { logado: true, permitido: true, restrito, pendente: null }
+    return { logado: true, permitido: true, restrito, recomendado: null }
   }
 
+  // ⚠️ **A RECOMENDAÇÃO VEM DE `formacao_curso_pendente`, NÃO DE `liberou`.**
+  // As duas podem discordar: uma etapa vazia na trilha principal faz
+  // `trilha_completa` dizer "incompleta" para sempre, e `liberou` dá false para
+  // quem concluiu todos os obrigatórios. Foi assim que o primeiro aluno a
+  // terminar a Formação ficou travado com uma tela mandando-o concluir o que já
+  // tinha concluído. Sem curso pendente nomeado, não há o que recomendar.
   const { data: falta } = await supabase.rpc('formacao_curso_pendente', {
     p_usuario: auth.user.id,
     p_curso_id: curso.id,
@@ -179,13 +183,11 @@ export async function verificarAcessoCurso(slugCurso: string): Promise<StatusAce
 
   return {
     logado: true,
-    permitido: false,
+    permitido: true,
     restrito,
-    // Sem o nome do curso pendente, a tela só sabe dizer "ainda não liberado" —
-    // que é a recusa sem caminho. O nome é o que transforma trava em sequência.
-    pendente: primeiro?.titulo
+    recomendado: primeiro?.titulo && primeiro?.slug
       ? { titulo: String(primeiro.titulo), slug: String(primeiro.slug) }
-      : { titulo: 'a Formação Pericial de Alta Performance', slug: '' },
+      : null,
   }
 }
 

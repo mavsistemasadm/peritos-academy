@@ -963,6 +963,35 @@ continuariam vazando com a tela escondida:
 onde mora a Biblioteca de Planilhas (pastas por área). O portão da biblioteca é
 só a action. Não mexido aqui.
 
+## A Formação recomenda, não trava — 2026-09-29
+
+**Regra permanente.** Curso que a pessoa tem direito de abrir, abre. A ordem da
+Formação Pericial de Alta Performance é **recomendação**, mostrada no topo da
+página do curso (`components/RecomendacaoFormacao.tsx`), com "Começar por X" e
+"Já domino, seguir neste curso" (lembrado por curso, no `localStorage`).
+
+Até aqui era trava (`perfis.exige_formacao_base`, desde 04/09): a tela
+`FormacaoPendente` barrava o curso. Saiu por dois motivos medidos:
+
+- **Ela produzia pressa, não base.** O primeiro aluno a chegar ao fim marcou 91
+  aulas numa tarde para alcançar o PASEP, e pediu estorno logo depois.
+- **Ela era frágil.** Uma etapa vazia na trilha principal (etapa 6, zero
+  cursos) faz `trilha_completa` responder `false` para sempre. Com isso,
+  `formacao_liberou_curso` barrava quem já tinha concluído todos os
+  obrigatórios, e a tela mandava concluir "a Formação" sem link.
+
+⚠️ **A recomendação vem de `formacao_curso_pendente`, não de
+`formacao_liberou_curso`.** Sem curso pendente nomeado, não há recomendação. É
+isso que impede a etapa vazia de voltar a gerar mensagem falsa.
+
+As funções SQL e a coluna `exige_formacao_base` **continuam** (decidem quem vê
+a recomendação). O **Selo de Excelência** continua exigindo `trilha_completa`:
+é o incentivo que sobrou para seguir a ordem. Enquanto a etapa vazia existir,
+ninguém ganha o selo.
+
+A sequência **dentro** de um curso (aulas, avaliações, correção depois da prova)
+não mudou: ela continua trava, ver "A avaliação é um item da jornada".
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários; `tour_visto_em` timestamptz nullable — ver seção Tour guiado; `migrado_de`/`migrado_em`/`boas_vindas_migrado_em` — aluno importado em lote, ver seção Migração de alunos da Ensinio)
 - `cursos` (com `restrito` — turma fechada, ver seção própria), `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)

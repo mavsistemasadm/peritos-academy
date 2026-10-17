@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import NavPlataforma from '@/components/NavPlataforma'
+import RecomendacaoFormacao from '@/components/RecomendacaoFormacao'
 import type { DadosNav } from '@/lib/queries/nav'
 import { IconeChevronLeft, IconePlay, IconePlus, IconeCheck, IconeLock, IconeAlertTriangle, IconeClipboard } from '@/components/Icones'
 import { Certificado } from '@/components/Emblemas'
@@ -101,6 +102,8 @@ type Props = {
   conquistas: Conquista[];
   progresso: Progresso;
   proximoPasso: ProximoPasso;
+  /** Curso da Formação recomendado antes deste. Não trava nada, só aconselha. */
+  recomendado?: { titulo: string; slug: string } | null;
   nav: DadosNav;
 };
 
@@ -121,7 +124,7 @@ function durOuNull(seg: number) {
   return seg > 0 ? fmtDur(seg) : null;
 }
 
-export function CursoContent({ curso, modulos, conquistas, progresso, proximoPasso, nav }: Props) {
+export function CursoContent({ curso, modulos, conquistas, progresso, proximoPasso, nav, recomendado }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const moduloAtualId = modulos.find((m) => m.ehAtual)?.id ?? modulos[0]?.id ?? null;
   const [abertos, setAbertos] = useState<Record<string, boolean>>(
@@ -215,6 +218,7 @@ export function CursoContent({ curso, modulos, conquistas, progresso, proximoPas
               <IconeChevronLeft size={13} strokeWidth={2.4} />
               Biblioteca
             </a>
+            {recomendado && <RecomendacaoFormacao cursoSlug={curso.slug} recomendado={recomendado} />}
             <div className="hero-chips">
               {curso.etapa_nome && <span className="chip trilha">Trilha · {curso.etapa_nome}</span>}
               {curso.nivel && <span className="chip">{curso.nivel}</span>}
