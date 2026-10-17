@@ -8,6 +8,7 @@ import { deBrasiliaParaISO, somarSemanasEmBrasilia } from '@/lib/evento/relogio'
 import { enviarEmailConvidado } from '@/lib/email/enviarConvidado'
 import { emailEvento } from '@/lib/email/templates/evento'
 import { dadosDoEmail, type EventoParaEmail } from '@/lib/evento/email'
+import { anunciarEventoNucleo, contarAudienciaDoEvento, type ResultadoAnuncio } from '@/lib/evento/anunciar'
 
 type Resultado = { ok: true; id?: string } | { ok: false; erro: string }
 
@@ -251,78 +252,16 @@ export async function uploadThumbEvento(id: string, formData: FormData): Promise
 // exclusivo, e isso não tem volta.
 // ══════════════════════════════════════════════════════════════════
 
-type ResultadoAnuncio =
-  | { ok: true; enviados: number; total: number }
-  | { ok: false; erro: string }
-
-type Pessoa = { usuario_id: string; nome: string | null; email: string }
-
-/** Só conta o público, sem mandar nada. É o número que o botão mostra antes. */
+/* O miolo do anúncio mora em lib/evento/anunciar.ts desde 17/10/2026: o Jarvis
+   anuncia pela mesma função. Aqui fica só a porta (permissão) e o revalidar. */
 export async function contarAudienciaEvento(id: string): Promise<number> {
   if (!(await checarPermissao())) return 0
-  const supabase = criarClienteServico()
-  const { data } = await supabase.rpc('evento_audiencia', { p_evento: id })
-  return (data as Pessoa[] | null)?.length ?? 0
+  return contarAudienciaDoEvento(id)
 }
 
 export async function anunciarEvento(id: string): Promise<ResultadoAnuncio> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
-
-  const supabase = criarClienteServico()
-
-  const { data: ev } = await supabase
-    .from('eventos')
-    .select('id, slug, titulo, tipo, descricao, inicia_em, duracao_seg, apresentador_nome, publicado, visibilidade')
-    .eq('id', id)
-    .maybeSingle()
-
-  if (!ev) return { ok: false, erro: 'Evento não encontrado.' }
-  if (!ev.publicado) {
-    return { ok: false, erro: 'Publique o evento antes de anunciar: o link do anúncio responderia 404.' }
-  }
-  if (!ev.inicia_em) {
-    return { ok: false, erro: 'Defina a data e a hora antes de anunciar.' }
-  }
-
-  const { data: audienciaRaw, error: erroAud } = await supabase.rpc('evento_audiencia', { p_evento: id })
-  if (erroAud) return { ok: false, erro: erroAud.message }
-
-  const audiencia = (audienciaRaw as Pessoa[] | null) ?? []
-  if (audiencia.length === 0) {
-    return {
-      ok: false,
-      erro: ev.visibilidade === 'todos'
-        ? 'Não encontrei nenhum aluno ativo para avisar.'
-        : ev.visibilidade === 'turma'
-          ? 'Turma ainda não existe no banco: o rótulo é texto livre e não seleciona ninguém. '
-            + 'Escolha outra visibilidade para poder anunciar.'
-          : ev.visibilidade === 'curso'
-            ? 'Escolha o curso vinculado: sem ele não dá para saber quem são os alunos dele.'
-            : 'Não encontrei ninguém neste segmento.',
-    }
-  }
-
-  let enviados = 0
-  for (const pessoa of audiencia) {
-    const { assunto, html } = emailEvento('anuncio', dadosDoEmail(ev as EventoParaEmail, pessoa.nome ?? 'Perito'))
-    const r = await enviarEmailConvidado({
-      para: pessoa.email,
-      tipo: 'evento_anuncio',
-      refId: ev.id,
-      assunto,
-      html,
-    })
-    if (r.enviado) enviados++
-
-    // O sino junto com o email, pelo mesmo motivo dos lembretes: são dois
-    // canais, e o de dentro não deve depender do de fora ter funcionado.
-    await supabase.rpc('notificar_anuncio_evento', { p_usuario: pessoa.usuario_id, p_evento: ev.id })
-
-    // O Resend aceita 2 por segundo. Sem a pausa, uma base de 544 devolve
-    // metade em 429 e o anúncio "termina" tendo alcançado metade.
-    await new Promise(res => setTimeout(res, 600))
-  }
-
-  revalidar(id)
-  return { ok: true, enviados, total: audiencia.length }
+  const r = await anunciarEventoNucleo(id)
+  if (r.ok) revalidar(id)
+  return r
 }
