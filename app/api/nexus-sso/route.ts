@@ -227,6 +227,20 @@ async function marcarAssinanteNexus(usuarioId: string, planoTier: string | null 
   if (error) console.error('[SSO-ACADEMY] erro ao marcar nexus_status:', error.message)
 }
 
+/**
+ * Para onde o aluno vai depois de entrar. Sem `para`, a home, como sempre foi.
+ *
+ * `para` chega quando o clique vem de uma NOTIFICAÇÃO no celular: a central do
+ * Nexus abre `/abrir/academy?para=/evento/x`, que passa por aqui (17/10/2026,
+ * ver lib/push/avisos.ts). Só caminho deste site: `//outro.com` ou
+ * `https://...` levariam a pessoa, recém-autenticada, para fora.
+ */
+function destinoSeguro(para: string | null): string {
+  const p = (para || '').trim()
+  if (!p.startsWith('/') || p.startsWith('//') || p.includes('\\')) return '/'
+  return p
+}
+
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get('token')
   const paraLogin = (erro: string) =>
@@ -298,7 +312,7 @@ export async function GET(req: NextRequest) {
   //
   // Por isso o cliente escreve direto nesta resposta, no mesmo formato que o
   // middleware já usa.
-  const redirecionamento = NextResponse.redirect(new URL('/', req.nextUrl.origin))
+  const redirecionamento = NextResponse.redirect(new URL(destinoSeguro(req.nextUrl.searchParams.get('para')), req.nextUrl.origin))
 
   // ══════════════════════════════════════════════════════
   // DE ONDE ESTA PESSOA VEIO — para o "Sair" saber para onde devolvê-la

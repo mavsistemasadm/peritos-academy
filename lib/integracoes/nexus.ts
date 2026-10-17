@@ -1,11 +1,12 @@
 // ══════════════════════════════════════════════════════════════════
-// lib/integracoes/nexus.ts — AS DUAS CONVERSAS COM O NEXUS
+// lib/integracoes/nexus.ts — AS CONVERSAS COM O NEXUS
 //
 // A Academy é outro projeto Supabase e não tem — nem deve ter — credencial do
 // banco do Nexus. Fala por HTTP, como já faz em `/api/nexus-sso`.
 //
 //   ehAssinanteDoNexus     GET  /api/acesso/status   (x-acesso-key)
 //   registrarContatoNoNexus POST /api/integracoes/sdr-contato (x-admin-key)
+//   notificarNoNexus       POST /api/integracoes/notificar   (x-integracao-key)
 //
 // ⚠️ AS DUAS FALHAM PARA LADOS OPOSTOS, e cada direção é uma decisão.
 // ══════════════════════════════════════════════════════════════════
@@ -159,6 +160,56 @@ export async function registrarContatoNoNexus(entrada: {
 
   if (!r || !r.ok) {
     console.error('[nexus] contato da live não sincronizou:', r?.status ?? 'sem resposta')
+    return false
+  }
+  return true
+}
+
+// ─────────────────────────────────────────────────────────────
+// 3. "Toque no celular desta pessoa"
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Entrega um aviso no celular pela central de notificações do Nexus.
+ *
+ * A Academy não guarda aparelho nenhum: o aluno instala só o Nexus (PWA) e
+ * ativa lá uma vez. O Nexus acha os celulares pelo nosso id e pelo email, e o
+ * toque na notificação volta para cá pelo SSO, já logado, em `para`. Ver
+ * lib/push/central.ts no repositório do Nexus, e lib/push/avisos.ts aqui.
+ *
+ * Falha calada: push é conveniência, o aviso já está no sino.
+ */
+export async function notificarNoNexus(aviso: {
+  ref: string
+  usuarioId: string
+  email: string | null
+  titulo: string
+  corpo: string
+  para: string
+  tag?: string
+}): Promise<boolean> {
+  const chave = process.env.NEXUS_NOTIFICAR_KEY?.trim()
+  if (!chave) {
+    console.error('[nexus] NEXUS_NOTIFICAR_KEY ausente: push não enviado')
+    return false
+  }
+
+  const r = await comTempoLimite(`${NEXUS_URL}/api/integracoes/notificar`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-integracao-key': chave },
+    body: JSON.stringify({
+      app: 'academy',
+      ref: aviso.ref,
+      destinatario: { academy_user_id: aviso.usuarioId, email: aviso.email },
+      titulo: aviso.titulo,
+      corpo: aviso.corpo,
+      para: aviso.para,
+      tag: aviso.tag,
+    }),
+  })
+
+  if (!r || !r.ok) {
+    console.error('[nexus] push não entregue:', r?.status ?? 'sem resposta')
     return false
   }
   return true

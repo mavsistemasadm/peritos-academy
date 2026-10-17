@@ -30,6 +30,27 @@ Por que a constante existe: o endereço estava **copiado em 38 lugares**, 36 del
 
 ⚠️ Isso vale como regra, não como registro: **endereço nesta plataforma vive em três sistemas** — código (`lib/site.ts`), banco (corpo das funções) e config do Auth. Trocar só o primeiro passa em revisão, builda, deploya, e deixa dois terços do problema no ar.
 
+## O celular toca pelo Nexus, não pela Academy — 2026-10-17
+
+**Regra permanente.** A Academy **não tem push próprio**, nem PWA, nem tabela
+de aparelhos. O aluno instala só o Nexus no celular e ativa uma vez; os avisos
+de todos os produtos chegam por lá. Motivo: inscrição de Web Push fica presa
+ao domínio, e push em cada app seria um ícone e uma permissão por produto.
+
+- Gatilho `trg_push_ao_notificar` em `notificacoes` → `/api/internal/push`
+  (mesmo segredo do email) → `notificarNoNexus` em `lib/integracoes/nexus.ts`
+  → `POST /api/integracoes/notificar` no Nexus (`NEXUS_NOTIFICAR_KEY`, chave
+  só da Academy).
+- **O que vai ao celular é decidido em `lib/push/avisos.ts`, e só lá** (não no
+  gatilho). A regra: só o que acontece sem a pessoa na tela (resposta,
+  correção, live). Conquista nasce do clique dela e já tem toast; no celular
+  seria festa repetida.
+- O Nexus acha o celular pelo nosso id **e** pelo email. O toque abre
+  `/abrir/academy?para=...` no Nexus, que passa pelo `/api/nexus-sso` daqui
+  com `para`: o aluno cai logado no lugar do aviso.
+- O título no celular começa com "Peritos Academy ·": o remetente é sempre o
+  Nexxus, e no iPhone o ícone também, então é o texto que separa os apps.
+
 ## Acesso parcial: o comprador de curso avulso — 2026-08-14
 
 **Regra permanente.** Seção que não é de um curso exige **acesso completo** —
