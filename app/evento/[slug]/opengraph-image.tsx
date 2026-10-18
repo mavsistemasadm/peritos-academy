@@ -19,6 +19,23 @@ export const alt = 'Convite para a aula ao vivo na Peritos Academy'
 
 const TZ = 'America/Sao_Paulo'
 
+// A Inter, fonte da Academy, nos pesos usados. A fonte padrão do gerador só tem
+// o regular, e o título sem peso parecia um texto qualquer. Se o download
+// falhar, o cartão sai com a padrão em vez de não sair.
+const FONTE = 'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.18/files/inter-latin-'
+async function fontes() {
+  try {
+    const pesos = [400, 700, 800] as const
+    const dados = await Promise.all(pesos.map(w => fetch(`${FONTE}${w}-normal.woff`).then(r => {
+      if (!r.ok) throw new Error(String(r.status))
+      return r.arrayBuffer()
+    })))
+    return pesos.map((weight, i) => ({ name: 'Inter', data: dados[i], weight, style: 'normal' as const }))
+  } catch {
+    return undefined
+  }
+}
+
 function quando(iso: string | null) {
   if (!iso) return { dia: 'Data a confirmar', hora: '' }
   const d = new Date(iso)
@@ -43,7 +60,7 @@ export default async function Imagem({ params }: { params: Promise<{ slug: strin
     (
       <div style={{
         width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-        padding: '64px 72px', background: 'radial-gradient(90% 120% at 100% 0%, #0E3B30 0%, #070908 60%)', color: '#F1F2DF',
+        padding: '64px 72px', fontFamily: 'Inter', background: 'radial-gradient(90% 120% at 100% 0%, #0E3B30 0%, #070908 60%)', color: '#F1F2DF',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{ display: 'flex', width: 18, height: 18, borderRadius: 9, background: '#FF4D4D' }} />
@@ -68,6 +85,6 @@ export default async function Imagem({ params }: { params: Promise<{ slug: strin
         </div>
       </div>
     ),
-    size,
+    { ...size, fonts: await fontes() },
   )
 }
