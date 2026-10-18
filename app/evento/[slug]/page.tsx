@@ -62,10 +62,11 @@ export async function generateMetadata({ params }: {
   )
 
   const url = `${SITE_URL}/evento/${ev.slug}`
-  // A figura do cartão: a do evento; na falta dela, a da plataforma. Sem
-  // nenhuma das duas o WhatsApp monta um cartão só de texto — funciona, mas
-  // rende muito menos clique. O admin avisa disso ao copiar o link.
-  const imagem = ev.imagemUrl ?? ev.imagemPadraoUrl ?? null
+  // A figura do cartão: a do evento; na falta dela, o cartão de convite gerado
+  // para esta live (opengraph-image.tsx: "aula ao vivo", título, dia e hora).
+  // A imagem padrão da plataforma saiu em 19/10/2026: num grupo de WhatsApp ela
+  // não dizia que era um convite, nem de quê.
+  const imagem = ev.imagemUrl ?? `${SITE_URL}/evento/${ev.slug}/opengraph-image`
 
   return {
     title: `${ev.titulo} · ${ev.nomePlataforma}`,

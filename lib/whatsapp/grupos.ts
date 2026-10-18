@@ -102,8 +102,14 @@ export async function textoDoGrupo(ev: EventoGrupo, momento: MomentoGrupo): Prom
   const duvida = ev.recebe_duvidas
     ? `❓ *Tem uma dúvida?* Mande antes, com documento ou print se precisar, e eu respondo ao vivo: ${link}#duvida`
     : null
+  // A primeira linha diz o que a mensagem É: sem ela, o gancho chegava solto
+  // no grupo e ninguém sabia que era um convite (o dono, 19/10/2026).
+  const convite = ev.recebe_duvidas || ev.tipo === 'plantao'
+    ? '🎥 *Convite: plantão de tira-dúvidas ao vivo na Peritos Academy*'
+    : '🎥 *Convite: aula ao vivo na Peritos Academy*'
   if (momento === 'anuncio') {
     return [
+      convite,
       `*${gancho ?? ev.titulo}*`,
       t?.anuncio ?? `Live nova: ${ev.titulo}.`,
       `📅 *${dia}, às ${hora}*, ao vivo na Peritos Academy.`,
@@ -113,7 +119,8 @@ export async function textoDoGrupo(ev: EventoGrupo, momento: MomentoGrupo): Prom
   }
   if (momento === 'hoje') {
     return [
-      `*Hoje às ${hora}: ${gancho ?? ev.titulo}*`,
+      `🎥 *Hoje tem ${ev.recebe_duvidas || ev.tipo === 'plantao' ? 'plantão de tira-dúvidas' : 'aula'} ao vivo, às ${hora}*`,
+      `*${gancho ?? ev.titulo}*`,
       t?.hoje ?? 'É hoje. Separe o horário e traga a sua dúvida.',
       `Entre por aqui: ${link}`,
       duvida,
