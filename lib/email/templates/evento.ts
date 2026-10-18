@@ -175,12 +175,29 @@ const TEXTO = '#3F4A46'
  * texto é o mesmo, com um parágrafo a mais e o botão que reserva: o link leva
  * `?reservar=1`, que a página usa para reservar sozinha depois do login.
  */
+/**
+ * `tema`: o parágrafo escrito para o assunto desta live (lib/evento/textos-ia.ts).
+ * Entra como segundo parágrafo; no anúncio, no lugar da descrição genérica. A
+ * estrutura do email não muda: abertura, tema, o resto, botão.
+ */
 export function emailEvento(
   momento: MomentoEvento,
   d: DadosEmailEvento,
-  opcoes: { convite?: boolean } = {},
+  opcoes: { convite?: boolean; tema?: string | null } = {},
 ): { assunto: string; html: string } {
-  const base = COPY[momento]
+  const fixo = COPY[momento]
+  const tema = opcoes.tema?.trim()
+  const base = tema && momento !== 'confirmacao'
+    ? {
+        ...fixo,
+        corpo: (x: DadosEmailEvento) => {
+          const ps = fixo.corpo(x)
+          return momento === 'anuncio'
+            ? [ps[0], tema, ...ps.slice(2)]
+            : [ps[0], tema, ...ps.slice(1)]
+        },
+      }
+    : fixo
   const convite = !!opcoes.convite && (momento === 'vespera' || momento === 'hoje')
   const c = convite
     ? {

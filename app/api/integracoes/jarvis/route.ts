@@ -35,6 +35,7 @@ import { criarClienteServico } from '@/lib/supabase/servico'
 import { concederAcessoNaAcademy, daquiAMeses } from '@/lib/acessos/conceder'
 import { anunciarEventoNucleo, contarAudienciaDoEvento } from '@/lib/evento/anunciar'
 import { deBrasiliaParaISO } from '@/lib/evento/relogio'
+import { garantirTextosEmail } from '@/lib/evento/textos'
 import { enviarEmailConvidado } from '@/lib/email/enviarConvidado'
 import { emailEvento } from '@/lib/email/templates/evento'
 import { dadosDoEmail, type EventoParaEmail } from '@/lib/evento/email'
@@ -132,15 +133,19 @@ export async function POST(request: NextRequest) {
       publicado: true,
     }).select('id, slug, inicia_em').single()
     if (error) return NextResponse.json({ ok: false, erro: error.message }, { status: 400 })
+    // Os textos de cada email, sobre o assunto, já na criação: o teste do
+    // anúncio e os lembretes saem com eles sem esperar.
+    after(() => garantirTextosEmail({ id: data.id, titulo, descricao: String(corpo.descricao || '') || null, tipo }).then(() => undefined))
     return NextResponse.json({ ok: true, ...data, link: `${SITE_URL}/evento/${data.slug}` })
   }
 
   if (acao === 'anuncio_teste') {
     const { data: ev } = await sb.from('eventos')
-      .select('id, slug, titulo, tipo, descricao, inicia_em, duracao_seg, apresentador_nome')
+      .select('id, slug, titulo, tipo, descricao, inicia_em, duracao_seg, apresentador_nome, textos_email')
       .eq('id', String(corpo.eventoId || '')).maybeSingle()
     if (!ev) return NextResponse.json({ ok: false, erro: 'Evento não encontrado.' }, { status: 400 })
-    const { assunto, html } = emailEvento('anuncio', dadosDoEmail(ev as EventoParaEmail, 'Marlos'))
+    const textos = await garantirTextosEmail(ev)
+    const { assunto, html } = emailEvento('anuncio', dadosDoEmail(ev as EventoParaEmail, 'Marlos'), { tema: textos?.anuncio })
     // refId próprio: não conta como o anúncio real (ref_id = id do evento) no
     // dedupe, e cada teste é um envio novo.
     const r = await enviarEmailConvidado({

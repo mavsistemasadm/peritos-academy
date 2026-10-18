@@ -41,6 +41,7 @@ import { enviarEmailConvidado } from '@/lib/email/enviarConvidado'
 import { emailEvento } from '@/lib/email/templates/evento'
 import { dadosDoEmail, type EventoParaEmail } from '@/lib/evento/email'
 import { JANELAS } from '@/lib/evento/janelas'
+import { garantirTextosEmail } from '@/lib/evento/textos'
 
 // A audiência inteira (500+) não cabe numa passada com a pausa do Resend.
 // O cron roda de hora em hora e a janela da manhã tem três passadas (7h, 8h,
@@ -71,7 +72,7 @@ export async function GET(request: NextRequest) {
 
     const { data: eventos, error } = await supabase
       .from('eventos')
-      .select('id, slug, titulo, inicia_em, duracao_seg, descricao, apresentador_nome, lembrete, lembrar_audiencia')
+      .select('id, slug, titulo, inicia_em, duracao_seg, descricao, apresentador_nome, lembrete, lembrar_audiencia, tipo, textos_email')
       .eq('publicado', true)
       .gte('inicia_em', new Date(agora + faixa.de).toISOString())
       .lte('inicia_em', new Date(agora + faixa.ate).toISOString())
@@ -87,6 +88,9 @@ export async function GET(request: NextRequest) {
       // e que até aqui não ligava nada. Agora liga isto.
       if (ev.lembrete === false) continue
 
+      // Uma vez por live, não por pessoa: os textos ficam guardados no evento.
+      const textos = await garantirTextosEmail(ev)
+      const tema = janela.momento in (textos ?? {}) ? (textos as Record<string, string>)[janela.momento] : null
       const confirmados = await destinatarios(supabase, ev.id)
       const lista: (Pessoa & { convite?: boolean })[] = [...confirmados]
       if (ev.lembrar_audiencia && (janela.momento === 'vespera' || janela.momento === 'hoje')) {
@@ -102,7 +106,7 @@ export async function GET(request: NextRequest) {
 
       for (const pessoa of lista) {
         if (Date.now() - inicio > ORCAMENTO_MS) break
-        const { assunto, html } = emailEvento(janela.momento, dadosDoEmail(ev as EventoParaEmail, pessoa.nome), { convite: pessoa.convite })
+        const { assunto, html } = emailEvento(janela.momento, dadosDoEmail(ev as EventoParaEmail, pessoa.nome), { convite: pessoa.convite, tema })
         const r = await enviarEmailConvidado({
           para: pessoa.email,
           tipo: janela.tipo,

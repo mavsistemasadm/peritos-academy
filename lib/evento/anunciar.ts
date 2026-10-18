@@ -11,6 +11,7 @@ import { criarClienteServico } from '@/lib/supabase/servico'
 import { enviarEmailConvidado } from '@/lib/email/enviarConvidado'
 import { emailEvento } from '@/lib/email/templates/evento'
 import { dadosDoEmail, type EventoParaEmail } from '@/lib/evento/email'
+import { garantirTextosEmail } from '@/lib/evento/textos'
 
 export type ResultadoAnuncio =
   | { ok: true; enviados: number; total: number }
@@ -31,7 +32,7 @@ export async function anunciarEventoNucleo(id: string): Promise<ResultadoAnuncio
 
   const { data: ev } = await supabase
     .from('eventos')
-    .select('id, slug, titulo, tipo, descricao, inicia_em, duracao_seg, apresentador_nome, publicado, visibilidade')
+    .select('id, slug, titulo, tipo, descricao, inicia_em, duracao_seg, apresentador_nome, publicado, visibilidade, textos_email')
     .eq('id', id)
     .maybeSingle()
 
@@ -61,9 +62,11 @@ export async function anunciarEventoNucleo(id: string): Promise<ResultadoAnuncio
     }
   }
 
+  const textos = await garantirTextosEmail(ev)
+
   let enviados = 0
   for (const pessoa of audiencia) {
-    const { assunto, html } = emailEvento('anuncio', dadosDoEmail(ev as EventoParaEmail, pessoa.nome ?? 'Perito'))
+    const { assunto, html } = emailEvento('anuncio', dadosDoEmail(ev as EventoParaEmail, pessoa.nome ?? 'Perito'), { tema: textos?.anuncio })
     const r = await enviarEmailConvidado({
       para: pessoa.email,
       tipo: 'evento_anuncio',

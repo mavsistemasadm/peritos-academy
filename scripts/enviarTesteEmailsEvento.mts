@@ -3,7 +3,10 @@
 // antes, ao vivo, e as duas versões "convite" (véspera e é hoje para quem
 // ainda não reservou, desde 18/10/2026). O assunto ganha [TESTE n/8].
 //
-//   node --experimental-strip-types scripts/enviarTesteEmailsEvento.mts <email>
+//   node --experimental-strip-types scripts/enviarTesteEmailsEvento.mts <email> ["assunto da live"]
+//
+// Com o assunto, o parágrafo de cada email é escrito pela IA para ele, como
+// numa live de verdade (lib/evento/textos-ia.ts).
 //
 // Usa o MESMO template e a MESMA injeção de link de descadastro do envio real
 // (lib/email/templates/evento.ts e o replace de enviarConvidado.ts), para o
@@ -16,6 +19,7 @@
 import { readFileSync } from 'node:fs'
 import { createHmac } from 'node:crypto'
 import { emailEvento, type MomentoEvento } from '../lib/email/templates/evento.ts'
+import { escreverTextosEmail } from '../lib/evento/textos-ia.ts'
 
 const destino = process.argv[2]
 if (!destino) {
@@ -31,6 +35,9 @@ const env = Object.fromEntries(
       return [l.slice(0, i).trim(), l.slice(i + 1).trim().replace(/^["']|["']$/g, '')]
     }),
 )
+
+process.env.ANTHROPIC_API_KEY = env.ANTHROPIC_API_KEY
+const ASSUNTO = process.argv[3] || 'Plantão do Perito: dúvidas de cálculo e perícia, ao vivo'
 
 const SITE = 'https://evolua.peritosacademy.com.br'
 // Uma página de live que existe, para os botões abrirem algo de verdade.
@@ -54,14 +61,14 @@ function injetarDescadastro(html: string, email: string) {
 
 const dados = {
   primeiroNome: 'Marlos',
-  titulo: 'Plantão do Perito: dúvidas de cálculo e perícia, ao vivo',
+  titulo: ASSUNTO,
   quando: 'Quinta-feira, 22 de outubro, às 11h00, horário de Brasília',
   dia: 'Quinta-feira, 22 de outubro',
   horario: '11h00',
   duracao: '1h',
   apresentador: 'Marlos Henrique',
   descricao: null,
-  tipoRotulo: 'Plantão de dúvidas',
+  tipoRotulo: 'Aula ao vivo',
   url: `${SITE}/evento/${SLUG}`,
   linkCalendario: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Sala+de+an%C3%A1lise',
 }
@@ -77,10 +84,15 @@ const MOMENTOS: [MomentoEvento, boolean, string][] = [
   ['ao_vivo', false, 'ao vivo'],
 ]
 
+const textos = process.argv[3]
+  ? await escreverTextosEmail({ id: 'teste', titulo: ASSUNTO, tipo: 'aula_ao_vivo', apresentador_nome: 'Marlos Henrique' })
+  : null
+if (textos) console.log('textos escritos para o assunto:\n', textos, '\n')
+
 const ids: [string, string][] = []
 
 for (const [n, [momento, convite, nome]] of MOMENTOS.entries()) {
-  const { assunto: a, html } = emailEvento(momento, dados as never, { convite })
+  const { assunto: a, html } = emailEvento(momento, dados as never, { convite, tema: (textos as Record<string, string> | null)?.[momento] })
   const assunto = `[TESTE ${n + 1}/${MOMENTOS.length} · ${nome}] ${a}`
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
