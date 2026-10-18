@@ -4,6 +4,7 @@
 // A confirmação sai na hora da inscrição (ver a server action). Estes são os
 // três que vêm depois:
 //
+//   vespera   · na manhã do dia anterior
 //   hoje      · na manhã do dia do evento
 //   comecando · uma hora antes
 //   ao_vivo   · quando entra no ar
@@ -24,6 +25,12 @@
 // pela agenda (`evento_reservas`). Os dois esperam pela mesma coisa; avisar só
 // o convidado deixaria o aluno, que é quem já paga, sabendo menos.
 //
+// ⚠️ DESDE 18/10/2026, a véspera e o "é hoje" também vão para a AUDIÊNCIA
+// inteira do evento (evento_audiencia) quando `eventos.lembrar_audiencia`
+// está ligado, o que o anúncio pelo Jarvis faz. Quem não reservou recebe a
+// versão com o botão de reservar. Uma hora antes e "ao vivo" continuam só
+// para quem reservou: são avisos de quem já decidiu ir.
+//
 // ⚠️ Quem está nas duas listas recebe UMA vez: a inscrição guarda o
 // `usuario_id` quando o email casa com um aluno, e os já cobertos por ela são
 // removidos da lista de reservas antes do envio.
@@ -35,6 +42,13 @@ import { emailEvento } from '@/lib/email/templates/evento'
 import { dadosDoEmail, type EventoParaEmail } from '@/lib/evento/email'
 import { JANELAS } from '@/lib/evento/janelas'
 
+// A audiência inteira (500+) não cabe numa passada com a pausa do Resend.
+// O cron roda de hora em hora e a janela da manhã tem três passadas (7h, 8h,
+// 9h); o dedupe do envio pula quem já recebeu, então a passada seguinte
+// continua de onde esta parou.
+export const maxDuration = 300
+const ORCAMENTO_MS = 270_000
+
 function autorizado(request: NextRequest): boolean {
   const token = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
   return !!process.env.CRON_SECRET && token === process.env.CRON_SECRET
@@ -45,6 +59,7 @@ export async function GET(request: NextRequest) {
 
   const supabase = criarClienteServico()
   const agora = Date.now()
+  const inicio = Date.now()
   const resumo: Record<string, number | string> = {}
 
   for (const janela of JANELAS) {
@@ -56,7 +71,7 @@ export async function GET(request: NextRequest) {
 
     const { data: eventos, error } = await supabase
       .from('eventos')
-      .select('id, slug, titulo, inicia_em, duracao_seg, descricao, apresentador_nome, lembrete')
+      .select('id, slug, titulo, inicia_em, duracao_seg, descricao, apresentador_nome, lembrete, lembrar_audiencia')
       .eq('publicado', true)
       .gte('inicia_em', new Date(agora + faixa.de).toISOString())
       .lte('inicia_em', new Date(agora + faixa.ate).toISOString())
@@ -72,8 +87,22 @@ export async function GET(request: NextRequest) {
       // e que até aqui não ligava nada. Agora liga isto.
       if (ev.lembrete === false) continue
 
-      for (const pessoa of await destinatarios(supabase, ev.id)) {
-        const { assunto, html } = emailEvento(janela.momento, dadosDoEmail(ev as EventoParaEmail, pessoa.nome))
+      const confirmados = await destinatarios(supabase, ev.id)
+      const lista: (Pessoa & { convite?: boolean })[] = [...confirmados]
+      if (ev.lembrar_audiencia && (janela.momento === 'vespera' || janela.momento === 'hoje')) {
+        const ja = new Set(confirmados.map(p => p.email.trim().toLowerCase()))
+        const { data: aud } = await supabase.rpc('evento_audiencia', { p_evento: ev.id })
+        for (const a of (aud ?? []) as { usuario_id: string; nome: string | null; email: string }[]) {
+          const chave = a.email?.trim().toLowerCase()
+          if (!chave || ja.has(chave)) continue
+          ja.add(chave)
+          lista.push({ nome: a.nome ?? 'Perito', email: a.email, usuarioId: a.usuario_id, convite: true })
+        }
+      }
+
+      for (const pessoa of lista) {
+        if (Date.now() - inicio > ORCAMENTO_MS) break
+        const { assunto, html } = emailEvento(janela.momento, dadosDoEmail(ev as EventoParaEmail, pessoa.nome), { convite: pessoa.convite })
         const r = await enviarEmailConvidado({
           para: pessoa.email,
           tipo: janela.tipo,
@@ -82,6 +111,8 @@ export async function GET(request: NextRequest) {
           html,
         })
         if (r.enviado) enviados++
+        // Já recebeu numa passada anterior: o sino também já tocou.
+        if (r.motivo === 'duplicado') continue
 
         // Quem tem conta recebe o mesmo aviso no sino. Independe do email ter
         // saído: são dois canais, e o de dentro da plataforma não deve deixar
@@ -94,6 +125,8 @@ export async function GET(request: NextRequest) {
             p_momento: janela.momento,
           })
         }
+        // O Resend aceita 2 por segundo (ver lib/evento/anunciar.ts).
+        if (r.enviado) await new Promise(res => setTimeout(res, 600))
       }
     }
     resumo[janela.momento] = enviados

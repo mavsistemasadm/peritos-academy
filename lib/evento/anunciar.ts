@@ -79,7 +79,9 @@ export async function anunciarEventoNucleo(id: string): Promise<ResultadoAnuncio
 
     // O Resend aceita 2 por segundo. Sem a pausa, uma base de 544 devolve
     // metade em 429 e o anúncio "termina" tendo alcançado metade.
-    await new Promise(res => setTimeout(res, 600))
+    // 520ms (≈1,9 por segundo): com 600ms, 544 pessoas davam 326s e passavam
+    // do teto de 300s da função; o fim da lista ficava sem anúncio.
+    await new Promise(res => setTimeout(res, 520))
   }
 
   return { ok: true, enviados, total: audiencia.length }

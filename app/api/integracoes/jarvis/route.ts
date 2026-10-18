@@ -12,7 +12,10 @@
 //   cursos                                  cursos publicados (slug e título)
 //   eventos                                 próximos eventos com o público de cada um
 //   matricular { email, cursoSlug, meses? } matrícula num curso (meses ausente = vitalício)
-//   anunciar   { eventoId }                 anúncio por email e sino
+//   anunciar   { eventoId }                 anúncio por email, sino e celular, e liga os
+//                                           lembretes da véspera e do dia para todos
+//   anuncio_teste { eventoId, email }       o email do anúncio só para esse endereço
+//   abrir_ao_publico { eventoId }           quem não é aluno passa a poder se inscrever
 //   criar_evento { titulo, quando, ... }     live nova, já publicada (18/10/2026)
 //   pendentes_gravacao                      lives que já acabaram, com YouTube e sem gravação
 //   gravacao { eventoId, url }              grava o link da gravação (só se ainda vazio)
@@ -26,12 +29,15 @@
 // Ela nasce PUBLICADA, porque é o que faz a data aparecer na agenda e na home
 // do Nexus; publicar não manda email nenhum (anunciar é outro passo).
 // ══════════════════════════════════════════════════════
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse, after, type NextRequest } from 'next/server'
 import { timingSafeEqual } from 'node:crypto'
 import { criarClienteServico } from '@/lib/supabase/servico'
 import { concederAcessoNaAcademy, daquiAMeses } from '@/lib/acessos/conceder'
 import { anunciarEventoNucleo, contarAudienciaDoEvento } from '@/lib/evento/anunciar'
 import { deBrasiliaParaISO } from '@/lib/evento/relogio'
+import { enviarEmailConvidado } from '@/lib/email/enviarConvidado'
+import { emailEvento } from '@/lib/email/templates/evento'
+import { dadosDoEmail, type EventoParaEmail } from '@/lib/evento/email'
 import { SITE_URL } from '@/lib/site'
 
 const TIPOS = ['sala_analise', 'aula_ao_vivo', 'plantao', 'mentoria', 'lancamento']
@@ -62,11 +68,12 @@ export async function POST(request: NextRequest) {
 
   if (acao === 'eventos') {
     const { data } = await sb.from('eventos')
-      .select('id, titulo, slug, inicia_em, publicado, visibilidade')
+      .select('id, titulo, slug, inicia_em, publicado, visibilidade, aberto_ao_publico, link_transmissao')
       .gte('inicia_em', new Date(Date.now() - 3 * 3600_000).toISOString())
       .order('inicia_em').limit(10)
     const eventos = await Promise.all((data ?? []).map(async e => ({
-      ...e, publico: e.publicado ? await contarAudienciaDoEvento(e.id) : 0,
+      ...e, link: `${SITE_URL}/evento/${e.slug}`,
+      publico: e.publicado ? await contarAudienciaDoEvento(e.id) : 0,
     })))
     return NextResponse.json({ eventos })
   }
@@ -90,8 +97,19 @@ export async function POST(request: NextRequest) {
   }
 
   if (acao === 'anunciar') {
-    const r = await anunciarEventoNucleo(String(corpo.eventoId || ''))
-    return NextResponse.json(r, { status: r.ok ? 200 : 400 })
+    // Pelo Jarvis, o anúncio também liga os lembretes da véspera e do dia
+    // para a audiência inteira (ver o cron email-evento-lembrete).
+    await sb.from('eventos').update({ lembrar_audiencia: true }).eq('id', String(corpo.eventoId || ''))
+    // Em segundo plano (`after`): 500+ emails levam quase 5 minutos, e o
+    // Jarvis não pode ficar pendurado esperando. A resposta diz quantos vão.
+    const id = String(corpo.eventoId || '')
+    const total = await contarAudienciaDoEvento(id)
+    if (!total) return NextResponse.json({ ok: false, erro: 'Ninguém para avisar neste evento.' }, { status: 400 })
+    after(async () => {
+      const r = await anunciarEventoNucleo(id)
+      if (!r.ok) console.error('[jarvis] anúncio falhou:', r.erro)
+    })
+    return NextResponse.json({ ok: true, total, nota: 'O anúncio está saindo agora, leva alguns minutos.' })
   }
 
   if (acao === 'criar_evento') {
@@ -115,6 +133,28 @@ export async function POST(request: NextRequest) {
     }).select('id, slug, inicia_em').single()
     if (error) return NextResponse.json({ ok: false, erro: error.message }, { status: 400 })
     return NextResponse.json({ ok: true, ...data, link: `${SITE_URL}/evento/${data.slug}` })
+  }
+
+  if (acao === 'anuncio_teste') {
+    const { data: ev } = await sb.from('eventos')
+      .select('id, slug, titulo, tipo, descricao, inicia_em, duracao_seg, apresentador_nome')
+      .eq('id', String(corpo.eventoId || '')).maybeSingle()
+    if (!ev) return NextResponse.json({ ok: false, erro: 'Evento não encontrado.' }, { status: 400 })
+    const { assunto, html } = emailEvento('anuncio', dadosDoEmail(ev as EventoParaEmail, 'Marlos'))
+    // refId próprio: não conta como o anúncio real (ref_id = id do evento) no
+    // dedupe, e cada teste é um envio novo.
+    const r = await enviarEmailConvidado({
+      para: String(corpo.email || ''), tipo: 'evento_anuncio', refId: `teste:${ev.id}:${Date.now()}`,
+      assunto: `[TESTE] ${assunto}`, html,
+    })
+    return NextResponse.json({ ok: r.enviado, motivo: r.motivo, assunto })
+  }
+
+  if (acao === 'abrir_ao_publico') {
+    const { data, error } = await sb.from('eventos').update({ aberto_ao_publico: true })
+      .eq('id', String(corpo.eventoId || '')).select('slug')
+    if (error || !data?.length) return NextResponse.json({ ok: false, erro: error?.message ?? 'Evento não encontrado.' }, { status: 400 })
+    return NextResponse.json({ ok: true, link: `${SITE_URL}/evento/${data[0].slug}` })
   }
 
   if (acao === 'pendentes_gravacao') {

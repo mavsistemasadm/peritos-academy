@@ -169,8 +169,30 @@ const VERDE_ESCURO = '#0B5E4E'
 const VERDE = '#12A87F'
 const TEXTO = '#3F4A46'
 
-export function emailEvento(momento: MomentoEvento, d: DadosEmailEvento): { assunto: string; html: string } {
-  const c = COPY[momento]
+/**
+ * `convite`: a pessoa recebe a véspera ou o "é hoje" sem ter reservado (a
+ * audiência inteira, quando o anúncio liga `eventos.lembrar_audiencia`). O
+ * texto é o mesmo, com um parágrafo a mais e o botão que reserva: o link leva
+ * `?reservar=1`, que a página usa para reservar sozinha depois do login.
+ */
+export function emailEvento(
+  momento: MomentoEvento,
+  d: DadosEmailEvento,
+  opcoes: { convite?: boolean } = {},
+): { assunto: string; html: string } {
+  const base = COPY[momento]
+  const convite = !!opcoes.convite && (momento === 'vespera' || momento === 'hoje')
+  const c = convite
+    ? {
+        ...base,
+        corpo: (x: DadosEmailEvento) => [
+          ...base.corpo(x),
+          'Você ainda não reservou o seu lugar. Leva um minuto, e garante o aviso de uma hora antes e o de quando entrarmos no ar.',
+        ],
+        botao: 'Reservar meu lugar',
+      }
+    : base
+  if (convite) d = { ...d, url: `${d.url}?reservar=1` }
   const assunto = c.assunto(d)
 
   const paragrafos = c.corpo(d).map(p =>
