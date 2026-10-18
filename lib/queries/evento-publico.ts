@@ -113,6 +113,9 @@ export type EventoPublico = {
    * app/evento/[slug]/duvidas.ts e supabase/migrations/20261018_lives_duvidas.sql.
    */
   recebeDuvidas: boolean
+  /** A live é de tira-dúvidas, mesmo depois de fechar o formulário: é o que
+   *  mostra a quem conduz o painel com as dúvidas recebidas. */
+  liveDeDuvidas: boolean
 }
 
 export async function carregarEventoPublico(slug: string): Promise<EventoPublico | null> {
@@ -214,6 +217,7 @@ export async function carregarEventoPublico(slug: string): Promise<EventoPublico
     ),
     inscritoComoConvidado: await jaInscritoComoConvidado(supabase, ev.id),
     recebeDuvidas: !!ev.recebe_duvidas && duvidasAbertas(ev.inicia_em, ev.duracao_seg),
+    liveDeDuvidas: !!ev.recebe_duvidas,
     logado,
     nomePlataforma: config?.nome_plataforma ?? 'Peritos Academy',
     logoUrl: config?.logo_url ?? null,

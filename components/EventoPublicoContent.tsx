@@ -21,6 +21,7 @@ import { urlEmbedYoutube } from '@/lib/video/youtube'
 import { criarClienteBrowser } from '@/lib/supabase/client'
 import ChatDoEvento from '@/components/ChatDoEvento'
 import EventoDuvidas from '@/components/EventoDuvidas'
+import PainelDuvidasDaLive from '@/components/PainelDuvidasDaLive'
 import { IconeCalendarPlus, IconeCheck, IconePlay, IconeStar, IconeChevronRight, IconeLock, IconeMessageCircle } from '@/components/Icones'
 import { AoVivo } from '@/components/Emblemas'
 
@@ -636,6 +637,11 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
                 {ev.estado === 'encerrado' && (
                   <a className="btn btn-fantasma" href="/agenda">Ver os próximos eventos</a>
                 )}
+
+                {/* Atalho de quem conduz para o painel das dúvidas, lá embaixo. */}
+                {ev.liveDeDuvidas && ev.ehDaCasa && (
+                  <a className="btn btn-primario" href="#duvida">Ver as dúvidas recebidas</a>
+                )}
               </div>
 
               {/* A inscrição do convidado fica FORA da fila de botões: é um
@@ -744,7 +750,10 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
 
           {/* Live de tira-dúvidas: a pergunta chega antes, com anexo. Fica logo
               abaixo do cartão porque é para cá que o convite aponta (#duvida). */}
-          {ev.recebeDuvidas && (
+          {/* Quem conduz não manda dúvida: lê, abre os anexos e dá baixa aqui
+              mesmo, sem ir ao /admin (pedido do dono, 18/10/2026). */}
+          {ev.liveDeDuvidas && ev.ehDaCasa && <PainelDuvidasDaLive eventoId={ev.id} />}
+          {ev.recebeDuvidas && !ev.ehDaCasa && (
             <EventoDuvidas eventoId={ev.id} logado={ev.logado} abertoAoPublico={ev.abertoAoPublico} urlLogin={urlLogin(ev.slug, false)} />
           )}
 

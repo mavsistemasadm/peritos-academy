@@ -1019,6 +1019,10 @@ ligado) ou o editor do evento. Desligado, nada aparece e nada é convidado.
   WhatsApp dos grupos ganha a linha no convite e no "é hoje".
 - Jarvis: `academy_duvidas_da_live` lê (quantas, quais, com anexo); dar baixa é
   só na tela.
+- **Quem conduz vê as dúvidas na própria página do evento** (`PainelDuvidasDaLive`,
+  no lugar do formulário, mais o botão "Ver as dúvidas recebidas"): mesmas
+  actions e mesmo portão da tela do admin. As dúvidas vêm por action, nunca no
+  HTML da página pública.
 
 ⚠️ Testado em produção como aluno logado (texto + imagem, nome com acento no
 anexo) e pelo Jarvis. A tela do admin não foi aberta por um admin no teste.
