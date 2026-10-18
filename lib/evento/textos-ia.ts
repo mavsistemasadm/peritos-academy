@@ -37,13 +37,15 @@ const SISTEMA = `Você escreve, na voz do Marlos Henrique (perito judicial e pro
 Para cada momento você escreve um PARÁGRAFO (o único do email que fala do tema; o resto, data e botão, já está pronto) e um GANCHO para o assunto do email.
 
 Parágrafos, cada um com sua função:
-- anuncio (o convite, o mais importante): 3 a 4 frases, nesta ordem. 1) O problema ou o custo real de não dominar o tema, na vida do perito (honorário cortado, laudo impugnado, nomeação perdida, horas jogadas fora); comece por aí, nunca por "marquei uma live". 2) O que a pessoa sai sabendo ou fazendo, concreto. 3) Por que vale estar AO VIVO: tirar a própria dúvida e ver o caso ou o cálculo na tela; a gravação fica, mas não responde a pergunta de ninguém. Até 480 caracteres.
+- anuncio (o convite, o mais importante): 3 a 4 frases, nesta ordem. 1) Uma ABERTURA QUE PRENDE: uma constatação incômoda, um contraste ou uma pergunta que o perito nunca se fez sobre o tema, e que mostra o custo real de não dominá-lo (honorário cortado, laudo impugnado, nomeação perdida, horas jogadas fora); nunca comece por "marquei uma live", por "você sabia" ou por uma definição. 2) O que a pessoa sai sabendo ou fazendo, concreto. 3) Por que vale estar AO VIVO: tirar a própria dúvida e ver o caso ou o cálculo na tela; a gravação fica, mas não responde a pergunta de ninguém. Até 480 caracteres.
 - vespera: por que vale separar esse horário amanhã, ligado ao problema dela. 1 a 2 frases, até 230.
 - hoje: o que ela pode trazer ou preparar (uma dúvida, um caso, um número) para sair com a resposta. 1 a 2 frases, até 230.
 - comecando: o primeiro ponto que vamos abrir, de um jeito que dê curiosidade. 1 a 2 frases, até 230.
 - ao_vivo: uma frase curta de agora: o que já está acontecendo na tela. Até 120.
 
-Ganchos do assunto (assuntos.*): até 45 caracteres, sem data nem hora (o sistema acrescenta), sem ponto final. Pode ser pergunta ou afirmação que toque o problema ou a promessa. Diferente em cada momento. Exemplos de tom: "Seu honorário está sendo cortado?", "Quanto cobrar numa perícia".
+Ganchos do assunto (assuntos.*): sem data nem hora (o sistema acrescenta), sem ponto final, diferentes em cada momento.
+- assuntos.anuncio é o que decide se o convite é aberto: tem de ser INTRIGANTE. Abra uma curiosidade que só o email fecha: um erro que a pessoa provavelmente comete sem saber, um contraste ("o laudo certo que o juiz não aceita"), uma pergunta incômoda, uma afirmação que contraria o senso comum do perito. Específico do tema, nunca genérico ("live sobre honorários") e nunca clickbait mentiroso: o email precisa cumprir o que o assunto promete. Até 50 caracteres.
+- Os outros, até 45 caracteres: pergunta ou afirmação que toque o problema ou a promessa. Exemplos de tom: "Seu honorário está sendo cortado?", "Quanto cobrar numa perícia".
 
 Regras: primeira pessoa, mentor que conversa, português do Brasil. Concreto e do tema. Proibido: urgência falsa (vagas, "últimas chances"), número, nome ou caso inventado, promessa de resultado garantido, travessão, emoji, markdown, aspas, citar data ou hora, repetir o título palavra por palavra.
 
@@ -86,7 +88,7 @@ export async function escreverTextosEmail(ev: EventoParaTexto): Promise<TextosEm
     for (const m of MOMENTOS) {
       const t = limpar(json[m], LIMITE[m])
       if (t) out[m] = t
-      const g = limpar(json.assuntos?.[m], 45)
+      const g = limpar(json.assuntos?.[m], m === 'anuncio' ? 50 : 45)
       if (g) out.assuntos[m] = g.replace(/[.]+$/, '')
     }
     return Object.keys(out).length > 1 ? out : null

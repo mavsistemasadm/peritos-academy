@@ -37,7 +37,7 @@ const env = Object.fromEntries(
 )
 
 process.env.ANTHROPIC_API_KEY = env.ANTHROPIC_API_KEY
-const ASSUNTO = process.argv[3] || 'Plantão do Perito: dúvidas de cálculo e perícia, ao vivo'
+const ASSUNTO = (process.argv[3] && !process.argv[3].startsWith('--') ? process.argv[3] : '') || 'Plantão do Perito: dúvidas de cálculo e perícia, ao vivo'
 
 const SITE = 'https://evolua.peritosacademy.com.br'
 // Uma página de live que existe, para os botões abrirem algo de verdade.
@@ -73,7 +73,7 @@ const dados = {
   linkCalendario: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Sala+de+an%C3%A1lise',
 }
 
-const MOMENTOS: [MomentoEvento, boolean, string][] = [
+const TODOS: [MomentoEvento, boolean, string][] = [
   ['anuncio', false, 'convite'],
   ['confirmacao', false, 'inscrição confirmada'],
   ['vespera', false, 'véspera, quem reservou'],
@@ -83,8 +83,10 @@ const MOMENTOS: [MomentoEvento, boolean, string][] = [
   ['comecando', false, '1 hora antes'],
   ['ao_vivo', false, 'ao vivo'],
 ]
+// --so-convite: só o primeiro, para comparar versões do convite.
+const MOMENTOS = process.argv.includes('--so-convite') ? TODOS.slice(0, 1) : TODOS
 
-const textos = process.argv[3]
+const textos = process.argv[3] && !process.argv[3].startsWith('--')
   ? await escreverTextosEmail({ id: 'teste', titulo: ASSUNTO, tipo: 'aula_ao_vivo', apresentador_nome: 'Marlos Henrique' })
   : null
 if (textos) console.log('textos escritos para o assunto:\n', textos, '\n')
