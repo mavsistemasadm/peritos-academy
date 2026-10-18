@@ -48,9 +48,9 @@ ao domínio, e push em cada app seria um ícone e uma permissão por produto.
 - O Nexus acha o celular pelo nosso id **e** pelo email. O toque abre
   `/abrir/academy?para=...` no Nexus, que passa pelo `/api/nexus-sso` daqui
   com `para`: o aluno cai logado no lugar do aviso.
-- O título no celular começa com "🟢 Peritos Academy ·": o remetente é sempre
+- O título no celular começa com "Peritos Academy ·": o remetente é sempre
   o Nexxus, e no iPhone o ícone também (a Apple ignora o ícone do push), então
-  é a cor e o texto que separam os apps.
+  é o nome que separa os apps. Sem bolinha de cor desde 17/10/2026.
 
 ## Acesso parcial: o comprador de curso avulso — 2026-08-14
 
