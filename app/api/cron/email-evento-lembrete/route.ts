@@ -42,6 +42,7 @@ import { emailEvento } from '@/lib/email/templates/evento'
 import { dadosDoEmail, type EventoParaEmail } from '@/lib/evento/email'
 import { JANELAS } from '@/lib/evento/janelas'
 import { garantirTextosEmail } from '@/lib/evento/textos'
+import { publicarNosGrupos } from '@/lib/whatsapp/grupos'
 
 // A audiência inteira (500+) não cabe numa passada com a pausa do Resend.
 // O cron roda de hora em hora e a janela da manhã tem três passadas (7h, 8h,
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
 
     const { data: eventos, error } = await supabase
       .from('eventos')
-      .select('id, slug, titulo, inicia_em, duracao_seg, descricao, apresentador_nome, lembrete, lembrar_audiencia, tipo, textos_email')
+      .select('id, slug, titulo, inicia_em, duracao_seg, descricao, apresentador_nome, lembrete, lembrar_audiencia, tipo, textos_email, avisar_grupos')
       .eq('publicado', true)
       .gte('inicia_em', new Date(agora + faixa.de).toISOString())
       .lte('inicia_em', new Date(agora + faixa.ate).toISOString())
@@ -87,6 +88,13 @@ export async function GET(request: NextRequest) {
       // `eventos.lembrete` é o interruptor que já existia na tela do produtor
       // e que até aqui não ligava nada. Agora liga isto.
       if (ev.lembrete === false) continue
+
+      // Os grupos de WhatsApp primeiro: são poucas mensagens, e não podem
+      // ficar para trás se a lista de emails estourar o orçamento de tempo.
+      if (ev.avisar_grupos && (janela.momento === 'hoje' || janela.momento === 'ao_vivo')) {
+        const g = await publicarNosGrupos(ev, janela.momento)
+        resumo[`grupos_${janela.momento}`] = g.resultados.filter(r => r.enviado).length
+      }
 
       // Uma vez por live, não por pessoa: os textos ficam guardados no evento.
       const textos = await garantirTextosEmail(ev)

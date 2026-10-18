@@ -16,6 +16,10 @@
 //                                           lembretes da véspera e do dia para todos
 //   anuncio_teste { eventoId, email }       o email do anúncio só para esse endereço
 //   abrir_ao_publico { eventoId }           quem não é aluno passa a poder se inscrever
+//   grupos                                  grupos de WhatsApp: os escolhidos e os que o número vê
+//   grupos_definir { jids: [{jid,nome}] }   quais grupos recebem as lives
+//   grupos_teste { eventoId, numero }       o convite do grupo só no WhatsApp do dono
+//   grupos_anunciar { eventoId }            o convite nos grupos, e liga o "é hoje" e o "ao vivo"
 //   criar_evento { titulo, quando, ... }     live nova, já publicada (18/10/2026)
 //   pendentes_gravacao                      lives que já acabaram, com YouTube e sem gravação
 //   gravacao { eventoId, url }              grava o link da gravação (só se ainda vazio)
@@ -36,6 +40,7 @@ import { concederAcessoNaAcademy, daquiAMeses } from '@/lib/acessos/conceder'
 import { anunciarEventoNucleo, contarAudienciaDoEvento } from '@/lib/evento/anunciar'
 import { deBrasiliaParaISO } from '@/lib/evento/relogio'
 import { garantirTextosEmail } from '@/lib/evento/textos'
+import { descobrirGrupos, gruposLigados, publicarNosGrupos, testeNoWhatsapp } from '@/lib/whatsapp/grupos'
 import { enviarEmailConvidado } from '@/lib/email/enviarConvidado'
 import { emailEvento } from '@/lib/email/templates/evento'
 import { dadosDoEmail, type EventoParaEmail } from '@/lib/evento/email'
@@ -160,6 +165,49 @@ export async function POST(request: NextRequest) {
       .eq('id', String(corpo.eventoId || '')).select('slug')
     if (error || !data?.length) return NextResponse.json({ ok: false, erro: error?.message ?? 'Evento não encontrado.' }, { status: 400 })
     return NextResponse.json({ ok: true, link: `${SITE_URL}/evento/${data[0].slug}` })
+  }
+
+  if (acao === 'grupos') {
+    const { data: escolhidos } = await sb.from('whatsapp_grupos').select('jid, nome, ativo')
+    let disponiveis: unknown = null
+    try { disponiveis = await descobrirGrupos() } catch (e) { disponiveis = { erro: (e as Error).message } }
+    return NextResponse.json({ ligado: gruposLigados(), escolhidos: escolhidos ?? [], disponiveis })
+  }
+
+  if (acao === 'grupos_definir') {
+    const lista = (Array.isArray(corpo.jids) ? corpo.jids : []) as { jid: string; nome: string }[]
+    const validos = lista.filter(g => /@g\.us$/.test(String(g?.jid)) && g?.nome)
+    if (!validos.length) return NextResponse.json({ ok: false, erro: 'Nenhum grupo válido.' }, { status: 400 })
+    // Escolher é substituir: o que não está na lista nova fica desligado.
+    await sb.from('whatsapp_grupos').update({ ativo: false }).neq('jid', '')
+    const { error } = await sb.from('whatsapp_grupos').upsert(validos.map(g => ({ jid: g.jid, nome: g.nome, ativo: true })))
+    if (error) return NextResponse.json({ ok: false, erro: error.message }, { status: 400 })
+    return NextResponse.json({ ok: true, grupos: validos.map(g => g.nome) })
+  }
+
+  const eventoDoGrupo = async () => (await sb.from('eventos')
+    .select('id, slug, titulo, inicia_em, descricao, tipo, apresentador_nome, textos_email')
+    .eq('id', String(corpo.eventoId || '')).maybeSingle()).data
+
+  if (acao === 'grupos_teste') {
+    const ev = await eventoDoGrupo()
+    if (!ev) return NextResponse.json({ ok: false, erro: 'Evento não encontrado.' }, { status: 400 })
+    try {
+      return NextResponse.json(await testeNoWhatsapp(ev, String(corpo.numero || '')))
+    } catch (e) {
+      return NextResponse.json({ ok: false, erro: (e as Error).message }, { status: 400 })
+    }
+  }
+
+  if (acao === 'grupos_anunciar') {
+    const ev = await eventoDoGrupo()
+    if (!ev) return NextResponse.json({ ok: false, erro: 'Evento não encontrado.' }, { status: 400 })
+    if (!gruposLigados()) {
+      return NextResponse.json({ ok: false, erro: 'Os grupos ainda estão desligados (WHATSAPP_GRUPOS_ATIVO): falta conferir se o número é administrador.' }, { status: 400 })
+    }
+    await sb.from('eventos').update({ avisar_grupos: true }).eq('id', ev.id)
+    const r = await publicarNosGrupos(ev, 'anuncio')
+    return NextResponse.json({ ok: true, ...r })
   }
 
   if (acao === 'pendentes_gravacao') {
