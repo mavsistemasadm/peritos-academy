@@ -992,6 +992,37 @@ ninguém ganha o selo.
 A sequência **dentro** de um curso (aulas, avaliações, correção depois da prova)
 não mudou: ela continua trava, ver "A avaliação é um item da jornada".
 
+## Live de tira-dúvidas: a dúvida chega antes — 2026-10-18
+
+**Regra permanente.** `eventos.recebe_duvidas` liga, na página `/evento/{slug}`,
+o formulário "Mande sua dúvida" (texto até 4.000 caracteres e um anexo de até
+20 MB), aberto até o fim da transmissão (`duvidasAbertas` em
+`lib/queries/evento-publico.ts`, a mesma conta para a tela e para a action).
+Liga por: Jarvis (`criar_evento` com `tiraDuvidas`), tipo `plantao` (nasce
+ligado) ou o editor do evento. Desligado, nada aparece e nada é convidado.
+
+- **Quem manda:** aluno pela sessão; convidado com nome e email só se a live
+  for `aberto_ao_publico` (senão a tela pede login). Teto de 5 por email.
+- **`evento_duvidas` sem policy nenhuma**, como `evento_inscricoes`: grava
+  `app/evento/[slug]/duvidas.ts` (service role, depois de validar); lê
+  `/admin/agenda/{id}/duvidas`, depois do papel de agenda.
+- ⚠️ **O anexo nunca atravessa a server action** (teto de 4,5 MB da Vercel):
+  URL assinada + `enviarParaSignedUrl`. O bucket privado `evento-duvidas` trava
+  20 MB e os tipos aceitos no próprio Storage, e a confirmação só aceita
+  caminho na pasta daquele evento que exista no bucket.
+- **A tela do admin** (durante a live): abertas em cima, na ordem de chegada
+  (o número `#4` não muda com o filtro), "✓ Respondida" dá baixa e "Reabrir"
+  volta; o anexo abre por URL assinada de 10 min gerada no clique; recarrega a
+  cada 20 s. Na agenda, o botão "Dúvidas (N)" mostra as sem resposta.
+- **Convite:** emails (menos o "ao vivo") ganham o bloco "Tem uma dúvida?
+  Mande antes" com link para `#duvida` (`duvidasUrl` em `dadosDoEmail`); o
+  WhatsApp dos grupos ganha a linha no convite e no "é hoje".
+- Jarvis: `academy_duvidas_da_live` lê (quantas, quais, com anexo); dar baixa é
+  só na tela.
+
+⚠️ Testado em produção como aluno logado (texto + imagem, nome com acento no
+anexo) e pelo Jarvis. A tela do admin não foi aberta por um admin no teste.
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários; `tour_visto_em` timestamptz nullable — ver seção Tour guiado; `migrado_de`/`migrado_em`/`boas_vindas_migrado_em` — aluno importado em lote, ver seção Migração de alunos da Ensinio)
 - `cursos` (com `restrito` — turma fechada, ver seção própria), `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)
