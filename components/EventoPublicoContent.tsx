@@ -20,6 +20,7 @@ import { inscreverNoEvento, alternarOfertaDoEvento } from '@/app/evento/[slug]/a
 import { urlEmbedYoutube } from '@/lib/video/youtube'
 import { criarClienteBrowser } from '@/lib/supabase/client'
 import ChatDoEvento from '@/components/ChatDoEvento'
+import EventoDuvidas from '@/components/EventoDuvidas'
 import { IconeCalendarPlus, IconeCheck, IconePlay, IconeStar, IconeChevronRight, IconeLock, IconeMessageCircle } from '@/components/Icones'
 import { AoVivo } from '@/components/Emblemas'
 
@@ -740,6 +741,12 @@ export default function EventoPublicoContent({ ev }: { ev: EventoPublico }) {
               </aside>
             )}
           </article>
+
+          {/* Live de tira-dúvidas: a pergunta chega antes, com anexo. Fica logo
+              abaixo do cartão porque é para cá que o convite aponta (#duvida). */}
+          {ev.recebeDuvidas && (
+            <EventoDuvidas eventoId={ev.id} logado={ev.logado} abertoAoPublico={ev.abertoAoPublico} urlLogin={urlLogin(ev.slug, false)} />
+          )}
 
           {!ev.ehAssinanteNexus && <ConviteNexus link={ev.nexusLink} nomePlataforma={ev.nomePlataforma} />}
         </div>

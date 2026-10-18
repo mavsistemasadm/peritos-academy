@@ -107,6 +107,12 @@ export type EventoPublico = {
   ehAssinanteNexus: boolean
   /** O apresentador já liberou a oferta nesta transmissão? */
   ofertaLiberada: boolean
+  /**
+   * Live de tira-dúvidas: a página mostra o formulário "Mande sua dúvida"
+   * (texto e um anexo de até 20 MB) até o fim da transmissão. Ver
+   * app/evento/[slug]/duvidas.ts e supabase/migrations/20261018_lives_duvidas.sql.
+   */
+  recebeDuvidas: boolean
 }
 
 export async function carregarEventoPublico(slug: string): Promise<EventoPublico | null> {
@@ -207,6 +213,7 @@ export async function carregarEventoPublico(slug: string): Promise<EventoPublico
          })).data === true
     ),
     inscritoComoConvidado: await jaInscritoComoConvidado(supabase, ev.id),
+    recebeDuvidas: !!ev.recebe_duvidas && duvidasAbertas(ev.inicia_em, ev.duracao_seg),
     logado,
     nomePlataforma: config?.nome_plataforma ?? 'Peritos Academy',
     logoUrl: config?.logo_url ?? null,
@@ -272,4 +279,14 @@ async function jaInscritoComoConvidado(
 
 export function nomeDoCookieDeInscricao(eventoId: string) {
   return `evt_${eventoId}`
+}
+
+/**
+ * Até quando se manda dúvida: até o fim da transmissão. Depois disso ninguém
+ * mais responde, e o formulário aberto seria uma promessa que a live não cumpre.
+ * Mora aqui (e não na action) porque a tela e a action precisam da MESMA conta.
+ */
+export function duvidasAbertas(iniciaEm: string | null, duracaoSeg: number | null, agora = Date.now()): boolean {
+  if (!iniciaEm) return true
+  return agora < +new Date(iniciaEm) + (duracaoSeg || 3600) * 1000
 }

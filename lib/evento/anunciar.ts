@@ -32,7 +32,7 @@ export async function anunciarEventoNucleo(id: string): Promise<ResultadoAnuncio
 
   const { data: ev } = await supabase
     .from('eventos')
-    .select('id, slug, titulo, tipo, descricao, inicia_em, duracao_seg, apresentador_nome, publicado, visibilidade, textos_email')
+    .select('id, slug, titulo, tipo, descricao, inicia_em, duracao_seg, apresentador_nome, publicado, visibilidade, textos_email, recebe_duvidas')
     .eq('id', id)
     .maybeSingle()
 

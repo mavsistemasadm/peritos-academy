@@ -653,6 +653,19 @@ export default function AdminEventoEditorContent({ evento, cursos, ogImagePadrao
                 </span>
               </label>
 
+              <label className="pnl-opcao pnl-opcao-destaque">
+                <input type="checkbox" name="recebe_duvidas" defaultChecked={evento.recebeDuvidas} />
+                <span>
+                  <b>Live de tira-dúvidas: receber dúvidas antes</b>
+                  <small>
+                    A página do evento ganha o formulário &quot;Mande sua dúvida&quot; (texto e um arquivo de até
+                    20 MB), e o convite e os lembretes passam a convidar para mandar. Você responde e dá baixa
+                    em <a href={`/admin/agenda/${evento.id}/duvidas`}>Dúvidas da live</a>
+                    {evento.duvidasAbertas > 0 ? ` (${evento.duvidasAbertas} sem resposta)` : ''}.
+                  </small>
+                </span>
+              </label>
+
               <label className="pnl-opcao">
                 <input type="checkbox" name="lembrete" defaultChecked={evento.lembrete} />
                 <span>

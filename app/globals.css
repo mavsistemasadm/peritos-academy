@@ -6926,3 +6926,65 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
   .rec-formacao-card{flex-direction:column;gap:12px;padding:16px}
   .rec-formacao-btn{width:100%;justify-content:center}
 }
+
+/* ---------- dúvidas antes da live (live de tira-dúvidas, 18/10/2026) ---------- */
+.pagina-evento .ev-duvidas{
+  margin-top:var(--s-5);padding:var(--s-6);scroll-margin-top:80px;
+  border:1px solid rgba(32,217,166,.28);border-radius:26px;
+  background:radial-gradient(70% 90% at 90% 0%,rgba(32,217,166,.09),transparent 60%),linear-gradient(160deg,#0C100E,#080B09 80%);
+}
+@media(max-width:768px){.pagina-evento .ev-duvidas{padding:var(--s-4)}}
+.pagina-evento .ev-duvidas-eyebrow{
+  display:block;font-size:11px;font-weight:660;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--verde);margin-bottom:var(--s-2);
+}
+.pagina-evento .ev-duvidas h2{font-size:clamp(22px,2.6vw,30px);font-weight:730;letter-spacing:-.03em;line-height:1.15;margin:0 0 var(--s-2)}
+.pagina-evento .ev-duvidas-sub{font-size:15px;line-height:1.6;color:var(--cinza-claro);max-width:620px;margin:0 0 var(--s-4)}
+.pagina-evento .ev-duvidas-forma{max-width:620px}
+.pagina-evento .ev-duvidas-dupla{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-2)}
+@media(max-width:600px){.pagina-evento .ev-duvidas-dupla{grid-template-columns:1fr;gap:0}}
+.pagina-evento .ev-duvidas textarea{
+  width:100%;font:inherit;font-size:14.5px;line-height:1.55;color:var(--creme);resize:vertical;min-height:120px;
+  background:rgba(0,0,0,.35);border:1px solid var(--linha);border-radius:12px;
+  padding:12px 14px;outline:none;transition:border-color .2s;
+}
+.pagina-evento .ev-duvidas textarea::placeholder{color:#6C736D}
+.pagina-evento .ev-duvidas textarea:focus{border-color:rgba(32,217,166,.5)}
+.pagina-evento .ev-duvidas-anexo{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin:var(--s-2) 0}
+.pagina-evento .ev-duvidas-anexo input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.pagina-evento .ev-duvidas-anexo label.btn{cursor:pointer}
+.pagina-evento .ev-duvidas-anexo small{font-size:12.5px;color:var(--cinza)}
+.pagina-evento .ev-duvidas-arq{font-size:13px;color:var(--creme);word-break:break-all}
+.pagina-evento .ev-duvidas-arq button{margin-left:8px;background:none;border:0;padding:0;font:inherit;font-size:12.5px;color:var(--cinza);text-decoration:underline;cursor:pointer}
+.pagina-evento .ev-duvidas-forma > .btn-primario{width:100%;max-width:320px;margin-top:var(--s-2)}
+.pagina-evento .ev-duvidas-ok{
+  display:flex;gap:10px;align-items:flex-start;max-width:620px;margin:0 0 var(--s-3);
+  padding:12px 16px;border-radius:14px;font-size:14px;line-height:1.5;color:var(--creme);
+  background:rgba(32,217,166,.1);border:1px solid rgba(32,217,166,.3);
+}
+.pagina-evento .ev-duvidas-ok svg{color:var(--verde);flex-shrink:0;margin-top:3px}
+
+/* ---------- admin: dúvidas da live (18/10/2026) ---------- */
+.pagina-admin .pnl-duv-voltar{display:inline-block;font-size:12.5px;color:var(--cinza);text-decoration:none;margin-bottom:6px}
+.pagina-admin .pnl-duv-voltar:hover{color:var(--creme)}
+.pagina-admin .pnl-duv-cab-acoes{display:flex;gap:8px;flex-wrap:wrap}
+.pagina-admin .pnl-duv-aviso{padding:12px 16px;border-radius:12px;font-size:13.5px;color:#FFD38A;background:rgba(255,180,60,.08);border:1px solid rgba(255,180,60,.25);margin:0 0 var(--s-3)}
+.pagina-admin .pnl-duv-aviso a{color:inherit}
+.pagina-admin .pnl-duv-resumo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 var(--s-3)}
+.pagina-admin .pnl-duv-resumo div{padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--linha)}
+.pagina-admin .pnl-duv-resumo b{display:block;font-size:24px;font-weight:720;color:var(--creme)}
+.pagina-admin .pnl-duv-resumo span{font-size:12px;color:var(--cinza)}
+.pagina-admin .pnl-duv-filtros{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 var(--s-3)}
+.pagina-admin .pnl-duv-filtros button{font:inherit;font-size:13px;font-weight:600;padding:8px 14px;border-radius:999px;cursor:pointer;color:var(--cinza-claro);background:transparent;border:1px solid var(--linha)}
+.pagina-admin .pnl-duv-filtros button.ativo{color:var(--carvao);background:var(--verde);border-color:var(--verde)}
+.pagina-admin .pnl-duv-lista{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.pagina-admin .pnl-duv-item{padding:18px 20px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--linha)}
+.pagina-admin .pnl-duv-item.respondida{opacity:.6}
+.pagina-admin .pnl-duv-topo{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin-bottom:10px}
+.pagina-admin .pnl-duv-num{font-size:12px;font-weight:700;color:var(--verde)}
+.pagina-admin .pnl-duv-selo{font-size:11px;font-weight:650;padding:2px 8px;border-radius:999px;color:var(--cinza-claro);background:rgba(255,255,255,.06)}
+.pagina-admin .pnl-duv-selo.aluno{color:var(--verde);background:rgba(32,217,166,.12)}
+.pagina-admin .pnl-duv-meta{font-size:12px;color:var(--cinza)}
+.pagina-admin .pnl-duv-texto{margin:0 0 12px;font-size:15.5px;line-height:1.6;color:var(--creme);white-space:pre-wrap;word-break:break-word}
+.pagina-admin .pnl-duv-acoes{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+@media(max-width:600px){.pagina-admin .pnl-duv-resumo{grid-template-columns:1fr 1fr 1fr}.pagina-admin .pnl-duv-resumo b{font-size:20px}}

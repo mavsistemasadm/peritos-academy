@@ -1,5 +1,6 @@
 // lib/queries/admin-agenda.ts
 import { criarClienteServidor } from '@/lib/supabase/server'
+import { criarClienteServico } from '@/lib/supabase/servico'
 
 export type EventoAdmin = {
   id: string
@@ -27,6 +28,10 @@ export type EventoAdmin = {
   /** Live aberta: quem não tem conta se inscreve pela página pública. */
   abertoAoPublico: boolean
   chatModo: 'nenhum' | 'youtube' | 'proprio'
+  /** Live de tira-dúvidas: a página recebe dúvidas com anexo antes da live. */
+  recebeDuvidas: boolean
+  /** Dúvidas ainda sem baixa (as respondidas não contam). */
+  duvidasAbertas: number
   totalReservas: number
   /** Convidados sem conta. Vazio na listagem; preenchido na ficha do evento. */
   inscricoes: InscricaoEvento[]
@@ -50,6 +55,7 @@ export async function carregarEventosAdmin(): Promise<EventoAdmin[]> {
   if (!eventos || eventos.length === 0) return []
 
   const { data: reservas } = await supabase.from('evento_reservas').select('evento_id')
+  const abertasPorEvento = await duvidasAbertasPorEvento()
   const reservasPorEvento = new Map<string, number>()
   for (const r of reservas ?? []) {
     reservasPorEvento.set(r.evento_id, (reservasPorEvento.get(r.evento_id) ?? 0) + 1)
@@ -63,6 +69,7 @@ export async function carregarEventosAdmin(): Promise<EventoAdmin[]> {
     alvoRotulo: e.alvo_rotulo, visibilidade: e.visibilidade, gravar: e.gravar, lembrete: e.lembrete,
     publicarFeed: e.publicar_feed, publicado: e.publicado,
     abertoAoPublico: !!e.aberto_ao_publico, chatModo: (e.chat_modo ?? 'proprio') as EventoAdmin['chatModo'],
+    recebeDuvidas: !!e.recebe_duvidas, duvidasAbertas: abertasPorEvento.get(e.id) ?? 0,
     totalReservas: reservasPorEvento.get(e.id) ?? 0,
     inscricoes: [],
   }))
@@ -93,10 +100,25 @@ export async function carregarEventoAdmin(id: string): Promise<EventoAdmin | nul
     alvoRotulo: e.alvo_rotulo, visibilidade: e.visibilidade, gravar: e.gravar, lembrete: e.lembrete,
     publicarFeed: e.publicar_feed, publicado: e.publicado,
     abertoAoPublico: !!e.aberto_ao_publico, chatModo: (e.chat_modo ?? 'proprio') as EventoAdmin['chatModo'],
+    recebeDuvidas: !!e.recebe_duvidas, duvidasAbertas: (await duvidasAbertasPorEvento(id)).get(id) ?? 0,
     totalReservas: count ?? 0,
     inscricoes: (inscritos ?? []).map(i => ({
       nome: i.nome, email: i.email, whatsapp: i.whatsapp,
       jaEAluno: !!i.usuario_id, criadoEm: i.criado_em,
     })),
   }
+}
+
+/**
+ * Dúvidas sem baixa, por evento. `evento_duvidas` não tem policy nenhuma (só
+ * a chave de serviço lê), e quem chama aqui é tela de admin que já conferiu o
+ * papel de agenda.
+ */
+async function duvidasAbertasPorEvento(eventoId?: string): Promise<Map<string, number>> {
+  let q = criarClienteServico().from('evento_duvidas').select('evento_id').eq('status', 'aberta')
+  if (eventoId) q = q.eq('evento_id', eventoId)
+  const { data } = await q
+  const mapa = new Map<string, number>()
+  for (const d of data ?? []) mapa.set(d.evento_id, (mapa.get(d.evento_id) ?? 0) + 1)
+  return mapa
 }

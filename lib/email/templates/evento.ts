@@ -66,6 +66,12 @@ export type DadosEmailEvento = {
   /** Endereço público do evento, onde se assiste. */
   url: string
   linkCalendario: string | null
+  /**
+   * Live de tira-dúvidas: o formulário da página (`/evento/{slug}#duvida`).
+   * Com ele, o email ganha o bloco "Mande sua dúvida antes", em todo momento
+   * menos o "ao vivo" (aí a conversa é no chat).
+   */
+  duvidasUrl?: string | null
 }
 
 export type MomentoEvento = 'anuncio' | 'confirmacao' | 'vespera' | 'hoje' | 'comecando' | 'ao_vivo'
@@ -276,6 +282,7 @@ export function emailEvento(
             </td>
           </tr>
         </table>
+        ${blocoDuvidas(d, momento)}
       </td>
     </tr>
 
@@ -345,4 +352,23 @@ export function emailEvento(
 </html>`
 
   return { assunto, html }
+}
+
+/**
+ * O convite para mandar a dúvida antes, na live de tira-dúvidas. Link em texto
+ * dentro de um bloco, e não um segundo botão: dois botões iguais no mesmo
+ * email dividem o clique, e o principal (reservar, abrir a página) continua
+ * sendo o que leva a pessoa à live.
+ */
+function blocoDuvidas(d: DadosEmailEvento, momento: MomentoEvento) {
+  if (!d.duvidasUrl || momento === 'ao_vivo') return ''
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+          <tr>
+            <td style="background-color:#F6F7F4;border:1px solid #E4E6E1;border-radius:10px;padding:18px 22px;">
+              <p style="margin:0 0 6px;font-family:${FONTE};font-size:15px;font-weight:bold;line-height:1.4;color:#1B211E;">Tem uma dúvida? Mande antes.</p>
+              <p style="margin:0 0 10px;font-family:${FONTE};font-size:14.5px;line-height:1.6;color:${TEXTO};">Escreva a sua pergunta e, se ajudar, anexe o documento ou um print (até 20 MB). Eu leio antes e <b>respondo ao vivo</b>.</p>
+              <a href="${d.duvidasUrl}" target="_blank" style="font-family:${FONTE};font-size:14.5px;font-weight:bold;color:#0E8A68;text-decoration:underline;">Mandar minha dúvida</a>
+            </td>
+          </tr>
+        </table>`
 }

@@ -23,6 +23,7 @@
 //   criar_evento { titulo, quando, ... }     live nova, já publicada (18/10/2026)
 //   pendentes_gravacao                      lives que já acabaram, com YouTube e sem gravação
 //   gravacao { eventoId, url }              grava o link da gravação (só se ainda vazio)
+//   duvidas { eventoId? }                   dúvidas mandadas antes da live de tira-dúvidas
 //
 // ⚠️ A matrícula NÃO cria conta: email sem conta volta `sem_conta`, como no
 // lote de /admin/acessos. Conta fantasma por erro de voz é para sempre.
@@ -135,6 +136,9 @@ export async function POST(request: NextRequest) {
       apresentador_nome: String(corpo.apresentador || '').trim() || 'Marlos Henrique',
       visibilidade: 'todos',
       aberto_ao_publico: corpo.abertoAoPublico === true,
+      // Live de tira-dúvidas: a página recebe a dúvida antes, com anexo, e o
+      // convite e os lembretes chamam para mandar. Plantão já nasce assim.
+      recebe_duvidas: corpo.tiraDuvidas === true || (corpo.tiraDuvidas !== false && tipo === 'plantao'),
       publicado: true,
     }).select('id, slug, inicia_em').single()
     if (error) return NextResponse.json({ ok: false, erro: error.message }, { status: 400 })
@@ -144,9 +148,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, ...data, link: `${SITE_URL}/evento/${data.slug}` })
   }
 
+  // As dúvidas que chegaram para uma live de tira-dúvidas (a próxima, se não
+  // vier o id). Só leitura: dar baixa é na tela, durante a live.
+  if (acao === 'duvidas') {
+    let id = String(corpo.eventoId || '')
+    if (!id) {
+      const { data: prox } = await sb.from('eventos').select('id').eq('recebe_duvidas', true)
+        .gte('inicia_em', new Date(Date.now() - 6 * 3600_000).toISOString()).order('inicia_em').limit(1).maybeSingle()
+      id = prox?.id || ''
+    }
+    if (!id) return NextResponse.json({ ok: true, evento: null, total: 0, abertas: 0, duvidas: [] })
+    const [{ data: ev }, { data: ds }] = await Promise.all([
+      sb.from('eventos').select('id, titulo, inicia_em, recebe_duvidas').eq('id', id).maybeSingle(),
+      sb.from('evento_duvidas').select('nome, texto, anexo_nome, status, criado_em, usuario_id').eq('evento_id', id).order('criado_em'),
+    ])
+    const lista = ds ?? []
+    return NextResponse.json({
+      ok: true, evento: ev, total: lista.length, abertas: lista.filter(d => d.status === 'aberta').length,
+      pagina: `${SITE_URL}/admin/agenda/${id}/duvidas`,
+      duvidas: lista.map(d => ({ nome: d.nome, aluno: !!d.usuario_id, texto: d.texto.slice(0, 400), anexo: d.anexo_nome, respondida: d.status === 'respondida' })),
+    })
+  }
+
   if (acao === 'anuncio_teste') {
     const { data: ev } = await sb.from('eventos')
-      .select('id, slug, titulo, tipo, descricao, inicia_em, duracao_seg, apresentador_nome, textos_email')
+      .select('id, slug, titulo, tipo, descricao, inicia_em, duracao_seg, apresentador_nome, textos_email, recebe_duvidas')
       .eq('id', String(corpo.eventoId || '')).maybeSingle()
     if (!ev) return NextResponse.json({ ok: false, erro: 'Evento não encontrado.' }, { status: 400 })
     const textos = await garantirTextosEmail(ev)
@@ -186,7 +212,7 @@ export async function POST(request: NextRequest) {
   }
 
   const eventoDoGrupo = async () => (await sb.from('eventos')
-    .select('id, slug, titulo, inicia_em, descricao, tipo, apresentador_nome, textos_email')
+    .select('id, slug, titulo, inicia_em, descricao, tipo, apresentador_nome, textos_email, recebe_duvidas')
     .eq('id', String(corpo.eventoId || '')).maybeSingle()).data
 
   if (acao === 'grupos_teste') {

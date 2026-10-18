@@ -79,6 +79,7 @@ type EventoGrupo = {
   id: string; slug: string; titulo: string; inicia_em: string
   descricao?: string | null; tipo?: string | null; apresentador_nome?: string | null
   textos_email?: Record<string, unknown> | null
+  recebe_duvidas?: boolean | null
 }
 
 function quando(iso: string) {
@@ -94,20 +95,27 @@ export async function textoDoGrupo(ev: EventoGrupo, momento: MomentoGrupo): Prom
   const { dia, hora } = quando(ev.inicia_em)
   const link = `${SITE_URL}/evento/${ev.slug}`
   const gancho = t?.assuntos?.[momento]
+  // Live de tira-dúvidas: o convite e o "é hoje" chamam para mandar a dúvida
+  // antes, com anexo, pelo formulário da página.
+  const duvida = ev.recebe_duvidas
+    ? `❓ *Tem uma dúvida?* Mande antes, com documento ou print se precisar, e eu respondo ao vivo: ${link}#duvida`
+    : null
   if (momento === 'anuncio') {
     return [
       `*${gancho ?? ev.titulo}*`,
       t?.anuncio ?? `Live nova: ${ev.titulo}.`,
       `📅 *${dia}, às ${hora}*, ao vivo na Peritos Academy.`,
       `Reserve o seu lugar: ${link}`,
-    ].join('\n\n')
+      duvida,
+    ].filter(Boolean).join('\n\n')
   }
   if (momento === 'hoje') {
     return [
       `*Hoje às ${hora}: ${gancho ?? ev.titulo}*`,
       t?.hoje ?? 'É hoje. Separe o horário e traga a sua dúvida.',
       `Entre por aqui: ${link}`,
-    ].join('\n\n')
+      duvida,
+    ].filter(Boolean).join('\n\n')
   }
   return [`🔴 *Estamos ao vivo:* ${ev.titulo}`, t?.ao_vivo ?? 'Já começou.', link].join('\n\n')
 }

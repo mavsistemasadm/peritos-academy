@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
 
     const { data: eventos, error } = await supabase
       .from('eventos')
-      .select('id, slug, titulo, inicia_em, duracao_seg, descricao, apresentador_nome, lembrete, lembrar_audiencia, tipo, textos_email, avisar_grupos')
+      .select('id, slug, titulo, inicia_em, duracao_seg, descricao, apresentador_nome, lembrete, lembrar_audiencia, tipo, textos_email, avisar_grupos, recebe_duvidas')
       .eq('publicado', true)
       .gte('inicia_em', new Date(agora + faixa.de).toISOString())
       .lte('inicia_em', new Date(agora + faixa.ate).toISOString())

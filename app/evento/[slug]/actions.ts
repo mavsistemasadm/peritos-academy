@@ -56,7 +56,7 @@ export async function inscreverNoEvento(entrada: {
   // em que não pode entrar.
   const { data: ev } = await supabase
     .from('eventos')
-    .select('id, slug, titulo, inicia_em, duracao_seg, descricao, apresentador_nome, publicado, aberto_ao_publico')
+    .select('id, slug, titulo, inicia_em, duracao_seg, descricao, apresentador_nome, publicado, aberto_ao_publico, recebe_duvidas')
     .eq('id', entrada.eventoId)
     .maybeSingle()
 

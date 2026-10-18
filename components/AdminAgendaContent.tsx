@@ -109,6 +109,11 @@ export default function AdminAgendaContent({ eventos }: { eventos: EventoAdmin[]
                 <input type="checkbox" checked={e.publicado} disabled={pendente} onChange={ev => onAlternarPublicacao(e.id, ev.target.checked)} />
                 {e.publicado ? 'Publicado' : 'Rascunho'}
               </label>
+              {e.recebeDuvidas && (
+                <a href={`/admin/agenda/${e.id}/duvidas`} className={e.duvidasAbertas > 0 ? 'pnl-btn-primario' : 'pnl-btn-secundario'}>
+                  Dúvidas{e.duvidasAbertas > 0 ? ` (${e.duvidasAbertas})` : ''}
+                </a>
+              )}
               <a href={`/admin/agenda/${e.id}`} className="pnl-btn-secundario">Editar</a>
               {e.iniciaEm && (
                 <button type="button" className="pnl-btn-secundario" disabled={pendente} onClick={() => onRepetir(e.id)} title="Cria uma cópia deste encontro sete dias depois, como rascunho">

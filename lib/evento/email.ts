@@ -24,6 +24,8 @@ export type EventoParaEmail = {
   inicia_em: string | null; duracao_seg: number
   descricao: string | null; apresentador_nome: string | null
   tipo?: string | null
+  /** Live de tira-dúvidas: o email convida a mandar a dúvida antes. */
+  recebe_duvidas?: boolean | null
 }
 
 /** Os mesmos rótulos da tela. Um evento não pode se chamar "sala_analise" no
@@ -49,6 +51,7 @@ export function dadosDoEmail(ev: EventoParaEmail, nome: string): DadosEmailEvent
     tipoRotulo: ev.tipo ? TIPO_ROTULO[ev.tipo] ?? null : null,
     url: `${SITE_URL}/evento/${ev.slug}`,
     linkCalendario: linkCalendario(ev),
+    duvidasUrl: ev.recebe_duvidas ? `${SITE_URL}/evento/${ev.slug}#duvida` : null,
   }
 }
 

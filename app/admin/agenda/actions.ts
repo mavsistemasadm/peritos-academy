@@ -53,6 +53,9 @@ function montarCampos(formData: FormData) {
     // evento — abrir por engano entrega de graça o que se vende, e ninguém
     // percebe uma sala aberta demais.
     aberto_ao_publico: formData.get('aberto_ao_publico') === 'on',
+    // Live de tira-dúvidas: a página pública recebe dúvidas com anexo até o
+    // fim da transmissão. Ver app/evento/[slug]/duvidas.ts.
+    recebe_duvidas: formData.get('recebe_duvidas') === 'on',
     chat_modo: ['nenhum', 'youtube', 'proprio'].includes(String(formData.get('chat_modo')))
       ? String(formData.get('chat_modo'))
       : 'proprio',
