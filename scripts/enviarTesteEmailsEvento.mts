@@ -1,5 +1,7 @@
-// Manda os quatro emails de um encontro para um endereço, para conferir na
-// caixa de entrada de verdade.
+// Manda TODOS os emails de uma live para um endereço, para conferir na caixa
+// de entrada de verdade: anúncio, confirmação, véspera, é hoje, uma hora
+// antes, ao vivo, e as duas versões "convite" (véspera e é hoje para quem
+// ainda não reservou, desde 18/10/2026). O assunto ganha [TESTE n/8].
 //
 //   node --experimental-strip-types scripts/enviarTesteEmailsEvento.mts <email>
 //
@@ -31,7 +33,8 @@ const env = Object.fromEntries(
 )
 
 const SITE = 'https://evolua.peritosacademy.com.br'
-const SLUG = 'teste-sala-de-analise-leitura-de-extrato-e-capitalizacao'
+// Uma página de live que existe, para os botões abrirem algo de verdade.
+const SLUG = 'plantao-do-perito-01-duvidas-de-calculo-e-pericia-ao-vivo'
 
 // Mesmo token do envio real, para o link de descadastro do rodapé funcionar
 // de verdade se você clicar nele.
@@ -51,22 +54,34 @@ function injetarDescadastro(html: string, email: string) {
 
 const dados = {
   primeiroNome: 'Marlos',
-  titulo: 'Sala de análise: leitura de extrato e capitalização',
-  quando: 'Sábado, 5 de setembro, às 20h00, horário de Brasília',
-  dia: 'Sábado, 5 de setembro',
-  horario: '20h00',
-  duracao: '1h30',
+  titulo: 'Plantão do Perito: dúvidas de cálculo e perícia, ao vivo',
+  quando: 'Quinta-feira, 22 de outubro, às 11h00, horário de Brasília',
+  dia: 'Quinta-feira, 22 de outubro',
+  horario: '11h00',
+  duracao: '1h',
   apresentador: 'Marlos Henrique',
+  descricao: null,
+  tipoRotulo: 'Plantão de dúvidas',
   url: `${SITE}/evento/${SLUG}`,
   linkCalendario: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Sala+de+an%C3%A1lise',
 }
 
-const MOMENTOS: MomentoEvento[] = ['confirmacao', 'vespera', 'hoje', 'comecando', 'ao_vivo']
+const MOMENTOS: [MomentoEvento, boolean, string][] = [
+  ['anuncio', false, 'convite'],
+  ['confirmacao', false, 'inscrição confirmada'],
+  ['vespera', false, 'véspera, quem reservou'],
+  ['vespera', true, 'véspera, quem não reservou'],
+  ['hoje', false, 'é hoje, quem reservou'],
+  ['hoje', true, 'é hoje, quem não reservou'],
+  ['comecando', false, '1 hora antes'],
+  ['ao_vivo', false, 'ao vivo'],
+]
 
 const ids: [string, string][] = []
 
-for (const momento of MOMENTOS) {
-  const { assunto, html } = emailEvento(momento, dados)
+for (const [n, [momento, convite, nome]] of MOMENTOS.entries()) {
+  const { assunto: a, html } = emailEvento(momento, dados as never, { convite })
+  const assunto = `[TESTE ${n + 1}/${MOMENTOS.length} · ${nome}] ${a}`
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
@@ -79,8 +94,8 @@ for (const momento of MOMENTOS) {
     }),
   })
   const corpo = await r.json() as { id?: string; message?: string }
-  console.log(`${momento.padEnd(12)} ${r.ok ? corpo.id : 'FALHOU · ' + corpo.message}`)
-  if (corpo.id) ids.push([momento, corpo.id])
+  console.log(`${nome.padEnd(28)} ${r.ok ? corpo.id : 'FALHOU · ' + corpo.message}`)
+  if (corpo.id) ids.push([nome, corpo.id])
   // O Resend limita a 2 requisições por segundo; sem a pausa, o terceiro
   // e o quarto voltam 429 e o teste "passa" com dois emails a menos.
   await new Promise(r => setTimeout(r, 700))
@@ -95,5 +110,5 @@ for (const [momento, id] of ids) {
     headers: { Authorization: `Bearer ${env.RESEND_API_KEY}` },
   })
   const d = await r.json() as { last_event?: string }
-  console.log(`${momento.padEnd(12)} ${d.last_event}`)
+  console.log(`${momento.padEnd(28)} ${d.last_event}`)
 }
