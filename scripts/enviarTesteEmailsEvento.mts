@@ -92,7 +92,7 @@ if (textos) console.log('textos escritos para o assunto:\n', textos, '\n')
 const ids: [string, string][] = []
 
 for (const [n, [momento, convite, nome]] of MOMENTOS.entries()) {
-  const { assunto: a, html } = emailEvento(momento, dados as never, { convite, tema: (textos as Record<string, string> | null)?.[momento] })
+  const { assunto: a, html } = emailEvento(momento, dados as never, { convite, tema: (textos as Record<string, string> | null)?.[momento], gancho: (textos?.assuntos as Record<string, string> | undefined)?.[momento] })
   const assunto = `[TESTE ${n + 1}/${MOMENTOS.length} · ${nome}] ${a}`
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',

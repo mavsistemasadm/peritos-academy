@@ -66,7 +66,7 @@ export async function anunciarEventoNucleo(id: string): Promise<ResultadoAnuncio
 
   let enviados = 0
   for (const pessoa of audiencia) {
-    const { assunto, html } = emailEvento('anuncio', dadosDoEmail(ev as EventoParaEmail, pessoa.nome ?? 'Perito'), { tema: textos?.anuncio })
+    const { assunto, html } = emailEvento('anuncio', dadosDoEmail(ev as EventoParaEmail, pessoa.nome ?? 'Perito'), { tema: textos?.anuncio, gancho: textos?.assuntos?.anuncio })
     const r = await enviarEmailConvidado({
       para: pessoa.email,
       tipo: 'evento_anuncio',

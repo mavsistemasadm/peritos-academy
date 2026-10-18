@@ -183,21 +183,35 @@ const TEXTO = '#3F4A46'
 export function emailEvento(
   momento: MomentoEvento,
   d: DadosEmailEvento,
-  opcoes: { convite?: boolean; tema?: string | null } = {},
+  opcoes: { convite?: boolean; tema?: string | null; gancho?: string | null } = {},
 ): { assunto: string; html: string } {
   const fixo = COPY[momento]
   const tema = opcoes.tema?.trim()
-  const base = tema && momento !== 'confirmacao'
-    ? {
-        ...fixo,
-        corpo: (x: DadosEmailEvento) => {
-          const ps = fixo.corpo(x)
-          return momento === 'anuncio'
-            ? [ps[0], tema, ...ps.slice(2)]
-            : [ps[0], tema, ...ps.slice(1)]
-        },
+  const gancho = opcoes.gancho?.trim()
+  const comTema = momento !== 'confirmacao'
+  const base = {
+    ...fixo,
+    // O convite com tema abre PELO PORQUÊ (o parágrafo do tema), e a data vem
+    // depois: "Marquei um encontro novo" não convence ninguém a ir.
+    corpo: (x: DadosEmailEvento) => {
+      const ps = fixo.corpo(x)
+      if (!tema || !comTema) return ps
+      return momento === 'anuncio' ? [tema, ...ps.slice(2)] : [ps[0], tema, ...ps.slice(1)]
+    },
+    // O gancho entra no assunto; dia e hora quem põe é o template, nunca a IA.
+    assunto: (x: DadosEmailEvento) => {
+      if (!gancho || !comTema) return fixo.assunto(x)
+      const diaCurto = x.dia.split(',')[0].toLowerCase().replace('-feira', '')
+      switch (momento) {
+        case 'anuncio': return `${gancho} · ${diaCurto}, ${x.horario}, ao vivo`
+        case 'vespera': return `Amanhã às ${x.horario}: ${gancho}`
+        case 'hoje': return `Hoje às ${x.horario}: ${gancho}`
+        case 'comecando': return `Em 1 hora: ${gancho}`
+        case 'ao_vivo': return `Ao vivo agora: ${gancho}`
+        default: return fixo.assunto(x)
       }
-    : fixo
+    },
+  }
   const convite = !!opcoes.convite && (momento === 'vespera' || momento === 'hoje')
   const c = convite
     ? {

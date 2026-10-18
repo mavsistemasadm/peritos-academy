@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
       .eq('id', String(corpo.eventoId || '')).maybeSingle()
     if (!ev) return NextResponse.json({ ok: false, erro: 'Evento não encontrado.' }, { status: 400 })
     const textos = await garantirTextosEmail(ev)
-    const { assunto, html } = emailEvento('anuncio', dadosDoEmail(ev as EventoParaEmail, 'Marlos'), { tema: textos?.anuncio })
+    const { assunto, html } = emailEvento('anuncio', dadosDoEmail(ev as EventoParaEmail, 'Marlos'), { tema: textos?.anuncio, gancho: textos?.assuntos?.anuncio })
     // refId próprio: não conta como o anúncio real (ref_id = id do evento) no
     // dedupe, e cada teste é um envio novo.
     const r = await enviarEmailConvidado({

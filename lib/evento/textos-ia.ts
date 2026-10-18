@@ -12,7 +12,11 @@
 // o texto fixo de sempre: um email genérico é melhor que email nenhum.
 // ══════════════════════════════════════════════════════
 export type MomentoComTexto = 'anuncio' | 'vespera' | 'hoje' | 'comecando' | 'ao_vivo'
-export type TextosEmail = Partial<Record<MomentoComTexto, string>> & { titulo?: string }
+export type TextosEmail = Partial<Record<MomentoComTexto, string>> & {
+  titulo?: string
+  /** O gancho do assunto de cada email, sem data: o template põe dia e hora. */
+  assuntos?: Partial<Record<MomentoComTexto, string>>
+}
 
 const MOMENTOS: MomentoComTexto[] = ['anuncio', 'vespera', 'hoje', 'comecando', 'ao_vivo']
 
@@ -25,23 +29,32 @@ export type EventoParaTexto = {
   textos_email?: TextosEmail | null
 }
 
-const SISTEMA = `Você escreve, na voz do Marlos Henrique (perito judicial e professor da Peritos Academy), um parágrafo para cada email de uma live. O resto de cada email já está escrito; o seu parágrafo é o único que fala do ASSUNTO da live.
+// ⚠️ O OBJETIVO É PRESENÇA (18/10/2026). Pedido do dono: o email tem de dizer
+// por que vale participar, para trazer o maior número de pessoas. A ordem do
+// convite é fixa (dor, o que leva, por que ao vivo); o conteúdo é do tema.
+const SISTEMA = `Você escreve, na voz do Marlos Henrique (perito judicial e professor da Peritos Academy), os textos dos emails de uma live. O objetivo de todos é UM: trazer o maior número de peritos para a live ao vivo. A pessoa lê no celular, com pressa, e decide em segundos.
 
-Um parágrafo por momento, cada um com um ângulo diferente:
-- anuncio: o que a pessoa vai sair sabendo ou conseguindo fazer depois desta live.
-- vespera: por que vale segurar esse horário, ligado ao tema.
-- hoje: o que ela pode preparar ou trazer (uma dúvida, um caso, um número) para aproveitar mais.
-- comecando: o primeiro ponto que vamos abrir na live.
-- ao_vivo: uma frase curta, ligada ao tema, que dá vontade de entrar agora.
+Para cada momento você escreve um PARÁGRAFO (o único do email que fala do tema; o resto, data e botão, já está pronto) e um GANCHO para o assunto do email.
 
-Regras: primeira pessoa, tom de mentor que conversa, português do Brasil. Concreto e específico do tema, sem promessa exagerada e sem inventar números, nomes ou casos. De 1 a 2 frases, até 230 caracteres (ao_vivo até 120). Sem travessão, sem emoji, sem markdown, sem aspas, sem repetir o título palavra por palavra e sem citar data ou hora.
+Parágrafos, cada um com sua função:
+- anuncio (o convite, o mais importante): 3 a 4 frases, nesta ordem. 1) O problema ou o custo real de não dominar o tema, na vida do perito (honorário cortado, laudo impugnado, nomeação perdida, horas jogadas fora); comece por aí, nunca por "marquei uma live". 2) O que a pessoa sai sabendo ou fazendo, concreto. 3) Por que vale estar AO VIVO: tirar a própria dúvida e ver o caso ou o cálculo na tela; a gravação fica, mas não responde a pergunta de ninguém. Até 480 caracteres.
+- vespera: por que vale separar esse horário amanhã, ligado ao problema dela. 1 a 2 frases, até 230.
+- hoje: o que ela pode trazer ou preparar (uma dúvida, um caso, um número) para sair com a resposta. 1 a 2 frases, até 230.
+- comecando: o primeiro ponto que vamos abrir, de um jeito que dê curiosidade. 1 a 2 frases, até 230.
+- ao_vivo: uma frase curta de agora: o que já está acontecendo na tela. Até 120.
 
-Responda APENAS com um objeto JSON com as chaves anuncio, vespera, hoje, comecando, ao_vivo.`
+Ganchos do assunto (assuntos.*): até 45 caracteres, sem data nem hora (o sistema acrescenta), sem ponto final. Pode ser pergunta ou afirmação que toque o problema ou a promessa. Diferente em cada momento. Exemplos de tom: "Seu honorário está sendo cortado?", "Quanto cobrar numa perícia".
+
+Regras: primeira pessoa, mentor que conversa, português do Brasil. Concreto e do tema. Proibido: urgência falsa (vagas, "últimas chances"), número, nome ou caso inventado, promessa de resultado garantido, travessão, emoji, markdown, aspas, citar data ou hora, repetir o título palavra por palavra.
+
+Responda APENAS com JSON: {"anuncio":"","vespera":"","hoje":"","comecando":"","ao_vivo":"","assuntos":{"anuncio":"","vespera":"","hoje":"","comecando":"","ao_vivo":""}}`
+
+const LIMITE: Record<MomentoComTexto, number> = { anuncio: 480, vespera: 230, hoje: 230, comecando: 230, ao_vivo: 120 }
 
 function limpar(t: unknown, max: number): string | null {
   if (typeof t !== 'string') return null
   const s = t.replace(/[—–]/g, ',').replace(/[*#`"]/g, '').replace(/\s+/g, ' ').trim()
-  return s.length >= 20 && s.length <= max + 40 ? s : null
+  return s.length >= 8 && s.length <= max + 40 ? s : null
 }
 
 export async function escreverTextosEmail(ev: EventoParaTexto): Promise<TextosEmail | null> {
@@ -54,7 +67,7 @@ export async function escreverTextosEmail(ev: EventoParaTexto): Promise<TextosEm
       signal: AbortSignal.timeout(40_000),
       body: JSON.stringify({
         model: 'claude-opus-5-5',
-        max_tokens: 1500,
+        max_tokens: 2500,
         system: SISTEMA,
         messages: [{
           role: 'user',
@@ -69,9 +82,12 @@ export async function escreverTextosEmail(ev: EventoParaTexto): Promise<TextosEm
     const texto = (d.content ?? []).map((c: { text?: string }) => c.text ?? '').join('')
     const json = JSON.parse(texto.slice(texto.indexOf('{'), texto.lastIndexOf('}') + 1))
     const out: TextosEmail = { titulo: ev.titulo }
+    out.assuntos = {}
     for (const m of MOMENTOS) {
-      const t = limpar(json[m], m === 'ao_vivo' ? 120 : 230)
+      const t = limpar(json[m], LIMITE[m])
       if (t) out[m] = t
+      const g = limpar(json.assuntos?.[m], 45)
+      if (g) out.assuntos[m] = g.replace(/[.]+$/, '')
     }
     return Object.keys(out).length > 1 ? out : null
   } catch (e) {

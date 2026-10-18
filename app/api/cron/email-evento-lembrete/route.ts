@@ -90,7 +90,8 @@ export async function GET(request: NextRequest) {
 
       // Uma vez por live, não por pessoa: os textos ficam guardados no evento.
       const textos = await garantirTextosEmail(ev)
-      const tema = janela.momento in (textos ?? {}) ? (textos as Record<string, string>)[janela.momento] : null
+      const tema = (textos as Record<string, string> | null)?.[janela.momento] ?? null
+      const gancho = (textos?.assuntos as Record<string, string> | undefined)?.[janela.momento] ?? null
       const confirmados = await destinatarios(supabase, ev.id)
       const lista: (Pessoa & { convite?: boolean })[] = [...confirmados]
       if (ev.lembrar_audiencia && (janela.momento === 'vespera' || janela.momento === 'hoje')) {
@@ -106,7 +107,7 @@ export async function GET(request: NextRequest) {
 
       for (const pessoa of lista) {
         if (Date.now() - inicio > ORCAMENTO_MS) break
-        const { assunto, html } = emailEvento(janela.momento, dadosDoEmail(ev as EventoParaEmail, pessoa.nome), { convite: pessoa.convite, tema })
+        const { assunto, html } = emailEvento(janela.momento, dadosDoEmail(ev as EventoParaEmail, pessoa.nome), { convite: pessoa.convite, tema, gancho })
         const r = await enviarEmailConvidado({
           para: pessoa.email,
           tipo: janela.tipo,
