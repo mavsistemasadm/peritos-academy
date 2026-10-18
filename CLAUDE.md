@@ -1023,6 +1023,11 @@ ligado) ou o editor do evento. Desligado, nada aparece e nada é convidado.
   no lugar do formulário, mais o botão "Ver as dúvidas recebidas"): mesmas
   actions e mesmo portão da tela do admin. As dúvidas vêm por action, nunca no
   HTML da página pública.
+- **Uma hora antes, quem conduz recebe o link** (sino e celular, tipo
+  `evento_conduzir`, `notificar_conducao_evento`), na passada `comecando` do
+  cron: na live de tira-dúvidas vai para `#duvida` e diz quantas esperam
+  resposta. Quem conduz = `criado_por`; sem ele (live do Jarvis), os super
+  admins ativos. Vale para toda live, não só a de dúvidas.
 
 ⚠️ Testado em produção como aluno logado (texto + imagem, nome com acento no
 anexo) e pelo Jarvis. A tela do admin não foi aberta por um admin no teste.

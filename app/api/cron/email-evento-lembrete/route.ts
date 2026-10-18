@@ -87,6 +87,13 @@ export async function GET(request: NextRequest) {
     for (const ev of eventos ?? []) {
       // `eventos.lembrete` é o interruptor que já existia na tela do produtor
       // e que até aqui não ligava nada. Agora liga isto.
+      // Quem conduz recebe o link da live (e das dúvidas) uma hora antes, no
+      // sino e no celular, para não ter que procurar. Antes do interruptor de
+      // lembrete: aquele é dos alunos, este é do apresentador.
+      if (janela.momento === 'comecando') {
+        await supabase.rpc('notificar_conducao_evento', { p_evento: ev.id })
+      }
+
       if (ev.lembrete === false) continue
 
       // Os grupos de WhatsApp primeiro: são poucas mensagens, e não podem

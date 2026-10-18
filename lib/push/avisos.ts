@@ -29,6 +29,8 @@ export const TITULO_DO_PUSH: Record<string, string> = {
   evento_hoje: 'A live é hoje',
   evento_comecando: 'A live começa em uma hora',
   evento_ao_vivo: 'Estamos ao vivo',
+  // Para quem conduz: o link da página da live (e das dúvidas) uma hora antes.
+  evento_conduzir: 'Sua live começa em uma hora',
 }
 
 export function vaiAoCelular(tipo: string | null | undefined): boolean {
