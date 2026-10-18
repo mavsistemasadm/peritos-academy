@@ -14,6 +14,8 @@
 //   matricular { email, cursoSlug, meses? } matrícula num curso (meses ausente = vitalício)
 //   anunciar   { eventoId }                 anúncio por email e sino
 //   criar_evento { titulo, quando, ... }     live nova, já publicada (18/10/2026)
+//   pendentes_gravacao                      lives que já acabaram, com YouTube e sem gravação
+//   gravacao { eventoId, url }              grava o link da gravação (só se ainda vazio)
 //
 // ⚠️ A matrícula NÃO cria conta: email sem conta volta `sem_conta`, como no
 // lote de /admin/acessos. Conta fantasma por erro de voz é para sempre.
@@ -113,6 +115,28 @@ export async function POST(request: NextRequest) {
     }).select('id, slug, inicia_em').single()
     if (error) return NextResponse.json({ ok: false, erro: error.message }, { status: 400 })
     return NextResponse.json({ ok: true, ...data, link: `${SITE_URL}/evento/${data.slug}` })
+  }
+
+  if (acao === 'pendentes_gravacao') {
+    const { data } = await sb.from('eventos')
+      .select('id, titulo, link_transmissao, inicia_em')
+      .is('gravacao_url', null)
+      .not('link_transmissao', 'is', null)
+      .lt('inicia_em', new Date(Date.now() - 3600_000).toISOString())
+      .gte('inicia_em', new Date(Date.now() - 14 * 86400_000).toISOString())
+    return NextResponse.json({ eventos: data ?? [] })
+  }
+
+  if (acao === 'gravacao') {
+    const url = String(corpo.url || '')
+    if (!/^https:\/\/www\.youtube\.com\/watch\?v=[\w-]{11}$/.test(url)) {
+      return NextResponse.json({ ok: false, erro: 'Só link de vídeo do YouTube.' }, { status: 400 })
+    }
+    // Só preenche o vazio: gravação posta à mão no admin nunca é trocada.
+    const { data, error } = await sb.from('eventos').update({ gravacao_url: url })
+      .eq('id', String(corpo.eventoId || '')).is('gravacao_url', null).select('id')
+    if (error) return NextResponse.json({ ok: false, erro: error.message }, { status: 400 })
+    return NextResponse.json({ ok: (data ?? []).length > 0 })
   }
 
   return NextResponse.json({ erro: `ação desconhecida: ${acao}` }, { status: 400 })
