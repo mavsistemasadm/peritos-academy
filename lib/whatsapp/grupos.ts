@@ -23,8 +23,10 @@ import { garantirTextosEmail } from '@/lib/evento/textos'
 
 export type MomentoGrupo = 'anuncio' | 'hoje' | 'ao_vivo'
 
-/** O número que publica: o "Nexus Pericial", o mesmo da Última Chamada. */
-const INSTANCIA_PADRAO = 'opera_b52f881e38bc_nexus_r3'
+/** O número que publica: o "Suporte do Nexus Pericial" (final 5528), admin
+ *  dos grupos da Academy desde 19/10/2026. O "Nexus Pericial" (o da Última
+ *  Chamada) não está nesses grupos. WHATSAPP_GRUPOS_INSTANCIA troca sem deploy. */
+const INSTANCIA_PADRAO = 'opera_b52f881e38bc_suporte'
 
 function evolution() {
   const base = process.env.EVOLUTION_API_URL?.replace(/\/+$/, '')
