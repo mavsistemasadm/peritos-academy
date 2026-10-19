@@ -1032,6 +1032,23 @@ ligado) ou o editor do evento. Desligado, nada aparece e nada é convidado.
 ⚠️ Testado em produção como aluno logado (texto + imagem, nome com acento no
 anexo) e pelo Jarvis. A tela do admin não foi aberta por um admin no teste.
 
+## O envelope dos e-mails — 2026-10-19
+
+**Regra permanente.** Todo e-mail da Academy monta com as peças de
+`lib/email/marca.ts` (`casca`, `abertura`, `p`, `destaque`, `resumo`, `botao`,
+`insignia`, `numeros`, `assinatura`): fundo branco, linha fina em degradê
+verde → ciano → lima, logo no centro, botão só com contorno, fonte
+arredondada. Mesma pegada do e-mail da MH Cálculos que o dono escolheu entre
+cinco modelos. Ajuste de visual se faz em `marca.ts`, uma vez, e vale para todos.
+
+Os TEXTOS continuam os aprovados (`docs/email-templates/`); só o envelope
+mudou. Os níveis deixaram de ter cores próprias: muda a insígnia e o texto.
+
+⚠️ O rodapé é o que vira link de descadastro: "Preferências de email ·
+Cancelar inscrição" (trocado por `enviar.ts`) e, nos e-mails de evento, "Não
+quero mais receber estes e-mails" (trocado por `enviarConvidado.ts`, via
+`casca({ descadastro })`). Mudar uma vírgula deixa o e-mail sem descadastro.
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários; `tour_visto_em` timestamptz nullable — ver seção Tour guiado; `migrado_de`/`migrado_em`/`boas_vindas_migrado_em` — aluno importado em lote, ver seção Migração de alunos da Ensinio)
 - `cursos` (com `restrito` — turma fechada, ver seção própria), `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)

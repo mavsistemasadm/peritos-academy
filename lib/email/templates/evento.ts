@@ -19,33 +19,19 @@
 // CALENDÁRIO (reserve o horário, avise quem precisa) e o da manhã fala do DIA
 // (é hoje, deixa o link à mão).
 //
-// ── O ESQUELETO É O DOS EMAILS DO NEXUS ──
+// ── O ENVELOPE ──
 //
-// Copiado de `docs/template-email-mh.html` e `template-email-acheumperito.html`
-// do projeto nexus-peritosacademy, que são a mesma estrutura em duas marcas.
-// O que muda por marca é só o degradê do cabeçalho, o nome, a assinatura e a
-// cor do destaque; aqui a marca é a Peritos Academy.
-//
-// O que vem de lá e NÃO é enfeite:
-//
-//  · **Tabelas, não divs.** Outlook renderiza com o motor do Word e ignora
-//    flex e grid. Layout em `<table role="presentation">` é o que faz o email
-//    chegar inteiro em quem lê no Outlook do escritório, que é metade dos
-//    peritos.
-//  · **Preheader.** A linha escondida no topo é o texto que a caixa de entrada
-//    mostra ao lado do assunto. Sem ela, o Gmail exibe o começo do HTML ou o
-//    "Olá, Fulano" — desperdiçando a segunda coisa mais lida do email.
-//  · **`background-color` junto do `background-image`.** Gradiente em email é
-//    ignorado por vários clientes; sem a cor sólida por baixo, o cabeçalho e o
-//    botão chegam transparentes, e o botão vira texto branco sobre branco.
-//  · **Estilo em cada tag.** Não existe `<style>` confiável em email; regra
-//    fora do atributo `style` é descartada por boa parte dos clientes.
+// O texto é o aprovado; o envelope é o de lib/email/marca.ts desde 19/10/2026,
+// o mesmo dos outros emails da Academy (era o esqueleto dos emails do Nexus).
 //
 // ⚠️ A frase "Não quero mais receber estes e-mails" no rodapé é substituída
-// por um link real em enviarEmailConvidado(). Mexer no texto quebra a
-// substituição em silêncio, e o email sai com um descadastro que não
-// descadastra.
+// por um link real em enviarEmailConvidado() (é ela que este email passa a
+// casca() em `descadastro`, no lugar da frase de enviarEmail()). Mexer no
+// texto quebra a substituição em silêncio, e o email sai com um descadastro
+// que não descadastra.
 // ══════════════════════════════════════════════════════════════════
+
+import { abertura, botao, casca, esc as escapar, p, resumo } from '@/lib/email/marca'
 
 export type DadosEmailEvento = {
   primeiroNome: string
@@ -165,15 +151,8 @@ function cortar(texto: string, max: number) {
   return texto.length <= max ? texto : texto.slice(0, max - 1).trimEnd() + '…'
 }
 
-function escapar(t: string) {
-  return t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-}
-
-// ── A marca, nas cores da Academy ───────────────────────────────
-const FONTE = 'Arial,Helvetica,sans-serif'
-const VERDE_ESCURO = '#0B5E4E'
-const VERDE = '#12A87F'
-const TEXTO = '#3F4A46'
+/** A frase que enviarEmailConvidado() troca pelo link de descadastro. */
+const FRASE_DESCADASTRO = 'Não quero mais receber estes e-mails'
 
 /**
  * `convite`: a pessoa recebe a véspera ou o "é hoje" sem ter reservado (a
@@ -232,124 +211,32 @@ export function emailEvento(
   if (convite) d = { ...d, url: `${d.url}?reservar=1` }
   const assunto = c.assunto(d)
 
-  const paragrafos = c.corpo(d).map(p =>
-    `<p style="margin:0 0 16px;font-family:${FONTE};font-size:16px;line-height:1.65;color:${TEXTO};">${p}</p>`,
-  ).join('\n          ')
+  const conteudo = [
+    abertura(escapar(c.etiqueta), escapar(d.titulo)),
+    p(`Olá, ${escapar(d.primeiroNome)},`),
+    ...c.corpo(d).map(t => p(t)),
+    // O encontro: quando é e quanto dura, o que a pessoa precisa reler.
+    resumo([
+      ['Quando', escapar(d.quando)],
+      ['Duração', escapar(d.duracao)],
+    ]),
+    blocoDuvidas(d, momento),
+    botao(c.botao, d.url),
+    d.linkCalendario && momento === 'confirmacao'
+      ? p(
+          `<a href="${d.linkCalendario}" style="color:#083952;text-decoration:underline;">Adicionar ao meu calendário</a>`,
+          'text-align:center;font-size:14px;margin:0 0 30px;',
+        )
+      : '',
+  ].filter(Boolean).join('\n')
 
-  const html = `<!DOCTYPE html>
-<html lang="pt-BR" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>${escapar(assunto)}</title>
-<!--[if mso]><style>table{border-collapse:collapse}h1,h2,p,a{font-family:Arial,sans-serif!important}</style><![endif]-->
-</head>
-<body style="margin:0;padding:0;background-color:#F4F5F2;">
-
-<!-- PREHEADER: o texto que a caixa de entrada mostra ao lado do assunto -->
-<div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:#F4F5F2;">
-  ${escapar(c.preheader(d))}
-</div>
-
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F4F5F2;">
-<tr><td align="center" style="padding:32px 16px;">
-
-  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:100%;">
-
-    <!-- ===== CABEÇALHO: DEGRADÊ DA MARCA (escuro → claro) ===== -->
-    <tr>
-      <td style="border-radius:14px 14px 0 0;background-color:${VERDE_ESCURO};background-image:linear-gradient(100deg,#083D33 0%,${VERDE_ESCURO} 45%,#1FA98A 100%);padding:30px 40px;" align="left">
-        <span style="font-family:${FONTE};font-size:22px;font-weight:bold;color:#FFFFFF;letter-spacing:.3px;">PERITOS ACADEMY</span>
-        <span style="font-family:${FONTE};font-size:12px;color:#C6EFE2;letter-spacing:.14em;text-transform:uppercase;display:block;margin-top:4px;">${escapar(c.etiqueta)}</span>
-      </td>
-    </tr>
-
-    <!-- ===== CORPO ===== -->
-    <tr>
-      <td style="background-color:#FFFFFF;padding:40px 40px 12px;" align="left">
-        <p style="margin:0 0 16px;font-family:${FONTE};font-size:16px;line-height:1.65;color:${TEXTO};">
-          Olá, ${escapar(d.primeiroNome)},
-        </p>
-        ${paragrafos}
-
-        <!-- O encontro, no bloco de destaque -->
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
-          <tr>
-            <td style="background-color:#EAFBF4;border-left:4px solid ${VERDE};border-radius:0 10px 10px 0;padding:18px 22px;">
-              <p style="margin:0 0 6px;font-family:${FONTE};font-size:17px;font-weight:bold;line-height:1.4;color:#0B4A3D;">${escapar(d.titulo)}</p>
-              <p style="margin:0;font-family:${FONTE};font-size:15px;line-height:1.6;color:#2F6357;">${escapar(d.quando)}</p>
-            </td>
-          </tr>
-        </table>
-        ${blocoDuvidas(d, momento)}
-      </td>
-    </tr>
-
-    <!-- ===== BOTÃO ===== -->
-    <tr>
-      <td style="background-color:#FFFFFF;padding:8px 40px 40px;" align="center">
-        <table role="presentation" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="border-radius:10px;background-color:${VERDE};background-image:linear-gradient(100deg,#0B6B55 0%,${VERDE} 100%);" align="center">
-              <a href="${d.url}" target="_blank" style="display:inline-block;padding:16px 42px;font-family:${FONTE};font-size:16px;font-weight:bold;color:#FFFFFF;text-decoration:none;border-radius:10px;">
-                ${escapar(c.botao)}
-              </a>
-            </td>
-          </tr>
-        </table>
-        ${d.linkCalendario && momento === 'confirmacao'
-          ? `<p style="margin:18px 0 0;font-family:${FONTE};font-size:13px;color:#8A938E;"><a href="${d.linkCalendario}" style="color:#0E8A68;text-decoration:underline;">Adicionar ao meu calendário</a></p>`
-          : ''}
-      </td>
-    </tr>
-
-    <!-- ===== FAIXA DO ENCONTRO =====
-         No template do Nexus esta faixa traz os números de autoridade. Num
-         email de evento, o que a pessoa precisa reler é quando é e quanto
-         dura, então a faixa carrega isso. -->
-    <tr>
-      <td style="background-color:#FAFAF8;border-top:1px solid #E4E6E1;padding:22px 40px;" align="center">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td width="40%" align="center" style="font-family:${FONTE};">
-              <span style="font-size:11px;color:#8A938E;letter-spacing:.1em;text-transform:uppercase;">Dia</span><br>
-              <span style="font-size:15px;font-weight:bold;color:#2F3D38;">${escapar(d.dia)}</span>
-            </td>
-            <td width="30%" align="center" style="font-family:${FONTE};border-left:1px solid #E4E6E1;border-right:1px solid #E4E6E1;">
-              <span style="font-size:11px;color:#8A938E;letter-spacing:.1em;text-transform:uppercase;">Horário</span><br>
-              <span style="font-size:15px;font-weight:bold;color:#2F3D38;">${escapar(d.horario)}</span>
-            </td>
-            <td width="30%" align="center" style="font-family:${FONTE};">
-              <span style="font-size:11px;color:#8A938E;letter-spacing:.1em;text-transform:uppercase;">Duração</span><br>
-              <span style="font-size:15px;font-weight:bold;color:#2F3D38;">${escapar(d.duracao)}</span>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-
-    <!-- ===== RODAPÉ ===== -->
-    <tr>
-      <td style="border-radius:0 0 14px 14px;background-color:#1B211E;padding:30px 40px;" align="center">
-        <p style="margin:0 0 8px;font-family:${FONTE};font-size:14px;font-weight:bold;color:#FFFFFF;">Peritos Academy</p>
-        <p style="margin:0 0 14px;font-family:${FONTE};font-size:12px;line-height:1.6;color:#A3ABA6;">
-          Do conhecimento à autoridade.<br>
-          A plataforma de formação do perito judicial · <a href="https://evolua.peritosacademy.com.br" style="color:#3FD3AC;text-decoration:none;">evolua.peritosacademy.com.br</a>
-        </p>
-        <p style="margin:0;font-family:${FONTE};font-size:11px;line-height:1.6;color:#767E79;">
-          Você recebe este e-mail porque se inscreveu neste encontro.<br>
-          Não quero mais receber estes e-mails
-        </p>
-      </td>
-    </tr>
-
-  </table>
-
-</td></tr>
-</table>
-</body>
-</html>`
+  const html = casca({
+    titulo: assunto,
+    preheader: c.preheader(d),
+    corpo: conteudo,
+    motivo: 'Você recebe este e-mail porque se inscreveu neste encontro.',
+    descadastro: FRASE_DESCADASTRO,
+  })
 
   return { assunto, html }
 }
@@ -362,13 +249,9 @@ export function emailEvento(
  */
 function blocoDuvidas(d: DadosEmailEvento, momento: MomentoEvento) {
   if (!d.duvidasUrl || momento === 'ao_vivo') return ''
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
-          <tr>
-            <td style="background-color:#F6F7F4;border:1px solid #E4E6E1;border-radius:10px;padding:18px 22px;">
-              <p style="margin:0 0 6px;font-family:${FONTE};font-size:15px;font-weight:bold;line-height:1.4;color:#1B211E;">Tem uma dúvida? Mande antes.</p>
-              <p style="margin:0 0 10px;font-family:${FONTE};font-size:14.5px;line-height:1.6;color:${TEXTO};">Escreva a sua pergunta e, se ajudar, anexe o documento ou um print (até 20 MB). Eu leio antes e <b>respondo ao vivo</b>.</p>
-              <a href="${d.duvidasUrl}" target="_blank" style="font-family:${FONTE};font-size:14.5px;font-weight:bold;color:#0E8A68;text-decoration:underline;">Mandar minha dúvida</a>
-            </td>
-          </tr>
-        </table>`
+  return p(
+    '<b>Tem uma dúvida? Mande antes.</b><br>'
+    + 'Escreva a sua pergunta e, se ajudar, anexe o documento ou um print (até 20 MB). Eu leio antes e <b>respondo ao vivo</b>.<br>'
+    + `<a href="${d.duvidasUrl}" target="_blank" style="color:#083952;text-decoration:underline;font-weight:700;">Mandar minha dúvida</a>`,
+  )
 }
