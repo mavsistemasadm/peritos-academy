@@ -134,7 +134,8 @@ export function casca(a: {
 <body style="margin:0;padding:0;background:#FFFFFF;">
 ${pre}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FFFFFF;"><tr><td align="center" style="padding:0 16px 36px;">
-<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:560px;max-width:100%;">
+<!--[if mso]><table role="presentation" width="560" cellpadding="0" cellspacing="0" align="center"><tr><td><![endif]-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;">
 <tr><td style="height:4px;line-height:4px;font-size:0;background-color:#1DC8A0;background-image:linear-gradient(90deg,#0e9e82 0%,#1DC8A0 35%,#36DCD1 65%,#DDF784 100%);">&nbsp;</td></tr>
 <tr><td align="center" style="padding:30px 0 6px;"><img src="${LOGO}" width="52" height="53" alt="Peritos Academy" style="display:block;border:0;"></td></tr>
 <tr><td align="center" style="padding:0 0 30px;font-family:${FONTE};font-size:13px;font-weight:700;letter-spacing:.08em;color:${COR.marinho};">PERITOS ACADEMY</td></tr>
@@ -145,7 +146,9 @@ ${a.corpo}
 <p style="margin:0 0 6px;font-family:${FONTE};font-size:12px;color:${COR.apagado};">Peritos Academy · A jornada completa da perícia judicial</p>
 <p style="margin:0;font-family:${FONTE};font-size:11px;line-height:1.6;color:#b4bac6;">${a.motivo}<br/>${a.descadastro ?? "Preferências de email · Cancelar inscrição"}</p>
 </td></tr>
-</table></td></tr></table>
+</table>
+<!--[if mso]></td></tr></table><![endif]-->
+</td></tr></table>
 </body>
 </html>`;
 }
