@@ -67,6 +67,8 @@ export type DadosPerfil = {
   mostrar_tel: boolean
   mostrar_email: boolean
   perfil_publico: boolean
+  /** Selo de Excelência (Formação Pericial concluída); null = ainda não. */
+  seloExcelenciaEm: string | null
   sons_conquista: boolean
   receberEmails: boolean
   foto_url: string | null
@@ -272,6 +274,7 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
     mostrar_tel: perfil.mostrar_tel ?? false,
     mostrar_email: perfil.mostrar_email ?? false,
     perfil_publico: perfil.perfil_publico ?? true,
+    seloExcelenciaEm: perfil.selo_excelencia_em ?? null,
     sons_conquista: perfil.sons_conquista ?? true,
     receberEmails: emailPref?.receber_emails ?? true,
     foto_url: perfil.foto_url ?? null,

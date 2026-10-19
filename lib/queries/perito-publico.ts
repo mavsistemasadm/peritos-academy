@@ -38,6 +38,8 @@ export type DadosPeritoPublico = {
     nivel: number
     moedas: number
     membro_desde: string
+    /** Selo de Excelência: Formação Pericial de Alta Performance concluída. */
+    seloExcelenciaEm: string | null
   }
   stats: {
     cursos_concluidos: number
@@ -214,6 +216,7 @@ export async function carregarPeritoPublico(slug: string): Promise<DadosPeritoPu
       nivel: nivelReal,
       moedas: perfil.moedas ?? 0,
       membro_desde,
+      seloExcelenciaEm: perfil.selo_excelencia_em ?? null,
     },
     stats: {
       cursos_concluidos,

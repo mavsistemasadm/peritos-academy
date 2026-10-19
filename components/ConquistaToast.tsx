@@ -3,6 +3,15 @@
 // (não Realtime, ver CLAUDE.md) na tabela notificacoes, filtrando celebracao=true.
 // Fila com prioridade quando várias conquistas chegam juntas; som sintetizado
 // (lib/sons) por trás de cada toast, nunca sobreposto.
+//
+// O Selo de Excelência é a exceção, e a maior comemoração da plataforma
+// (components/ComemoracaoSelo.tsx): prioridade acima de tudo, sem fechar
+// sozinho, e o ÚNICO tipo que não depende de a notificação nascer com a página
+// aberta. O polling só enxerga o que foi criado depois do carregamento; o selo
+// pode ser concedido com a pessoa fora, dias antes. Por isso o layout passa
+// `seloPendente` (perfis.selo_excelencia_em preenchido e selo_comemorado_em
+// vazio) e a comemoração abre na próxima visita. Quem marca "vista" é
+// abrirComemoracaoSelo(), no instante em que ela abre.
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
@@ -11,9 +20,10 @@ import { criarClienteBrowser } from '@/lib/supabase/client'
 import { tocarSom, type TipoSom } from '@/lib/sons'
 import type { Notificacao } from '@/lib/queries/avisos'
 import { Trofeu, Certificado, FogoStreak, XP, SeloNivel } from '@/components/Emblemas'
+import ComemoracaoSelo from '@/components/ComemoracaoSelo'
 
 const PRIORIDADE: Record<string, number> = {
-  nivel_up: 0, curso_concluido: 1, avaliacao_aprovada: 2, streak: 3, primeira_aula: 4,
+  selo_excelencia: -1, nivel_up: 0, curso_concluido: 1, avaliacao_aprovada: 2, streak: 3, primeira_aula: 4,
 }
 
 const NIVEL_IMG: Record<number, string> = {
@@ -36,7 +46,7 @@ const DURACAO_MS: Record<string, number> = {
 function num(v: unknown): number | undefined { return typeof v === 'number' ? v : undefined }
 function str(v: unknown): string | undefined { return typeof v === 'string' ? v : undefined }
 
-export default function ConquistaToast({ logado, sonsConquista }: { logado: boolean; sonsConquista: boolean }) {
+export default function ConquistaToast({ logado, sonsConquista, seloPendente = false }: { logado: boolean; sonsConquista: boolean; seloPendente?: boolean }) {
   const [atual, setAtual] = useState<Notificacao | null>(null)
   const [saindo, setSaindo] = useState(false)
   // Sugestão do ecossistema: entra como toast secundário DEPOIS da
@@ -50,13 +60,15 @@ export default function ConquistaToast({ logado, sonsConquista }: { logado: bool
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const fecharTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const emAndamentoRef = useRef(false)
+  // O selo abre uma vez por montagem, venha da notificação ou do pendente.
+  const seloAbertoRef = useRef(false)
   const sonsRef = useRef(sonsConquista)
   useEffect(() => { sonsRef.current = sonsConquista }, [sonsConquista])
 
   // Uma celebração apareceu: agenda a sugestão do ecossistema e guarda o
   // curso como contexto (quando a notificação trouxer essa informação).
   useEffect(() => {
-    if (!atual) return
+    if (!atual || atual.tipo === 'selo_excelencia') return
     setCtaContexto((antes) => antes ?? str(atual.dados?.curso_slug) ?? null)
     setCtaLigado(true)
   }, [atual])
@@ -80,6 +92,17 @@ export default function ConquistaToast({ logado, sonsConquista }: { logado: bool
     filaRef.current.sort((a, b) => (PRIORIDADE[a.tipo] ?? 99) - (PRIORIDADE[b.tipo] ?? 99))
     const proxima = filaRef.current.shift()
     if (!proxima) return
+
+    if (proxima.tipo === 'selo_excelencia') {
+      if (seloAbertoRef.current) { avancar(); return }
+      seloAbertoRef.current = true
+      emAndamentoRef.current = true
+      // Som e dados ficam com a própria comemoração (que só toca depois de
+      // confirmar o selo no servidor). Não fecha sozinha.
+      setAtual(proxima)
+      setSaindo(false)
+      return
+    }
     emAndamentoRef.current = true
 
     // toast de curso_concluido espera o popup de certificado (se estiver aberto) fechar primeiro
@@ -97,6 +120,17 @@ export default function ConquistaToast({ logado, sonsConquista }: { logado: bool
 
     fecharTimerRef.current = setTimeout(fecharAtual, DURACAO_MS[proxima.tipo] ?? 4000)
   }
+
+  // Selo concedido com a pessoa fora (há qualquer tempo): abre agora.
+  useEffect(() => {
+    if (!logado || !seloPendente) return
+    filaRef.current.push({
+      id: 'selo-pendente', tipo: 'selo_excelencia', prefixo: '', destaque: 'Selo de Excelência', sufixo: '',
+      link_url: '/perfil', emblema: 'selo_excelencia', dados: {}, celebracao: true, lida: false, criado_em: new Date().toISOString(),
+    })
+    avancar()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logado, seloPendente])
 
   // polling — pausa quando a aba está oculta, retoma (com checagem imediata) ao voltar o foco
   useEffect(() => {
@@ -153,6 +187,15 @@ export default function ConquistaToast({ logado, sonsConquista }: { logado: bool
   ) : null
 
   if (!atual) return cta
+
+  if (atual.tipo === 'selo_excelencia') {
+    return (
+      <ComemoracaoSelo
+        som={sonsRef.current}
+        onFechar={() => { setAtual(null); setSaindo(false); emAndamentoRef.current = false; avancar() }}
+      />
+    )
+  }
 
   if (atual.tipo === 'nivel_up') {
     return (

@@ -9,14 +9,9 @@ import type { DadosJornada, Marco, PainelTrilha, Territorio } from '@/lib/querie
 import NavPlataforma from '@/components/NavPlataforma'
 import type { DadosNav } from '@/lib/queries/nav'
 import { IconePlay, IconeCheck, IconeShield, IconeFileText } from '@/components/Icones'
-import { SeloExcelencia } from '@/components/Emblemas'
+import { SELO_IMG_P } from '@/lib/selo'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
-const fmtDataLonga = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: 'long', year: 'numeric' })
-function formatarDataSelo(iso: string | null): string | null {
-  if (!iso) return null
-  return fmtDataLonga.format(new Date(iso))
-}
 
 function Anel({ pct, size, largura, children }: { pct: number; size: number; largura: number; children: React.ReactNode }) {
   const r = (size - largura) / 2
@@ -174,7 +169,7 @@ export default function JornadaContent({ dados, nav }: { dados: DadosJornada; na
     return () => io.disconnect()
   }, [])
 
-  const dataSelo = formatarDataSelo(d.seloConquistadoEm)
+  const dataSeloCurta = d.seloConquistadoEm ? new Date(d.seloConquistadoEm).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' }) : null
 
   return (
     <div ref={raiz} className="pagina-jornada">
@@ -205,19 +200,18 @@ export default function JornadaContent({ dados, nav }: { dados: DadosJornada; na
         <div className="palco">
           {/* ============ SELO CONQUISTADO ============ */}
           {d.seloConquistado && (
-            <div className="selo-card reveal">
+            <div className="selo-card selo-novo reveal">
               <div className="brilho" aria-hidden="true"></div>
-              <div className="selo-icone"><SeloExcelencia size={34} /></div>
+              <div className="selo-arte"><img src={SELO_IMG_P} alt="Selo de Excelência" width={72} height={72} /></div>
               <div className="selo-info">
-                <span className="selo-tag">Selo de Excelência conquistado</span>
+                <span className="selo-tag">Selo de Excelência conquistado{dataSeloCurta ? ` em ${dataSeloCurta}` : ''}</span>
                 <h3>{d.trilhaPrincipalNome ?? 'Formação Pericial de Alta Performance'} concluída</h3>
-                <p>Formação completa{dataSelo ? ` · Concluída em ${dataSelo}` : ''} · Insígnia permanente no seu perfil</p>
+                <p>Insígnia permanente no seu perfil. A base está feita: agora escolha onde a sua autoridade vai crescer.</p>
               </div>
-              {d.trilhaPrincipalSlug && (
-                <div className="selo-acao">
-                  <a href={`/jornada/${d.trilhaPrincipalSlug}`}>Rever cursos da formação</a>
-                </div>
-              )}
+              <div className="selo-acao">
+                <a className="prim" href="#territorios">Ver territórios de especialização</a>
+                {d.trilhaPrincipalSlug && <a href={`/jornada/${d.trilhaPrincipalSlug}`}>Rever a formação</a>}
+              </div>
             </div>
           )}
 

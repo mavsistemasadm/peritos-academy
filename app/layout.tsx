@@ -40,7 +40,7 @@ export default async function RootLayout({
       <body className="min-h-screen">
         {children}
         <AvisosGlobais dados={avisos} />
-        <ConquistaToast logado={avisos.logado} sonsConquista={avisos.sonsConquista} />
+        <ConquistaToast logado={avisos.logado} sonsConquista={avisos.sonsConquista} seloPendente={avisos.seloPendente} />
         {config.textoRodape && <footer className="rodape-global">{config.textoRodape}</footer>}
       </body>
     </html>

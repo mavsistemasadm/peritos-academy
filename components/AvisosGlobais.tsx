@@ -15,7 +15,7 @@ import {
 } from '@/app/avisos/actions'
 import type { DadosAvisos, Notificacao } from '@/lib/queries/avisos'
 import { IconeBell, IconeClose, IconeMegaphone, IconeMessageCircle, IconeCalendar, IconeMap, IconeCheck, IconeSend, IconeStar } from '@/components/Icones'
-import { Trofeu, Certificado, FogoStreak, XP, SeloNivel } from '@/components/Emblemas'
+import { Trofeu, Certificado, FogoStreak, XP, SeloNivel, SeloExcelencia } from '@/components/Emblemas'
 
 const fmtData = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo',
@@ -61,6 +61,8 @@ function iconeNotificacao(n: Notificacao) {
     case 'fogo_streak':
     case 'streak':
       return <FogoStreak variante="mono" size={14} />
+    case 'selo_excelencia':
+      return <SeloExcelencia variante="mono" size={14} />
     case 'xp':
     case 'primeira_aula':
       return <XP variante="mono" size={14} />

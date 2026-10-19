@@ -7006,3 +7006,95 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 .pagina-evento .ev-painel-texto{margin:0 0 12px;font-size:15.5px;line-height:1.6;color:var(--creme);white-space:pre-wrap;word-break:break-word}
 .pagina-evento .ev-painel-acoes{display:flex;flex-wrap:wrap;gap:8px}
 .pagina-evento .ev-painel-acoes .btn{font-size:13px}
+
+/* ============ COMEMORAÇÃO DO SELO DE EXCELÊNCIA (components/ComemoracaoSelo.tsx) ============ */
+/* Réplica do protótipo aprovado em 19/10/2026. Montado no layout raiz, por isso
+   a classe raiz é o próprio overlay. Keyframes com sufixo Selo. */
+.comemoracao-selo{position:fixed;inset:0;z-index:10050;background:#000;color:#F1F2DF;font-family:inherit;overflow:hidden;animation:entraSelo .5s ease both}
+.comemoracao-selo.saindo{animation:saiSelo .45s ease forwards}
+.comemoracao-selo .cena{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.comemoracao-selo .aurora{position:absolute;inset:-20%;background:conic-gradient(from 0deg at 50% 45%,rgba(32,217,166,0),rgba(32,217,166,.35),rgba(54,220,209,.15),rgba(221,247,132,.28),rgba(32,217,166,0));filter:blur(90px);opacity:0}
+.comemoracao-selo .go .aurora{animation:auGiraSelo 14s linear infinite,auEntraSelo 2.4s ease .4s both}
+.comemoracao-selo .hero{position:relative;width:min(78vh,92vw);aspect-ratio:1/1;border-radius:50%;overflow:hidden;opacity:0;-webkit-mask:radial-gradient(circle at 50% 50%,#000 52%,transparent 71%);mask:radial-gradient(circle at 50% 50%,#000 52%,transparent 71%)}
+.comemoracao-selo .hero img{width:100%;height:100%;object-fit:cover;display:block}
+.comemoracao-selo .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.75) 48%,rgba(221,247,132,.4) 52%,transparent 68%);background-size:300% 100%;mix-blend-mode:screen;opacity:0}
+.comemoracao-selo .go .hero{animation:heroRevelaSelo 2.6s cubic-bezier(.16,.85,.2,1) .2s both,heroFlutuaSelo 6s ease-in-out 2.8s infinite}
+.comemoracao-selo .go .hero::after{animation:heroBrilhoSelo 1.6s ease-in-out 2.1s both}
+.comemoracao-selo .flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(241,242,223,.95),rgba(32,217,166,.4) 25%,transparent 55%);opacity:0;pointer-events:none}
+.comemoracao-selo .go .flash{animation:flashSelo 1.1s ease-out 1.9s both}
+.comemoracao-selo canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.comemoracao-selo .txt{position:absolute;left:0;right:0;bottom:7vh;text-align:center;padding:0 16px}
+.comemoracao-selo .sobre{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:#DDF784;opacity:0}
+.comemoracao-selo .titulo{font-size:clamp(34px,6vw,68px);font-weight:900;letter-spacing:-.04em;line-height:1;margin:12px 0;opacity:0;background:linear-gradient(90deg,#fff 0%,#DDF784 45%,#36DCD1 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 30px rgba(32,217,166,.35))}
+.comemoracao-selo .frase{font-size:clamp(15px,1.6vw,19px);color:rgba(241,242,223,.78);opacity:0;margin:0 0 18px}
+.comemoracao-selo .nums{display:flex;justify-content:center;gap:34px;opacity:0;margin-bottom:22px}
+.comemoracao-selo .nums b{display:block;font-size:30px;font-weight:800;color:#F1F2DF}
+.comemoracao-selo .nums small{color:#989E99;font-size:12.5px}
+.comemoracao-selo .bts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;opacity:0}
+.comemoracao-selo .bt{border:0;font:inherit;font-weight:800;font-size:15px;padding:15px 26px;border-radius:999px;cursor:pointer;text-decoration:none;display:inline-block}
+.comemoracao-selo .bt.p{background:linear-gradient(90deg,#20D9A6,#36DCD1,#DDF784);color:#04120d;box-shadow:0 10px 40px rgba(32,217,166,.35)}
+.comemoracao-selo .bt.s{background:rgba(241,242,223,.06);color:#F1F2DF;border:1px solid rgba(241,242,223,.2)}
+.comemoracao-selo .bt:focus-visible,.comemoracao-selo .fechar:focus-visible{outline:2px solid #DDF784;outline-offset:3px}
+.comemoracao-selo .go .sobre{animation:sobeSelo .8s ease 2.5s both}
+.comemoracao-selo .go .titulo{animation:tituloSelo 1s cubic-bezier(.2,.9,.2,1.1) 2.7s both}
+.comemoracao-selo .go .frase{animation:sobeSelo .8s ease 3.15s both}
+.comemoracao-selo .go .nums{animation:sobeSelo .8s ease 3.4s both}
+.comemoracao-selo .go .bts{animation:sobeSelo .8s ease 3.7s both}
+.comemoracao-selo .fechar{position:absolute;top:16px;right:16px;z-index:2;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(241,242,223,.08);color:#F1F2DF;border:1px solid rgba(241,242,223,.18);cursor:pointer;backdrop-filter:blur(8px)}
+.comemoracao-selo .fechar:hover{background:rgba(241,242,223,.16)}
+@keyframes entraSelo{from{opacity:0}to{opacity:1}}
+@keyframes saiSelo{to{opacity:0}}
+@keyframes auGiraSelo{to{transform:rotate(360deg)}}
+@keyframes auEntraSelo{from{opacity:0}to{opacity:1}}
+@keyframes heroRevelaSelo{0%{opacity:0;transform:scale(1.6);filter:blur(24px) brightness(.2)}55%{opacity:1;filter:blur(2px) brightness(1.4)}100%{opacity:1;transform:scale(1) translateY(-9vh);filter:none}}
+@keyframes heroFlutuaSelo{0%,100%{transform:translateY(-9vh)}50%{transform:translateY(-10.5vh)}}
+@keyframes heroBrilhoSelo{0%{opacity:1;background-position:120% 0}100%{opacity:1;background-position:-40% 0}}
+@keyframes flashSelo{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
+@keyframes sobeSelo{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes tituloSelo{0%{opacity:0;transform:scale(.85);letter-spacing:.1em;filter:blur(8px)}100%{opacity:1;transform:none;letter-spacing:-.04em;filter:none}}
+@media(max-width:700px){
+  .comemoracao-selo .hero{width:86vw}
+  .comemoracao-selo .nums{gap:22px}
+  .comemoracao-selo .nums b{font-size:24px}
+  .comemoracao-selo .txt{bottom:4vh}
+  .comemoracao-selo .bt{font-size:14px;padding:13px 20px}
+}
+@media(max-height:640px){.comemoracao-selo .hero{width:min(60vh,86vw)}}
+@media (prefers-reduced-motion:reduce){
+  .comemoracao-selo .go *,.comemoracao-selo .go *::after{animation-duration:.01s!important;animation-delay:0s!important;animation-iteration-count:1!important}
+}
+
+/* ---------- Selo de Excelência no /perfil (topo) ---------- */
+.pagina-perfil .selo-destaque{position:relative;overflow:hidden;display:flex;align-items:center;gap:var(--s-4);flex-wrap:wrap;margin-top:var(--s-5);max-width:760px;padding:var(--s-4) var(--s-5);border-radius:var(--r-card);border:1px solid rgba(32,217,166,.35);scroll-margin-top:96px;
+  background:radial-gradient(ellipse at 10% 50%,rgba(32,217,166,.18),transparent 50%),radial-gradient(ellipse at 90% 10%,rgba(221,247,132,.10),transparent 55%),linear-gradient(155deg,rgba(10,30,24,.85),rgba(7,9,8,.92))}
+.pagina-perfil .selo-destaque-brilho{position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 40%,rgba(221,247,132,.10) 50%,transparent 60%);background-size:250% 100%;animation:seloBrilhaPerf 6s ease-in-out infinite}
+@keyframes seloBrilhaPerf{0%,100%{background-position:130% 0}50%{background-position:-30% 0}}
+.pagina-perfil .selo-destaque-img{width:84px;height:84px;border-radius:50%;flex-shrink:0;position:relative;box-shadow:0 0 34px rgba(32,217,166,.35)}
+.pagina-perfil .selo-destaque-info{flex:1;min-width:200px;position:relative}
+.pagina-perfil .selo-destaque-tag{font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;background:linear-gradient(90deg,var(--verde),var(--ciano),var(--lima));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pagina-perfil .selo-destaque-info h2{font-size:19px;font-weight:780;letter-spacing:-.015em;margin:6px 0 4px;color:var(--creme)}
+.pagina-perfil .selo-destaque-info p{font-size:13px;color:var(--cinza-claro);margin:0}
+.pagina-perfil .selo-destaque-acao{position:relative;flex-shrink:0}
+@media(prefers-reduced-motion:reduce){.pagina-perfil .selo-destaque-brilho{animation:none}}
+
+/* ---------- Selo de Excelência na Jornada (arte nova + brilho periódico) ---------- */
+.pagina-jornada .selo-card.selo-novo{border-color:rgba(32,217,166,.38);
+  background:radial-gradient(ellipse at 12% 50%,rgba(32,217,166,.18),transparent 45%),radial-gradient(ellipse at 90% 20%,rgba(221,247,132,.08),transparent 50%),linear-gradient(155deg,rgba(10,30,24,.85),rgba(7,9,8,.92))}
+.pagina-jornada .selo-card.selo-novo::before{background:linear-gradient(90deg,var(--verde),var(--ciano),var(--lima))}
+.pagina-jornada .selo-card.selo-novo .brilho{background:linear-gradient(105deg,transparent 40%,rgba(221,247,132,.12) 50%,transparent 60%);background-size:250% 100%}
+.pagina-jornada .selo-arte{width:72px;height:72px;flex-shrink:0;position:relative;z-index:1;border-radius:50%;overflow:hidden;box-shadow:0 0 30px rgba(32,217,166,.35)}
+.pagina-jornada .selo-arte img{width:100%;height:100%;display:block}
+.pagina-jornada .selo-arte::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);background-size:300% 100%;background-position:130% 0;mix-blend-mode:screen;animation:seloReluzJor 7s ease-in-out infinite}
+@keyframes seloReluzJor{0%,70%{background-position:130% 0}85%,100%{background-position:-40% 0}}
+.pagina-jornada .selo-card.selo-novo .selo-tag{background:linear-gradient(90deg,var(--verde),var(--ciano),var(--lima));-webkit-background-clip:text;background-clip:text;color:transparent;font-size:10px}
+.pagina-jornada .selo-card.selo-novo .selo-info h3{color:var(--creme)}
+.pagina-jornada .selo-card.selo-novo .selo-acao{display:flex;gap:8px;flex-wrap:wrap}
+.pagina-jornada .selo-card.selo-novo .selo-acao a{background:none;-webkit-background-clip:initial;background-clip:initial;color:var(--creme);border-color:rgba(32,217,166,.4)}
+.pagina-jornada .selo-card.selo-novo .selo-acao a.prim{background:linear-gradient(90deg,var(--verde),var(--ciano),var(--lima));color:#04120d;border-color:transparent}
+@media(prefers-reduced-motion:reduce){.pagina-jornada .selo-arte::after{animation:none}}
+
+/* ---------- Selo de Excelência no perfil público ---------- */
+.pagina-perito-pub .pp-selo-exc{display:inline-flex;align-items:center;gap:10px;margin:2px 0 10px;padding:6px 14px 6px 6px;border-radius:var(--r-pill);border:1px solid rgba(32,217,166,.38);background:linear-gradient(90deg,rgba(32,217,166,.12),rgba(221,247,132,.05))}
+.pagina-perito-pub .pp-selo-exc img{width:44px;height:44px;border-radius:50%;flex-shrink:0;box-shadow:0 0 18px rgba(32,217,166,.35)}
+.pagina-perito-pub .pp-selo-exc span{display:flex;flex-direction:column;font-size:12px;line-height:1.3;color:var(--cinza-claro)}
+.pagina-perito-pub .pp-selo-exc b{font-size:13px;font-weight:800;background:linear-gradient(90deg,var(--verde),var(--ciano),var(--lima));-webkit-background-clip:text;background-clip:text;color:transparent}

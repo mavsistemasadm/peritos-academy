@@ -10,8 +10,9 @@ import { tocarAplausoCurso } from './curso'
 import { tocarWhooshStreak } from './streak'
 import { tocarNotaPrimeiraAula } from './primeiraAula'
 import { tocarBaqueCarimbo } from './carimbo'
+import { tocarFanfarraSelo } from './selo'
 
-export type TipoSom = 'nivel_up' | 'avaliacao_aprovada' | 'curso_concluido' | 'streak' | 'primeira_aula' | 'carimbo'
+export type TipoSom = 'nivel_up' | 'avaliacao_aprovada' | 'curso_concluido' | 'streak' | 'primeira_aula' | 'carimbo' | 'selo_excelencia'
 
 const VOLUME_MESTRE = 0.4
 
@@ -45,6 +46,8 @@ function obterContexto(): { ctx: AudioContext; master: GainNode } | null {
 /** Toca o som de um tipo de conquista. Falha sempre silenciosa — nunca lança, nunca bloqueia o toast visual. */
 export function tocarSom(tipo: TipoSom) {
   try {
+    // O selo toca arquivo (HTMLAudioElement), não síntese: ver lib/sons/selo.ts.
+    if (tipo === 'selo_excelencia') { tocarFanfarraSelo(); return }
     const audio = obterContexto()
     if (!audio) return
     if (audio.ctx.state === 'suspended') audio.ctx.resume().catch(() => {})

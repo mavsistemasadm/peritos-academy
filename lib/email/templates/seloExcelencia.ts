@@ -3,6 +3,7 @@
 // Performance concluída. Sai junto da comemoração de tela cheia, assinado pelo
 // Marlos. Texto aprovado pelo dono em 19/10/2026; envelope de lib/email/marca.ts.
 import { SITE_URL } from "@/lib/site";
+import { SELO_IMG } from "@/lib/selo";
 import { abertura, assinatura, botao, casca, destaque, insignia, numeros, p } from "@/lib/email/marca";
 
 export type DadosSeloExcelencia = {
@@ -19,11 +20,11 @@ export function emailSeloExcelencia(d: DadosSeloExcelencia): { assunto: string; 
   const corpo = [
     abertura(`Parabéns, ${d.primeiroNome}`, "Você conquistou o<br>Selo de Excelência."),
     insignia({
-      img: `${SITE_URL}/selo/selo-excelencia.png`,
+      img: `${SITE_URL}${SELO_IMG}`,
       rotulo: "Formação concluída",
       nome: "Selo de Excelência",
       linha: "Formação Pericial de Alta Performance",
-      tamanho: 150,
+      tamanho: 160,
     }),
     p(`${d.primeiroNome}, você acabou de fazer algo que <strong>pouquíssimos peritos fazem</strong>: concluiu a Formação Pericial de Alta Performance inteira, da decisão de ser perito até a entrada no mercado.`),
     numeros([

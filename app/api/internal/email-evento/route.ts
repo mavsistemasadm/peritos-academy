@@ -13,6 +13,8 @@ import { emailNivelUp } from "@/lib/email/templates/nivelUp";
 import { emailCertificado } from "@/lib/email/templates/certificado";
 import { emailCartaPessoal } from "@/lib/email/templates/cartaPessoal";
 import { emailCursoConcluido } from "@/lib/email/templates/cursoConcluido";
+import { emailSeloExcelencia } from "@/lib/email/templates/seloExcelencia";
+import { perfilPublicoUrl, primeiroNomeDe } from "@/lib/selo";
 
 function primeiroNome(nome: string): string {
   return nome.trim().split(/\s+/)[0] || nome;
@@ -237,6 +239,36 @@ export async function POST(request: NextRequest) {
         usuarioId,
         tipo: "curso_concluido" as TipoEmail,
         refId: cursoId,
+        assunto,
+        html,
+        remetente: "pessoal",
+      });
+      return NextResponse.json(resultado);
+    }
+
+    // Selo de Excelência: disparado por conceder_selo_excelencia_interno, que
+    // só chega aqui uma vez (retorna antes se o selo já existe). O dedupe de
+    // enviarEmail (tipo + usuário, sem ref_id) segura uma segunda chamada.
+    if (tipo === "selo_excelencia") {
+      const { data: p } = await supabase
+        .from("perfis")
+        .select("slug, perfil_publico, selo_excelencia_em")
+        .eq("id", usuarioId)
+        .maybeSingle();
+      if (!p?.selo_excelencia_em) return NextResponse.json({ ok: false, motivo: "sem selo" });
+
+      const { data: numerosRaw } = await supabase.rpc("formacao_numeros");
+      const numeros = (numerosRaw ?? {}) as { cursos?: number; aulas?: number; horas?: number };
+      const { assunto, html } = emailSeloExcelencia({
+        primeiroNome: primeiroNomeDe(perfil.nome),
+        cursos: numeros.cursos ?? 0,
+        aulas: numeros.aulas ?? 0,
+        horas: numeros.horas ?? 0,
+        perfilPublicoUrl: perfilPublicoUrl(p.slug, p.perfil_publico),
+      });
+      const resultado = await enviarEmail({
+        usuarioId,
+        tipo: "selo_excelencia" as TipoEmail,
         assunto,
         html,
         remetente: "pessoal",

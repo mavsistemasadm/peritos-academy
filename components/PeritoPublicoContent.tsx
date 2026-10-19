@@ -6,6 +6,7 @@ import { useState } from 'react'
 import type { DadosPeritoPublico } from '@/lib/queries/perito-publico'
 import { IconeMapPin, IconeCalendar, IconeMail, IconePhone, IconeCheck, IconeClipboard } from '@/components/Icones'
 import { Certificado, XP, SeloNivel } from '@/components/Emblemas'
+import { SELO_IMG_P, formatarDataSelo } from '@/lib/selo'
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR')
 
@@ -129,6 +130,12 @@ export default function PeritoPublicoContent({ dados, url }: { dados: DadosPerit
               </div>
               <div className="pp-hero-dados">
                 <h1>{p.nome}</h1>
+                {p.seloExcelenciaEm && (
+                  <div className="pp-selo-exc" title={`Conquistado em ${formatarDataSelo(p.seloExcelenciaEm)}`}>
+                    <img src={SELO_IMG_P} alt="Selo de Excelência" width={44} height={44} />
+                    <span><b>Selo de Excelência</b>Formação Pericial de Alta Performance concluída</span>
+                  </div>
+                )}
                 <p className="pp-bio">{p.bio}</p>
                 <div className="pp-meta">
                   {p.cidade && <span><IconeMapPin size={13} /> {p.cidade}{p.estado ? `, ${p.estado}` : ''}</span>}

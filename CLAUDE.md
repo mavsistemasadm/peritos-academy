@@ -1049,6 +1049,64 @@ Cancelar inscrição" (trocado por `enviar.ts`) e, nos e-mails de evento, "Não
 quero mais receber estes e-mails" (trocado por `enviarConvidado.ts`, via
 `casca({ descadastro })`). Mudar uma vírgula deixa o e-mail sem descadastro.
 
+## O Selo de Excelência — 2026-10-19
+
+**Regra permanente.** O Selo de Excelência (Formação Pericial de Alta
+Performance concluída) é a **maior comemoração da plataforma**, acima da subida
+de nível. Concessão única: `conceder_selo_excelencia_interno(usuario)`, chamada
+por `gam_verificar_progresso_curso` quando `trilha_completa` vira verdade, ou à
+mão (`select conceder_selo_excelencia_interno('<id>')`). Ela retorna antes se o
+selo já existe, então tudo abaixo acontece **uma vez só**.
+
+- **A concessão faz quatro coisas:** grava `perfis.selo_excelencia_em` (e zera
+  `selo_comemorado_em`), cria a insígnia em `perfil_insignias`, chama
+  `notificar(..., 'selo_excelencia', celebracao=true)` e dispara o email pelo
+  `net.http_post` para `/api/internal/email-evento` (tipo `selo_excelencia`).
+- ⚠️ **`selo_excelencia_em` é protegido por trigger** (`trg_proteger_selo_excelencia`):
+  a policy de update de `perfis` é por linha e o selo aparece no perfil público.
+  Só grava com `set_config('app.selo_write','on',true)`, que só a concessão seta.
+
+### A comemoração abre na próxima visita, não importa quando
+O `ConquistaToast` só enxerga notificação criada **depois** de a página abrir.
+O selo pode ser concedido com a pessoa fora (à mão, dias antes), e ela nunca
+veria a festa. Por isso o "visto" mora no banco: **`perfis.selo_comemorado_em`**.
+O layout calcula `seloPendente` (selo preenchido e comemoração vazia) e o
+ConquistaToast enfileira o selo ao montar. Quem marca "visto" é
+`abrirComemoracaoSelo()` (`app/actions.ts`), no instante em que a tela abre, e
+ela devolve os números. Os outros tipos de celebração não mudaram.
+
+- Prioridade -1 (acima de `nivel_up`), não fecha sozinha (botão X e ESC), sem a
+  sugestão do Nexus por cima. `components/ComemoracaoSelo.tsx` + CSS
+  `.comemoracao-selo` (keyframes com sufixo `Selo`), réplica do protótipo
+  aprovado. `prefers-reduced-motion` desliga canvas e animação.
+- Números: `formacao_numeros()` (cursos, aulas e horas de **todos** os cursos da
+  trilha principal), a mesma conta para tela e email. Em 19/10/2026: 10 · 91 · 18h.
+- Primeiro nome por `primeiroNomeDe()` (`lib/selo`): pula prefixo com ponto e
+  desfaz caixa alta ("ADM. CRISTIAN" vira "Cristian").
+
+### Email
+`lib/email/templates/seloExcelencia.ts`, remetente pessoal. Em `enviar.ts` o
+`selo_excelencia` é o **primeiro** da lista de prioridade: nada no mesmo dia o
+barra. Ele nasce junto do `curso_concluido` do último curso, e é esse que cede.
+Dedupe por tipo + usuário (sem `ref_id`).
+
+### Onde o selo aparece
+`/perfil` no topo (`#selo-excelencia`, com data e botão do LinkedIn),
+`/perito/[slug]` ao lado do nome, Jornada no card de selo (arte com brilho
+periódico e link para os territórios), sino com `SeloExcelencia` mono.
+LinkedIn: `share-offsite/?url=<perfil público>`; sem perfil público, o botão
+pede para torná-lo público (o selo mora lá, compartilhar `/perfil` não abre
+para ninguém).
+
+### Arte e som
+`public/selo/selo-excelencia.png` (600, círculo transparente, email),
+`selo-excelencia-200.png` (telas), `selo-hero.jpg` (1200, comemoração): a arte
+do "P" de vidro líquido aprovada pelo dono. A arte institucional antiga foi
+descartada. Constantes em `lib/selo/index.ts`. O som é o único **arquivo** de
+conquista: `public/sons/selo-excelencia.mp3`, "Grand brass fanfare" da Mixkit
+(sfx 631), licença Mixkit Free Sound Effects, uso comercial sem atribuição.
+Toca por `lib/sons/selo.ts` (respeita `sons_conquista`, falha calada).
+
 ## Tabelas principais
 - `perfis` (usuário: nome, slug, bio, cidade, estado, telefone, email_publico, mostrar_tel, mostrar_email, perfil_publico, foto_url, xp, nivel, moedas, titulo, `status` ativo/suspenso/banido — ver seção Usuários; `tour_visto_em` timestamptz nullable — ver seção Tour guiado; `migrado_de`/`migrado_em`/`boas_vindas_migrado_em` — aluno importado em lote, ver seção Migração de alunos da Ensinio)
 - `cursos` (com `restrito` — turma fechada, ver seção própria), `modulos`, `aulas`, `aula_progresso` (tem coluna `concluida` bool, default `false` desde 2026-07-14 — não existe tabela `aula_concluida`, nunca criar código que a referencie; toda leitura precisa filtrar `.eq('concluida', true)`, existência de linha não implica concluída, ver seção Progressão sequencial), `aula_anotacoes`, `material_downloads` (rastreio de download por aluno, ver Progressão sequencial)

@@ -19,7 +19,7 @@ export type Novidade = {
 export type TipoNotificacao =
   | 'comunidade' | 'evento' | 'jornada' | 'geral'
   // celebrações (também viram toast, ver ConquistaToast.tsx)
-  | 'nivel_up' | 'curso_concluido' | 'avaliacao_aprovada' | 'streak' | 'primeira_aula'
+  | 'nivel_up' | 'curso_concluido' | 'avaliacao_aprovada' | 'streak' | 'primeira_aula' | 'selo_excelencia'
   // sino-only
   | 'modulo_concluido' | 'desafio_entrega' | 'certificado_disponivel'
   | 'comunidade_resposta' | 'comunidade_melhor_resposta' | 'duvida_respondida'
@@ -45,11 +45,15 @@ export type DadosAvisos = {
   notificacoes: Notificacao[]  // as 12 mais recentes
   naoLidas: number             // contador do sino (novidades + pessoais)
   sonsConquista: boolean       // preferência do usuário pra som de toast
+  // Selo de Excelência concedido e comemoração de tela cheia ainda não vista.
+  // Vale por tempo indeterminado: concedido com a pessoa fora, abre na próxima
+  // visita (ver "O Selo de Excelência" no CLAUDE.md).
+  seloPendente: boolean
 }
 
 const VAZIO: DadosAvisos = {
   logado: false, novidades: [], temNovidadeNaoLida: false,
-  notificacoes: [], naoLidas: 0, sonsConquista: true,
+  notificacoes: [], naoLidas: 0, sonsConquista: true, seloPendente: false,
 }
 
 export async function carregarAvisos(): Promise<DadosAvisos> {
@@ -66,7 +70,7 @@ export async function carregarAvisos(): Promise<DadosAvisos> {
       supabase.from('novidade_leituras').select('novidade_id'),
       supabase.from('notificacoes').select('*')
         .order('criado_em', { ascending: false }).limit(12),
-      supabase.from('perfis').select('sons_conquista').eq('id', auth.user.id).single(),
+      supabase.from('perfis').select('sons_conquista, selo_excelencia_em, selo_comemorado_em').eq('id', auth.user.id).single(),
     ])
 
   const lidas = new Set((leituras ?? []).map(l => l.novidade_id))
@@ -109,5 +113,6 @@ export async function carregarAvisos(): Promise<DadosAvisos> {
     notificacoes,
     naoLidas,
     sonsConquista: perfil?.sons_conquista ?? true,
+    seloPendente: !!perfil?.selo_excelencia_em && !perfil?.selo_comemorado_em,
   }
 }

@@ -12,6 +12,7 @@ import { gerarTokenCancelamento } from "./token";
 export type TipoEmail =
   | "boas_vindas"
   | "nivel_up"
+  | "selo_excelencia"
   | "certificado"
   | "curso_concluido"
   | "carta_pessoal"
@@ -41,7 +42,12 @@ const REMETENTES: Record<"pessoal" | "automatico", { from: string; replyTo: stri
 // NÃO competem por esse limite (são transacionais diretos: boas-vindas é
 // onboarding único, certificado é a prova formal de uma conquista — nenhum
 // dos dois pode ser silenciosamente engolido por um teto de celebração).
+//
+// O selo_excelencia é o primeiro de propósito: nada que saia no mesmo dia o
+// barra (só outro selo, que o dedupe já impede). Ele costuma nascer no mesmo
+// instante do curso_concluido do último curso da formação, e é esse que cede.
 const PRIORIDADE: TipoEmail[] = [
+  "selo_excelencia",
   "nivel_up",
   "curso_concluido",
   "carta_pessoal",

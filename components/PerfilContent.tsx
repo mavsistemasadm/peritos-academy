@@ -1,6 +1,7 @@
 // components/PerfilContent.tsx
 'use client'
 
+import { SELO_IMG_P, formatarDataSelo, linkedinCompartilharUrl, perfilPublicoUrl } from '@/lib/selo'
 import { useEffect, useRef, useState } from 'react'
 import type { DadosPerfil } from '@/lib/queries/perfil'
 import NavPlataforma from '@/components/NavPlataforma'
@@ -175,6 +176,23 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
               </p>
             </div>
           </div>
+
+          {d.seloExcelenciaEm && (
+            <div className="selo-destaque" id="selo-excelencia">
+              <span className="selo-destaque-brilho" aria-hidden="true" />
+              <img src={SELO_IMG_P} alt="Selo de Excelência" width={84} height={84} className="selo-destaque-img" />
+              <div className="selo-destaque-info">
+                <span className="selo-destaque-tag">Selo de Excelência</span>
+                <h2>Formação Pericial de Alta Performance concluída</h2>
+                <p>Conquistado em {formatarDataSelo(d.seloExcelenciaEm)}</p>
+              </div>
+              <div className="selo-destaque-acao privado">
+                {d.slug && d.perfil_publico
+                  ? <a className="btn btn-primario" href={linkedinCompartilharUrl(perfilPublicoUrl(d.slug, true)!)} target="_blank" rel="noopener noreferrer">Compartilhar no LinkedIn</a>
+                  : <button type="button" className="btn btn-fantasma" onClick={() => setEditando(true)}>Torne seu perfil público para compartilhar</button>}
+              </div>
+            </div>
+          )}
 
           <div className="xp-linha privado">
             <div className="topo num">
