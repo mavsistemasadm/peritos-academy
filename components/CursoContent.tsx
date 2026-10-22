@@ -340,7 +340,9 @@ export function CursoContent({ curso, modulos, conquistas, progresso, proximoPas
                             <ol className="aulas">
                               {modulo.aulas.map((aula) => {
                                 const quiz = aula.tipo === "quiz" || aula.tipo === "prova";
-                                const classeAula = aula.bloqueada ? "bloqueada" : aula.concluida ? "feita" : "atual";
+                                // Só a aula ATUAL ganha o destaque de palco. Sem trava (admin), todas as
+                                // pendentes viravam "atual" e os cartões ficavam empilhados.
+                                const classeAula = aula.bloqueada ? "bloqueada" : aula.concluida ? "feita" : aula.atual ? "atual" : "pendente";
                                 const dur = durOuNull(aula.duracao_seg);
                                 const conteudo = (
                                   <>
