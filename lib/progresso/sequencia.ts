@@ -16,6 +16,10 @@
 // decisão do dono do produto (21/08/2026), quem concluiu a aula de correção
 // antes de fazer a prova volta a vê-la trancada até ser aprovado. O progresso
 // gravado não é apagado — assim que a prova passa, a aula reaparece concluída.
+//
+// ADMIN NÃO TEM TRAVA (22/10/2026, pedido do dono). As RPCs de escrita já
+// pulavam a sequência para `is_admin_papel`; a tela não, e o admin via a aula
+// trancada que o banco o deixaria concluir. Agora a tela usa a mesma pergunta.
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type TipoItem = "aula" | "avaliacao";
@@ -81,8 +85,11 @@ export async function carregarSequencia(
 
   let concluidas = new Set<string>();
   let aprovadas = new Set<string>();
+  let semTrava = false;
 
   if (userId && itens.length > 0) {
+    const { data: ehAdmin } = await supabase.rpc("is_admin_papel", { uid: userId });
+    semTrava = ehAdmin === true;
     const [{ data: prog }, { data: tent }] = await Promise.all([
       idsAulas.length
         // .eq('concluida', true) é essencial: a linha também existe pra progresso
@@ -102,7 +109,7 @@ export async function carregarSequencia(
   const comEstado: ItemComEstado[] = itens.map((item) => {
     const cumprido = item.tipo === "aula" ? concluidas.has(item.id) : aprovadas.has(item.id);
     const estado: ItemComEstado = { ...item, cumprido, bloqueado: pendencia !== null, pendencia };
-    if (!cumprido && pendencia === null) {
+    if (!cumprido && pendencia === null && !semTrava) {
       pendencia = { tipo: item.tipo, id: item.id, titulo: item.titulo };
     }
     return estado;
