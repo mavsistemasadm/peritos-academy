@@ -19,8 +19,9 @@ export type MaterialAdmin = {
   id: string
   nome: string
   descricao: string | null
-  tipo: 'pdf' | 'xlsx' | 'docx' | 'zip' | 'outro'
+  tipo: 'pdf' | 'xlsx' | 'docx' | 'zip' | 'outro' | 'link'
   arquivoUrl: string | null
+  linkUrl: string | null
   tamanhoBytes: number | null
   ordem: number
 }
@@ -164,7 +165,7 @@ export async function carregarCursoAdmin(id: string): Promise<CursoDetalheAdmin 
     const lista = materiaisPorAula.get(m.aula_id) ?? []
     lista.push({
       id: m.id, nome: m.nome, descricao: m.descricao, tipo: m.tipo,
-      arquivoUrl: m.arquivo_url, tamanhoBytes: m.tamanho_bytes, ordem: m.ordem,
+      arquivoUrl: m.arquivo_url, linkUrl: m.link_url ?? null, tamanhoBytes: m.tamanho_bytes, ordem: m.ordem,
     })
     materiaisPorAula.set(m.aula_id, lista)
   }

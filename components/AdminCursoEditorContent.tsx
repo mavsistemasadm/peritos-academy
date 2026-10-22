@@ -9,10 +9,10 @@ import {
   atualizarCurso, criarUploadCapaCurso, confirmarCapaCurso, alternarPublicacaoCurso, excluirCurso,
   criarModulo, atualizarModulo, excluirModulo, moverModulo,
   criarAula, atualizarAula, excluirAula, moverAula, criarUploadCapaAula, confirmarCapaAula,
-  criarCapitulo, excluirCapitulo, uploadMateriais, renomearMaterial, moverMaterial, excluirMaterial,
+  criarCapitulo, excluirCapitulo, uploadMateriais, adicionarLinkMaterial, renomearMaterial, moverMaterial, excluirMaterial,
 } from '@/app/admin/cursos/actions'
 import { criarClienteBrowser } from '@/lib/supabase/client'
-import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconePencil, IconeTrash, IconeUpload } from '@/components/Icones'
+import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconePencil, IconeTrash, IconeUpload, IconeLink } from '@/components/Icones'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
 function segParaLabel(seg: number) {
@@ -541,12 +541,26 @@ function fmtBytes(bytes: number | null) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
+function dominioDo(url: string): string {
+  try { return new URL(url).hostname.replace(/^www\./, '') } catch { return url }
+}
+
 function MateriaisBloco({ aula, cursoId, onErro, onSucesso, onRefresh }: {
   aula: AulaAdmin; cursoId: string; onErro: (e: string) => void; onSucesso: (m: string) => void; onRefresh: () => void
 }) {
   const [pendente, startTransition] = useTransition()
   const [editandoId, setEditandoId] = useState<string | null>(null)
   const [nomeEditado, setNomeEditado] = useState('')
+  const [linkNome, setLinkNome] = useState('')
+  const [linkUrl, setLinkUrl] = useState('')
+
+  function onAdicionarLink() {
+    startTransition(async () => {
+      const r = await adicionarLinkMaterial(aula.id, cursoId, linkNome, linkUrl)
+      if (!r.ok) onErro(r.erro)
+      else { onSucesso('Link adicionado com sucesso'); setLinkNome(''); setLinkUrl(''); onRefresh() }
+    })
+  }
 
   function onUpload(e: ChangeEvent<HTMLInputElement>) {
     const arquivos = e.target.files
@@ -602,7 +616,11 @@ function MateriaisBloco({ aula, cursoId, onErro, onSucesso, onRefresh }: {
             ) : (
               <>
                 <span>{m.nome}</span>
-                <span className="pnl-sublista-meta">{m.tipo.toUpperCase()}{m.tamanhoBytes ? ` · ${fmtBytes(m.tamanhoBytes)}` : ''}</span>
+                <span className="pnl-sublista-meta">
+                  {m.tipo === 'link'
+                    ? <>LINK{m.linkUrl ? <> · <a href={m.linkUrl} target="_blank" rel="noopener noreferrer">{dominioDo(m.linkUrl)}</a></> : null}</>
+                    : <>{m.tipo.toUpperCase()}{m.tamanhoBytes ? ` · ${fmtBytes(m.tamanhoBytes)}` : ''}</>}
+                </span>
                 <button type="button" disabled={pendente || i === 0} onClick={() => onMover(m.id, 'up')} title="Mover para cima"><IconeArrowUp size={13} /></button>
                 <button type="button" disabled={pendente || i === aula.materiais.length - 1} onClick={() => onMover(m.id, 'down')} title="Mover para baixo"><IconeArrowDown size={13} /></button>
                 <button type="button" onClick={() => { setEditandoId(m.id); setNomeEditado(m.nome) }} title="Renomear"><IconePencil size={13} /></button>
@@ -616,6 +634,13 @@ function MateriaisBloco({ aula, cursoId, onErro, onSucesso, onRefresh }: {
         <IconeUpload size={13} /> Enviar arquivos (PDF, XLSX, DOCX, ZIP, até 20MB cada)
         <input type="file" multiple accept=".pdf,.xlsx,.xls,.docx,.doc,.zip" onChange={onUpload} hidden disabled={pendente} />
       </label>
+      <div className="pnl-inline-edit" style={{ marginTop: 10 }}>
+        <input placeholder="Nome do link (ex.: Como eu fechei esse trabalho)" value={linkNome} onChange={e => setLinkNome(e.target.value)} disabled={pendente} />
+        <input placeholder="https://..." value={linkUrl} onChange={e => setLinkUrl(e.target.value)} disabled={pendente} />
+        <button type="button" className="pnl-btn-secundario" disabled={pendente || !linkNome.trim() || !linkUrl.trim()} onClick={onAdicionarLink}>
+          <IconeLink size={13} /> Adicionar link
+        </button>
+      </div>
     </div>
   )
 }

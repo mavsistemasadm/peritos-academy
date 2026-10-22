@@ -15,6 +15,7 @@ import { verificarCertificado, baixarMaterialAula, concluirAula } from '@/app/cu
 import {
   IconeChevronLeft, IconeChevronRight, IconePlay, IconeCheck, IconeDownload, IconeSend, IconeHeadset, IconeAlertTriangle,
   IconeFileText, IconeBarChart, IconePaperclip, IconeLock, IconeClipboard,
+  IconeLink,
 } from '@/components/Icones'
 import { Certificado, XP } from '@/components/Emblemas'
 import NexusSugestao from "@/components/NexusSugestao";
@@ -777,9 +778,38 @@ const ICONE_POR_TIPO: Record<string, typeof IconeFileText> = {
   docx: IconeFileText,
   zip: IconePaperclip,
   outro: IconePaperclip,
+  link: IconeLink,
 };
 
+// Vídeo conhecido ganha "Assistir"; o resto, "Abrir". Abre em aba nova de
+// propósito: um segundo player do Panda nesta página mandaria os mesmos
+// eventos panda_timeupdate que medem o vídeo DESTA aula, e o ouvinte não
+// distingue a origem.
+const ehVideo = (url: string) => /pandavideo\.com|youtube\.com|youtu\.be|vimeo\.com/i.test(url);
+
 function MaterialItem({ material, baixado, onBaixado }: { material: Material; baixado: boolean; onBaixado: (materialId: string) => void }) {
+  if (material.tipo === "link" && material.link_url) {
+    const video = ehVideo(material.link_url);
+    const IconeDoLink = video ? IconePlay : IconeLink;
+    return (
+      <li className="arquivo">
+        <a href={material.link_url} target="_blank" rel="noopener noreferrer">
+          <span className="arq-ico link" aria-hidden="true">
+            <IconeDoLink size={20} strokeWidth={1.6} />
+          </span>
+          <span className="arq-txt"><b>{material.nome}</b><span>{material.descricao ?? (video ? "Vídeo, abre em nova aba" : "Abre em nova aba")}</span></span>
+          <span className="arq-baixar">
+            <IconeDoLink size={13} strokeWidth={2.2} />
+            {video ? "Assistir" : "Abrir"}
+          </span>
+        </a>
+      </li>
+    );
+  }
+  return <MaterialArquivo material={material} baixado={baixado} onBaixado={onBaixado} />;
+}
+
+function MaterialArquivo({ material, baixado, onBaixado }: { material: Material; baixado: boolean; onBaixado: (materialId: string) => void }) {
   const [baixando, setBaixando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const Icone = ICONE_POR_TIPO[material.tipo] ?? IconePaperclip;

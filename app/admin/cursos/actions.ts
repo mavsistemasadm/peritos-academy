@@ -414,6 +414,28 @@ export async function uploadMateriais(aulaId: string, cursoId: string, formData:
   return { ok: true }
 }
 
+// Link como material (22/10/2026): um vídeo de outra aula, uma página externa.
+// Só https, e o endereço passa pelo construtor de URL antes de ir ao banco.
+export async function adicionarLinkMaterial(aulaId: string, cursoId: string, nome: string, url: string): Promise<Resultado> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  const titulo = nome.trim()
+  if (!titulo) return { ok: false, erro: 'Dê um nome ao link.' }
+  let endereco: URL
+  try { endereco = new URL(url.trim()) } catch { return { ok: false, erro: 'Endereço inválido. Cole o link completo, começando com https://' } }
+  if (endereco.protocol !== 'https:') return { ok: false, erro: 'O link precisa começar com https://' }
+
+  const supabase = await criarClienteServidor()
+  const { data: ultimo } = await supabase
+    .from('aula_materiais').select('ordem').eq('aula_id', aulaId).order('ordem', { ascending: false }).limit(1).maybeSingle()
+  const { error } = await supabase.from('aula_materiais').insert({
+    aula_id: aulaId, nome: titulo, tipo: 'link', link_url: endereco.toString(), arquivo_url: null, ordem: (ultimo?.ordem ?? 0) + 1,
+  })
+  if (error) return { ok: false, erro: error.message }
+
+  revalidarCurso(cursoId)
+  return { ok: true }
+}
+
 export async function renomearMaterial(id: string, cursoId: string, nome: string): Promise<Resultado> {
   if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
   if (!nome.trim()) return { ok: false, erro: 'Nome é obrigatório.' }
