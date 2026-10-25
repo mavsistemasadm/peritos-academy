@@ -68,11 +68,15 @@ export default function AdminDuvidasContent({ evento, duvidas }: {
   }
 
   async function abrirAnexo(id: string) {
+    // A aba abre ANTES do await: aberta depois, o navegador a bloqueia como
+    // pop-up. Mesmo padrão de PainelDuvidasDaLive.
+    const aba = window.open('', '_blank')
     setAbrindo(id)
     const r = await linkDoAnexo(id)
     setAbrindo(null)
-    if (!r.ok) { toast.erro(r.erro); return }
-    window.open(r.url, '_blank', 'noopener')
+    if (!r.ok) { aba?.close(); toast.erro(r.erro); return }
+    if (aba) { aba.opener = null; aba.location.href = r.url }
+    else window.location.href = r.url
   }
 
   const linkFormulario = evento.slug ? `${SITE_URL}/evento/${evento.slug}#duvida` : null

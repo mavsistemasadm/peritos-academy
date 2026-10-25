@@ -822,7 +822,17 @@ function MaterialArquivo({ material, baixado, onBaixado }: { material: Material;
     setBaixando(false);
     if (!r.ok) { setErro(r.erro); return; }
     onBaixado(material.id);
-    window.open(r.url, "_blank");
+    // Baixa NA MESMA ABA, nunca por aba nova. window.open depois do await é
+    // tratado como pop-up e bloqueado (Safari, iPhone, Chrome com bloqueador):
+    // o clique não fazia nada, e quem autorizava o pop-up abria o link já
+    // vencido (60s), com "InvalidJWT exp". O link assinado vem com download,
+    // então a pessoa continua na aula. Mesmo padrão de DesafioContent. (25/10/2026)
+    const a = document.createElement("a");
+    a.href = r.url;
+    a.download = "";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   }
 
   return (

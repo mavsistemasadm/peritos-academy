@@ -90,7 +90,13 @@ export default function AdminDesafioEditorContent({ desafio, categorias, entrega
   async function onBaixar(path: string) {
     const r = await baixarDocumento(path)
     if (!r.ok) { toast.erro(r.erro); return }
-    window.open(r.url, '_blank')
+    // Na mesma aba: aba nova depois do await é bloqueada como pop-up.
+    const a = document.createElement('a')
+    a.href = r.url
+    a.download = ''
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
   }
 
   return (
