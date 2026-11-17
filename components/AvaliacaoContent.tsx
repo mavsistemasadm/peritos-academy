@@ -15,7 +15,12 @@ import type {
   QuestaoPublica,
   ResultadoCorrecao,
 } from "@/lib/queries/avaliacao";
-import { IconeChevronLeft, IconeCheck, IconeClose, IconePlay } from "@/components/Icones";
+import {
+  IconeChevronLeft, IconeCheck, IconeClose, IconePlay,
+  IconeDownload, IconeFileText, IconeBarChart, IconePaperclip, IconeLink,
+} from "@/components/Icones";
+import { baixarMaterialAvaliacao } from "@/app/curso/[slug]/avaliacao/[avaliacaoId]/actions";
+import type { MaterialAvaliacao } from "@/lib/queries/avaliacao";
 import { XP, Trofeu } from "@/components/Emblemas";
 
 type Resposta = { opcaoId?: string; valor?: string };
@@ -55,7 +60,15 @@ function embaralhar<T>(lista: T[]): T[] {
 }
 
 export default function AvaliacaoContent({ dados, usuarioNome, submeter, vindoDeBloqueio }: Props & { vindoDeBloqueio?: boolean }) {
-  const { curso, modulo, avaliacao, questoes } = dados;
+  const { curso, modulo, avaliacao, questoes, materiais } = dados;
+  const temAutos = materiais.length > 0 || !!avaliacao.instrucoes || !!avaliacao.video_url;
+  const [autosAberto, setAutosAberto] = useState(false);
+  useEffect(() => {
+    if (!autosAberto) return;
+    const onEsc = (e: KeyboardEvent) => { if (e.key === "Escape") setAutosAberto(false); };
+    addEventListener("keydown", onEsc);
+    return () => removeEventListener("keydown", onEsc);
+  }, [autosAberto]);
   const ehProva = avaliacao.tipo === "prova";
   const nQ = questoes.length;
 
@@ -238,8 +251,29 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter, vindoDe
           {avaliacao.caso_numero ? <>Caso Nº <b>{avaliacao.caso_numero}</b> · </> : null}
           {rotuloTopo}
         </span>
-        <span style={{ width: 90 }}></span>
+        {temAutos && cena !== "brief" ? (
+          <button className="autos-topo-btn" onClick={() => setAutosAberto(true)}>
+            <IconePaperclip size={13} strokeWidth={2.2} />
+            Autos do caso{materiais.length ? ` (${materiais.length})` : ""}
+          </button>
+        ) : (
+          <span style={{ width: 90 }}></span>
+        )}
       </div>
+
+      {/* os autos ficam a um clique durante os quesitos: a prova pede para
+          consultar o processo, e voltar ao briefing perderia o lugar */}
+      {autosAberto && (
+        <div className="autos-gaveta" role="dialog" aria-modal="true" aria-label="Autos do caso" onClick={() => setAutosAberto(false)}>
+          <div className="autos-gaveta-corpo" onClick={(e) => e.stopPropagation()}>
+            <div className="autos-gaveta-cab">
+              <b>Autos do caso</b>
+              <button onClick={() => setAutosAberto(false)} aria-label="Fechar"><IconeClose size={16} /></button>
+            </div>
+            <AutosDoCaso materiais={materiais} instrucoes={avaliacao.instrucoes} video={null} />
+          </div>
+        </div>
+      )}
 
       {/* ============ BRIEFING ============ */}
       <section className={cls("brief")}>
@@ -269,6 +303,9 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter, vindoDe
               <span className="grad-txt">{avaliacao.titulo.split(" ").slice(-1)[0]}.</span>
             </h1>
             {avaliacao.descricao && <p className="desc">{avaliacao.descricao}</p>}
+            {temAutos && (
+              <AutosDoCaso materiais={materiais} instrucoes={avaliacao.instrucoes} video={avaliacao.video_url} />
+            )}
             <div className="brief-dados num">
               <div className="bd"><span className="v">{nQ}</span><span className="r">quesitos</span></div>
               <div className="bd"><span className="v gd"><XP size={16} /> +{avaliacao.xp_total}</span><span className="r">XP em jogo</span></div>
@@ -496,5 +533,97 @@ export default function AvaliacaoContent({ dados, usuarioNome, submeter, vindoDe
         )}
       </section>
     </div>
+  );
+}
+
+/* ---------- Autos do caso: vídeo, instruções e arquivos da avaliação ----------
+   Vieram da Ensinio, onde a avaliação era uma aula com tudo isso. Nas provas de
+   cálculo as instruções trazem os parâmetros (data do cálculo, RMA, citação):
+   sem elas a prova não tem como ser feita. */
+function AutosDoCaso({ materiais, instrucoes, video }: {
+  materiais: MaterialAvaliacao[];
+  instrucoes: string | null;
+  video: string | null;
+}) {
+  const longo = (instrucoes?.length ?? 0) > 700;
+  const [tudo, setTudo] = useState(!longo);
+  const paragrafos = (instrucoes ?? "").split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+
+  return (
+    <div className="autos">
+      {video && (
+        <div className="autos-video">
+          <iframe src={video} title="Instruções em vídeo" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
+        </div>
+      )}
+      {paragrafos.length > 0 && (
+        <div className={`autos-instrucoes${tudo ? "" : " cortado"}`}>
+          <span className="eyebrow">Instruções do professor</span>
+          {paragrafos.map((p, i) => (
+            <p key={i}>{p.split("\n").map((l, j) => (j ? <span key={j}><br />{l}</span> : <span key={j}>{l}</span>))}</p>
+          ))}
+          {!tudo && (
+            <button className="autos-ler-tudo" onClick={() => setTudo(true)}>Ler as instruções completas</button>
+          )}
+        </div>
+      )}
+      {materiais.length > 0 && (
+        <div className="autos-arquivos">
+          <span className="eyebrow">
+            {materiais.length === 1 ? "1 arquivo para consultar" : `${materiais.length} arquivos para consultar`}
+          </span>
+          <ul>
+            {materiais.map((m) => <ArquivoDosAutos key={m.id} material={m} />)}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ArquivoDosAutos({ material }: { material: MaterialAvaliacao }) {
+  const [baixando, setBaixando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
+  const Icone = material.link
+    ? IconeLink
+    : material.tipo === "xlsx" ? IconeBarChart
+    : material.tipo === "pdf" || material.tipo === "docx" ? IconeFileText
+    : IconePaperclip;
+  const tamanho = material.tamanho_bytes
+    ? material.tamanho_bytes >= 1048576
+      ? `${(material.tamanho_bytes / 1048576).toFixed(1).replace(".", ",")} MB`
+      : `${Math.max(1, Math.round(material.tamanho_bytes / 1024))} KB`
+    : null;
+
+  async function onBaixar() {
+    if (baixando) return;
+    setErro(null);
+    setBaixando(true);
+    const r = await baixarMaterialAvaliacao(material.id);
+    setBaixando(false);
+    if (!r.ok) { setErro(r.erro); return; }
+    // mesma aba, nunca aba nova: window.open depois do await é bloqueado como
+    // pop-up, e o link assinado vence em 60s (ver AulaContent, 25/10/2026)
+    const a = document.createElement("a");
+    a.href = r.url;
+    if (r.externo) { a.target = "_blank"; a.rel = "noopener"; } else a.download = "";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  return (
+    <li>
+      <button className="autos-arquivo" onClick={onBaixar} disabled={baixando}>
+        <span className="autos-arq-ico" aria-hidden="true"><Icone size={18} strokeWidth={1.7} /></span>
+        <span className="autos-arq-txt">
+          <b>{material.nome}</b>
+          <span>{erro ?? (baixando ? "Preparando o download..." : material.link ? "Abrir link" : tamanho ?? "Baixar")}</span>
+        </span>
+        <span className="autos-arq-acao" aria-hidden="true">
+          {material.link ? <IconeLink size={14} strokeWidth={2.2} /> : <IconeDownload size={14} strokeWidth={2.2} />}
+        </span>
+      </button>
+    </li>
   );
 }

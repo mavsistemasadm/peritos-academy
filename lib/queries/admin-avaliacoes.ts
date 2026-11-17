@@ -54,11 +54,24 @@ export type AvaliacaoAdmin = {
   tema: number
   publicado: boolean
   capaUrl: string | null
+  /** texto de instruções do professor (parâmetros do cálculo nas provas) */
+  instrucoes: string | null
+  /** embed do vídeo de instruções */
+  videoUrl: string | null
+}
+
+export type MaterialAvaliacaoAdmin = {
+  id: string
+  nome: string
+  tipo: string
+  tamanhoBytes: number | null
+  linkUrl: string | null
 }
 
 export type AvaliacaoDetalheAdmin = {
   avaliacao: AvaliacaoAdmin
   questoes: QuestaoAdmin[]
+  materiais: MaterialAvaliacaoAdmin[]
 }
 
 export type ModuloPicker = {
@@ -112,7 +125,7 @@ export async function carregarAvaliacaoAdmin(id: string): Promise<AvaliacaoDetal
 
   const { data: av } = await supabase
     .from('avaliacoes')
-    .select('id, curso_id, modulo_id, numero_caso, titulo, briefing, nota_minima, peso, tipo, ordem, posicao, tema, publicado, capa_url')
+    .select('id, curso_id, modulo_id, numero_caso, titulo, briefing, nota_minima, peso, tipo, ordem, posicao, tema, publicado, capa_url, instrucoes, video_url')
     .eq('id', id)
     .single()
   if (!av) return null
@@ -122,6 +135,12 @@ export async function carregarAvaliacaoAdmin(id: string): Promise<AvaliacaoDetal
     .select('*')
     .eq('avaliacao_id', id)
     .order('ordem', { ascending: true })
+
+  const { data: materiaisRaw } = await supabase
+    .from('avaliacao_materiais')
+    .select('id, nome, tipo, tamanho_bytes, link_url')
+    .eq('avaliacao_id', id)
+    .order('ordem')
 
   const questaoIds = (questoesRaw ?? []).map(q => q.id)
   const { data: opcoesRaw } = questaoIds.length
@@ -148,8 +167,12 @@ export async function carregarAvaliacaoAdmin(id: string): Promise<AvaliacaoDetal
       id: av.id, cursoId: av.curso_id, moduloId: av.modulo_id, numeroCaso: av.numero_caso,
       titulo: av.titulo, briefing: av.briefing, notaMinima: Number(av.nota_minima), peso: av.peso,
       tipo: av.tipo, ordem: av.ordem, posicao: av.posicao, tema: av.tema, publicado: av.publicado, capaUrl: av.capa_url,
+      instrucoes: av.instrucoes ?? null, videoUrl: av.video_url ?? null,
     },
     questoes,
+    materiais: (materiaisRaw ?? []).map(m => ({
+      id: m.id, nome: m.nome, tipo: m.tipo, tamanhoBytes: m.tamanho_bytes, linkUrl: m.link_url,
+    })),
   }
 }
 

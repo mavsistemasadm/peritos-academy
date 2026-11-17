@@ -21,5 +21,5 @@ export default async function PaginaAdminAvaliacaoEditor({ params }: { params: P
 
   const modulos = await carregarModulosDoCurso(dados.avaliacao.cursoId)
 
-  return <AdminAvaliacaoEditorContent avaliacao={dados.avaliacao} questoes={dados.questoes} modulos={modulos} />
+  return <AdminAvaliacaoEditorContent avaliacao={dados.avaliacao} questoes={dados.questoes} materiais={dados.materiais} modulos={modulos} />
 }

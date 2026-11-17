@@ -31,6 +31,20 @@ export type AvaliacaoInfo = {
   xp_total: number; // teto de XP (avaliacao_xp_base x peso, a 100% de acerto) — o efetivo depende do acerto
   nota_minima: number;
   tema: number;
+  /** texto de instruções do professor (parâmetros do cálculo nas provas) */
+  instrucoes: string | null;
+  /** vídeo de instruções (embed do Panda) */
+  video_url: string | null;
+};
+
+/** "Autos do caso": arquivos que a avaliação pede para ler. Download por URL
+ *  assinada gerada no clique (baixarMaterialAvaliacao), nunca embutida aqui. */
+export type MaterialAvaliacao = {
+  id: string;
+  nome: string;
+  tipo: string;
+  tamanho_bytes: number | null;
+  link: boolean;
 };
 
 export type GabaritoItem = {
@@ -61,6 +75,7 @@ export type AvaliacaoDados = {
   modulo: { titulo: string; ordem: number } | null;
   avaliacao: AvaliacaoInfo;
   questoes: QuestaoPublica[];
+  materiais: MaterialAvaliacao[];
 };
 
 export async function getAvaliacao(
@@ -80,7 +95,7 @@ export async function getAvaliacao(
   const { data: av } = await supabase
     .from("avaliacoes")
     .select(
-      "id, tipo, titulo, briefing, numero_caso, capa_url, peso, nota_minima, tema, modulo_id"
+      "id, tipo, titulo, briefing, numero_caso, capa_url, peso, nota_minima, tema, modulo_id, instrucoes, video_url"
     )
     .eq("id", avaliacaoId)
     .eq("curso_id", curso.id)
@@ -120,6 +135,12 @@ export async function getAvaliacao(
     .in("questao_id", questoes.map((q) => q.id))
     .order("ordem");
 
+  const { data: materiaisRaw } = await supabase
+    .from("avaliacao_materiais")
+    .select("id, nome, tipo, tamanho_bytes, link_url")
+    .eq("avaliacao_id", av.id)
+    .order("ordem");
+
   const porQuestao = new Map<string, OpcaoPublica[]>();
   (opcoes ?? []).forEach((o) => {
     const lista = porQuestao.get(o.questao_id) ?? [];
@@ -140,7 +161,16 @@ export async function getAvaliacao(
       xp_total: (configGam?.avaliacao_xp_base ?? 200) * Math.max(av.peso ?? 1, 1), // teto: avaliacao_xp_base x peso, a 100% de acerto
       nota_minima: Number(av.nota_minima ?? 7),
       tema: av.tema ?? 0,
+      instrucoes: av.instrucoes ?? null,
+      video_url: av.video_url ?? null,
     },
+    materiais: (materiaisRaw ?? []).map((m) => ({
+      id: m.id,
+      nome: m.nome,
+      tipo: m.tipo,
+      tamanho_bytes: m.tamanho_bytes,
+      link: !!m.link_url,
+    })),
     questoes: questoes.map((q) => ({
       id: q.id,
       ordem: q.ordem,

@@ -4,17 +4,19 @@
 import { useState, useTransition } from 'react'
 import type { FormEvent, ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import type { AvaliacaoAdmin, QuestaoAdmin, ModuloPicker } from '@/lib/queries/admin-avaliacoes'
+import type { AvaliacaoAdmin, QuestaoAdmin, ModuloPicker, MaterialAvaliacaoAdmin } from '@/lib/queries/admin-avaliacoes'
 import {
   atualizarAvaliacao, uploadCapaAvaliacao, alternarPublicacaoAvaliacao, excluirAvaliacao,
   criarQuestao, atualizarQuestao, excluirQuestao, moverQuestao,
   criarOpcao, marcarOpcaoCorreta, excluirOpcao,
+  criarUploadMaterialAvaliacao, confirmarMaterialAvaliacao, adicionarLinkMaterialAvaliacao, excluirMaterialAvaliacao,
 } from '@/app/admin/avaliacoes/actions'
+import { enviarParaSignedUrl } from '@/lib/storage/enviarDireto'
 import { IconeChevronLeft, IconeArrowUp, IconeArrowDown, IconeTrash } from '@/components/Icones'
 import { useAdminToast, AdminToastContainer } from '@/components/AdminToast'
 
-export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modulos }: {
-  avaliacao: AvaliacaoAdmin; questoes: QuestaoAdmin[]; modulos: ModuloPicker[]
+export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, materiais, modulos }: {
+  avaliacao: AvaliacaoAdmin; questoes: QuestaoAdmin[]; materiais: MaterialAvaliacaoAdmin[]; modulos: ModuloPicker[]
 }) {
   const router = useRouter()
   const toast = useAdminToast()
@@ -147,6 +149,15 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
             <label>Briefing / enunciado geral
               <textarea name="briefing" defaultValue={avaliacao.briefing ?? ''} rows={4} />
             </label>
+            {/* Aparece para o aluno antes das questões, em "Autos do caso". Nas
+                provas de cálculo é aqui que vão os parâmetros (data do cálculo,
+                RMA, citação): sem eles a prova não tem como ser feita. */}
+            <label>Instruções do professor (aparecem antes das questões)
+              <textarea name="instrucoes" defaultValue={avaliacao.instrucoes ?? ''} rows={6} placeholder="Ex.: data do cálculo, parâmetros, o que ler antes de responder" />
+            </label>
+            <label>Vídeo de instruções (link do player, opcional)
+              <input name="video_url" type="url" defaultValue={avaliacao.videoUrl ?? ''} placeholder="https://player-vz-....tv.pandavideo.com.br/embed/?v=..." />
+            </label>
             <div className="pnl-form-linha">
               <label>Nota mínima
                 <input name="nota_minima" type="number" step="0.1" min="0" max="10" defaultValue={avaliacao.notaMinima} />
@@ -159,6 +170,8 @@ export default function AdminAvaliacaoEditorContent({ avaliacao, questoes, modul
           </form>
         </section>
       </div>
+
+      <ArquivosAvaliacao avaliacaoId={avaliacao.id} cursoId={avaliacao.cursoId} materiais={materiais} onMudou={refresh} toast={toast} />
 
       <section className="pnl-card">
         <h2>Questões</h2>
@@ -336,5 +349,87 @@ function QuestaoBloco({ questao, avaliacaoId, cursoId, indice, total, expandida,
         </div>
       )}
     </div>
+  )
+}
+
+
+// ---------- Arquivos da avaliação ("autos do caso") ----------
+// O aluno vê esta lista antes das questões e pode reabri-la durante a prova.
+// O arquivo sobe direto do navegador para o Storage (URL assinada): passando
+// pela server action, acima de 4,5 MB a Vercel derruba a página.
+function ArquivosAvaliacao({ avaliacaoId, cursoId, materiais, onMudou, toast }: {
+  avaliacaoId: string; cursoId: string; materiais: MaterialAvaliacaoAdmin[]
+  onMudou: () => void; toast: ReturnType<typeof useAdminToast>
+}) {
+  const [enviando, setEnviando] = useState<string | null>(null)
+  const [linkNome, setLinkNome] = useState('')
+  const [linkUrl, setLinkUrl] = useState('')
+  const [pendente, startTransition] = useTransition()
+
+  async function onArquivos(e: ChangeEvent<HTMLInputElement>) {
+    const arquivos = Array.from(e.target.files ?? [])
+    e.target.value = ''
+    for (const f of arquivos) {
+      setEnviando(f.name)
+      const prep = await criarUploadMaterialAvaliacao(avaliacaoId, f.name, f.size)
+      if (!prep.ok) { toast.erro(prep.erro); continue }
+      const env = await enviarParaSignedUrl('materiais-aulas', prep.path, prep.token, f)
+      if (!env.ok) { toast.erro(env.erro); continue }
+      const conf = await confirmarMaterialAvaliacao(avaliacaoId, cursoId, prep.path, f.name, f.size)
+      if (!conf.ok) toast.erro(conf.erro)
+      else toast.sucesso(`"${f.name}" adicionado`)
+    }
+    setEnviando(null)
+    onMudou()
+  }
+
+  function onAdicionarLink() {
+    startTransition(async () => {
+      const r = await adicionarLinkMaterialAvaliacao(avaliacaoId, cursoId, linkNome, linkUrl)
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Link adicionado'); setLinkNome(''); setLinkUrl(''); onMudou() }
+    })
+  }
+
+  function onExcluir(m: MaterialAvaliacaoAdmin) {
+    if (!confirm(`Remover "${m.nome}" desta avaliação?`)) return
+    startTransition(async () => {
+      const r = await excluirMaterialAvaliacao(m.id, avaliacaoId, cursoId)
+      if (!r.ok) toast.erro(r.erro)
+      else { toast.sucesso('Arquivo removido'); onMudou() }
+    })
+  }
+
+  const tamanho = (b: number | null) => !b ? '' : b >= 1048576 ? `${(b / 1048576).toFixed(1).replace('.', ',')} MB` : `${Math.max(1, Math.round(b / 1024))} KB`
+
+  return (
+    <section className="pnl-card">
+      <h2>Arquivos da avaliação</h2>
+      <p className="pnl-vazio" style={{ marginBottom: 12 }}>
+        O que o aluno precisa consultar para responder: o processo, o contrato, a planilha. Aparece antes das questões e fica disponível durante a prova. Até 60 MB por arquivo.
+      </p>
+      {materiais.length === 0 && <p className="pnl-vazio">Nenhum arquivo ainda.</p>}
+      {materiais.length > 0 && (
+        <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 14 }}>
+          {materiais.map(m => (
+            <li key={m.id} className="pnl-modulo-cab" style={{ padding: '8px 12px' }}>
+              <span style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>
+                {m.nome} <small style={{ opacity: .6 }}>{m.linkUrl ? 'link' : tamanho(m.tamanhoBytes)}</small>
+              </span>
+              <button type="button" className="pnl-btn-perigo-sm" disabled={pendente} onClick={() => onExcluir(m)} title="Remover"><IconeTrash size={13} /></button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="pnl-nova-linha" style={{ flexWrap: 'wrap', gap: 8 }}>
+        <label className="pnl-btn-secundario pnl-upload-btn">
+          {enviando ? `Enviando ${enviando}...` : '+ Enviar arquivos'}
+          <input type="file" multiple onChange={onArquivos} hidden disabled={!!enviando} />
+        </label>
+        <input placeholder="Nome do link" value={linkNome} onChange={e => setLinkNome(e.target.value)} />
+        <input placeholder="https://" value={linkUrl} onChange={e => setLinkUrl(e.target.value)} />
+        <button type="button" className="pnl-btn-secundario" disabled={pendente || !linkNome || !linkUrl} onClick={onAdicionarLink}>+ Link</button>
+      </div>
+    </section>
   )
 }

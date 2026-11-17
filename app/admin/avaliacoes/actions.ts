@@ -81,6 +81,17 @@ export async function atualizarAvaliacao(id: string, cursoId: string, formData: 
 
   const moduloId = (formData.get('modulo_id') as string)?.trim() || null
 
+  // vídeo de instruções: embed (Panda, YouTube). Só https.
+  const videoBruto = (formData.get('video_url') as string)?.trim() || ''
+  let videoUrl: string | null = null
+  if (videoBruto) {
+    try {
+      const u = new URL(videoBruto)
+      if (u.protocol !== 'https:') return { ok: false, erro: 'O link do vídeo precisa começar com https://' }
+      videoUrl = u.toString()
+    } catch { return { ok: false, erro: 'Link do vídeo inválido. Cole o endereço completo do player.' } }
+  }
+
   const supabase = await criarClienteServidor()
   const { error } = await supabase.from('avaliacoes').update({
     titulo,
@@ -92,6 +103,8 @@ export async function atualizarAvaliacao(id: string, cursoId: string, formData: 
     // faixas de acerto) — o update falhava inteiro e nada era salvo aqui.
     peso: Number((formData.get('peso') as string) || 1),
     posicao: lerPosicao(formData),
+    instrucoes: (formData.get('instrucoes') as string)?.trim() || null,
+    video_url: videoUrl,
   }).eq('id', id)
 
   if (error) return { ok: false, erro: error.message }
@@ -297,6 +310,88 @@ export async function excluirOpcao(id: string, avaliacaoId: string, cursoId: str
   const supabase = await criarClienteServidor()
   const { error } = await supabase.from('avaliacao_opcoes').delete().eq('id', id)
   if (error) return { ok: false, erro: error.message }
+
+  await revalidarAvaliacao(avaliacaoId, cursoId)
+  return { ok: true }
+}
+
+
+// ---------- Arquivos da avaliação ("autos do caso") ----------
+// O arquivo NUNCA atravessa a server action (a Vercel recusa corpo acima de
+// 4,5 MB e a página cai em "Application error"): a action gera a URL assinada,
+// o navegador sobe direto (lib/storage/enviarDireto.ts) e a confirmação grava
+// a linha, aceitando só o path que a primeira etapa gerou.
+
+const BUCKET_MATERIAIS = 'materiais-aulas'
+const LIMITE_MATERIAL = 60 * 1024 * 1024 // file_size_limit do bucket
+const EXT_TIPO: Record<string, string> = { pdf: 'pdf', xlsx: 'xlsx', xls: 'xlsx', xlsm: 'xlsx', docx: 'docx', doc: 'docx', zip: 'zip' }
+
+function nomeSeguro(nome: string) {
+  return nome.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9._-]+/g, '_').replace(/_+/g, '_').slice(-120)
+}
+
+export async function criarUploadMaterialAvaliacao(avaliacaoId: string, nome: string, tamanho: number):
+  Promise<{ ok: true; path: string; token: string } | { ok: false; erro: string }> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  if (!nome) return { ok: false, erro: 'Arquivo sem nome.' }
+  if (tamanho > LIMITE_MATERIAL) return { ok: false, erro: `"${nome}" passa de 60 MB. Divida em partes ou use um link.` }
+
+  const path = `avaliacoes/${avaliacaoId}/${crypto.randomUUID()}-${nomeSeguro(nome)}`
+  const supabase = await criarClienteServidor()
+  const { data, error } = await supabase.storage.from(BUCKET_MATERIAIS).createSignedUploadUrl(path)
+  if (error || !data) return { ok: false, erro: error?.message ?? 'Não foi possível preparar o envio.' }
+  return { ok: true, path: data.path, token: data.token }
+}
+
+export async function confirmarMaterialAvaliacao(avaliacaoId: string, cursoId: string, path: string, nome: string, tamanho: number): Promise<Resultado> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  if (!path.startsWith(`avaliacoes/${avaliacaoId}/`)) return { ok: false, erro: 'Envio inválido.' }
+
+  const supabase = await criarClienteServidor()
+  const pasta = path.slice(0, path.lastIndexOf('/'))
+  const arquivo = path.slice(path.lastIndexOf('/') + 1)
+  const { data: lista } = await supabase.storage.from(BUCKET_MATERIAIS).list(pasta, { search: arquivo })
+  if (!lista?.some(o => o.name === arquivo)) return { ok: false, erro: 'O arquivo não chegou ao servidor. Tente de novo.' }
+
+  const { data: ultimo } = await supabase
+    .from('avaliacao_materiais').select('ordem').eq('avaliacao_id', avaliacaoId).order('ordem', { ascending: false }).limit(1).maybeSingle()
+  const ext = nome.split('.').pop()?.toLowerCase() ?? ''
+  const { error } = await supabase.from('avaliacao_materiais').insert({
+    avaliacao_id: avaliacaoId, nome, tipo: EXT_TIPO[ext] ?? 'outro', arquivo_url: path, tamanho_bytes: tamanho, ordem: (ultimo?.ordem ?? 0) + 1,
+  })
+  if (error) return { ok: false, erro: error.message }
+
+  await revalidarAvaliacao(avaliacaoId, cursoId)
+  return { ok: true }
+}
+
+export async function adicionarLinkMaterialAvaliacao(avaliacaoId: string, cursoId: string, nome: string, url: string): Promise<Resultado> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  const titulo = nome.trim()
+  if (!titulo) return { ok: false, erro: 'Dê um nome ao link.' }
+  let endereco: URL
+  try { endereco = new URL(url.trim()) } catch { return { ok: false, erro: 'Endereço inválido. Cole o link completo, começando com https://' } }
+  if (endereco.protocol !== 'https:') return { ok: false, erro: 'O link precisa começar com https://' }
+
+  const supabase = await criarClienteServidor()
+  const { data: ultimo } = await supabase
+    .from('avaliacao_materiais').select('ordem').eq('avaliacao_id', avaliacaoId).order('ordem', { ascending: false }).limit(1).maybeSingle()
+  const { error } = await supabase.from('avaliacao_materiais').insert({
+    avaliacao_id: avaliacaoId, nome: titulo, tipo: 'link', link_url: endereco.toString(), ordem: (ultimo?.ordem ?? 0) + 1,
+  })
+  if (error) return { ok: false, erro: error.message }
+
+  await revalidarAvaliacao(avaliacaoId, cursoId)
+  return { ok: true }
+}
+
+export async function excluirMaterialAvaliacao(id: string, avaliacaoId: string, cursoId: string): Promise<Resultado> {
+  if (!(await checarPermissao())) return { ok: false, erro: 'Sem permissão.' }
+  const supabase = await criarClienteServidor()
+  const { data: mat } = await supabase.from('avaliacao_materiais').select('arquivo_url').eq('id', id).maybeSingle()
+  const { error } = await supabase.from('avaliacao_materiais').delete().eq('id', id)
+  if (error) return { ok: false, erro: error.message }
+  if (mat?.arquivo_url) await supabase.storage.from(BUCKET_MATERIAIS).remove([mat.arquivo_url])
 
   await revalidarAvaliacao(avaliacaoId, cursoId)
   return { ok: true }

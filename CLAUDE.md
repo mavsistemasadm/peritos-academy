@@ -375,6 +375,37 @@ aprovação destravando, `concluir_aula` recusando com o nome certo,
 concluída sem prova não serve de escada). **Não testado em navegador** — a
 verificação ficou em banco/RPC + `npm run build`.
 
+## Arquivos e instruções da avaliação — 2026-11-17
+
+**Regra permanente.** A avaliação tem arquivos próprios (`avaliacao_materiais`,
+mesmo desenho de `aula_materiais`: path no bucket `materiais-aulas`, download
+por URL assinada de 60s, leitura para quem tem `tem_acesso_curso`) e duas
+colunas novas: `avaliacoes.instrucoes` (texto do professor) e
+`avaliacoes.video_url` (embed). O aluno vê tudo em "Autos do caso", no briefing,
+e reabre pelo botão da barra do topo durante as questões.
+
+Chegou por uma aluna: a "Avaliação de conhecimento" da Leitura e interpretação
+pergunta sobre três processos (cível, previdenciário, bancário) que o curso
+nunca entregou. Na Ensinio a avaliação era uma aula com vídeo, texto e anexos;
+na migração as perguntas viraram `avaliacoes` e o resto ficou sem lugar. As 37
+avaliações perderam vídeo e texto, 17 perderam anexos. Nas provas de cálculo o
+texto traz os **parâmetros** (data do cálculo, RMA, citação): sem ele a prova
+não tinha como ser feita. 27 alunos fizeram 73 tentativas daquela avaliação.
+
+- Trazido por `scripts/migration/importarAnexosAvaliacoes.mjs` (simulação por
+  padrão, idempotente, só preenche texto/vídeo vazios): 34 textos, 35 vídeos,
+  35 anexos em 16 avaliações. Log em `migracao/logs/anexos_avaliacoes_*`.
+- ⚠️ **"Prova 01 resolvida.pdf" ficou de fora de propósito.** Na Ensinio ele
+  estava anexado à própria Prova I (Revisões previdenciárias II) e é o cálculo
+  inteiro resolvido: anexar entregaria o gabarito. O script separa todo anexo
+  com "resolvid" no nome.
+- Arquivo acima de ~50 MB não sobe (teto do plano, independente do bucket):
+  foi **dividido em partes** sem perda (PDF por páginas, ZIP reempacotado), nunca
+  comprimido, porque processo escaneado fica ilegível. Vale para os 3 grandes
+  das aulas, que estavam pendentes desde a migração.
+- Admin: `/admin/avaliacoes/[id]` → campos de instruções e vídeo, e o cartão
+  "Arquivos da avaliação" (upload direto pelo navegador, link, remover).
+
 ## Tour guiado + Guia da plataforma — 2026-07-15
 Onboarding em duas peças: overlay com spotlight (8 passos) na primeira visita à home, e `/guia` (documentação viva, link no dropdown do avatar entre "Perfil público" e "Sair", ícone `IconeCompass` novo).
 

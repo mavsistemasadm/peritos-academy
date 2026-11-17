@@ -16,6 +16,34 @@ export type RespostaEnviada = {
   valor?: number;
 };
 
+// Arquivo da avaliação ("autos do caso"): link assinado de 60s gerado no
+// clique, mesmo padrão de baixarMaterialAula. Não precisa checar acesso aqui:
+// a leitura da linha e o createSignedUrl já passam pela RLS (tem_acesso_curso).
+export async function baixarMaterialAvaliacao(materialId: string): Promise<
+  { ok: true; url: string; externo: boolean } | { ok: false; erro: string }
+> {
+  const sb = await criarClienteServidor();
+  const { data: auth } = await sb.auth.getUser();
+  if (!auth?.user) return { ok: false, erro: "Faça login para baixar." };
+
+  const { data: material } = await sb
+    .from("avaliacao_materiais")
+    .select("id, nome, arquivo_url, link_url")
+    .eq("id", materialId)
+    .maybeSingle();
+  if (!material) return { ok: false, erro: "Arquivo indisponível." };
+  if (material.link_url) return { ok: true, url: material.link_url, externo: true };
+  if (!material.arquivo_url) return { ok: false, erro: "Arquivo indisponível." };
+
+  const { data: assinado, error } = await sb.storage
+    .from("materiais-aulas")
+    .createSignedUrl(material.arquivo_url, 60, { download: material.nome });
+  if (error || !assinado?.signedUrl) {
+    return { ok: false, erro: "Não foi possível gerar o link. Tente de novo." };
+  }
+  return { ok: true, url: assinado.signedUrl, externo: false };
+}
+
 export async function submeterAvaliacao(
   avaliacaoId: string,
   respostas: RespostaEnviada[]
