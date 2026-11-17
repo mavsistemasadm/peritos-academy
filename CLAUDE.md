@@ -245,7 +245,8 @@ suspeitar disso antes de procurar bug de dado.
 - Número via RPC `nextval_certificado()` (sequência `seq_certificado_numero`), formato `PA-{ano}-{5dígitos}`
 - Constraint `uq_cert_usuario_curso unique(usuario_id, curso_id)`
 - Popup animado com confetes randômicos ao completar
-- Lógica em `lib/certificados/gerar.ts` → `verificarEEmitirCertificado(supabase, userId, cursoId)`
+- **Quem emite é o banco** (desde 17/11/2026): `emitir_certificado_interno(usuario, curso)`, chamada por `gam_verificar_progresso_curso` no instante em que `gam_curso_completo` vira verdade, seja pela última aula, seja pela aprovação na avaliação. Antes só a tela da aula emitia, e curso que fecha numa avaliação ficava sem certificado. `lib/certificados/gerar.ts` agora só serve para abrir o popup (devolve `gerado` se o certificado nasceu há menos de 2 min). Retroativo: 85 certificados para 41 alunos.
+- ⚠️ `cert_publico` libera leitura de todo certificado emitido (verificação pública). Toda consulta de "meus certificados" PRECISA de `.eq('usuario_id', uid)`: o `/perfil` não filtrava e mostrava os 243 da plataforma para todo mundo.
 - Auditoria retroativa (2026-07-13): checado se havia aluno com curso completo sem certificado emitido (bug do `aula_concluida` fantasma) — plataforma ainda pré-lançamento, `aula_progresso` está zerada, nenhum caso pendente
 
 ## Materiais complementares das aulas

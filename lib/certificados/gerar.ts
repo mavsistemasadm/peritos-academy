@@ -25,15 +25,30 @@ export async function verificarEEmitirCertificado(
   if (!curso || !curso.emite_certificado) return { gerado: false }
 
   // 2. Já tem certificado emitido?
+  //    Desde 17/11/2026 quem emite é o banco (emitir_certificado_interno, chamado
+  //    por gam_verificar_progresso_curso no instante da conclusão, seja por aula
+  //    ou por avaliação). Quando a tela chega aqui o certificado já existe:
+  //    se nasceu agora há pouco, devolve como "gerado" só para abrir o popup.
   const { data: certExistente } = await supabase
     .from('certificados')
-    .select('numero')
+    .select('numero, curso_titulo, nota, carga_horas, emitido_em')
     .eq('usuario_id', userId)
     .eq('curso_id', cursoId)
     .not('numero', 'is', null)
     .maybeSingle()
 
-  if (certExistente) return { gerado: false }
+  if (certExistente) {
+    const recente = certExistente.emitido_em
+      && Date.now() - new Date(certExistente.emitido_em).getTime() < 2 * 60 * 1000
+    if (!recente) return { gerado: false }
+    return {
+      gerado: true,
+      numero: certExistente.numero,
+      curso_titulo: certExistente.curso_titulo ?? curso.titulo,
+      nota: certExistente.nota ?? undefined,
+      carga_horas: certExistente.carga_horas ?? undefined,
+    }
+  }
 
   // 3. Curso 100% completo (aulas + avaliações)? Checagem única via RPC
   //    (fonte da verdade compartilhada com o motor de gamificação —

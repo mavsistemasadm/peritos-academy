@@ -145,7 +145,10 @@ export async function carregarPerfil(): Promise<DadosPerfil | null> {
   ] = await Promise.all([
     supabase.from('perfis').select('*').eq('id', uid).single(),
     supabase.from('perfil_insignias').select('*').order('ordem'),
-    supabase.from('certificados').select('*').order('ordem'),
+    // ⚠️ filtro por usuário é obrigatório: as policies cert_publico deixam
+    // qualquer um ler certificado emitido (verificação pública), então sem o
+    // .eq a pessoa via os 243 certificados da plataforma inteira no perfil.
+    supabase.from('certificados').select('*').eq('usuario_id', uid).not('numero', 'is', null).order('emitido_em', { ascending: false }),
     supabase.from('aula_anotacoes').select('id', { count: 'exact', head: true }),
     supabase.from('email_preferencias').select('receber_emails').eq('usuario_id', uid).maybeSingle(),
     supabase.from('gamificacao_niveis').select('ordem, nome, pontos_minimos').order('ordem'),
