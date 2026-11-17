@@ -400,16 +400,24 @@ export default function PerfilContent({ dados, nav }: { dados: DadosPerfil; nav:
                   <div className="cert-txt">
                     <span className="eyebrow">Certificado · nº {c.numero}</span>
                     <b>{c.curso_titulo}</b>
-                    <p className="meta num">Emitido em {c.emitido_rotulo} · nota final {c.nota?.toLocaleString('pt-BR', { minimumFractionDigits: 1 })} · {c.carga_horas}h</p>
+                    <p className="meta num">
+                      {/* Só o que existe: nota em branco e "· h" apareciam para quase todos
+                          (curso sem avaliação não tem nota; nenhum curso tem carga preenchida). */}
+                      {[
+                        `Emitido em ${c.emitido_rotulo}`,
+                        c.nota != null ? `nota final ${c.nota.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}` : null,
+                        c.carga_horas ? `${c.carga_horas}h` : null,
+                      ].filter(Boolean).join(' · ')}
+                    </p>
                     <div className="cert-acoes">
                       <button className="mini-btn" onClick={() => copiar(`${location.origin}/certificado/${c.numero}`, c.numero!)}>
                         <IconeLink size={12} strokeWidth={2.2} />
                         {copiado === c.numero ? <><IconeCheck size={12} /> Copiado</> : 'Copiar link de verificação'}
                       </button>
-                      <button className="mini-btn">
+                      <a className="mini-btn" href={`/certificado/${c.numero}/pdf`} download>
                         <IconeDownload size={12} strokeWidth={2.2} />
                         PDF
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </div>

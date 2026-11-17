@@ -7169,3 +7169,28 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
   .autos-instrucoes{padding:var(--s-3)}
 }
 @media(prefers-reduced-motion:reduce){.autos-gaveta,.autos-gaveta-corpo{animation:none}}
+
+/* ═══ /certificado/[numero] · verificação pública (2026-11-17) ═══ */
+.pagina-certificado{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 16px;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(32,217,166,.10),transparent 70%),radial-gradient(ellipse 50% 40% at 100% 100%,rgba(54,220,209,.06),transparent 70%),var(--carvao,#070908);
+  color:var(--creme,#F1F2DF);font-family:Inter,system-ui,sans-serif}
+.pagina-certificado .pc-cartao{position:relative;width:100%;max-width:640px;padding:48px 40px 36px;text-align:center;
+  border:1px solid var(--linha,rgba(241,242,223,.12));border-radius:var(--r-card,20px);background:var(--preto-elev,rgba(255,255,255,.03));overflow:hidden}
+.pagina-certificado .pc-cartao::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,var(--verde,#20D9A6),var(--ciano,#36DCD1),var(--lima,#DDF784))}
+.pagina-certificado .pc-valido{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--r-pill,999px);
+  background:rgba(32,217,166,.12);color:var(--verde,#20D9A6);font-size:12px;font-weight:600;letter-spacing:.02em}
+.pagina-certificado .pc-eyebrow{margin:24px 0 28px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cinza,#989E99)}
+.pagina-certificado .pc-rotulo{margin:0;font-size:14px;color:var(--cinza,#989E99)}
+.pagina-certificado .pc-nome{margin:8px 0 18px;font-size:clamp(26px,5vw,36px);font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.pagina-certificado .pc-curso{margin:8px 0 28px;font-size:clamp(18px,3.4vw,22px);font-weight:600;line-height:1.3;color:var(--creme,#F1F2DF)}
+.pagina-certificado .pc-dados{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;margin:0 0 28px;
+  border:1px solid var(--linha-suave,rgba(241,242,223,.08));border-radius:14px;overflow:hidden;background:var(--linha-suave,rgba(241,242,223,.08))}
+.pagina-certificado .pc-dados div{padding:14px 12px;background:var(--carvao,#070908)}
+.pagina-certificado .pc-dados dt{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--cinza,#989E99)}
+.pagina-certificado .pc-dados dd{margin:4px 0 0;font-size:14px;font-weight:600}
+.pagina-certificado .pc-acoes{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:16px}
+.pagina-certificado .pc-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:var(--r-pill,999px);
+  background:var(--verde,#20D9A6);color:var(--carvao,#070908);font-weight:600;font-size:14px;text-decoration:none;transition:transform .15s,filter .15s}
+.pagina-certificado .pc-btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.pagina-certificado .pc-link{font-size:14px;color:var(--cinza-claro,#B9BFB8);text-decoration:underline;text-underline-offset:3px}
+@media(max-width:640px){.pagina-certificado .pc-cartao{padding:40px 20px 28px}}
