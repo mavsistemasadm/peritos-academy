@@ -7171,7 +7171,8 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
 @media(prefers-reduced-motion:reduce){.autos-gaveta,.autos-gaveta-corpo{animation:none}}
 
 /* ═══ /certificado/[numero] · verificação pública (2026-11-17) ═══ */
-.pagina-certificado{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 16px;
+.pagina-certificado .pc-arte{display:block;width:100%;max-width:960px;height:auto;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.55);background:#0b0f0d}
+.pagina-certificado{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:48px 16px;
   background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(32,217,166,.10),transparent 70%),radial-gradient(ellipse 50% 40% at 100% 100%,rgba(54,220,209,.06),transparent 70%),var(--carvao,#070908);
   color:var(--creme,#F1F2DF);font-family:Inter,system-ui,sans-serif}
 .pagina-certificado .pc-cartao{position:relative;width:100%;max-width:640px;padding:48px 40px 36px;text-align:center;
@@ -7181,8 +7182,8 @@ body:has(.pagina-anamnese) .rodape-global{display:none}
   background:rgba(32,217,166,.12);color:var(--verde,#20D9A6);font-size:12px;font-weight:600;letter-spacing:.02em}
 .pagina-certificado .pc-eyebrow{margin:24px 0 28px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cinza,#989E99)}
 .pagina-certificado .pc-rotulo{margin:0;font-size:14px;color:var(--cinza,#989E99)}
-.pagina-certificado .pc-nome{margin:8px 0 18px;font-size:clamp(26px,5vw,36px);font-weight:700;letter-spacing:-.02em;line-height:1.15}
-.pagina-certificado .pc-curso{margin:8px 0 28px;font-size:clamp(18px,3.4vw,22px);font-weight:600;line-height:1.3;color:var(--creme,#F1F2DF)}
+.pagina-certificado .pc-nome{margin:22px 0 6px;font-size:clamp(22px,4vw,28px);font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.pagina-certificado .pc-curso{margin:0 0 24px;font-size:16px;font-weight:400;line-height:1.4;color:var(--cinza-claro,#B9BFB8)}
 .pagina-certificado .pc-dados{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;margin:0 0 28px;
   border:1px solid var(--linha-suave,rgba(241,242,223,.08));border-radius:14px;overflow:hidden;background:var(--linha-suave,rgba(241,242,223,.08))}
 .pagina-certificado .pc-dados div{padding:14px 12px;background:var(--carvao,#070908)}

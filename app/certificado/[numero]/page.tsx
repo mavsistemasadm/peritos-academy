@@ -21,13 +21,13 @@ export default async function PaginaCertificado({ params }: { params: Promise<{ 
 
   return (
     <main className="pagina-certificado">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="pc-arte" src={`/certificado/${c.numero}/imagem`} width={1123} height={794}
+        alt={`Certificado de ${c.nome}, ${c.cursoTitulo}`} />
       <div className="pc-cartao">
         <span className="pc-valido"><IconeCheck size={14} strokeWidth={2.4} /> Certificado válido</span>
 
-        <p className="pc-eyebrow">Certificado de conclusão · Peritos Academy</p>
-        <p className="pc-rotulo">Certificamos que</p>
         <h1 className="pc-nome">{c.nome}</h1>
-        <p className="pc-rotulo">concluiu com aproveitamento o curso</p>
         <h2 className="pc-curso">{c.cursoTitulo}</h2>
 
         <dl className="pc-dados">

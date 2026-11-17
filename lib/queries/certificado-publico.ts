@@ -19,6 +19,20 @@ export type CertificadoPublico = {
   peritoSlug: string | null
 }
 
+/**
+ * Nome gravado todo em maiúsculas ("SAMARA APARECIDA DA SILVA") vira a forma
+ * normal ("Samara Aparecida da Silva"), com as partículas em minúscula. Nome
+ * já escrito com maiúsculas e minúsculas fica exatamente como a pessoa digitou.
+ */
+export function nomeParaCertificado(nome: string) {
+  const limpo = nome.trim().replace(/\s+/g, ' ')
+  if (limpo !== limpo.toUpperCase() || limpo === limpo.toLowerCase()) return limpo
+  const particulas = new Set(['da', 'de', 'do', 'das', 'dos', 'e'])
+  return limpo.toLowerCase().split(' ').map((p, i) =>
+    i > 0 && particulas.has(p) ? p : p.charAt(0).toUpperCase() + p.slice(1)
+  ).join(' ')
+}
+
 const FORMATO_NUMERO = /^PA-\d{4}-\d{5}$/
 
 export async function carregarCertificadoPublico(numeroBruto: string): Promise<CertificadoPublico | null> {
@@ -36,7 +50,7 @@ export async function carregarCertificadoPublico(numeroBruto: string): Promise<C
 
   return {
     numero: c.numero,
-    nome: (c.nome ?? '').trim() || 'Aluno Peritos Academy',
+    nome: nomeParaCertificado(c.nome ?? '') || 'Aluno Peritos Academy',
     cursoTitulo: c.curso_titulo ?? '',
     cursoSlug: c.curso_slug ?? null,
     nota: c.nota == null ? null : Number(c.nota),
